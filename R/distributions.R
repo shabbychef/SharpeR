@@ -9,12 +9,23 @@
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
-
+#
+#' @include utils.R
 source("utils.R")
 
 # Sharpe Ratio as a distribution
 # dsr, psr, qsr, rsr#FOLDUP
 #' the (non-central) Sharpe Ratio
+#'
+#' @usage
+#'
+#' dsr(x, df, snr, opy, log = FALSE)
+#'
+#' psr(q, df, snr, opy, lower.tail = TRUE, log.p = FALSE) 
+#'
+#' qsr(p, df, snr, opy, lower.tail = TRUE, log.p = FALSE) 
+#'
+#' rsr(n, df, snr, opy)
 #'
 #' @param x vector of quantiles.
 #' @param q vector of quantiles.
@@ -22,41 +33,47 @@ source("utils.R")
 #' @param n number of observations. 
 #' @param df the number of observations the statistic is based on.
 #' @param snr the 'signal-to-noise' parameter, defined as the population
-#         mean divided by the population standard deviation, 'annualized'.
+#'        mean divided by the population standard deviation, 'annualized'.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{snr} are quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @keywords distribution 
 #' @return NA
-#' @usage 
-#'   does this go on and on?
 #' @aliases psr qsr rsr
 #' @references none
 #' @seealso t-distribution functions, \code{\link{dt},\link{pt},\link{qt},\link{rt}}
 #' @export 
 #' @author Steven E. Pav <shabbychef@@gmail.com>
-#' @examples none
+#' @examples \dontrun{
+#' rvs <- rsr(2048, 253*6, 0, 253)
+#' dvs <- dsr(rvs, 253*6, 0, 253)
+#' pvs <- psr(rvs, 253*6, 0, 253)
+#' plot(ecdf(pvs))
+#' pvs <- psr(rvs, 253*6, 1, 253)
+#' plot(ecdf(pvs))
+#'}
 dsr <- function(x, df, snr, opy, log = FALSE) {
 	if (!missing(opy)) {
 		x <- .deannualize(x,opy)
 		if (!missing(snr)) { snr <- .deannualize(x,opy) }
 	}
 
-  tx <- .sr_to_t(x, df)
-  if (missing(snr)) {
-    xd <- dt(tx, df = df - 1, log = log)
-  } else {
-    ncp <- .sr_to_t(snr, df)
-    xd <- dt(tx, df = df - 1, ncp = ncp, log = log)
-  }
-  if (log) {
-    retv <- xd + log(.d_sr_to_t(snr, df))    
-  } else {
-    retv <- xd * .d_sr_to_t(snr, df)
-  }
-  return(retv)  
+	tx <- .sr_to_t(x, df)
+	if (missing(snr)) {
+		xd <- dt(tx, df = df - 1, log = log)
+	} else {
+		ncp <- .sr_to_t(snr, df)
+		xd <- dt(tx, df = df - 1, ncp = ncp, log = log)
+	}
+	if (log) {
+		retv <- xd + log(.d_sr_to_t(snr, df))		
+	} else {
+		retv <- xd * .d_sr_to_t(snr, df)
+	}
+	return(retv)	
 }
+#' @export 
 psr <- function(q, df, snr, opy, ...) {
 	if (!missing(opy)) {
 		q <- .deannualize(q, opy)
@@ -64,75 +81,85 @@ psr <- function(q, df, snr, opy, ...) {
 			snr <- .deannualize(snr, opy)
 		}
 	}
-  tq <- .sr_to_t(q, df)
-  if (missing(snr)) {
-    retv <- pt(q = tq, df = df - 1, ...)    
-  } else {
-    ncp <- .sr_to_t(snr, df)
-    retv <- pt(q = tq, df = df - 1, ncp = ncp, ...)    
-  }
-  return(retv)  
+	tq <- .sr_to_t(q, df)
+	if (missing(snr)) {
+		retv <- pt(q = tq, df = df - 1, ...)		
+	} else {
+		ncp <- .sr_to_t(snr, df)
+		retv <- pt(q = tq, df = df - 1, ncp = ncp, ...)		
+	}
+	return(retv)	
 }
+#' @export 
 qsr <- function(p, df, snr, opy, lower.tail = TRUE, log.p = FALSE) {
 	if (!missing(opy) && !missing(snr)) {
 		snr <- .deannualize(snr, opy)
 	}
-  if (missing(snr)) {
-    tq <- qt(p, df = df - 1, lower.tail = lower.tail, log.p = log.p)
-  } else {
-    ncp <- .sr_to_t(snr, df)
-    tq <- qt(p, df = df - 1, ncp = ncp, 
-             lower.tail = lower.tail, log.p = log.p)
-  }
-  retv <- .t_to_sr(tq, df)
+	if (missing(snr)) {
+		tq <- qt(p, df = df - 1, lower.tail = lower.tail, log.p = log.p)
+	} else {
+		ncp <- .sr_to_t(snr, df)
+		tq <- qt(p, df = df - 1, ncp = ncp, 
+						 lower.tail = lower.tail, log.p = log.p)
+	}
+	retv <- .t_to_sr(tq, df)
 	# annualize
 	if (!missing(opy)) {
 		retv <- .annualize(retv, opy)
 	}
-  return(retv)
+	return(retv)
 }
+#' @export 
 rsr <- function(n, df, snr, opy) {
 	if (!missing(opy) && !missing(snr)) {
 		snr <- .deannualize(snr, opy)
 	}
-  if (missing(snr)) {
-    tr <- rt(n, df = df - 1)
-  } else {
-    ncp <- .sr_to_t(snr, df)
-    tr <- rt(n, df = df - 1, ncp = ncp) 
-  }
-  retv <- .t_to_sr(tr, df)
+	if (missing(snr)) {
+		tr <- rt(n, df = df - 1)
+	} else {
+		ncp <- .sr_to_t(snr, df)
+		tr <- rt(n, df = df - 1, ncp = ncp) 
+	}
+	retv <- .t_to_sr(tr, df)
 	# annualize
 	if (!missing(opy)) {
 		retv <- .annualize(retv, opy)
 	}
-  return(retv)
+	return(retv)
 }
 #UNFOLD
 
 # Hotelling
 # dT2, pT2, qT2, rT2#FOLDUP
-#' the (non-central) Hotelling T^2 distribution on a df1-vector with
+#' the (non-central) Hotelling \deqn{T^2}{T2} distribution on a df1-vector with
 #' df2-observations.
+#'
+#' @usage
+#'
+#' dT2(x, df1, df2, delta2, opy, log = FALSE)
+#'
+#' pT2(q, df1, df2, delta2, opy, lower.tail = TRUE, log.p = FALSE) 
+#'
+#' qT2(p, df1, df2, delta2, opy, lower.tail = TRUE, log.p = FALSE) 
+#'
+#' rT2(n, df1, df2, delta2, opy)
 #'
 #' @param x vector of quantiles.
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
 #' @param n number of observations. 
 #' @param df1 the dimension of the vector space from which multivariate
-#         observations had been drawn.
+#'        observations had been drawn.
 #' @param df2 the number of observations.
 #' @param delta2 the non-centrality parameter, defined as 
-#'        delta^2 = df2 * (mu' Sigma^{-1} mu) for population parameters
-#'        defaults to 0, i.e. a central T^2 distribution.
+#'        delta^2 = \deqn{df2 * (\mu' \Sigma^{-1} \mu)}{df2 * (mu' Sigma^-1 mu)} for population parameters
+#'        defaults to 0, i.e. a central \deqn{T^2}{T2} distribution.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{delta2} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @keywords distribution 
 #' @return NA
-#' @usage 
-#'   does this go on and on?
 #' @aliases pT2 qT2 rT2
 #' @references none
 #' @seealso F-distribution functions, \code{\link{df},\link{pf},\link{qf},\link{rf}}
@@ -159,6 +186,7 @@ dT2 <- function(x, df1, df2, delta2, opy, log = FALSE) {
 	}
 	return(retv)
 }
+#' @export 
 pT2 <- function(q, df1, df2, delta2, opy, ...) {
 	if (!missing(opy)) {
 		q <- .deannualize2(q, opy)
@@ -174,6 +202,7 @@ pT2 <- function(q, df1, df2, delta2, opy, ...) {
 	}
 	return(retv)
 }
+#' @export 
 qT2 <- function(p, df1, df2, delta2, opy, lower.tail = TRUE, log.p = FALSE) {
 	if (!missing(opy) && !missing(delta2)) {
 		delta2 <- .deannualize2(delta2, opy)
@@ -196,6 +225,7 @@ qT2 <- function(p, df1, df2, delta2, opy, lower.tail = TRUE, log.p = FALSE) {
 	}
 	return(retv)
 }
+#' @export 
 rT2 <- function(n, df1, df2, delta2, opy) {
 	if (!missing(opy) && !missing(delta2)) {
 		delta2 <- .deannualize2(delta2, opy)
@@ -218,6 +248,16 @@ rT2 <- function(n, df1, df2, delta2, opy) {
 #' the (non-central) maximal Sharpe Ratio distribution on df1-assets with
 #' df2-observations.
 #'
+#' @usage
+#'
+#' dsrstar(x, df1, df2, snrstar, opy, log = FALSE)
+#'
+#' psrstar(q, df1, df2, snrstar, opy, lower.tail = TRUE, log.p = FALSE) 
+#'
+#' qsrstar(p, df1, df2, snrstar, opy, lower.tail = TRUE, log.p = FALSE) 
+#'
+#' rsrstar(n, df1, df2, snrstar, opy)
+#'
 #' @param x vector of quantiles.
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
@@ -225,7 +265,8 @@ rT2 <- function(n, df1, df2, delta2, opy) {
 #' @param df1 the number of assets in the portfolio.
 #' @param df2 the number of observations.
 #' @param snrstar the non-centrality parameter, defined as 
-#'        snrstart = sqrt(mu' Sigma^{-1} mu) for population parameters
+#'        \deqn{snrstar = \sqrt{\mu' \Sigma^{-1} \mu}}{snrstar = sqrt(mu' Sigma^-1 mu)}
+#'        for population parameters
 #'        defaults to 0, i.e. a central sr^* distribution.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{snrstar} are quoted in 'annualized' units, that is, per 'year',
@@ -233,18 +274,17 @@ rT2 <- function(n, df1, df2, delta2, opy) {
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @keywords distribution 
 #' @return NA
-#' @usage 
-#'   does this go on and on?
 #' @aliases psrstar qsrstar rsrstar
 #' @references none
-#' @seealso F-distribution functions, \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
+#' @seealso Hotelling T2-distribution functions, \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
 #' @export 
 #' @author Steven E. Pav <shabbychef@@gmail.com>
-#' @examples 
-#' \dontrun rvs <- rsrstar(2048, 8, 253*6, 0, 253)
-#' \dontrun hist(rvs)
-#' \dontrun isp <- psrstar(rvs, 8, 253*6, 0, 253)
-#'           
+#' @examples \dontrun{
+#' rvs <- rsrstar(2048, 8, 253*6, 0, 253)
+#' hist(rvs)
+#' isp <- psrstar(rvs, 8, 253*6, 0, 253)
+#'}
+#' @export 
 dsrstar <- function(x, df1, df2, snrstar, opy, log = FALSE) {
 	x.T2 <- .srstar_to_T2(x, df2)
 	if (missing(snrstar)) {
@@ -260,6 +300,7 @@ dsrstar <- function(x, df1, df2, snrstar, opy, log = FALSE) {
 	}
 	return(retv)
 }
+#' @export 
 psrstar <- function(q, df1, df2, snrstar, ...) {
 	q.T2 <- .srstar_to_T2(q, df2)
 	if (missing(snrstar)) {
@@ -270,6 +311,7 @@ psrstar <- function(q, df1, df2, snrstar, ...) {
 	retv <- pT2(q.T2, df1, df2, delta2, ...)
 	return(retv)
 }
+#' @export 
 qsrstar <- function(p, df1, df2, snrstar, ...) {
 	if (missing(snrstar)) {
 		delta2 = 0.0
@@ -280,6 +322,7 @@ qsrstar <- function(p, df1, df2, snrstar, ...) {
 	retv <- .T2_to_srstar(q.T2, df2)
 	return(retv)
 }
+#' @export 
 rsrstar <- function(n, df1, df2, snrstar, ...) {
 	if (missing(snrstar)) {
 		delta2 = 0.0
@@ -292,6 +335,6 @@ rsrstar <- function(n, df1, df2, snrstar, ...) {
 }
 #UNFOLD
 
-
+# standard errors and confidence intervals
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:
