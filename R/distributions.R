@@ -10,8 +10,8 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 #
-#' @include utils.R
-source("utils.R")
+#         @include utils.R
+#source("utils.R")
 
 # Sharpe Ratio as a distribution
 # dsr, psr, qsr, rsr#FOLDUP
@@ -27,8 +27,7 @@ source("utils.R")
 #'
 #' rsr(n, df, snr, opy)
 #'
-#' @param x vector of quantiles.
-#' @param q vector of quantiles.
+#' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
 #' @param n number of observations. 
 #' @param df the number of observations the statistic is based on.
@@ -38,10 +37,15 @@ source("utils.R")
 #'        \code{snr} are quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#'        \eqn{P[X \le x]}{P\[X <= x\]}, otherwise, \eqn{P[X > x]}{P\[X > x\]}.
 #' @keywords distribution 
-#' @return NA
+#' @return \code{dsr} gives the density, \code{psr} gives the distribution function,
+#' \code{qsr} gives the quantile function, and \code{rsr} generates random deviates.
+#'
+#' Invalid arguments will result in return value \code{NaN} with a warning.
 #' @aliases psr qsr rsr
-#' @references none
 #' @seealso t-distribution functions, \code{\link{dt},\link{pt},\link{qt},\link{rt}}
 #' @export 
 #' @author Steven E. Pav <shabbychef@@gmail.com>
@@ -131,7 +135,7 @@ rsr <- function(n, df, snr, opy) {
 
 # Hotelling
 # dT2, pT2, qT2, rT2#FOLDUP
-#' the (non-central) Hotelling \deqn{T^2}{T2} distribution on a df1-vector with
+#' the (non-central) Hotelling \eqn{T^2}{T2} distribution on a df1-vector with
 #' df2-observations.
 #'
 #' @usage
@@ -144,28 +148,38 @@ rsr <- function(n, df, snr, opy) {
 #'
 #' rT2(n, df1, df2, delta2, opy)
 #'
-#' @param x vector of quantiles.
-#' @param q vector of quantiles.
+#' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
 #' @param n number of observations. 
 #' @param df1 the dimension of the vector space from which multivariate
 #'        observations had been drawn.
 #' @param df2 the number of observations.
 #' @param delta2 the non-centrality parameter, defined as 
-#'        delta^2 = \deqn{df2 * (\mu' \Sigma^{-1} \mu)}{df2 * (mu' Sigma^-1 mu)} for population parameters
-#'        defaults to 0, i.e. a central \deqn{T^2}{T2} distribution.
+#'        \eqn{delta^2 = df_2 * (\mu' \Sigma^{-1} \mu)}{delta^2 = df2 * (mu' Sigma^-1 mu)} for population parameters
+#'        defaults to 0, i.e. a central \eqn{T^2}{T2} distribution.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{delta2} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lower.tail logical; if TRUE (default), probabilities are
 #' @keywords distribution 
-#' @return NA
-#' @aliases pT2 qT2 rT2
-#' @references none
+#' @return \code{dT2} gives the density, \code{pT2} gives the distribution function,
+#' \code{qT2} gives the quantile function, and \code{rT2} generates random deviates.
+#'
+#' Invalid arguments will result in return value \code{NaN} with a warning.
+#' @aliases pT2 qT2 rT2 
 #' @seealso F-distribution functions, \code{\link{df},\link{pf},\link{qf},\link{rf}}
 #' @export 
 #' @author Steven E. Pav <shabbychef@@gmail.com>
-#' @examples none
+#' @examples \dontrun{
+#' rvs <- rT2(2048, 4, 253*6, 0, 253)
+#' dvs <- dT2(rvs, 4, 253*6, 0, 253)
+#' pvs <- pT2(rvs, 4, 253*6, 0, 253)
+#' plot(ecdf(pvs))
+#' pvs <- pT2(rvs, 4, 253*6, 1, 253)
+#' plot(ecdf(pvs))
+#' }
 dT2 <- function(x, df1, df2, delta2, opy, log = FALSE) {
 	if (!missing(opy)) {
 		x <- .deannualize2(x, opy)
@@ -258,31 +272,37 @@ rT2 <- function(n, df1, df2, delta2, opy) {
 #'
 #' rsrstar(n, df1, df2, snrstar, opy)
 #'
-#' @param x vector of quantiles.
-#' @param q vector of quantiles.
+#' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
 #' @param n number of observations. 
 #' @param df1 the number of assets in the portfolio.
 #' @param df2 the number of observations.
 #' @param snrstar the non-centrality parameter, defined as 
-#'        \deqn{snrstar = \sqrt{\mu' \Sigma^{-1} \mu}}{snrstar = sqrt(mu' Sigma^-1 mu)}
+#'        \eqn{snr^{*} = \sqrt{\mu' \Sigma^{-1} \mu}}{snrstar = sqrt(mu' Sigma^-1 mu)}
 #'        for population parameters
 #'        defaults to 0, i.e. a central sr^* distribution.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{snrstar} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lower.tail logical; if TRUE (default), probabilities are
 #' @keywords distribution 
-#' @return NA
+#' @return \code{dsrstar} gives the density, \code{psrstar} gives the distribution function,
+#' \code{qsrstar} gives the quantile function, and \code{rsrstar} generates random deviates.
+#'
+#' Invalid arguments will result in return value \code{NaN} with a warning.
 #' @aliases psrstar qsrstar rsrstar
-#' @references none
 #' @seealso Hotelling T2-distribution functions, \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
 #' @export 
 #' @author Steven E. Pav <shabbychef@@gmail.com>
 #' @examples \dontrun{
+#' # generate some variates 
 #' rvs <- rsrstar(2048, 8, 253*6, 0, 253)
 #' hist(rvs)
+#' # these should be uniform:
 #' isp <- psrstar(rvs, 8, 253*6, 0, 253)
+#' plot(ecdf(isp))
 #'}
 #' @export 
 dsrstar <- function(x, df1, df2, snrstar, opy, log = FALSE) {
