@@ -1,4 +1,10 @@
 
 # for testing, ignore these
 ./man
+./man/*
+
+.tags
+.R_tags
+
+.*.swp
 

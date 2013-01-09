@@ -6,9 +6,7 @@
 # Created: 2012.12.28
 #
 
-OWNER  				     = shabbychef@gmail.com
-
-# sto
+# all stolen
 
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
@@ -31,6 +29,9 @@ else
 test_tags:=
 endif
 
+# do not distribute these!
+EXTRA_FILES = Makefile rebuildTags.sh .gitignore .tags .R_tags
+EXTRA_DIRS = .git
 
 .PHONY: help news
 
@@ -40,11 +41,11 @@ help:
 	@echo ""
 	@echo "Development Tasks"
 	@echo "-----------------"
+	@echo "  tags       Build the ctags, for dev purposes"
 	@echo "  deps       Install dependencies for package development"
 	@echo "  docs       Invoke roxygen to generate Rd files in a seperate"
 	@echo "             directory"
-	@echo "  news       Create NEWS.Rd and NEWS.pdf from NEWS.md. Requires"
-	@echo "             GHC and Pandoc to be installed."
+	@echo "  news       Create NEWS.Rd and NEWS.pdf from NEWS.md. 2FIX!"
 	@echo "  vignette   Build a copy of the package vignette"
 	@echo "  build      Invoke docs and then create a package"
 	@echo "  check      Invoke build and then check the package"
@@ -65,18 +66,25 @@ help:
 # Development Tasks
 #------------------------------------------------------------------------------
 
+tags:
+	./rebuildTags.sh
+
 # Set a default CRAN mirror because otherwise R refuses to install anything.
 deps:
 	"$(RBIN)/R" --slave -e "options(repos = c(CRAN = 'http://cran.cnr.Berkeley.edu'));install.packages(c('roxygen2','testthat'))"
 
 
 docs:
-	cd ..;\
-		"$(RBIN)/R" --vanilla --slave -e "library(roxygen2); roxygenize('$(PKGSRC)', '$(PKGSRC).build', overwrite=TRUE, unlink.target=TRUE)"
+	cd .. ; \
+		"$(RBIN)/R" --vanilla --slave -e "library(roxygen2); roxygenize('$(PKGSRC)', '$(PKGSRC).build', overwrite=TRUE, unlink.target=TRUE)"; \
+		cd -;
 	# Cripple the new folder so you don't get confused and start doing
 	# development in there.
-	cd ../$(PKGSRC).build;\
-		rm GNUmakefile
+	cd ../$(PKGSRC).build ; \
+		rm $(EXTRA_FILES); \
+		rm -rf $(EXTRA_DIRS); \
+		rm -f `find . -name '.*.swp'`; \
+		cd -;
 
 news: NEWS.pdf
 
