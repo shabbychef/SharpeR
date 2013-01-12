@@ -23,13 +23,13 @@
 # changelog: 
 #
 # Created: 2012.05.19
-# Copyright: Steven E. Pav, 2012-2012
+# Copyright: Steven E. Pav, 2012-2013
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
 #         @include utils.R
-#source("utils.R")
+source("utils.R")
 
 # 2FIX: is df the # of observations or the d.f. of the t-stat? ack!
 
@@ -90,6 +90,11 @@
 #' Invalid arguments will result in return value \code{NaN} with a warning.
 #' @aliases psr qsr rsr
 #' @seealso t-distribution functions, \code{\link{dt}, \link{pt}, \link{qt}, \link{rt}}
+#' @note
+#' This is a thin wrapper on the t distribution. 
+#' The functions \code{\link{dt}, \link{pt}, \link{qt}} can accept ncp from
+#' limited range (\eqn{|\delta|\le 37.62}{delta <= 37.62}). Some corrections
+#' may have to be made here for large \code{snr}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @references 
@@ -203,20 +208,15 @@ rsr <- function(n, df, snr, opy) {
 #' The (non-central) T-squared distribution is a (non-central) F distribution
 #' up to scaling which depends on \eqn{q}{q} and \eqn{n}{n}.
 #'
-#' Here we assume that the sample statistic has been \emph{annualized}
-#' in the same manner as the Sharpe ratio (see \code{\link{dsr}}), that
-#' is, by multiplying by \eqn{p}{p}, the number of observations per
-#' epoch.
-#'
 #' @usage
 #'
-#' dT2(x, df1, df2, delta2, opy, log = FALSE)
+#' dT2(x, df1, df2, delta2, log = FALSE)
 #'
-#' pT2(q, df1, df2, delta2, opy, lower.tail = TRUE, log.p = FALSE) 
+#' pT2(q, df1, df2, delta2, lower.tail = TRUE, log.p = FALSE) 
 #'
-#' qT2(p, df1, df2, delta2, opy, lower.tail = TRUE, log.p = FALSE) 
+#' qT2(p, df1, df2, delta2, lower.tail = TRUE, log.p = FALSE) 
 #'
-#' rT2(n, df1, df2, delta2, opy)
+#' rT2(n, df1, df2, delta2)
 #'
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
@@ -228,10 +228,6 @@ rsr <- function(n, df, snr, opy) {
 #' @param delta2 the population non-centrality parameter, defined as 
 #'        \eqn{\delta^2 = n \mu^{\top}\Sigma^{-1}\mu}{delta^2 = n (mu' Sigma^-1 mu)}.
 #'        defaults to 0, i.e. a central \eqn{T^2}{T2} distribution.
-#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{delta2} are quoted in 'annualized' units, that is, per 'year',
-#'        but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
@@ -247,11 +243,17 @@ rsr <- function(n, df, snr, opy) {
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @note
 #' This is a thin wrapper on the F distribution, provided for convenience.
-#' The annualization should just go away.
 #' @references 
 #' Wikipedia contributors, 'Hotelling's T-squared distribution', Wikipedia, The Free Encyclopedia, 
 #' 11 December 2012, 13:38 UTC, \url{http://en.wikipedia.org/w/index.php?title=Hotelling\%27s_T-squared_distribution\&oldid=527530524}
 #' [accessed 9 January 2013]
+#'
+#' Martin Bilodeau and David Brenner, 'Theory of Multivariate Statistics (Springer Texts in Statistics),'
+#' Springer, 1999. \url{http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.172.3290}
+#'
+#' Neil. H. Timm, 'Applied multivariate analysis: methods and case studies (Springer Texts in Statistics),'
+#' Physica-Verlag, 2002. \url{http://books.google.com/books?id=vtiyg6fnnskC}
+#'
 #' @examples \dontrun{
 #' rvs <- rT2(2048, 4, 253*6, 0, 253)
 #' dvs <- dT2(rvs, 4, 253*6, 0, 253)
@@ -260,13 +262,7 @@ rsr <- function(n, df, snr, opy) {
 #' pvs <- pT2(rvs, 4, 253*6, 1, 253)
 #' plot(ecdf(pvs))
 #' }
-dT2 <- function(x, df1, df2, delta2, opy, log = FALSE) {
-	if (!missing(opy)) {
-		x <- .deannualize2(x, opy)
-		if (!missing(delta2)) {
-			delta2 <- .deannualize2(delta2, opy)
-		}
-	}
+dT2 <- function(x, df1, df2, delta2, log = FALSE) {
 	Fs <- .T2_to_F(x, df1, df2)
 	if (missing(delta2)) {
 		dv <- df(Fs, df1 = df1, df2 = df2 - df1, log = log)
@@ -281,13 +277,7 @@ dT2 <- function(x, df1, df2, delta2, opy, log = FALSE) {
 	return(retv)
 }
 #' @export 
-pT2 <- function(q, df1, df2, delta2, opy, ...) {
-	if (!missing(opy)) {
-		q <- .deannualize2(q, opy)
-		if (!missing(delta2)) {
-			delta2 <- .deannualize2(delta2, opy)
-		}
-	}
+pT2 <- function(q, df1, df2, delta2, ...) {
 	Fs <- .T2_to_F(q, df1, df2)
 	if (missing(delta2)) {
 		retv <- pf(Fs, df1 = df1, df2 = df2 - df1, ncp = 0, ...)
@@ -297,10 +287,7 @@ pT2 <- function(q, df1, df2, delta2, opy, ...) {
 	return(retv)
 }
 #' @export 
-qT2 <- function(p, df1, df2, delta2, opy, lower.tail = TRUE, log.p = FALSE) {
-	if (!missing(opy) && !missing(delta2)) {
-		delta2 <- .deannualize2(delta2, opy)
-	}
+qT2 <- function(p, df1, df2, delta2, lower.tail = TRUE, log.p = FALSE) {
 	if (log.p) {
 		Fp <- .logT2_to_logF(p, df1, df2)
 	} else {
@@ -314,25 +301,16 @@ qT2 <- function(p, df1, df2, delta2, opy, lower.tail = TRUE, log.p = FALSE) {
 						 lower.tail = lower.tail, log.p = log.p)
 	}
 	retv <- .F_to_T2(Fq, df1, df2)
-	if (!missing(opy)) {
-		retv <- .annualize2(retv,opy)
-	}
 	return(retv)
 }
 #' @export 
-rT2 <- function(n, df1, df2, delta2, opy) {
-	if (!missing(opy) && !missing(delta2)) {
-		delta2 <- .deannualize2(delta2, opy)
-	}
+rT2 <- function(n, df1, df2, delta2) {
 	if (missing(delta2)) {
 		Fr <- rf(n, df1 = df1, df2 = df2 - df1)
 	} else {
 		Fr <- rf(n, df1 = df1, df2 = df2 - df1, ncp = delta2)
 	}
 	retv <- .F_to_T2(Fr, df1, df2)
-	if (!missing(opy)) {
-		retv <- .annualize2(retv,opy)
-	}
 	return(retv)
 }
 #UNFOLD
@@ -353,6 +331,10 @@ rT2 <- function(n, df1, df2, delta2, opy) {
 #' portfolio maximizes the (sample) Sharpe Ratio over all static portfolios,
 #' and thus \eqn{z}{z} is the maximal achievable Sharpe Ratio.
 #'
+#' Here we assume that the sample statistic has been \emph{annualized}
+#' in the same manner as the Sharpe ratio (see \code{\link{dsr}}), that
+#' is, by multiplying by \eqn{p}{p}, the number of observations per
+#' epoch.
 #'
 #' @usage
 #'
@@ -402,13 +384,19 @@ rT2 <- function(n, df1, df2, delta2, opy) {
 #'}
 #' @export 
 dsrstar <- function(x, df1, df2, snrstar, opy, log = FALSE) {
+	if (!missing(opy)) {
+		x <- .deannualize(x, opy)
+		if (!missing(snrstar)) {
+			snrstar <- .deannualize(snrstar, opy)
+		}
+	}
 	x.T2 <- .srstar_to_T2(x, df2)
 	if (missing(snrstar)) {
 		delta2 <- 0
 	} else {
 		delta2 <- .srstar_to_T2(snrstar, df2)
 	}
-	d.T2 <- dT2(x.T2, df1, df2, delta2, opy=opy, log=log)
+	d.T2 <- dT2(x.T2, df1, df2, delta2, log=log)
 	if (log) {
 		retv <- (d.T2 - log(.d_T2_to_srstar(x, df2)))
 	} else {
@@ -417,7 +405,13 @@ dsrstar <- function(x, df1, df2, snrstar, opy, log = FALSE) {
 	return(retv)
 }
 #' @export 
-psrstar <- function(q, df1, df2, snrstar, ...) {
+psrstar <- function(q, df1, df2, snrstar, opy, ...) {
+	if (!missing(opy)) {
+		q <- .deannualize(q, opy)
+		if (!missing(snrstar)) {
+			snrstar <- .deannualize(snrstar, opy)
+		}
+	}
 	q.T2 <- .srstar_to_T2(q, df2)
 	if (missing(snrstar)) {
 		delta2 = 0.0
@@ -428,31 +422,45 @@ psrstar <- function(q, df1, df2, snrstar, ...) {
 	return(retv)
 }
 #' @export 
-qsrstar <- function(p, df1, df2, snrstar, ...) {
+qsrstar <- function(p, df1, df2, snrstar, opy, ...) {
 	if (missing(snrstar)) {
 		delta2 = 0.0
 	} else {
+		if (!missing(opy)) {
+			snrstar <- .deannualize(snrstar, opy)
+		}
 		delta2 <- .srstar_to_T2(snrstar, df2)
 	}
 	q.T2 <- qT2(p, df1, df2, delta2, ...)
 	retv <- .T2_to_srstar(q.T2, df2)
+	if (!missing(opy)) {
+		retv <- .annualize(retv,opy)
+	}
 	return(retv)
 }
 #' @export 
-rsrstar <- function(n, df1, df2, snrstar, ...) {
+rsrstar <- function(n, df1, df2, snrstar, opy, ...) {
 	if (missing(snrstar)) {
 		delta2 = 0.0
 	} else {
+		if (!missing(opy)) {
+			snrstar <- .deannualize(snrstar, opy)
+		}
 		delta2 <- .srstar_to_T2(snrstar, df2)
 	}
 	r.T2 <- rT2(n, df1, df2, delta2, ...) 
 	retv <- .T2_to_srstar(r.T2, df2)
+	if (!missing(opy)) {
+		retv <- .annualize(retv,opy)
+	}
 	return(retv)
 }
 #UNFOLD
 
-# confidence distributions 
+# confidence distributions?
 
+# lambda prime
+# plambdap, qlambdap#FOLDUP
 #' @title The lambda-prime distribution.
 #'
 #' @description 
@@ -499,6 +507,10 @@ rsrstar <- function(n, df1, df2, snrstar, ...) {
 #' Bruno Lecoutre, 'Another Look at the Confidence Intervals for
 #' the Noncentral T Distribution,' J. Mod. Appl. Stat. Meth., vol. 6, no. 1,
 #' pp 107-116, 2007, \url{http://www.univ-rouen.fr/LMRS/Persopage/Lecoutre/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
+#' @note
+#' \code{plambdap} should be an increasing function of the argument \code{q},
+#' and decreasing in \code{tstat}. \code{qlambdap} should be increasing
+#' in \code{p}
 #' @examples \dontrun{
 #' rvs <- rnorm(2048)
 #' pvs <- plambdap(rvs, 253*6, 0.5)
@@ -513,41 +525,177 @@ plambdap <- function(q,df,tstat,lower.tail=TRUE,...) {
 	retv <- pt(q=tstat,df=df,ncp=q,lower.tail=!lower.tail,...)
 	return(retv)
 }
+#' @export 
 qlambdap <- function(p,df,tstat,lower.tail=TRUE,log.p=FALSE) {
-	if (log.p) {
-		flo <- min(-1,tstat - qnorm((1 + p)/2))
-		fhi <- max(1,tstat - qnorm((p)/2))
-	} else {
+	maxl <- max(unlist(lapply(list(p,df,tstat),length))) 
+	if (maxl < 2) {
+		# create a function increasing in its argument that
+		# we wish to zero
+		if (lower.tail) {
+			zerf <- function(q) {
+				return(plambdap(q,df=df,tstat=tstat,lower.tail=lower.tail,log.p=log.p) - p)
+			}
+		} else {
+			zerf <- function(q) {
+				return(p - plambdap(q,df=df,tstat=tstat,lower.tail=lower.tail,log.p=log.p))
+			}
+		}
+		zmax = 2 * max(qnorm(p,lower.tail=TRUE,log.p=log.p),qnorm(p,lower.tail=FALSE,log.p=log.p))
+		flo <- min(-1,tstat - zmax)
+		fhi <- max( 1,tstat + zmax)
 
+		#find approximate endpoints;
+		#expand them until pt(tstat,df,flo) > p and pt(tstat,df,fhi) < p
+		FLIM <- 1e8
+		while ((zerf(flo) > 0) && (flo > -FLIM)) { flo <- 2 * flo }
+		while ((zerf(fhi) < 0) && (fhi < FLIM))  { fhi <- 2 * fhi }
+
+		ncp <- uniroot(zerf,c(flo,fhi))
+		return(ncp$root)
+	} else {
+		# crap! have to vectorize it smarter than this, I am afraid. bleah.
+		#retv <- vapply(p,function(x){ qlambdap(x,df,tstat,lower.tail,log.p) },c(0))
+		retv <- rep(0,maxl)
+		for (iii in seq(1,maxl)) {
+			retv[iii] <- qlambdap(p[1 + (iii-1) %% length(p)],
+														df[1 + (iii-1) %% length(df)],
+														tstat[1 + (iii-1) %% length(tstat)],
+														lower.tail,log.p)
+		}
+		return(retv)
 	}
-	# 2FIX: log.p not respected. bleah. lower.tail? bleah.
-	#find approximate endpoints;
-	#expand them until pt(tstat,df,flo) > p and pt(tstat,df,fhi) < p
-	while ((pt(tstat,df,flo,lower.tail,log.p) < p) && (flo > -100000)) { flo <- 2 * flo }
-	while ((pt(tstat,df,fhi,lower.tail,log.p) > p) && (fhi < 100000)) { fhi <- 2 * fhi }
-	ncp <- uniroot(function(ncp)(pt(tstat,df=df,ncp=ncp,lower.tail=lower.tail,log.p=log.p) - p),
-								 c(flo,fhi))
-	return(ncp$root)
+}
+#UNFOLD
+#qlambdap(0.1,128,2)
+#qlambdap(c(0.1),128,2)
+#qlambdap(c(0.1,0.2),128,2)
+#qlambdap(c(0.1,0.2),c(128,253),2)
+#qlambdap(c(0.1,0.2),c(128,253),c(2,4))
+#qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
+
+# inference
+
+# compute an unbiased estimator of the non-centrality parameter
+.F_ncp_unbiased <- function(Fs,df1,df2) {
+	ncp.unb <- (Fs * (df2 - 2) * df1 / df2) - v1
+	return(ncp.unbiased)
+}
+#MLE of the ncp based on a single F-stat
+.F_ncp_MLE <- function(Fs,df1,df2,ub=NULL,lb=0) {
+	if (Fs <= 1) { return(0.0) }  # Spruill's Thm 3.1, eqn 8
+	max.func <- function(z) { df(Fs,df1,df2,ncp=z,log=TRUE) }
+
+	if (is.null(ub)) {
+		prevdpf <- -Inf
+		ub <- 1
+		dpf <- max.func(ub)
+		while (prevdpf < dpf) {
+			prevdpf <- dpf
+			ub <- 2 * ub
+			dpf <- max.func(ub)
+		}
+		lb <- ifelse(ub > 2,ub/4,lb)
+	}
+	ncp.MLE <- optimize(max_func,c(lb,ub),maximum=TRUE)$maximum;
+	return(ncp.MLE)
+}
+# KRS estimator of the ncp based on a single F-stat
+.F_ncp_KRS <- function(Fs,df1,df2) {
+	xbs <- Fs * (df1/df2)
+	delta0 <- (df2 - 2) * xbs - df1
+	phi2 <- 2 * xbs * (df2 - 2) / (df1 + 2)
+	delta2 <- max(delta0,phi2)
+	return(delta2)
 }
 
-
-
+#' @title Inference on noncentrality parameter of observed F statistic
+#'
+#' @description 
+#'
+#' Let \eqn{F}{F} be an observed statistic distributed as a non-central F with 
+#' \eqn{\nu_1}{df1}, \eqn{\nu_2}{df2} degrees of freedom and non-centrality 
+#' parameter \eqn{\delta^2}{delta^2}. Three methods are presented to
+#' estimate the non-centrality parameter from the statistic:
+#'
+#' \itemize{
+#' \item an unbiased estimator, which, unfortunately, may be negative.
+#' \item the Maximum Likelihood Estimator, which may be zero, but not
+#' negative.
+#' \item the estimator of Kubokawa, Roberts, and Shaleh (KRS), which
+#' is a shrinkage estimator.
+#' }
+#'
+#' Since a Hotelling distribution is equivalent to the F-distribution
+#' up to scaling, the same estimators can be used to estimate the 
+#' non-centrality parameter of a non-central Hotelling T-squared statistic.
+#'
+#' @usage
+#'
+#' F_ncp_est(Fs, df1, df2, type=c("KRS","MLE","unbiased"))
+#'
+#' T2_ncp_est(T2,df1,df2,...) 
+#'
+#' @param Fs a (non-central) F statistic.
+#' @param T2 a (non-central) Hotelling T-squared statistic.
+#' @param df1 the numerator degrees of freedom.
+#' @param df2 the denominator degrees of freedom.
+#' @param type the estimator type. one of \code{"KRS", "MLE", "unbiased"}
+#' @keywords htest
+#' @return an estimate of the non-centrality parameter.
+#' @aliases T2_ncp_est
+#' @seealso F-distribution functions, \code{\link{df}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @references 
+#' T. Kubokawa, C. P. Robert and A. K. Md. E. Saleh, 'Estimation of
+#' noncentrality Parameters,' The Canadian Journal of Statistics / La Revue Canadienne de Statistique
+#' Vol. 21, No. 1 (Mar., 1993), pp. 45-57. \url{http://www.jstor.org/stable/3315657}
+#'
+#' M. C. Spruill, 'Computation of the maximum likelihood estimate of a noncentrality parameter,'
+#' Journal of Multivariate Analysis, Vol. 18, No. 2 (1986), pp. 216-224. 
+#'  \url{http://www.sciencedirect.com/science/article/pii/0047259X86900709}
+#'
+#' @examples \dontrun{
+#' rvs <- rf(1024, 4, 1000, 5)
+#' unbs <- F_ncp_est(rvs, 4, 1000, type="unbiased")
+#'}
+F_ncp_est <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
+	# type defaults to "KRS":
+	type <- match.arg(type)
+	Fncp <- switch(type,
+								 MLE = .F_ncp_MLE(Fs,df1,df2),
+								 KRS = .F_ncp_KRS(Fs,df1,df2),
+								 unbiased = .F_ncp_unbiased(Fs,df1,df2))
+	return(Fncp)
+}
+#' @export 
+T2_ncp_est <- function(T2,df1,df2,...) {
+	Fs <- .T2_to_F(T2, df1, df2)
+	Fdf1 <- df1
+	Fdf2 <- df2 - df1
+	retv <- F_ncp_est(Fs,Fdf1,Fdf2,...)
+	# the NCP is legit
+	retv <- Fncp
+	return(retv)
+}
 
 # junkyard
 
-
 ########################################################################
-## expectation of the t:#FOLDUP
-# the geometric bias of Sharpe ratio
-f_tbias <- function(n) { 
+# expectation of the t:#FOLDUP
+# the geometric bias of Sharpe ratio; this is 1 over 'c4'
+# http://mathworld.wolfram.com/StandardDeviationDistribution.html
+# http://finzi.psych.upenn.edu/R/library/IQCC/html/c4.html
+# http://math.stackexchange.com/questions/71573/the-limit-of-the-ratio-of-two-gammax-functions
+.tbias <- function(n) { 
 	sqrt((n-1) / 2) * exp(lgamma((n-2)/2) - lgamma((n-1)/2))
 }
 
-#approximate tbias
-f_apx_tbias1 <- function(n) { 
+#approximate tbias; don't need these, likely.
+.apx_tbias1 <- function(n) { 
 	1 + (0.75 / n)
 }
-f_apx_tbias2 <- function(n) { 
+.apx_tbias2 <- function(n) { 
 #1 + (0.75 / n) + (2 / n**2)
 	1 + (0.75 / (n - 1)) + (32 / (25 * ((n-1) ** 2)))
 }
@@ -602,6 +750,8 @@ f_treqsize <- function(rho,powr = 0.80,alpha = 0.05) {
 ########################################################################
 #inversions#FOLDUP
 
+#
+#
 #find the non-centrality parameter; that is, find
 #ncp such that pt(t,df,ncp) = alpha
 f_nct_cdf_ncp <- function(t,df,alpha) {
@@ -662,30 +812,60 @@ f_sqrt_ncf_apx_pow <- function(df1,df2,ncp,alpha = 0.05) {
 }
 
 
+# to get a hotelling statistic from n x k matrix x:
+# myt <- summary(manova(lm(x ~ 1)),test="Hotelling-Lawley",intercept=TRUE)
+#              Df Hotelling-Lawley approx F num Df den Df Pr(>F)
+#(Intercept)   1          0.00606     1.21      5    995    0.3
+#
+# HLT <- myt$stats[1,"Hotelling-Lawley"]
+#
+# myt <- summary(manova(lm(x ~ 1)),intercept=TRUE)
+# HLT <- sum(myt$Eigenvalues) #?
+# ...
+# 
+
+
+	
+
 
 ########################################################################
 # confidence intervals
 
 ## confidence intervals on the Sharpe Ratio#FOLDUP
 
+# standard errors
 #the sample.sr should *not* be annualized
-f_sr_se_shab <- function(sample.sr,n) {
-	cn <- f_tbias(n)
+.sr_se_weirdo <- function(sample.sr,n) {
+	cn <- .tbias(n)
 	dn <- (n-1) / ((n-3) * cn * cn)
 	W  <- (sample.sr / cn) ** 2
 	se <- sqrt((dn/n) + W * (dn - 1))
+	return(se)
 }
 
-f_sr_se_walck <- function(sample.sr,n) {
+.sr_se_walck <- function(sample.sr,n) {
 	se <- sqrt((1/n) + 0.5 * sample.sr ** 2 / (n - 1))
+	return(se)
 }
 
-f_sr_se_lo <- function(sample.sr,n) {
+.sr_se_lo <- function(sample.sr,n) {
 	se <- sqrt((1 + 0.5 * sample.sr ** 2) / (n - 1))
+	return(se)
 }
+
+#'@export
+sr_se <- function(sr,n,type=c("Walck","Lo","weirdo")) {
+	type <- match.arg(type)
+	se <- switch(type,
+							 Walck = .sr_se_walck(sr,n),
+							 Lo = .sr_se_lo(sr,n),
+							 weirdo = .sr_se_weirdo(sr,n))
+	return(se)
+}
+
 
 f_sr_ci_shab <- function(sample.sr,n,alpha = 0.05) {
-	cn <- f_tbias(n)
+	cn <- .tbias(n)
 	medv <- sample.sr / cn
 	se <- f_sr_se_shab(sample.sr,n)
 	zalp <- qnorm(1 - alpha / 2)
@@ -773,24 +953,6 @@ fncp.ci <- function(F,df1,df2,alpha.lo=0.025,alpha.hi=1-alpha.lo) {
 	return(list('lo' = cilo,'hi' = cihi))
 }
 
-#MLE of the ncp based on a single F-stat
-fncp.mle <- function(Fs,df1,df2,ub=NULL,lb=0) {
-	if (Fs <= 1) { return(0.0) }  # Spruill's Thm 3.1, eqn 8
-	if (is.null(ub)) {
-		prevdpf <- -Inf
-		ub <- 1
-		dpf <- df(Fs,df1,df2,ncp=ub,log=TRUE)
-		while (prevdpf < dpf) {
-			prevdpf <- dpf
-			ub <- 2 * ub
-			dpf <- df(Fs,df1,df2,ncp=ub,log=TRUE)
-		}
-		lb <- ifelse(ub > 2,ub/4,lb)
-	}
-	ncp.mle <- optimize(function(ncp){df(Fs,df1,df2,ncp=ncp,log=TRUE)},
-											c(lb,ub),maximum=TRUE)$maximum;
-	return(ncp.mle)
-}
 #UNFOLD
 
 # inference on Hotelling's ncp, by extension#FOLDUP
