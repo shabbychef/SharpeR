@@ -28,19 +28,100 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
-test_that("p function monotonicity",{
+test_that("pfoo/qfoo monotonicity",{#FOLDUP
 	set.seed(as.integer(charToRaw("1ccb4a05-fd09-43f7-a692-80deebfd67f4")))
 	
-	df <- 128
-	q1 <- 0.2
-	q2 <- 0.4
-	for (opy in c(1,12,52,253)) {
-		p1 <- psr(q1,df,opy=opy)
-		p2 <- psr(q2,df,opy=opy)
-		expect_true(p1 <= p2)
+	# psr
+	ps <- seq(0.1,0.9,length.out=9)
+	for (df in c(256,1024)) {
+		for (snr in c(0,1)) {
+			for (opy in c(1,52)) {
+				for (lp in c(TRUE,FALSE)) {
+					if (lp) { checkps <- log(ps) } else { checkps <- ps }
+					for (lt in c(TRUE,FALSE)) {
+						qs <- qsr(checkps, df, snr, opy, lower.tail=lt, log.p=lp)
+						if (lt) { 
+							expect_true(!is.unsorted(qs))
+						} else {
+							expect_true(!is.unsorted(rev(qs)))
+						}
+						pret <- psr(qs, df, snr, opy, lower.tail=lt, log.p=lp)
+						expect_equal(checkps,pret)
+					}
+				}
+			}
+		}
 	}
-})
-test_that("qlambdap sensible",{
+	# pT2
+	ps <- seq(0.1,0.9,length.out=9)
+	for (df1 in c(2,4,8)) {
+		for (df2 in c(256,1024)) {
+			for (delta2 in c(0,0.02)) {
+				for (lp in c(TRUE,FALSE)) {
+					if (lp) { checkps <- log(ps) } else { checkps <- ps }
+					for (lt in c(TRUE,FALSE)) {
+						qs <- qT2(checkps, df1, df2, delta2, lower.tail=lt, log.p=lp)
+						if (lt) { 
+							expect_true(!is.unsorted(qs))
+						} else {
+							expect_true(!is.unsorted(rev(qs)))
+						}
+						pret <- pT2(qs, df1, df2, delta2, lower.tail=lt, log.p=lp)
+						expect_equal(checkps,pret)
+					}
+				}
+			}
+		}
+	}
+	# psrstar
+	ps <- seq(0.1,0.9,length.out=9)
+	for (df1 in c(2,4,8)) {
+		for (df2 in c(256,1024)) {
+			for (snrstar in c(0,0.05)) {
+				for (opy in c(1,2)) {
+					for (drag in c(0,0.1)) {
+						for (lp in c(TRUE,FALSE)) {
+							if (lp) { checkps <- log(ps) } else { checkps <- ps }
+							for (lt in c(TRUE,FALSE)) {
+								qs <- qsrstar(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								if (lt) { 
+									expect_true(!is.unsorted(qs))
+								} else {
+									expect_true(!is.unsorted(rev(qs)))
+								}
+								pret <- psrstar(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								expect_equal(checkps,pret)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	# plambdap
+	ps <- seq(0.1,0.9,length.out=9)
+	for (df in c(4,8,16)) {
+		for (tstat in c(-1,0,1)) {
+			for (lp in c(TRUE,FALSE)) {
+				if (lp) { checkps <- log(ps) } else { checkps <- ps }
+				for (lt in c(TRUE,FALSE)) {
+					qs <- qlambdap(checkps, df, tstat, lower.tail=lt, log.p=lp)
+					if (lt) { 
+						expect_true(!is.unsorted(qs))
+					} else {
+						expect_true(!is.unsorted(rev(qs)))
+					}
+					pret <- plambdap(qs, df, tstat, lower.tail=lt, log.p=lp)
+					expect_equal(checkps,pret,tolerance=1e-4)
+				}
+			}
+		}
+	}
+})#UNFOLD
+
+# 2FIX: monotonicity wrt parameters...
+
+test_that("qlambdap sensible",{#FOLDUP
 	set.seed(as.integer(charToRaw("77141b84-05df-4e90-a726-a7788b9d89bf")))
 	
 	df <- 128
@@ -51,7 +132,7 @@ test_that("qlambdap sensible",{
 		tstat <- sapply(tvals,function(t) { return(qlambdap(p,df,t)) })
 		expect_equal(mean(tstat >= true.ncp),p,tolerance=0.05)
 	}
-})
+})#UNFOLD
 
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:

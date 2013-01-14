@@ -8,5 +8,5 @@ Title: Rat-arb
 Description: a collection of tools for analyzing significance of trading
     strategies, based on the Sharpe ratio and overfit of same.
 Collate:
-    'utils.R'
-    'distributions.R'
+    'utils.r'
+    'distributions.r'

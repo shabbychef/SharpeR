@@ -29,7 +29,7 @@
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
 #         @include utils.R
-source("utils.R")
+#source("utils.r")
 
 # 2FIX: is df the # of observations or the d.f. of the t-stat? ack!
 
@@ -42,19 +42,21 @@ source("utils.R")
 #' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a normal random
 #' variable with mean \eqn{\mu}{mu} and variance \eqn{\sigma^2}{sigma^2}.
 #' Let \eqn{\bar{x}}{xbar} be the sample mean, and \eqn{s}{s} be
-#' the sample standard deviation (using Bessel's correction). Then
-#' \eqn{z = \frac{\bar{x}}{s}}{z = xbar/s} is the (sample) Sharpe Ratio.
+#' the sample standard deviation (using Bessel's correction). Let \eqn{c_0}{c0}
+#' be the 'risk free rate'.  Then
+#' \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} 
+#' is the (sample) Sharpe Ratio.
 #' 
 #' The units of \eqn{z}{z} is \eqn{\mbox{time}^{-1/2}}{per root time}.
 #' Typically the Sharpe Ratio is \emph{annualized} by multiplying by
 #' \eqn{\sqrt{p}}{sqrt(p)}, where \eqn{p}{p} is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
-#' Letting \eqn{z = \sqrt{p}\frac{\bar{x}}{s}}{z = sqrt(p) xbar/s},
+#' Letting \eqn{z = \sqrt{p}\frac{\bar{x}-c_0}{s}}{z = sqrt(p)(xbar - c0)/s},
 #' where the sample estimates are based on \eqn{n}{n} observations, 
 #' then \eqn{z}{z} takes a (non-central) Sharpe Ratio distribution
 #' with \eqn{n}{n} 'degrees of freedom', non-centrality parameter
-#' \eqn{\delta = \frac{\mu}{\sigma}}{delta = mu/sigma}, and 
+#' \eqn{\delta = \frac{\mu - c_0}{\sigma}}{delta = (mu - c0)/sigma}, and 
 #' annualization parameter \eqn{p}{p}.
 #'
 #' @usage
@@ -105,14 +107,14 @@ source("utils.R")
 #' Andrew W. Lo, 'The Statistics of Sharpe Ratios,' Financial Analysts Journal,
 #' vol. 58, no. 4, 2002. \url{http://ssrn.com/paper=377260}
 #'
-#' @examples \dontrun{
+#' @examples 
 #' rvs <- rsr(2048, 253*6, 0, 253)
 #' dvs <- dsr(rvs, 253*6, 0, 253)
 #' pvs <- psr(rvs, 253*6, 0, 253)
 #' plot(ecdf(pvs))
 #' pvs <- psr(rvs, 253*6, 1, 253)
 #' plot(ecdf(pvs))
-#'}
+#'
 dsr <- function(x, df, snr, opy, log = FALSE) {
 	if (!missing(opy)) {
 		x <- .deannualize(x,opy)
@@ -254,14 +256,14 @@ rsr <- function(n, df, snr, opy) {
 #' Neil. H. Timm, 'Applied multivariate analysis: methods and case studies (Springer Texts in Statistics),'
 #' Physica-Verlag, 2002. \url{http://books.google.com/books?id=vtiyg6fnnskC}
 #'
-#' @examples \dontrun{
-#' rvs <- rT2(2048, 4, 253*6, 0, 253)
-#' dvs <- dT2(rvs, 4, 253*6, 0, 253)
-#' pvs <- pT2(rvs, 4, 253*6, 0, 253)
+#' @examples 
+#' rvs <- rT2(2048, 4, 253*6, 0)
+#' dvs <- dT2(rvs, 4, 253*6, 0)
+#' pvs <- pT2(rvs, 4, 253*6, 0)
 #' plot(ecdf(pvs))
-#' pvs <- pT2(rvs, 4, 253*6, 1, 253)
+#' pvs <- pT2(rvs, 4, 253*6, 1)
 #' plot(ecdf(pvs))
-#' }
+#' 
 dT2 <- function(x, df1, df2, delta2, log = FALSE) {
 	Fs <- .T2_to_F(x, df1, df2)
 	if (missing(delta2)) {
@@ -280,25 +282,20 @@ dT2 <- function(x, df1, df2, delta2, log = FALSE) {
 pT2 <- function(q, df1, df2, delta2, ...) {
 	Fs <- .T2_to_F(q, df1, df2)
 	if (missing(delta2)) {
-		retv <- pf(Fs, df1 = df1, df2 = df2 - df1, ncp = 0, ...)
+		#retv <- pf(Fs, df1 = df1, df2 = df2 - df1, ncp = 0, ...)
+		retv <- pf(Fs, df1 = df1, df2 = df2 - df1, ...)
 	} else {
 		retv <- pf(Fs, df1 = df1, df2 = df2 - df1, ncp = delta2, ...)
 	}
 	return(retv)
 }
 #' @export 
-qT2 <- function(p, df1, df2, delta2, lower.tail = TRUE, log.p = FALSE) {
-	if (log.p) {
-		Fp <- .logT2_to_logF(p, df1, df2)
-	} else {
-		Fp <- .T2tologF(p, df1, df2)
-	}
+qT2 <- function(p, df1, df2, delta2, ... ) {
 	if (missing(delta2)) {
-		Fq <- qf(Fp, df1 = df1, df2 = df2 - df2, ncp = 0,
-						 lower.tail = lower.tail, log.p = log.p)
+		#Fq <- qf(Fp, df1 = df1, df2 = df2 - df1, ncp = 0, ... )
+		Fq <- qf(p, df1 = df1, df2 = df2 - df1, ... )
 	} else {
-		Fq <- qf(Fp, df1 = df1, df2 = df2 - df2, ncp = delta2,
-						 lower.tail = lower.tail, log.p = log.p)
+		Fq <- qf(p, df1 = df1, df2 = df2 - df1, ncp = delta2, ... )
 	}
 	retv <- .F_to_T2(Fq, df1, df2)
 	return(retv)
@@ -324,27 +321,44 @@ rT2 <- function(n, df1, df2, delta2) {
 #' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
 #' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
 #' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
-#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). Then
-#' \eqn{z^2 = \bar{x}^{\top}S^{-1}\bar{x}}{z^2 = xbar' S^-1 xbar} is
-#' the squared (sample) Sharpe Ratio of the \emph{Markowitz portfolio}, 
-#' \eqn{w \propto_{+} S^{-1}\bar{x}}{w = S^-1 xbar}. The Markowitz
-#' portfolio maximizes the (sample) Sharpe Ratio over all static portfolios,
-#' and thus \eqn{z}{z} is the maximal achievable Sharpe Ratio.
+#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). Let
+#' \deqn{\zeta(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar - c0)/sqrt(w'Sw)}
+#' be the (sample) Sharpe Ratio of the portfolio \eqn{w}{w}, subject to 
+#' risk free rate \eqn{c_0}{c0}.
 #'
-#' Here we assume that the sample statistic has been \emph{annualized}
+#' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
+#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},}
+#' with maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* = zeta(w*)}.
+#' Then 
+#' \deqn{w_* = R \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
+#' w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)}
+#' and
+#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
+#' z* = sqrt(xbar' S^-1 xbar) - c0/R}
+#'
+#' The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe Ratio}
+#' distribution. For convenience, we may assume that the sample statistic
+#' has been annualized by 
 #' in the same manner as the Sharpe ratio (see \code{\link{dsr}}), that
 #' is, by multiplying by \eqn{p}{p}, the number of observations per
 #' epoch.
+#' 
+#' The distribution is parametrized by the number of independent observations,
+#' \eqn{n}, the number of assets, \eqn{q}, the noncentrality parameter,
+#' \eqn{\delta^2 = \mu^{\top}\Sigma^{-1}\mu}{delta^2 = mu' Sigma^-1 mu},
+#' the 'drag' term, \eqn{c_0/R}{c0/R}, and the annualization factor, \eqn{p}.
+#' The drag term makes this a location family of distributions, and 
+#' by default we assume it is zero.
 #'
 #' @usage
 #'
-#' dsrstar(x, df1, df2, snrstar, opy, log = FALSE)
+#' dsrstar(x, df1, df2, snrstar, opy, drag = 0, log = FALSE)
 #'
-#' psrstar(q, df1, df2, snrstar, opy, lower.tail = TRUE, log.p = FALSE) 
+#' psrstar(q, df1, df2, snrstar, opy, drag = 0, lower.tail = TRUE, log.p = FALSE) 
 #'
-#' qsrstar(p, df1, df2, snrstar, opy, lower.tail = TRUE, log.p = FALSE) 
+#' qsrstar(p, df1, df2, snrstar, opy, drag = 0, lower.tail = TRUE, log.p = FALSE) 
 #'
-#' rsrstar(n, df1, df2, snrstar, opy)
+#' rsrstar(n, df1, df2, snrstar, opy, drag = 0)
 #'
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
@@ -352,13 +366,16 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @param df1 the number of assets in the portfolio.
 #' @param df2 the number of observations.
 #' @param snrstar the non-centrality parameter, defined as 
-#'        \eqn{\zeta^{*} = \sqrt{\mu' \Sigma^{-1} \mu}}{zeta^* = sqrt(mu' Sigma^-1 mu)}
-#'        for population parameters
-#'        defaults to 0, i.e. a central maximal Sharpe Ratio distribution.
+#'        \eqn{\delta = \sqrt{\mu' \Sigma^{-1} \mu}}{delta = sqrt(mu' Sigma^-1 mu)}
+#'        for population parameters.
+#'        defaults to 0, \emph{i.e.} a central maximal Sharpe Ratio distribution.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{snrstar} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
+#'        that \code{drag} has been annualized, \emph{i.e.} is given in the
+#'        same units as \code{x} and \code{q}.
 #' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
@@ -374,16 +391,18 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @note
 #' This is a thin wrapper on the Hotelling T-squared distribution, provided for
 #' convenience.
-#' @examples \dontrun{
+#' @examples 
 #' # generate some variates 
 #' rvs <- rsrstar(2048, 8, 253*6, 0, 253)
 #' hist(rvs)
 #' # these should be uniform:
 #' isp <- psrstar(rvs, 8, 253*6, 0, 253)
 #' plot(ecdf(isp))
-#'}
-#' @export 
-dsrstar <- function(x, df1, df2, snrstar, opy, log = FALSE) {
+#'
+dsrstar <- function(x, df1, df2, snrstar, opy, drag = 0, log = FALSE) {
+	if (!missing(drag) && (drag != 0)) {
+		x <- x + drag
+	}
 	if (!missing(opy)) {
 		x <- .deannualize(x, opy)
 		if (!missing(snrstar)) {
@@ -405,7 +424,10 @@ dsrstar <- function(x, df1, df2, snrstar, opy, log = FALSE) {
 	return(retv)
 }
 #' @export 
-psrstar <- function(q, df1, df2, snrstar, opy, ...) {
+psrstar <- function(q, df1, df2, snrstar, opy, drag = 0, ...) {
+	if (!missing(drag) && (drag != 0)) {
+		q <- q + drag
+	}
 	if (!missing(opy)) {
 		q <- .deannualize(q, opy)
 		if (!missing(snrstar)) {
@@ -422,7 +444,7 @@ psrstar <- function(q, df1, df2, snrstar, opy, ...) {
 	return(retv)
 }
 #' @export 
-qsrstar <- function(p, df1, df2, snrstar, opy, ...) {
+qsrstar <- function(p, df1, df2, snrstar, opy, drag = 0, ...) {
 	if (missing(snrstar)) {
 		delta2 = 0.0
 	} else {
@@ -436,10 +458,13 @@ qsrstar <- function(p, df1, df2, snrstar, opy, ...) {
 	if (!missing(opy)) {
 		retv <- .annualize(retv,opy)
 	}
+	if (!missing(drag) && (drag != 0)) {
+		retv <- retv - drag
+	}
 	return(retv)
 }
 #' @export 
-rsrstar <- function(n, df1, df2, snrstar, opy, ...) {
+rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
 	if (missing(snrstar)) {
 		delta2 = 0.0
 	} else {
@@ -452,6 +477,9 @@ rsrstar <- function(n, df1, df2, snrstar, opy, ...) {
 	retv <- .T2_to_srstar(r.T2, df2)
 	if (!missing(opy)) {
 		retv <- .annualize(retv,opy)
+	}
+	if (!missing(drag) && (drag != 0)) {
+		retv <- retv - drag
 	}
 	return(retv)
 }
@@ -511,7 +539,7 @@ rsrstar <- function(n, df1, df2, snrstar, opy, ...) {
 #' \code{plambdap} should be an increasing function of the argument \code{q},
 #' and decreasing in \code{tstat}. \code{qlambdap} should be increasing
 #' in \code{p}
-#' @examples \dontrun{
+#' @examples 
 #' rvs <- rnorm(2048)
 #' pvs <- plambdap(rvs, 253*6, 0.5)
 #' plot(ecdf(pvs))
@@ -519,7 +547,7 @@ rsrstar <- function(n, df1, df2, snrstar, opy, ...) {
 #' plot(ecdf(pvs))
 #' pvs <- plambdap(rvs, 253*6, -0.5)
 #' plot(ecdf(pvs))
-#'}
+#'
 plambdap <- function(q,df,tstat,lower.tail=TRUE,...) {
 	# this is just a silly wrapper on pt
 	retv <- pt(q=tstat,df=df,ncp=q,lower.tail=!lower.tail,...)
@@ -577,8 +605,8 @@ qlambdap <- function(p,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 
 # compute an unbiased estimator of the non-centrality parameter
 .F_ncp_unbiased <- function(Fs,df1,df2) {
-	ncp.unb <- (Fs * (df2 - 2) * df1 / df2) - v1
-	return(ncp.unbiased)
+	ncp.unb <- (Fs * (df2 - 2) * df1 / df2) - df1
+	return(ncp.unb)
 }
 #MLE of the ncp based on a single F-stat
 .F_ncp_MLE <- function(Fs,df1,df2,ub=NULL,lb=0) {
@@ -655,10 +683,10 @@ qlambdap <- function(p,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 #' Journal of Multivariate Analysis, Vol. 18, No. 2 (1986), pp. 216-224. 
 #'  \url{http://www.sciencedirect.com/science/article/pii/0047259X86900709}
 #'
-#' @examples \dontrun{
+#' @examples 
 #' rvs <- rf(1024, 4, 1000, 5)
 #' unbs <- F_ncp_est(rvs, 4, 1000, type="unbiased")
-#'}
+#'
 F_ncp_est <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
 	# type defaults to "KRS":
 	type <- match.arg(type)

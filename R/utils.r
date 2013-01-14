@@ -59,6 +59,7 @@
 .d_T2_to_F <- function(T2, p, n) {
 	return((n - p) / (p * (n - 1)))
 }
+# don't need this?
 .logT2_to_logF <- function(logT2, p, n) {
 	return(logT2 + log(.T2_to_F(1, p, n)))  # correct but mildly inefficient
 }
