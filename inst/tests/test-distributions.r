@@ -28,6 +28,15 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
+# helper
+is.sorted <- function(xs,pragma=c("ascending","descending")) {
+	pragma <- match.arg(pragma)
+	retv <- switch(pragma,
+								 ascending = !is.unsorted(xs),
+								 descending = !is.unsorted(rev(xs)))
+	return(retv)
+}
+
 test_that("pfoo/qfoo monotonicity",{#FOLDUP
 	set.seed(as.integer(charToRaw("1ccb4a05-fd09-43f7-a692-80deebfd67f4")))
 	
@@ -41,9 +50,9 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 					for (lt in c(TRUE,FALSE)) {
 						qs <- qsr(checkps, df, snr, opy, lower.tail=lt, log.p=lp)
 						if (lt) { 
-							expect_true(!is.unsorted(qs))
+							expect_true(is.sorted(qs,pragma="ascending"))
 						} else {
-							expect_true(!is.unsorted(rev(qs)))
+							expect_true(is.sorted(qs,pragma="descending"))
 						}
 						pret <- psr(qs, df, snr, opy, lower.tail=lt, log.p=lp)
 						expect_equal(checkps,pret)
@@ -62,9 +71,9 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 					for (lt in c(TRUE,FALSE)) {
 						qs <- qT2(checkps, df1, df2, delta2, lower.tail=lt, log.p=lp)
 						if (lt) { 
-							expect_true(!is.unsorted(qs))
+							expect_true(is.sorted(qs,pragma="ascending"))
 						} else {
-							expect_true(!is.unsorted(rev(qs)))
+							expect_true(is.sorted(qs,pragma="descending"))
 						}
 						pret <- pT2(qs, df1, df2, delta2, lower.tail=lt, log.p=lp)
 						expect_equal(checkps,pret)
@@ -85,9 +94,9 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 							for (lt in c(TRUE,FALSE)) {
 								qs <- qsrstar(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
 								if (lt) { 
-									expect_true(!is.unsorted(qs))
+									expect_true(is.sorted(qs,pragma="ascending"))
 								} else {
-									expect_true(!is.unsorted(rev(qs)))
+									expect_true(is.sorted(qs,pragma="descending"))
 								}
 								pret <- psrstar(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
 								expect_equal(checkps,pret)
@@ -107,9 +116,9 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 				for (lt in c(TRUE,FALSE)) {
 					qs <- qlambdap(checkps, df, tstat, lower.tail=lt, log.p=lp)
 					if (lt) { 
-						expect_true(!is.unsorted(qs))
+						expect_true(is.sorted(qs,pragma="ascending"))
 					} else {
-						expect_true(!is.unsorted(rev(qs)))
+						expect_true(is.sorted(qs,pragma="descending"))
 					}
 					pret <- plambdap(qs, df, tstat, lower.tail=lt, log.p=lp)
 					expect_equal(checkps,pret,tolerance=1e-4)
@@ -119,6 +128,121 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 	}
 })#UNFOLD
 
+test_that("pfoo/qfoo parameter monotonicity",{#FOLDUP
+	set.seed(as.integer(charToRaw("5274138f-8db4-46bc-b015-08442166f22c")))
+	
+	# psr:
+	# snrs
+	snrs <- seq(-1,1,length.out=11)
+	ps <- 0.5
+	for (df in c(256,1024)) {
+		for (opy in c(1,12)) {
+			for (lp in c(TRUE,FALSE)) {
+				if (lp) { checkps <- log(ps) } else { checkps <- ps }
+				for (lt in c(TRUE,FALSE)) {
+					qs <- qsr(checkps, df, snrs, opy, lower.tail=lt, log.p=lp)
+					expect_true(is.sorted(qs,pragma="ascending"))
+				}
+			}
+		}
+	}
+	# opy
+	# in this case the nct ncp is decreasing so the bias is as well...
+	opy <- c(1,2,4,12,52,253)
+	ps <- 0.5
+	for (df in c(256,1024)) {
+		for (snr in c(0,1)) {
+			for (lp in c(TRUE,FALSE)) {
+				if (lp) { checkps <- log(ps) } else { checkps <- ps }
+				for (lt in c(TRUE,FALSE)) {
+					qs <- qsr(checkps, df, snr, opy, lower.tail=lt, log.p=lp)
+					expect_true(is.sorted(qs,pragma="descending"))
+				}
+			}
+		}
+	}
+	# df
+	# in this case the bias should decrease in the df...
+	df <- c(24,52,256,512,1024)
+	ps <- 0.5
+	for (opy in c(52,256)) {
+		for (snr in c(0,1)) {
+			for (lp in c(TRUE,FALSE)) {
+				if (lp) { checkps <- log(ps) } else { checkps <- ps }
+				for (lt in c(TRUE,FALSE)) {
+					qs <- qsr(checkps, df, snr, opy, lower.tail=lt, log.p=lp)
+					expect_true(is.sorted(qs,pragma="descending"))
+				}
+			}
+		}
+	}
+	
+	## pT2
+	#ps <- seq(0.1,0.9,length.out=9)
+	#for (df1 in c(2,4,8)) {
+		#for (df2 in c(256,1024)) {
+			#for (delta2 in c(0,0.02)) {
+				#for (lp in c(TRUE,FALSE)) {
+					#if (lp) { checkps <- log(ps) } else { checkps <- ps }
+					#for (lt in c(TRUE,FALSE)) {
+						#qs <- qT2(checkps, df1, df2, delta2, lower.tail=lt, log.p=lp)
+						#if (lt) { 
+							#expect_true(!is.unsorted(qs))
+						#} else {
+							#expect_true(!is.unsorted(rev(qs)))
+						#}
+						#pret <- pT2(qs, df1, df2, delta2, lower.tail=lt, log.p=lp)
+						#expect_equal(checkps,pret)
+					#}
+				#}
+			#}
+		#}
+	#}
+	## psrstar
+	#ps <- seq(0.1,0.9,length.out=9)
+	#for (df1 in c(2,4,8)) {
+		#for (df2 in c(256,1024)) {
+			#for (snrstar in c(0,0.05)) {
+				#for (opy in c(1,2)) {
+					#for (drag in c(0,0.1)) {
+						#for (lp in c(TRUE,FALSE)) {
+							#if (lp) { checkps <- log(ps) } else { checkps <- ps }
+							#for (lt in c(TRUE,FALSE)) {
+								#qs <- qsrstar(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								#if (lt) { 
+									#expect_true(!is.unsorted(qs))
+								#} else {
+									#expect_true(!is.unsorted(rev(qs)))
+								#}
+								#pret <- psrstar(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								#expect_equal(checkps,pret)
+							#}
+						#}
+					#}
+				#}
+			#}
+		#}
+	#}
+	## plambdap
+	#ps <- seq(0.1,0.9,length.out=9)
+	#for (df in c(4,8,16)) {
+		#for (tstat in c(-1,0,1)) {
+			#for (lp in c(TRUE,FALSE)) {
+				#if (lp) { checkps <- log(ps) } else { checkps <- ps }
+				#for (lt in c(TRUE,FALSE)) {
+					#qs <- qlambdap(checkps, df, tstat, lower.tail=lt, log.p=lp)
+					#if (lt) { 
+						#expect_true(!is.unsorted(qs))
+					#} else {
+						#expect_true(!is.unsorted(rev(qs)))
+					#}
+					#pret <- plambdap(qs, df, tstat, lower.tail=lt, log.p=lp)
+					#expect_equal(checkps,pret,tolerance=1e-4)
+				#}
+			#}
+		#}
+	#}
+})#UNFOLD
 # 2FIX: monotonicity wrt parameters...
 
 test_that("qlambdap sensible",{#FOLDUP
