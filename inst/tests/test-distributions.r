@@ -163,6 +163,9 @@ test_that("pfoo/qfoo parameter monotonicity",{#FOLDUP
 	}
 	# df
 	# in this case the bias should decrease in the df...
+	# see also Ghosh, B. K. "Some monotonicity theorems for χ 2, 
+	# F and t distributions with applications." Journal of the Royal 
+	# Statistical Society. Series B (Methodological) (1973): 480-492.
 	df <- c(24,52,256,512,1024)
 	ps <- 0.5
 	for (opy in c(52,256)) {

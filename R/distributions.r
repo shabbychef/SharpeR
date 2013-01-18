@@ -33,6 +33,8 @@
 
 # 2FIX: is df the # of observations or the d.f. of the t-stat? ack!
 
+# note: on citations, use the Chicago style from google scholar. tks.
+
 # Sharpe Ratio as a distribution
 # dsr, psr, qsr, rsr#FOLDUP
 #' @title The (non-central) Sharpe Ratio.
@@ -101,11 +103,11 @@
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @references 
 #'
-#' William F. Sharpe, 'Mutual Fund Performance,' Journal of Business, vol. 39, 
-#' p 119, 1965. \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+#' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
+#' \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 #' 
-#' Andrew W. Lo, 'The Statistics of Sharpe Ratios,' Financial Analysts Journal,
-#' vol. 58, no. 4, 2002. \url{http://ssrn.com/paper=377260}
+#' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal (2002): 36-52.
+#' \url{http://ssrn.com/paper=377260}
 #'
 #' @examples 
 #' rvs <- rsr(2048, 253*6, 0, 253)
@@ -246,15 +248,16 @@ rsr <- function(n, df, snr, opy) {
 #' @note
 #' This is a thin wrapper on the F distribution, provided for convenience.
 #' @references 
+#'
 #' Wikipedia contributors, 'Hotelling's T-squared distribution', Wikipedia, The Free Encyclopedia, 
 #' 11 December 2012, 13:38 UTC, \url{http://en.wikipedia.org/w/index.php?title=Hotelling\%27s_T-squared_distribution\&oldid=527530524}
 #' [accessed 9 January 2013]
 #'
-#' Martin Bilodeau and David Brenner, 'Theory of Multivariate Statistics (Springer Texts in Statistics),'
-#' Springer, 1999. \url{http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.172.3290}
+#' Bilodeau, Martin, and David Brenner. Theory of multivariate statistics. Springer, 1999.
+#' \url{http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.172.3290}
 #'
-#' Neil. H. Timm, 'Applied multivariate analysis: methods and case studies (Springer Texts in Statistics),'
-#' Physica-Verlag, 2002. \url{http://books.google.com/books?id=vtiyg6fnnskC}
+#' Timm, Neil H. Applied multivariate analysis: methods and case studies. Springer, 2002.
+#' \url{http://books.google.com/books?id=vtiyg6fnnskC}
 #'
 #' @examples 
 #' rvs <- rT2(2048, 4, 253*6, 0)
@@ -532,9 +535,11 @@ rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @references 
-#' Bruno Lecoutre, 'Another Look at the Confidence Intervals for
-#' the Noncentral T Distribution,' J. Mod. Appl. Stat. Meth., vol. 6, no. 1,
-#' pp 107-116, 2007, \url{http://www.univ-rouen.fr/LMRS/Persopage/Lecoutre/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
+#'
+#' Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
+#' Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107-116.
+#' \url{http://www.univ-rouen.fr/LMRS/Persopage/Lecoutre/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
+#'
 #' @note
 #' \code{plambdap} should be an increasing function of the argument \code{q},
 #' and decreasing in \code{tstat}. \code{qlambdap} should be increasing
@@ -675,13 +680,13 @@ qlambdap <- function(p,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @references 
-#' T. Kubokawa, C. P. Robert and A. K. Md. E. Saleh, 'Estimation of
-#' noncentrality Parameters,' The Canadian Journal of Statistics / La Revue Canadienne de Statistique
-#' Vol. 21, No. 1 (Mar., 1993), pp. 45-57. \url{http://www.jstor.org/stable/3315657}
 #'
-#' M. C. Spruill, 'Computation of the maximum likelihood estimate of a noncentrality parameter,'
-#' Journal of Multivariate Analysis, Vol. 18, No. 2 (1986), pp. 216-224. 
-#'  \url{http://www.sciencedirect.com/science/article/pii/0047259X86900709}
+#' Kubokawa, T., C. P. Robert, and A. K. Saleh. "Estimation of noncentrality parameters." 
+#' Canadian Journal of Statistics 21, no. 1 (1993): 45-57. \url{http://www.jstor.org/stable/3315657}
+#'
+#' Spruill, M. C. "Computation of the maximum likelihood estimate of a noncentrality parameter." 
+#' Journal of multivariate analysis 18, no. 2 (1986): 216-224.
+#' \url{http://www.sciencedirect.com/science/article/pii/0047259X86900709}
 #'
 #' @examples 
 #' rvs <- rf(1024, 4, 1000, 5)
