@@ -558,49 +558,42 @@ plambdap <- function(q,df,tstat,lower.tail=TRUE,...) {
 	retv <- pt(q=tstat,df=df,ncp=q,lower.tail=!lower.tail,...)
 	return(retv)
 }
-#' @export 
-qlambdap <- function(p,df,tstat,lower.tail=TRUE,log.p=FALSE) {
-	maxl <- max(unlist(lapply(list(p,df,tstat),length))) 
-	if (maxl < 2) {
-		# create a function increasing in its argument that
-		# we wish to zero
-		if (lower.tail) {
-			zerf <- function(q) {
-				return(plambdap(q,df=df,tstat=tstat,lower.tail=lower.tail,log.p=log.p) - p)
-			}
-		} else {
-			zerf <- function(q) {
-				return(p - plambdap(q,df=df,tstat=tstat,lower.tail=lower.tail,log.p=log.p))
-			}
+# create a scalar function that we later vectorize. 
+.qlambdap <- function(p,df,tstat,lower.tail=TRUE,log.p=FALSE) {
+	# create a function increasing in its argument that
+	# we wish to zero
+	if (lower.tail) {
+		zerf <- function(q) {
+			return(plambdap(q,df=df,tstat=tstat,lower.tail=lower.tail,log.p=log.p) - p)
 		}
-		zmax = 2 * max(qnorm(p,lower.tail=TRUE,log.p=log.p),qnorm(p,lower.tail=FALSE,log.p=log.p))
-		flo <- min(-1,tstat - zmax)
-		fhi <- max( 1,tstat + zmax)
-
-		#find approximate endpoints;
-		#expand them until pt(tstat,df,flo) > p and pt(tstat,df,fhi) < p
-		FLIM <- 1e8
-		while ((zerf(flo) > 0) && (flo > -FLIM)) { flo <- 2 * flo }
-		while ((zerf(fhi) < 0) && (fhi < FLIM))  { fhi <- 2 * fhi }
-
-		ncp <- uniroot(zerf,c(flo,fhi))
-		return(ncp$root)
 	} else {
-		# crap! have to vectorize it smarter than this, I am afraid. bleah.
-		#retv <- vapply(p,function(x){ qlambdap(x,df,tstat,lower.tail,log.p) },c(0))
-		retv <- rep(0,maxl)
-		for (iii in seq(1,maxl)) {
-			retv[iii] <- qlambdap(p[1 + (iii-1) %% length(p)],
-														df[1 + (iii-1) %% length(df)],
-														tstat[1 + (iii-1) %% length(tstat)],
-														lower.tail,log.p)
+		zerf <- function(q) {
+			return(p - plambdap(q,df=df,tstat=tstat,lower.tail=lower.tail,log.p=log.p))
 		}
-		return(retv)
 	}
+	zmax = 2 * max(qnorm(p,lower.tail=TRUE,log.p=log.p),qnorm(p,lower.tail=FALSE,log.p=log.p))
+	flo <- min(-1,tstat - zmax)
+	fhi <- max( 1,tstat + zmax)
+
+	#find approximate endpoints;
+	#expand them until pt(tstat,df,flo) > p and pt(tstat,df,fhi) < p
+	FLIM <- 1e8
+	while ((zerf(flo) > 0) && (flo > -FLIM)) { flo <- 2 * flo }
+	while ((zerf(fhi) < 0) && (fhi < FLIM))  { fhi <- 2 * fhi }
+
+	ncp <- uniroot(zerf,c(flo,fhi))
+	return(ncp$root)
 }
+#' @export 
+qlambdap <- Vectorize(.qlambdap, 
+											vectorize.args = c("p","df","tstat"),
+											SIMPLIFY = TRUE)
+
 #UNFOLD
 #qlambdap(0.1,128,2)
 #qlambdap(c(0.1),128,2)
+#qlambdap(c(0.2),128,2)
+#qlambdap(c(0.2),253,2)
 #qlambdap(c(0.1,0.2),128,2)
 #qlambdap(c(0.1,0.2),c(128,253),2)
 #qlambdap(c(0.1,0.2),c(128,253),c(2,4))
