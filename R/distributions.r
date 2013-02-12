@@ -35,6 +35,26 @@
 
 # note: on citations, use the Chicago style from google scholar. tks.
 
+########################################################################
+# Distributions
+########################################################################
+
+# geometric bias in the expectation of the non-central t-stat with a
+# given number of d.f.
+# this is 1 over 'c4', essentially:
+# http://mathworld.wolfram.com/StandardDeviationDistribution.html
+# http://finzi.psych.upenn.edu/R/library/IQCC/html/c4.html
+# http://math.stackexchange.com/questions/71573/the-limit-of-the-ratio-of-two-gammax-functions
+.tbias <- function(df) { 
+	retval <- sqrt(df / 2) * exp(lgamma((df-1)/2) - lgamma(df/2))
+	return(retval)
+}
+# same, but for sr:
+.srbias <- function(n) { 
+	return(.tbias(n-1))
+}
+
+
 # Sharpe Ratio as a distribution
 # dsr, psr, qsr, rsr#FOLDUP
 #' @title The (non-central) Sharpe Ratio.
@@ -599,7 +619,157 @@ qlambdap <- Vectorize(.qlambdap,
 #qlambdap(c(0.1,0.2),c(128,253),c(2,4))
 #qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
 
-# inference
+########################################################################
+# Inference
+########################################################################
+
+# confidence intervals on the Sharpe Ratio#FOLDUP
+
+# standard errors
+#the sample.sr should *not* be annualized
+.sr_se_weirdo <- function(sample.sr,n) {
+	cn <- .srbias(n)
+	dn <- (n-1) / ((n-3) * cn * cn)
+	W  <- (sample.sr / cn) ** 2
+	se <- sqrt((dn/n) + W * (dn - 1))
+	return(se)
+}
+
+.sr_se_walck <- function(sample.sr,n) {
+	se <- sqrt((1/n) + 0.5 * sample.sr ** 2 / (n - 1))
+	return(se)
+}
+
+.sr_se_lo <- function(sample.sr,n,ss.adjust=FALSE) {
+	# small sample adjustment; works better in practice.
+	df <- ifelse(ss.adjust,n-1,n)
+	se <- sqrt((1 + 0.5 * sample.sr ** 2) / df)
+	return(se)
+}
+
+#' @title Standard error of Sharpe Ratio
+#'
+#' @description 
+#'
+#' Estimates the standard error of the Sharpe ratio statistic. There
+#' are three methods:
+#'
+#' \itemize{
+#' \item The default, \code{t}, based on Johnson & Welch, with a correction
+#' for small sample size. 
+#' \item An asymptotically equivalent method, \code{Lo}, based on Lo,
+#' which is Johnson & Welch's method but without correcting for d.f.
+#' \item An approximation based on normality, \code{Z}.
+#' \item An approximation based on an F statistic, \code{F}.
+#' }
+#'
+#' @usage
+#'
+#' sr_se <- function(sr,df,opy,type=c("t","Lo","Z","F")) { 
+#'
+#' @param sr an observed Sharpe ratio statistic, annualized.
+#' @param df the number of observations the statistic is based on. This 
+#'        is one more than the number of degrees of freedom in the
+#'        corresponding t-statistic, although the effect will be small
+#'        when \code{df} is large.
+#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
+#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#'        'year', but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param type the estimator type. one of \code{"t", "Lo", "Z", "F"}
+#' @keywords htest
+#' @return an estimate of standard error.
+#' @seealso sr-distribution functions, \code{\link{dsr}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @references 
+#'
+#' Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
+#' 1996. \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
+#'
+#' Johnson, N. L., and Welch, B. L. "Applications of the non-central t-distribution."
+#' Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31.3-4.362}
+#'
+#' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal (2002): 36-52.
+#' \url{http://ssrn.com/paper=377260}
+#'
+#' @examples 
+#' opy <- 253
+#' df <- opy * 6
+#' rvs <- rsr(1, df, 1.0, opy)
+#' anse <- sr_se(rvs,df,opy,type="t")
+#' anse2 <- sr_se(rvs,df,opy,type="Z")
+#'
+#'@export
+sr_se <- function(sr,df,opy,type=c("t","Lo","Z","F")) { 
+	if (!missing(opy)) {
+		sr <- .deannualize(sr,opy)
+	}
+	type <- match.arg(type)
+	se <- switch(type,
+							 t = .sr_se_lo(sr,df,ss.adjust=TRUE),
+							 Lo = .sr_se_lo(sr,df,ss.adjust=FALSE),
+							 Z = .sr_se_walck(sr,df),
+							 F = .sr_se_weirdo(sr,n))
+	if (!missing(opy)) {
+		se <- .annualize(se,opy)
+	}
+	return(se)
+}
+
+
+# 2FIX: start here:
+
+# compute confidence intervals on the ncp of a nct 
+nct.confint <- function(ts,df,level=0.95,type=c("exact","t","Z","F"),
+												level.lo=(1-level)/2,level.hi=1-level.lo) {
+
+	# 2FIX: start here
+	invisible(NULL)
+}
+
+
+
+f_sr_ci_shab <- function(sample.sr,n,alpha = 0.05) {
+	cn <- .srbias(n)
+	medv <- sample.sr / cn
+	se <- f_sr_se_shab(sample.sr,n)
+	zalp <- qnorm(1 - alpha / 2)
+	cilo <- medv - zalp * se
+	cihi <- medv + zalp * se
+	return(list('lo' = cilo,'hi' = cihi))
+}
+
+f_sr_ci_lo <- function(sample.sr,n,alpha = 0.05) {
+	se <- f_sr_se_lo(sample.sr,n)
+	zalp <- qnorm(1 - alpha / 2)
+	cilo <- sample.sr - zalp * se
+	cihi <- sample.sr + zalp * se
+	return(list('lo' = cilo,'hi' = cihi))
+}
+
+# Walck gives this normal approximation
+f_sr_ci_walck <- function(sample.sr,n,alpha = 0.05) {
+	se <- f_sr_se_walck(sample.sr,n)
+	zalp <- qnorm(1 - alpha / 2)
+	midp <- sample.sr * (1 - 1 / (4 * (n - 1)))
+	cilo <- midp - zalp * se
+	cihi <- midp + zalp * se
+	return(list('lo' = cilo,'hi' = cihi))
+}
+
+# these are the 'exact' symmetric CI, which I first saw in 
+# Scholz' paper. I thought they were novel at that time.:w
+f_sr_ci_scholz <- function(sample.sr,n,alpha = 0.05) {
+	sn <- sqrt(n)
+	t <- sample.sr * sn
+	cilo <- (1 / sn) * f_nct_cdf_ncp(t,df = n-1,alpha = 1 - alpha/2)
+	cihi <- (1 / sn) * f_nct_cdf_ncp(t,df = n-1,alpha = alpha/2)
+	return(list('lo' = cilo,'hi' = cihi))
+}
+#UNFOLD
+
+# point inference on srstar/ncp of F#FOLDUP
 
 # compute an unbiased estimator of the non-centrality parameter
 .F_ncp_unbiased <- function(Fs,df1,df2) {
@@ -704,28 +874,25 @@ T2_ncp_est <- function(T2,df1,df2,...) {
 	retv <- Fncp
 	return(retv)
 }
+#UNFOLD
 
+
+# extract statistics (t-stat) from lm object:
+# https://stat.ethz.ch/pipermail/r-help/2009-February/190021.html
+#
+# also: 
+# see the code in summary.lm to see how sigma is calculated
+# or
+# sigma <- sqrt(deviance(fit) / df.residual(fit))
+# then base on confint? coef/vcov
+#
 # junkyard
 
-########################################################################
-# expectation of the t:#FOLDUP
-# the geometric bias of Sharpe ratio; this is 1 over 'c4'
-# http://mathworld.wolfram.com/StandardDeviationDistribution.html
-# http://finzi.psych.upenn.edu/R/library/IQCC/html/c4.html
-# http://math.stackexchange.com/questions/71573/the-limit-of-the-ratio-of-two-gammax-functions
-.tbias <- function(n) { 
-	sqrt((n-1) / 2) * exp(lgamma((n-2)/2) - lgamma((n-1)/2))
-}
 
-#approximate tbias; don't need these, likely.
-.apx_tbias1 <- function(n) { 
-	1 + (0.75 / n)
-}
-.apx_tbias2 <- function(n) { 
-#1 + (0.75 / n) + (2 / n**2)
-	1 + (0.75 / (n - 1)) + (32 / (25 * ((n-1) ** 2)))
-}
-#UNFOLD
+#t_power_rule <- function(n,alpha = 0.05,beta = 0.20,
+
+
+
 ########################################################################
 # power #FOLDUP
 
@@ -856,78 +1023,6 @@ f_sqrt_ncf_apx_pow <- function(df1,df2,ncp,alpha = 0.05) {
 
 ########################################################################
 # confidence intervals
-
-## confidence intervals on the Sharpe Ratio#FOLDUP
-
-# standard errors
-#the sample.sr should *not* be annualized
-.sr_se_weirdo <- function(sample.sr,n) {
-	cn <- .tbias(n)
-	dn <- (n-1) / ((n-3) * cn * cn)
-	W  <- (sample.sr / cn) ** 2
-	se <- sqrt((dn/n) + W * (dn - 1))
-	return(se)
-}
-
-.sr_se_walck <- function(sample.sr,n) {
-	se <- sqrt((1/n) + 0.5 * sample.sr ** 2 / (n - 1))
-	return(se)
-}
-
-.sr_se_lo <- function(sample.sr,n) {
-	se <- sqrt((1 + 0.5 * sample.sr ** 2) / (n - 1))
-	return(se)
-}
-
-#'@export
-sr_se <- function(sr,n,type=c("Walck","Lo","weirdo")) {
-	type <- match.arg(type)
-	se <- switch(type,
-							 Walck = .sr_se_walck(sr,n),
-							 Lo = .sr_se_lo(sr,n),
-							 weirdo = .sr_se_weirdo(sr,n))
-	return(se)
-}
-
-
-f_sr_ci_shab <- function(sample.sr,n,alpha = 0.05) {
-	cn <- .tbias(n)
-	medv <- sample.sr / cn
-	se <- f_sr_se_shab(sample.sr,n)
-	zalp <- qnorm(1 - alpha / 2)
-	cilo <- medv - zalp * se
-	cihi <- medv + zalp * se
-	return(list('lo' = cilo,'hi' = cihi))
-}
-
-f_sr_ci_lo <- function(sample.sr,n,alpha = 0.05) {
-	se <- f_sr_se_lo(sample.sr,n)
-	zalp <- qnorm(1 - alpha / 2)
-	cilo <- sample.sr - zalp * se
-	cihi <- sample.sr + zalp * se
-	return(list('lo' = cilo,'hi' = cihi))
-}
-
-# Walck gives this normal approximation
-f_sr_ci_walck <- function(sample.sr,n,alpha = 0.05) {
-	se <- f_sr_se_walck(sample.sr,n)
-	zalp <- qnorm(1 - alpha / 2)
-	midp <- sample.sr * (1 - 1 / (4 * (n - 1)))
-	cilo <- midp - zalp * se
-	cihi <- midp + zalp * se
-	return(list('lo' = cilo,'hi' = cihi))
-}
-
-# these are the 'exact' symmetric CI, which I first saw in 
-# Scholz' paper. I thought they were novel at that time.:w
-f_sr_ci_scholz <- function(sample.sr,n,alpha = 0.05) {
-	sn <- sqrt(n)
-	t <- sample.sr * sn
-	cilo <- (1 / sn) * f_nct_cdf_ncp(t,df = n-1,alpha = 1 - alpha/2)
-	cihi <- (1 / sn) * f_nct_cdf_ncp(t,df = n-1,alpha = alpha/2)
-	return(list('lo' = cilo,'hi' = cihi))
-}
-#UNFOLD
 
 # inference on F's ncp#FOLDUP
 
@@ -1110,40 +1205,6 @@ f_srstar2hot <- function(sample.sr,n) {
 f_hot2srstar <- function(T2,n) {
 	return(sqrt(T2 / n))
 }
-
-########################################################################
-# distributions#FOLDUP
-
-# density, distribution, quantile, and generator for (noncentral) Hotelling
-# distribution; this is just a rescaling of the (noncentral) F distribution.
-dhot <- function(x, p, n, ncp = 0, log = FALSE) {
-	z <- df(f_hot2F(x,p = p,n = n),df1 = p,df2 = n - p,ncp = ncp,log = log)
-	if (log) {
-		return(log(f_F2hot(1)) + z)
-	} else {
-		return(f_F2hot(z))
-	}
-}
-
-phot <- function(q, p, n, ncp = 0, lower.tail = TRUE, log.p = FALSE) {
-	return(pf(f_hot2F(q,p = p,n = n),df1 = p,df2 = n - p,ncp = ncp, 
-						lower.tail = lower.tail, log.p = log.p))
-}
-qhot <- function(pct, p, n, ncp = 0, lower.tail = TRUE, log.p = FALSE) {
-	return(f_F2hot(qf(pct,df1 = p,df2 = n - p,ncp = ncp, 
-						lower.tail = lower.tail, log.p = log.p),p = p,n = n))
-}
-rhot <- function(ngen, p, n, ncp = 0) {
-	return(f_F2hot(rf(ngen, df1 = p,df2 = n - p,ncp = ncp),p = p,n = n))
-}
-
-#Hotelling 
-gen_hot_T2 <- function(n,p = 1,df = 10,mean = 0,sd = 1) {
-	#2FIX: this was just cut and paste from gen_t and is not
-  #correct .
-	return(mean + sqrt((df-2)/df) * sd * rt(n,df = df))
-}
-#UNFOLD
 
 
 # standard errors and confidence intervals

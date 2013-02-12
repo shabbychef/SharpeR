@@ -29,7 +29,6 @@
 .deannualize2 <- function(T2.pa, opy) {
   return(T2.pa / opy)
 }
-
 #UNFOLD
 
 # Sharpe Ratio
