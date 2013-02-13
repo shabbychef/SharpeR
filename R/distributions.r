@@ -61,6 +61,12 @@
 #'
 #' @description 
 #'
+#' Density, distribution function, quantile function and random
+#' generation for the Sharpe Ratio distribution with \code{df} degrees of freedom
+#' (and optional signal-noise-ratio \code{snr}).
+#'
+#' @details
+#'
 #' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a normal random
 #' variable with mean \eqn{\mu}{mu} and variance \eqn{\sigma^2}{sigma^2}.
 #' Let \eqn{\bar{x}}{xbar} be the sample mean, and \eqn{s}{s} be
@@ -219,6 +225,13 @@ rsr <- function(n, df, snr, opy) {
 #'
 #' @description 
 #'
+#' Density, distribution function, quantile function and random
+#' generation for the Hotelling distribution distribution with 
+#' \code{df1} and \code{df2} degrees of freedom
+#' (and optional non-centrality parameter \code{delta2}).
+#'
+#' @details
+#'
 #' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
 #' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
 #' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
@@ -340,6 +353,13 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @title The (non-central) maximal Sharpe Ratio distribution.
 #'
 #' @description 
+#'
+#' Density, distribution function, quantile function and random
+#' generation for the maximal Sharpe Ratio distribution with 
+#' \code{df1} and \code{df2} degrees of freedom
+#' (and optional maximal signal-noise-ratio \code{snrstar}).
+#'
+#' @details
 #'
 #' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
 #' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
@@ -516,6 +536,12 @@ rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
 #'
 #' @description 
 #'
+#' Distribution function and quantile function for LeCoutre's
+#' lambda-prime distribution with \code{df} degrees of freedom
+#' and the observed t-statistic, \code{tstat}.
+#'
+#' @details
+#'
 #' Let \eqn{t}{t} be distributed
 #' as a non-central t with \eqn{\nu}{v} degrees of freedom and non-centrality
 #' parameter \eqn{\delta}{ncp}. We can view this as
@@ -608,7 +634,6 @@ plambdap <- function(q,df,tstat,lower.tail=TRUE,...) {
 qlambdap <- Vectorize(.qlambdap, 
 											vectorize.args = c("p","df","tstat"),
 											SIMPLIFY = TRUE)
-
 #UNFOLD
 #qlambdap(0.1,128,2)
 #qlambdap(c(0.1),128,2)
@@ -622,6 +647,92 @@ qlambdap <- Vectorize(.qlambdap,
 ########################################################################
 # Inference
 ########################################################################
+
+
+# power of SR test:#FOLDUP
+
+#' @title Power calculations for Sharpe Ratio tests
+#'
+#' @description 
+#'
+#' Compute power of test, or determine parameters to obtain target power.
+#'
+#' @details 
+#'
+#' Suppose you perform a single-sample test for significance of the
+#' Sharpe Ratio based on the corresponding single-sample t-test. 
+#' Given any three of: the effect size (the population SNR), the
+#' number of observations, and the type I and type II rates,
+#' this computes the fourth.
+#'
+#' This is a thin wrapper on \code{\link{power.t.test}}.
+#'
+#' Exactly one of the parameters \code{n}, \code{snr}, \code{power}, and 
+#' \code{sig.level} must be passed as NULL, and that parameter is determined 
+#' from the others.  Notice that \code{sig.level} has non-NULL default, so NULL 
+#' must be explicitly passed if you want to compute it.
+#' 
+#' @usage
+#'
+#' power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
+#'                           alternative=c("one.sided","two.sided"),opy=NULL) 
+#'
+#' @param n Number of observations
+#' @param snr the 'signal-to-noise' parameter, defined as the population
+#'        mean divided by the population standard deviation, 'annualized'.
+#' @param sig.level Significance level (Type I error probability).
+#' @param power Power of test (1 minus Type II error probability).
+#' @param alternative One- or two-sided test.
+#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
+#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#'        'year', but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @keywords htest
+#' @return Object of class \code{power.htest}, a list of the arguments
+#' (including the computed one) augmented with \code{method}, \code{note}
+#' and \code{n.yr} elements, the latter is the number of years under the
+#' given annualization (\code{opy}), \code{NA} if none given.
+#' @seealso \code{\link{power.t.test}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @examples 
+#' anex <- power.sr.test(253,1,0.05,NULL,opy=253) 
+#' anex <- power.sr.test(n=253,snr=NULL,sig.level=0.05,power=0.5,opy=253) 
+#' anex <- power.sr.test(n=NULL,snr=0.6,sig.level=0.05,power=0.5,opy=253) 
+#'
+#'@export
+power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
+													alternative=c("one.sided","two.sided"),
+													opy=NULL) {
+	# stolen from power.t.test
+	if (sum(sapply(list(n, snr, power, sig.level), is.null)) != 1) 
+			stop("exactly one of 'n', 'snr', 'power', and 'sig.level' must be NULL")
+	if (!is.null(sig.level) && !is.numeric(sig.level) || any(0 > 
+			sig.level | sig.level > 1)) 
+			stop("'sig.level' must be numeric in [0, 1]")
+	type <- "one.sample"
+	alternative <- match.arg(alternative)
+	if (!missing(opy) && !is.null(opy) && !is.null(snr)) {
+		snr <- .deannualize(snr,opy)
+	}
+	# delegate
+	subval <- power.t.test(n=n,delta=snr,sd=1,sig.level=sig.level,
+												 power=power,type=type,alternative=alternative,
+												 strict=FALSE)
+	# interpret
+	subval$snr <- subval$delta
+	if (!missing(opy) && !is.null(opy)) {
+		subval$snr <- .annualize(subval$snr,opy)
+		subval$n.yr <- subval$n / opy
+	} else {
+		subval$n.yr <- NA
+	}
+	
+	retval <- subval[c("n","n.yr","snr","sig.level","power","alternative","note","method")]
+	retval <- structure(retval,class=class(subval))
+	return(retval)
+}
+#UNFOLD
 
 # confidence intervals on the Sharpe Ratio#FOLDUP
 
@@ -651,8 +762,11 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' @description 
 #'
-#' Estimates the standard error of the Sharpe ratio statistic. There
-#' are three methods:
+#' Estimates the standard error of the Sharpe ratio statistic. 
+#'
+#' @details 
+#'
+#' There are three methods:
 #'
 #' \itemize{
 #' \item The default, \code{t}, based on Johnson & Welch, with a correction
@@ -665,7 +779,7 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' @usage
 #'
-#' sr_se <- function(sr,df,opy,type=c("t","Lo","Z","F")) { 
+#' sr_se <- function(sr,df,opy,type=c("t","Lo","Z","F")) 
 #'
 #' @param sr an observed Sharpe ratio statistic, annualized.
 #' @param df the number of observations the statistic is based on. This 
@@ -807,6 +921,11 @@ f_sr_ci_scholz <- function(sample.sr,n,alpha = 0.05) {
 #' @title Inference on noncentrality parameter of observed F statistic
 #'
 #' @description 
+#'
+#' Estimates the non-centrality parameter associated with an observed
+#' statistic following a (non-central) F distribution.
+#'
+#' @details 
 #'
 #' Let \eqn{F}{F} be an observed statistic distributed as a non-central F with 
 #' \eqn{\nu_1}{df1}, \eqn{\nu_2}{df2} degrees of freedom and non-centrality 
