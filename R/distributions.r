@@ -648,8 +648,7 @@ qlambdap <- Vectorize(.qlambdap,
 # Inference
 ########################################################################
 
-
-# power of SR test:#FOLDUP
+# power of tests:#FOLDUP
 
 #' @title Power calculations for Sharpe Ratio tests
 #'
@@ -732,6 +731,38 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 	retval <- structure(retval,class=class(subval))
 	return(retval)
 }
+
+# 2FIX: should this be expanded in its own right?
+power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) {
+	# stolen from power.anova.test
+	if (sum(sapply(list(df1, df2, ncp, power, sig.level), is.null)) != 1) 
+		stop("exactly one of 'df1', 'df2', 'ncp', 'power', and 'sig.level' must be NULL")
+	if (!is.null(sig.level) && !is.numeric(sig.level) || any(0 > 
+		sig.level | sig.level > 1)) 
+		stop("'sig.level' must be numeric in [0, 1]")
+	p.body <- quote({
+		delta2 <- df2 * ncp
+		pT2(qT2(sig.level, df1, df2, lower.tail = FALSE), df1, df2, delta2, lower.tail = FALSE)
+	})
+	if (is.null(power)) 
+		power <- eval(p.body)
+	else if (is.null(df1)) 
+		df1 <- uniroot(function(df1) eval(p.body) - power, c(1, 3e+03))$root
+	else if (is.null(df2)) 
+		df2 <- uniroot(function(df2) eval(p.body) - power, c(3, 1e+06))$root
+	else if (is.null(ncp))
+		ncp <- uniroot(function(ncp) eval(p.body) - power, c(0, 3e+01))$root
+	else if (is.null(sig.level)) 
+		sig.level <- uniroot(function(sig.level) eval(p.body) - power, c(1e-10, 1 - 1e-10))$root
+	else stop("internal error")
+	NOTE <- "one sided test"
+	METHOD <- "Hotelling test"
+	retval <- structure(list(df1 = df1, df2 = df2, ncp = ncp, delta2 = df2 * ncp,
+								 sig.level = sig.level, power = power, 
+								 note = NOTE, method = METHOD), class = "power.htest")
+	return(retval)
+}
+
 #UNFOLD
 
 # confidence intervals on the Sharpe Ratio#FOLDUP
@@ -1015,16 +1046,6 @@ T2_ncp_est <- function(T2,df1,df2,...) {
 ########################################################################
 # power #FOLDUP
 
-# the power of the univariate t-test;
-f_tpower <- function(n,rho = 0,alpha = 0.05) {
-	f_tpower_ncp(ncp = sqrt(n) * rho,n = n,alpha = alpha)
-}
-
-# the power of the univariate t-test as function of the ncp
-f_tpower_ncp <- function(ncp,n,alpha = 0.05) {
-	pt(qt(1-alpha,n-1),df = n-1,ncp = ncp,lower.tail = FALSE)
-}
-
 # the power of an f-test 
 f_fpower <- function(df1,df2,ncp,alpha = 0.05) {
 	pf(qf(alpha,df1=df1,df2=df2,ncp=0,lower.tail=FALSE),df1 = df1,df2 = df2,ncp = ncp,lower.tail = FALSE)
@@ -1033,30 +1054,6 @@ f_fpower <- function(df1,df2,ncp,alpha = 0.05) {
 # the power of the Hotelling test
 f_hpower <- function(n,p,rhosq,alpha = 0.05) {
 	f_fpower(df1 = p,df2 = n - p,ncp = n * rhosq,alpha = alpha)
-}
-#UNFOLD
-########################################################################
-# sample size computations#FOLDUP
-
-# find the sample size for a given power of the univariate hotelling test
-f_hreqsize <- function(rhosq,p,powr = 0.80,alpha = 0.05) {
-	#2FIX: get a sane upper bound!
-	zz <- uniroot(function(n,p,rhosq,alpha,powr)(f_hpower(n,p,rhosq,alpha) - powr),
-								c(max(8,p+1),2000000 * 10 / (rhosq)),p = p,rhosq = rhosq,powr = powr,alpha = alpha)
-	return(zz$root)
-}
-
-#estimate the required sample size using a fit...
-#this was all done at alpha = 0.05, so that is not a variable.
-f_est_hreqsize <- function(rhosq,p,powr = 0.80) {
-	estv <- exp(2.259 - log(rhosq) + 0.363 * log(p) + 1.31 * log(powr) - 0.0757 * log(powr) * log(p))
-}
-
-# find the sample size for a given power of the univariate t-test
-f_treqsize <- function(rho,powr = 0.80,alpha = 0.05) {
-	zz <- uniroot(function(n,rho,alpha,powr)(f_tpower(n,rho,alpha) - powr),
-								c(8,20 * 10 / (rho*rho)),rho = rho,powr = powr,alpha = alpha)
-	return(zz$root)
 }
 #UNFOLD
 ########################################################################
