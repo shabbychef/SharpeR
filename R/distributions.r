@@ -35,6 +35,11 @@
 
 # note: on citations, use the Chicago style from google scholar. tks.
 
+# the following are useful for grokking R
+# showMethods("print") 
+# getAnywhere("t.test.default")
+#
+
 ########################################################################
 # Distributions
 ########################################################################
@@ -647,6 +652,119 @@ qlambdap <- Vectorize(.qlambdap,
 ########################################################################
 # Inference
 ########################################################################
+
+# hypothesis tests.
+
+# equality of SR#FOLDUP
+
+#' @title Paired test for equality of Sharpe Ratio
+#'
+#' @description 
+#'
+#' Performs a hypothesis test of equality of Sharpe ratios of p assets
+#' given paired observations.
+#'
+#' @details 
+#'
+#' Given \eqn{n} \emph{i.i.d.} observations of the excess returns of
+#' \eqn{p} strategies, we test
+#' \deqn{H_0: \frac{\mu_i}{\sigma_i} = \frac{\mu_j}{\sigma_j}, 1 \le i < j \le p}{H0: sr1 = sr2 = ...}
+#' using the method of Wright, et. al. 
+#' 
+#' More generally, a matrix of constrasts, \eqn{E}{E} can be given, and we can
+#' test
+#' \deqn{H_0: E s = 0,}{H0: E s = 0,}
+#' where \eqn{s}{s} is the vector of Sharpe ratios of the \eqn{p} strategies.
+#' 
+#' Both chi-squared and F- approximations are supported.
+#' 
+#' @usage
+#'
+#' sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) 
+#'
+#' @param X an \eqn{n \times p}{n x p} matrix of paired observations.
+#' @param contrasts an \eqn{k \times p}{k x p} matrix of the contrasts
+#         to test. This defaults to a matrix which tests sequential equality.
+#' @param type which approximation to use. 'chisq' is preferred when
+#         the returns are non-normal, but the approximation is asymptotic.
+#' @keywords htest
+#' @return Object of class \code{htest}, a list of the test statistic,
+#' the size of \code{X}, and the \code{method} noted.
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @references 
+#'
+#' Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
+#' equality of multiple Sharpe ratios and its application on the evaluation
+#' of iShares." J. Risk. to appear. 
+#' \url{http://www.sta.cuhk.edu.hk/scpy/Preprints/John%20Wright/A%20test%20for%20the%20equality%20of%20multiple%20Sharpe%20ratios.pdf}
+#
+#' Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with 
+#' application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15-30.
+#' \url{http://papers.ssrn.com/sol3/papers.cfm?abstract_id=907270}
+#'
+#' Memmel, C. "Performance hypothesis testing with the Sharpe Ratio." Finance
+#' Letters 1 (2003): 21-23.
+#'
+#' @examples 
+#' rv <- sr.equality.test(matrix(rnorm(500*5),500,5))
+#' # test for uniformity
+#' pvs <- replicate(500,{ x <- sr.equality.test(matrix(rnorm(400*5),400,5),type="chisq")
+#'                        x$p.value })
+#' plot(ecdf(pvs))
+#' abline(0,1,col='red') 
+#'
+#'@export
+sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) {
+	dname <- deparse(substitute(X))
+	type <- match.arg(type)
+	n <- dim(X)[1]
+	p <- dim(X)[2]
+	if (is.null(contrasts))
+		contrasts <- .atoeplitz(c(1,-1,array(0,p-2)),c(1,array(0,p-2)))
+	k <- dim(contrasts)[1]
+	if (dim(contrasts)[2] != p)
+		stop("size mismatch in 'X', 'contrasts'")
+
+	# compute moments
+	m1 <- colMeans(X)
+	m2 <- colMeans(X^2)
+	# construct Sigma hat
+	Shat <- cov(cbind(X,X^2))
+	#Shat <- .agram(cbind(X,X^2))
+	# the SR
+	SR <- m1 / sqrt(diag(Shat[1:p,1:p]))
+
+	# construct D matrix
+	deno <- (m2 - m1^2)^(3/2)
+	D1 <- diag(m2 / deno)
+	D2 <- diag(-m1 / (2*deno))
+	Dt <- rbind(D1,D2)
+
+	# Omegahat
+	Ohat <- t(Dt) %*% Shat %*% Dt
+
+	# the test statistic:
+	ESR <- contrasts %*% SR
+	T2 <- n * t(ESR) %*% solve(contrasts %*% Ohat %*% t(contrasts),ESR)
+
+	pval <- switch(type,
+								 chisq = pchisq(T2,df=k,ncp=0,lower.tail=FALSE),
+								 F = pf((n-k) * T2/((n-1) * k),df1=k,df2=n-k,lower.tail=FALSE))
+
+	# attach names
+	names(T2) <- "T2"
+	names(k) <- "contrasts"
+	method <- paste(c("test for equality of Sharpe Ratio, via",type,"test"),collapse=" ")
+
+	retval <- list(statistic = T2, parameter = k,
+							 df1 = p, df2 = n, p.value = pval, 
+							 method = method, data.name = dname)
+	class(retval) <- "htest"
+	return(retval)
+}
+#UNFOLD
+
 
 # power of tests:#FOLDUP
 
