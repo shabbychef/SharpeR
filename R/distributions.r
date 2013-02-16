@@ -60,14 +60,14 @@
 }
 
 
-# Sharpe Ratio as a distribution
+# Sharpe ratio as a distribution
 # dsr, psr, qsr, rsr#FOLDUP
-#' @title The (non-central) Sharpe Ratio.
+#' @title The (non-central) Sharpe ratio.
 #'
 #' @description 
 #'
 #' Density, distribution function, quantile function and random
-#' generation for the Sharpe Ratio distribution with \code{df} degrees of freedom
+#' generation for the Sharpe ratio distribution with \code{df} degrees of freedom
 #' (and optional signal-noise-ratio \code{snr}).
 #'
 #' @details
@@ -78,16 +78,16 @@
 #' the sample standard deviation (using Bessel's correction). Let \eqn{c_0}{c0}
 #' be the 'risk free rate'.  Then
 #' \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} 
-#' is the (sample) Sharpe Ratio.
+#' is the (sample) Sharpe ratio.
 #' 
 #' The units of \eqn{z}{z} is \eqn{\mbox{time}^{-1/2}}{per root time}.
-#' Typically the Sharpe Ratio is \emph{annualized} by multiplying by
+#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
 #' \eqn{\sqrt{p}}{sqrt(p)}, where \eqn{p}{p} is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
 #' Letting \eqn{z = \sqrt{p}\frac{\bar{x}-c_0}{s}}{z = sqrt(p)(xbar - c0)/s},
 #' where the sample estimates are based on \eqn{n}{n} observations, 
-#' then \eqn{z}{z} takes a (non-central) Sharpe Ratio distribution
+#' then \eqn{z}{z} takes a (non-central) Sharpe ratio distribution
 #' with \eqn{n}{n} 'degrees of freedom', non-centrality parameter
 #' \eqn{\delta = \frac{\mu - c_0}{\sigma}}{delta = (mu - c0)/sigma}, and 
 #' annualization parameter \eqn{p}{p}.
@@ -280,7 +280,7 @@ rsr <- function(n, df, snr, opy) {
 #' Invalid arguments will result in return value \code{NaN} with a warning.
 #' @aliases pT2 qT2 rT2 
 #' @seealso F-distribution functions, \code{\link{df}, \link{pf}, \link{qf}, \link{rf}},
-#' Sharpe Ratio distribution, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
+#' Sharpe ratio distribution, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @note
@@ -355,12 +355,12 @@ rT2 <- function(n, df1, df2, delta2) {
 
 # SR^*
 # dsrstar, psrstar, qsrstar, rsrstar#FOLDUP
-#' @title The (non-central) maximal Sharpe Ratio distribution.
+#' @title The (non-central) maximal Sharpe ratio distribution.
 #'
 #' @description 
 #'
 #' Density, distribution function, quantile function and random
-#' generation for the maximal Sharpe Ratio distribution with 
+#' generation for the maximal Sharpe ratio distribution with 
 #' \code{df1} and \code{df2} degrees of freedom
 #' (and optional maximal signal-noise-ratio \code{snrstar}).
 #'
@@ -371,7 +371,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
 #' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). Let
 #' \deqn{\zeta(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar - c0)/sqrt(w'Sw)}
-#' be the (sample) Sharpe Ratio of the portfolio \eqn{w}{w}, subject to 
+#' be the (sample) Sharpe ratio of the portfolio \eqn{w}{w}, subject to 
 #' risk free rate \eqn{c_0}{c0}.
 #'
 #' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
@@ -384,7 +384,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
 #' z* = sqrt(xbar' S^-1 xbar) - c0/R}
 #'
-#' The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe Ratio}
+#' The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio}
 #' distribution. For convenience, we may assume that the sample statistic
 #' has been annualized by 
 #' in the same manner as the Sharpe ratio (see \code{\link{dsr}}), that
@@ -416,7 +416,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @param snrstar the non-centrality parameter, defined as 
 #'        \eqn{\delta = \sqrt{\mu' \Sigma^{-1} \mu}}{delta = sqrt(mu' Sigma^-1 mu)}
 #'        for population parameters.
-#'        defaults to 0, \emph{i.e.} a central maximal Sharpe Ratio distribution.
+#'        defaults to 0, \emph{i.e.} a central maximal Sharpe ratio distribution.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{snrstar} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
@@ -656,7 +656,7 @@ qlambdap <- Vectorize(.qlambdap,
 
 # equality of SR#FOLDUP
 
-#' @title Paired test for equality of Sharpe Ratio
+#' @title Paired test for equality of Sharpe ratio
 #'
 #' @description 
 #'
@@ -689,6 +689,7 @@ qlambdap <- Vectorize(.qlambdap,
 #' @keywords htest
 #' @return Object of class \code{htest}, a list of the test statistic,
 #' the size of \code{X}, and the \code{method} noted.
+#' @seealso \code{\link{sr.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @references 
@@ -702,7 +703,7 @@ qlambdap <- Vectorize(.qlambdap,
 #' application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15-30.
 #' \url{http://papers.ssrn.com/sol3/papers.cfm?abstract_id=907270}
 #'
-#' Memmel, C. "Performance hypothesis testing with the Sharpe Ratio." Finance
+#' Memmel, C. "Performance hypothesis testing with the Sharpe ratio." Finance
 #' Letters 1 (2003): 21-23.
 #'
 #' @examples 
@@ -754,20 +755,156 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) {
 	# attach names
 	names(T2) <- "T2"
 	names(k) <- "contrasts"
-	method <- paste(c("test for equality of Sharpe Ratio, via",type,"test"),collapse=" ")
+	method <- paste(c("test for equality of Sharpe ratio, via",type,"test"),collapse=" ")
+	names(SR) <- sapply(1:p,function(x) { paste(c("strat",x),collapse="_") })
 
 	retval <- list(statistic = T2, parameter = k,
 							 df1 = p, df2 = n, p.value = pval, 
+							 SR = SR,
 							 method = method, data.name = dname)
 	class(retval) <- "htest"
 	return(retval)
 }
 #UNFOLD
 
+# SR test#FOLDUP
+#getAnywhere("t.test.default")
+#' @title test for Sharpe ratio
+#'
+#' @description 
+#'
+#' Performs one and two sample tests of Sharpe ratio on vectors of data.
+#'
+#' @details 
+#'
+#' 2FIX
+#' 
+#' @usage
+#'
+#' sr.test(x,y=NULL,alternative=c("two.sided","less","greater"),
+#'         snr=0,opy=1,paired=FALSE,conf.level=0.95)
+#'
+#' @param x a (non-empty) numeric vector of data values.
+#' @param y an optional (non-empty) numeric vector of data values.
+#' @param snr a number indicating .... 2FIX START HERE ... 
+#' @keywords htest
+#' @return  2FIX ... 
+#' @seealso \code{\link{sr.equality.test}}, \code{\link{t.test}}.
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @examples 
+#' # should reject null
+#' x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
+#' x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="two.sided")
+#' # should not reject null
+#' x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="less")
+#'
+#' # test for uniformity
+#' pvs <- replicate(1000,{ x <- sr.test(rnorm(1000),opy=253,alternative="two.sided")
+#'                         x$p.value })
+#' plot(ecdf(pvs))
+#' abline(0,1,col='red') 
+#'
+#'@export
+sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
+										snr=0,opy=1,paired=FALSE,conf.level=0.95) {
+	# all this stolen from t.test.default:
+	alternative <- match.arg(alternative)
+	if (!missing(snr) && (length(snr) != 1 || is.na(snr))) 
+		stop("'snr' must be a single number")
+	if (!missing(conf.level) && (length(conf.level) != 1 || !is.finite(conf.level) || 
+		conf.level < 0 || conf.level > 1)) 
+		stop("'conf.level' must be a single number between 0 and 1")
+
+	if (!is.null(y)) {
+		dname <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
+		if (paired) {
+			xok <- yok <- complete.cases(x, y)
+		} else {
+			yok <- !is.na(y)
+			xok <- !is.na(x)
+		}
+		y <- y[yok]
+	} else {
+		dname <- deparse(substitute(x))
+		if (paired) 
+			stop("'y' is missing for paired test")
+		xok <- !is.na(x)
+		yok <- NULL
+	}
+	x <- x[xok]
+	mx <- mean(x)
+	vx <- var(x)
+	sx <- mx / sqrt(vx)
+	if (is.null(y)) {
+		nx <- length(x)
+		if (nx < 2) 
+			stop("not enough 'x' observations")
+		estimate <- .annualize(sx,opy)
+		tstat <- .sr_to_t(sx,nx)
+		df <- nx - 1
+
+		method <- "One Sample sr test"
+		names(estimate) <- "Sharpe ratio of x"
+
+		# 2FIX: add CIs here.
+		if (alternative == "less") {
+			pval <- psr(estimate, df=nx, snr=snr, opy=opy)
+		}
+		else if (alternative == "greater") {
+			pval <- psr(estimate, df=nx, snr=snr, opy=opy, lower.tail = FALSE)
+		}
+		else {
+			pval <- 1 - 2 * abs(0.5 - psr(estimate, df=nx, snr=snr, opy=opy))
+		}
+	} else {
+		ny <- length(y)
+		if (paired) {
+			if (nx != ny)
+				stop("'x','y' must be same length")
+			df <- nx - 1
+
+			subtest <- sr.equality.test(cbind(x,y),type="chisq")
+			# x minus y
+			estimate <- - diff(as.vector(subtest$SR))
+			method <- "Paired sr-test"
+			tstat <- sqrt(subtest$statistic) * sign(estimate)
+
+			pval <- subtest$p.value
+			if (alternative == "less") {
+				pval <- - pval
+			}
+			else if (alternative == "two.sided") {
+				pval <- 1 - 2 * abs(pval - 0.5)
+			}
+		} else {
+			# not yet implemented!
+			stop("NYI")
+
+			my <- mean(y)
+			vy <- var(y)
+			sy <- my / sqrt(vy)
+			estimate <- sx - sy
+			method <- "unpaired sr-test"
+		}
+		names(estimate) <- "difference in Sharpe ratios"
+	}
+
+	names(tstat) <- "t"
+	names(df) <- "df"
+	#attr(cint, "conf.level") <- conf.level
+	retval <- list(statistic = tstat, parameter = df,
+								 estimate = estimate, p.value = pval, 
+								 alternative = alternative, null.value = snr,
+								 method = method, data.name = dname)
+	class(retval) <- "htest"
+	return(retval)
+}
+#UNFOLD
 
 # power of tests:#FOLDUP
 
-#' @title Power calculations for Sharpe Ratio tests
+#' @title Power calculations for Sharpe ratio tests
 #'
 #' @description 
 #'
@@ -776,7 +913,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) {
 #' @details 
 #'
 #' Suppose you perform a single-sample test for significance of the
-#' Sharpe Ratio based on the corresponding single-sample t-test. 
+#' Sharpe ratio based on the corresponding single-sample t-test. 
 #' Given any three of: the effect size (the population SNR), the
 #' number of observations, and the type I and type II rates,
 #' this computes the fourth.
@@ -882,7 +1019,7 @@ power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) 
 
 #UNFOLD
 
-# confidence intervals on the Sharpe Ratio#FOLDUP
+# confidence intervals on the Sharpe ratio#FOLDUP
 
 # standard errors
 #the sample.sr should *not* be annualized
@@ -906,7 +1043,7 @@ power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) 
 	return(se)
 }
 
-#' @title Standard error of Sharpe Ratio
+#' @title Standard error of Sharpe ratio
 #'
 #' @description 
 #'
