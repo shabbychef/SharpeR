@@ -564,16 +564,15 @@ rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
 #'
 #' @usage
 #'
-#' plambdap(q, df, tstat, lower.tail = TRUE, log.p = FALSE) 
+#' plambdap(q, df, tstat, lower.tail = TRUE, log.p = FALSE)
 #'
-#' qlambdap(p, df, tstat, lower.tail = TRUE, log.p = FALSE) 
+#' qlambdap(p, df, tstat, lower.tail = TRUE, log.p = FALSE)
 #'
-#' @param x,q vector of quantiles.
+#' @param q vector of quantiles.
 #' @param p vector of probabilities.
-#' @param n number of observations. 
 #' @param df the degrees of freedom of the t-statistic.
 #' @param tstat the observed (non-central) t-statistic.
-#' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #'        \eqn{P[X \le x]}{P\[X <= x\]}, otherwise, \eqn{P[X > x]}{P\[X > x\]}.
 #' @keywords distribution 
@@ -604,9 +603,9 @@ rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
 #' pvs <- plambdap(rvs, 253*6, -0.5)
 #' plot(ecdf(pvs))
 #'
-plambdap <- function(q,df,tstat,lower.tail=TRUE,...) {
+plambdap <- function(q,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 	# this is just a silly wrapper on pt
-	retv <- pt(q=tstat,df=df,ncp=q,lower.tail=!lower.tail,...)
+	retv <- pt(q=tstat,df=df,ncp=q,lower.tail=!lower.tail,log.p=log.p)
 	return(retv)
 }
 # create a scalar function that we later vectorize. 
@@ -680,13 +679,13 @@ qlambdap <- Vectorize(.qlambdap,
 #' 
 #' @usage
 #'
-#' sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) 
+#' sr.equality.test(X,contrasts=NULL,type=c("chisq","F"))
 #'
 #' @param X an \eqn{n \times p}{n x p} matrix of paired observations.
 #' @param contrasts an \eqn{k \times p}{k x p} matrix of the contrasts
 #         to test. This defaults to a matrix which tests sequential equality.
 #' @param type which approximation to use. 'chisq' is preferred when
-#         the returns are non-normal, but the approximation is asymptotic.
+#'        the returns are non-normal, but the approximation is asymptotic.
 #' @keywords htest
 #' @return Object of class \code{htest}, a list of the test statistic,
 #' the size of \code{X}, and the \code{method} noted.
@@ -697,8 +696,8 @@ qlambdap <- Vectorize(.qlambdap,
 #' Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
 #' equality of multiple Sharpe ratios and its application on the evaluation
 #' of iShares." J. Risk. to appear. 
-#' \url{http://www.sta.cuhk.edu.hk/scpy/Preprints/John%20Wright/A%20test%20for%20the%20equality%20of%20multiple%20Sharpe%20ratios.pdf}
-#
+#' \url{http://www.sta.cuhk.edu.hk/scpy/Preprints/John\%20Wright/A\%20test\%20for\%20the\%20equality\%20of\%20multiple\%20Sharpe\%20ratios.pdf}
+#'
 #' Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with 
 #' application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15-30.
 #' \url{http://papers.ssrn.com/sol3/papers.cfm?abstract_id=907270}
@@ -791,7 +790,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) {
 #' 
 #' @usage
 #'
-#' power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
+#' power.sr.test(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #'                           alternative=c("one.sided","two.sided"),opy=NULL) 
 #'
 #' @param n Number of observations
@@ -928,7 +927,7 @@ power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) 
 #'
 #' @usage
 #'
-#' sr_se <- function(sr,df,opy,type=c("t","Lo","Z","F")) 
+#' sr_se(sr,df,opy,type=c("t","Lo","Z","F")) 
 #'
 #' @param sr an observed Sharpe ratio statistic, annualized.
 #' @param df the number of observations the statistic is based on. This 
