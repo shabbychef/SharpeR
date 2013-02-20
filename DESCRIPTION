@@ -10,3 +10,5 @@ Description: a collection of tools for analyzing significance of trading
 Collate:
     'utils.r'
     'distributions.r'
+    'estimation.r'
+    'tests.r'
