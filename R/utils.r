@@ -30,6 +30,62 @@
 # the mean gram 
 #.mean.gram <- function(X) { (t(X) %*% X) / dim(X)[1] }
 
+# Sharpe Ratio#FOLDUP
+#' @title Compute the Sharpe ratio.
+#'
+#' @description 
+#'
+#' Computes the Sharpe ratio of some observed returns.
+#'
+#' @details
+#'
+#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent returns of some
+#' asset.
+#' Let \eqn{\bar{x}}{xbar} be the sample mean, and \eqn{s}{s} be
+#' the sample standard deviation (using Bessel's correction). Let \eqn{c_0}{c0}
+#' be the 'risk free rate'.  Then
+#' \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} 
+#' is the (sample) Sharpe ratio.
+#' 
+#' The units of \eqn{z}{z} is \eqn{\mbox{time}^{-1/2}}{per root time}.
+#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
+#' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
+#' is the number of observations
+#' per year (or whatever the target annualization epoch.)
+#'
+#'
+#' @usage
+#'
+#' sharpe(x,c0=0,opy=1,na.rm=FALSE)
+#'
+#' @param x vector of returns.
+#' @param c0 the 'risk-free' or 'disastrous' rate of return.
+#' @param opy the number of observations per 'year'. This is used to
+#'        'annualize' the answer.
+#' @param na.rm logical.  Should missing values be removed?
+#' @keywords univar 
+#' @return the annualized Sharpe ratio.
+#' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @references 
+#'
+#' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
+#' \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+#' 
+#' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal (2002): 36-52.
+#' \url{http://ssrn.com/paper=377260}
+#'
+#' @examples 
+#' rvs <- sharpe(rnorm(253*8),opy=253)
+#'
+sharpe <- function(x,c0=0,opy=1,na.rm=FALSE) {
+	sr <- (mean(x,na.rm=na.rm) - c0) / sd(x,na.rm=na.rm)
+	if (!missing(opy))
+		sr <- .annualize(sr,opy)
+	return(sr)
+}
+#UNFOLD
 # annualize and deannualize a Sharpe Ratio#FOLDUP
 #' @param sr the Sharpe Ratio, in per sqrt(epoch) units.
 #' @param opy the number of observations per year. no default here.
@@ -51,7 +107,6 @@
 }
 #UNFOLD
 
-# Sharpe Ratio
 # converting t <-> sr#FOLDUP
 
 # conversion routines

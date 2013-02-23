@@ -33,6 +33,10 @@
 #         @include distributions.r
 #source("distributions.r")
 
+# 2FIX:
+# add britten-jones weights CI
+
+
 ########################################################################
 # Tests 
 ########################################################################
@@ -58,18 +62,30 @@
 #' \deqn{H_0: E s = 0,}{H0: E s = 0,}
 #' where \eqn{s}{s} is the vector of Sharpe ratios of the \eqn{p} strategies.
 #' 
+#' When \eqn{E}{E} consists of a single row (a single contrast), as is the
+#' case when the default contrasts are used and only two strategies are
+#' compared, then an approximate t-test can be performed against the
+#' alternative hypothesis \eqn{H_a: E s > 0}{Ha: E s > 0}
+#' 
 #' Both chi-squared and F- approximations are supported; the former is
 #' described by Wright. \emph{et. al.}, the latter by Leung and Wong.
 #' 
 #' @usage
 #'
-#' sr.equality.test(X,contrasts=NULL,type=c("chisq","F"))
+#' sr.equality.test(X,contrasts=NULL,type=c("chisq","F","t"),
+#'                  alternative=c("two.sided","less","greater"))
 #'
 #' @param X an \eqn{n \times p}{n x p} matrix of paired observations.
 #' @param contrasts an \eqn{k \times p}{k x p} matrix of the contrasts
 #         to test. This defaults to a matrix which tests sequential equality.
-#' @param type which approximation to use. 'chisq' is preferred when
+#' @param type which approximation to use. \code{"chisq"} is preferred when
 #'        the returns are non-normal, but the approximation is asymptotic.
+#'        the \code{"t"} test is only supported when \eqn{k = 1}{k = 1}.
+#' @param alternative a character string specifying the alternative hypothesis,
+#'        must be one of \code{"two.sided"} (default), \code{"greater"} or
+#'        \code{"less"}. You can specify just the initial letter.
+#'        This is only relevant for the \code{"t"} test.
+#'        \code{"greater"} corresponds to \eqn{H_a: E s > 0}{Ha: E s > 0}.
 #' @keywords htest
 #' @return Object of class \code{htest}, a list of the test statistic,
 #' the size of \code{X}, and the \code{method} noted.
@@ -99,7 +115,8 @@
 #' abline(0,1,col='red') 
 #'
 #'@export
-sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) {
+sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
+														 alternative=c("two.sided","less","greater")) {
 	dname <- deparse(substitute(X))
 	type <- match.arg(type)
 	n <- dim(X)[1]
@@ -109,6 +126,8 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) {
 	k <- dim(contrasts)[1]
 	if (dim(contrasts)[2] != p)
 		stop("size mismatch in 'X', 'contrasts'")
+	if ((type == "t") && (k != 1))
+		stop("can only perform t-test on single contrast");
 
 	# compute moments
 	m1 <- colMeans(X)
@@ -130,19 +149,30 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F")) {
 
 	# the test statistic:
 	ESR <- contrasts %*% SR
-	T2 <- n * t(ESR) %*% solve(contrasts %*% Ohat %*% t(contrasts),ESR)
-
-	pval <- switch(type,
-								 chisq = pchisq(T2,df=k,ncp=0,lower.tail=FALSE),
-								 F = pf((n-k) * T2/((n-1) * k),df1=k,df2=n-k,lower.tail=FALSE))
+	COC <- contrasts %*% Ohat %*% t(contrasts)
+	if (type == "t") {
+		ts <- ESR * sqrt(n / COC)
+		names(ts) <- "t"
+		pval <- switch(alternative,
+									 two.sided = 1 - 2 * abs(pt(ts,df=n-1,lower.tail=TRUE) - 0.5),
+									 less = pt(ts,df=n-1,lower.tail=TRUE),
+									 greater = pt(ts,df=n-1,lower.tail=FALSE))
+		statistic <- ts
+	} else {
+		T2 <- n * t(ESR) %*% solve(COC,ESR)
+		names(T2) <- "T2"
+		pval <- switch(type,
+									 chisq = pchisq(T2,df=k,ncp=0,lower.tail=FALSE),
+									 F = pf((n-k) * T2/((n-1) * k),df1=k,df2=n-k,lower.tail=FALSE))
+		statistic <- T2
+	}
 
 	# attach names
-	names(T2) <- "T2"
 	names(k) <- "contrasts"
 	method <- paste(c("test for equality of Sharpe ratio, via",type,"test"),collapse=" ")
 	names(SR) <- sapply(1:p,function(x) { paste(c("strat",x),collapse="_") })
 
-	retval <- list(statistic = T2, parameter = k,
+	retval <- list(statistic = statistic, parameter = k,
 							 df1 = p, df2 = n, p.value = pval, 
 							 SR = SR,
 							 method = method, data.name = dname)
@@ -217,13 +247,11 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 		yok <- NULL
 	}
 	x <- x[xok]
-	mx <- mean(x)
-	vx <- var(x)
-	sx <- mx / sqrt(vx)
-	if (is.null(y)) {
+	if (is.null(y)) {#FOLDUP
 		nx <- length(x)
 		if (nx < 2) 
 			stop("not enough 'x' observations")
+		sx <- sharpe(x,c0=0)
 		estimate <- .annualize(sx,opy)
 		tstat <- .sr_to_t(sx,nx)
 		df <- nx - 1
@@ -241,38 +269,32 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 		else {
 			pval <- 1 - 2 * abs(0.5 - psr(estimate, df=nx, snr=snr, opy=opy))
 		}
-	} else {
+	} #UNFOLD
+	else {#FOLDUP
 		ny <- length(y)
 		if (paired) {
 			if (nx != ny)
 				stop("'x','y' must be same length")
 			df <- nx - 1
 
-			subtest <- sr.equality.test(cbind(x,y),type="chisq")
+			subtest <- sr.equality.test(cbind(x,y),type="t",alternative=alternative)
 			# x minus y
 			estimate <- - diff(as.vector(subtest$SR))
 			method <- "Paired sr-test"
-			tstat <- sqrt(subtest$statistic) * sign(estimate)
-
 			pval <- subtest$p.value
-			if (alternative == "less") {
-				pval <- - pval
-			}
-			else if (alternative == "two.sided") {
-				pval <- 1 - 2 * abs(pval - 0.5)
-			}
 		} else {
-			# not yet implemented!
+			sx <- sharpe(x,c0=0)
+			sy <- sharpe(y,c0=0)
+			se.x <- sr.se(sx,nx,type="t")
+			se.y <- sr.se(sy,ny,type="t")
+			estimate <- .annualize(sx - sy,opy)
+
 			stop("NYI")
 
-			my <- mean(y)
-			vy <- var(y)
-			sy <- my / sqrt(vy)
-			estimate <- sx - sy
 			method <- "unpaired sr-test"
 		}
 		names(estimate) <- "difference in Sharpe ratios"
-	}
+	}#UNFOLD
 
 	names(tstat) <- "t"
 	names(df) <- "df"
