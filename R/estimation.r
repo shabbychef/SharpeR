@@ -84,7 +84,7 @@
 #'
 #' @usage
 #'
-#' sr_se(sr,df,opy,type=c("t","Lo","Z","F")) 
+#' sr.se(sr,df,opy,type=c("t","Lo","Z","F")) 
 #'
 #' @param sr an observed Sharpe ratio statistic, annualized.
 #' @param df the number of observations the statistic is based on. This 
@@ -116,11 +116,11 @@
 #' opy <- 253
 #' df <- opy * 6
 #' rvs <- rsr(1, df, 1.0, opy)
-#' anse <- sr_se(rvs,df,opy,type="t")
-#' anse2 <- sr_se(rvs,df,opy,type="Z")
+#' anse <- sr.se(rvs,df,opy,type="t")
+#' anse2 <- sr.se(rvs,df,opy,type="Z")
 #'
 #'@export
-sr_se <- function(sr,df,opy,type=c("t","Lo","Z","F")) { 
+sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) { 
 	if (!missing(opy)) {
 		sr <- .deannualize(sr,opy)
 	}
@@ -136,56 +136,91 @@ sr_se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 	return(se)
 }
 
+#' @title Confidence Interval on Signal-Noise Ratio
+#'
+#' @description 
+#'
+#' Computes approximate confidence intervals on the Signal-Noise ratio given the Sharpe ratio.
+#'
+#' @details 
+#'
+#' @usage
+#'
+#' sr.confint(sr,df,level=0.95,type=c("exact","t","Z","F"),opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
+#'
+#' @param sr an observed Sharpe ratio statistic, annualized.
+#' @param df the number of observations the statistic is based on. This 
+#'        is one more than the number of degrees of freedom in the
+#'        corresponding t-statistic, although the effect will be small
+#'        when \code{df} is large.
+#' @param level the confidence level required.
+#' @param type the estimator type. one of \code{"t", "Lo", "Z", "F"}
+#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
+#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#'        'year', but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param level.lo the lower bound for the confidence interval.
+#' @param level.hi the upper bound for the confidence interval.
+#' @keywords htest
+#' @return A matrix (or vector) with columns giving lower and upper
+#' confidence limits for the SNR. These will be labelled as
+#' level.lo and level.hi in %
+#' @seealso \code{\link{confint}}, \code{\link{sr.se}}, \code{\link{qlambdap}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#'
+#' @examples 
+#' opy <- 253
+#' df <- opy * 6
+#' rvs <- rsr(1, df, 1.0, opy)
+#' aci <- sr.confint(rvs,df,type="t",opy=opy)
+#' aci2 <- sr.confint(rvs,df,type="Z",opy=opy)
+#'
+#'@export
+sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
+											 opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
+	#2FIX: the order of arguments is really wonky. where does opy go?
+	if (!missing(opy)) {
+		sr <- .deannualize(sr,opy)
+	}
+	type <- match.arg(type)
+	if  (type == "exact") {
+		tstat <- .sr_to_t(sr, df)
+		if (level.lo > 0) {
+			ci.lo <- qlambdap(level.lo,df-1,tstat,lower.tail=TRUE)
+		} else ci.lo <- -Inf
+		if (level.hi < 1) {
+			ci.hi <- qlambdap(level.hi,df-1,tstat,lower.tail=TRUE)
+		} else ci.hi <- Inf
+	} else if (type == "t") {
+		# already annualized;
+		se <- sr.se(sr,df,type=type)
+		midp <- sr
+		zalp <- qnorm(c(level.lo,level.hi))
+		ci <- midp + zalp * se
+	} else if (type == "Z") {
+		# already annualized;
+		se <- sr.se(sr,df,type=type)
+		midp <- sr * (1 - 1 / (4 * (df - 1)))
+		zalp <- qnorm(c(level.lo,level.hi))
+		ci <- midp + zalp * se
+	} else if (type == "F") {
+		# already annualized;
+		se <- sr.se(sr,df,type=type)
+		cn <- .srbias(df)
+		midp <- sr / cn
+		zalp <- qnorm(c(level.lo,level.hi))
+		ci <- midp + zalp * se
+	} else stop("internal error")
+
+	retval <- matrix(ci,nrow=1)
+	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+	return(retval)
+}
+											 
 
 # 2FIX: start here:
 
-# compute confidence intervals on the ncp of a nct 
-nct.confint <- function(ts,df,level=0.95,type=c("exact","t","Z","F"),
-												level.lo=(1-level)/2,level.hi=1-level.lo) {
-
-	# 2FIX: start here
-	invisible(NULL)
-}
-
-
-
-f_sr_ci_shab <- function(sample.sr,n,alpha = 0.05) {
-	cn <- .srbias(n)
-	medv <- sample.sr / cn
-	se <- f_sr_se_shab(sample.sr,n)
-	zalp <- qnorm(1 - alpha / 2)
-	cilo <- medv - zalp * se
-	cihi <- medv + zalp * se
-	return(list('lo' = cilo,'hi' = cihi))
-}
-
-f_sr_ci_lo <- function(sample.sr,n,alpha = 0.05) {
-	se <- f_sr_se_lo(sample.sr,n)
-	zalp <- qnorm(1 - alpha / 2)
-	cilo <- sample.sr - zalp * se
-	cihi <- sample.sr + zalp * se
-	return(list('lo' = cilo,'hi' = cihi))
-}
-
-# Walck gives this normal approximation
-f_sr_ci_walck <- function(sample.sr,n,alpha = 0.05) {
-	se <- f_sr_se_walck(sample.sr,n)
-	zalp <- qnorm(1 - alpha / 2)
-	midp <- sample.sr * (1 - 1 / (4 * (n - 1)))
-	cilo <- midp - zalp * se
-	cihi <- midp + zalp * se
-	return(list('lo' = cilo,'hi' = cihi))
-}
-
-# these are the 'exact' symmetric CI, which I first saw in 
-# Scholz' paper. I thought they were novel at that time.:w
-f_sr_ci_scholz <- function(sample.sr,n,alpha = 0.05) {
-	sn <- sqrt(n)
-	t <- sample.sr * sn
-	cilo <- (1 / sn) * f_nct_cdf_ncp(t,df = n-1,alpha = 1 - alpha/2)
-	cihi <- (1 / sn) * f_nct_cdf_ncp(t,df = n-1,alpha = alpha/2)
-	return(list('lo' = cilo,'hi' = cihi))
-}
 #UNFOLD
 
 # point inference on srstar/ncp of F#FOLDUP
@@ -317,19 +352,6 @@ T2_ncp_est <- function(T2,df1,df2,...) {
 
 
 
-########################################################################
-# power #FOLDUP
-
-# the power of an f-test 
-f_fpower <- function(df1,df2,ncp,alpha = 0.05) {
-	pf(qf(alpha,df1=df1,df2=df2,ncp=0,lower.tail=FALSE),df1 = df1,df2 = df2,ncp = ncp,lower.tail = FALSE)
-}
-
-# the power of the Hotelling test
-f_hpower <- function(n,p,rhosq,alpha = 0.05) {
-	f_fpower(df1 = p,df2 = n - p,ncp = n * rhosq,alpha = alpha)
-}
-#UNFOLD
 ########################################################################
 #inversions#FOLDUP
 

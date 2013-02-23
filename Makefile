@@ -8,6 +8,8 @@
 # Created: 2012.12.28
 #
 
+R_FILES           ?= $(wildcard R/*.r)
+
 # all stolen
 
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
@@ -68,8 +70,10 @@ help:
 # Development Tasks
 #------------------------------------------------------------------------------
 
-tags:
+.R_tags: $(R_FILES)
 	./rebuildTags.sh
+
+tags: .R_tags
 
 # Set a default CRAN mirror because otherwise R refuses to install anything.
 deps:
@@ -108,7 +112,7 @@ vignette:
 		"$(RBIN)/R" --vanilla --slave -e "tools:::compactPDF(getwd(), gs_quality='printer')"
 
 
-build: docs
+build: docs tags
 	cd ..;\
 		"$(RBIN)/R" CMD build --no-vignettes $(PKGSRC).build
 

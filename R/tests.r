@@ -58,7 +58,8 @@
 #' \deqn{H_0: E s = 0,}{H0: E s = 0,}
 #' where \eqn{s}{s} is the vector of Sharpe ratios of the \eqn{p} strategies.
 #' 
-#' Both chi-squared and F- approximations are supported.
+#' Both chi-squared and F- approximations are supported; the former is
+#' described by Wright. \emph{et. al.}, the latter by Leung and Wong.
 #' 
 #' @usage
 #'
