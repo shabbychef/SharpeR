@@ -37,6 +37,7 @@ is.sorted <- function(xs,pragma=c("ascending","descending")) {
 	return(retv)
 }
 
+
 test_that("pfoo/qfoo monotonicity",{#FOLDUP
 	set.seed(as.integer(charToRaw("1ccb4a05-fd09-43f7-a692-80deebfd67f4")))
 	
@@ -259,6 +260,17 @@ test_that("qlambdap sensible",{#FOLDUP
 		tstat <- sapply(tvals,function(t) { return(qlambdap(p,df,t)) })
 		expect_equal(mean(tstat >= true.ncp),p,tolerance=0.05)
 	}
+
+	# edge cases
+	expect_true(Inf == qlambdap(1,df,1,lower.tail=TRUE))
+	expect_true(-Inf == qlambdap(1,df,1,lower.tail=FALSE))
+	expect_true(-Inf == qlambdap(0,df,1,lower.tail=TRUE))
+	expect_true(Inf == qlambdap(0,df,1,lower.tail=FALSE))
+
+	expect_true(1 == plambdap(Inf,df,1,lower.tail=TRUE))
+	expect_true(1 == plambdap(-Inf,df,1,lower.tail=FALSE))
+	expect_true(0 == plambdap(-Inf,df,1,lower.tail=TRUE))
+	expect_true(0 == plambdap(Inf,df,1,lower.tail=FALSE))
 })#UNFOLD
 
 #for vim modeline: (do not edit)

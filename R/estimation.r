@@ -146,7 +146,8 @@ sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 #'
 #' @usage
 #'
-#' sr.confint(sr,df,level=0.95,type=c("exact","t","Z","F"),opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
+#' sr.confint(sr,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
+#'            level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
 #' @param sr an observed Sharpe ratio statistic, annualized.
 #' @param df the number of observations the statistic is based on. This 
@@ -164,7 +165,7 @@ sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 #' @keywords htest
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
-#' level.lo and level.hi in %
+#' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
 #' @seealso \code{\link{confint}}, \code{\link{sr.se}}, \code{\link{qlambdap}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
@@ -186,12 +187,9 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 	type <- match.arg(type)
 	if  (type == "exact") {
 		tstat <- .sr_to_t(sr, df)
-		if (level.lo > 0) {
-			ci.lo <- qlambdap(level.lo,df-1,tstat,lower.tail=TRUE)
-		} else ci.lo <- -Inf
-		if (level.hi < 1) {
-			ci.hi <- qlambdap(level.hi,df-1,tstat,lower.tail=TRUE)
-		} else ci.hi <- Inf
+		ci.lo <- qlambdap(level.lo,df-1,tstat,lower.tail=TRUE)
+		ci.hi <- qlambdap(level.hi,df-1,tstat,lower.tail=TRUE)
+		ci <- c(ci.lo,ci.hi)
 	} else if (type == "t") {
 		# already annualized;
 		se <- sr.se(sr,df,type=type)
@@ -218,6 +216,65 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 	return(retval)
 }
 											 
+#' @title Confidence Interval on Maximal Signal-Noise Ratio
+#'
+#' @description 
+#'
+#' Computes approximate confidence intervals on the Signal-Noise ratio given the Sharpe ratio.
+#'
+#' @details 
+#'
+#' none yet...
+#'
+#' @usage
+#'
+#' sr.confint(sr,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
+#'            level.lo=(1-level)/2,level.hi=1-level.lo)
+#'
+#' @param sr an observed Sharpe ratio statistic, annualized.
+#' @param df the number of observations the statistic is based on. This 
+#'        is one more than the number of degrees of freedom in the
+#'        corresponding t-statistic, although the effect will be small
+#'        when \code{df} is large.
+#' @param level the confidence level required.
+#' @param type the estimator type. one of \code{"t", "Lo", "Z", "F"}
+#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
+#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#'        'year', but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param level.lo the lower bound for the confidence interval.
+#' @param level.hi the upper bound for the confidence interval.
+#' @keywords htest
+#' @return A matrix (or vector) with columns giving lower and upper
+#' confidence limits for the SNR. These will be labelled as
+#' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
+#' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qco.srstar}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#'
+#' @examples 
+#' opy <- 253
+#' df <- opy * 6
+#' rvs <- rsr(1, df, 1.0, opy)
+#' aci <- sr.confint(rvs,df,type="t",opy=opy)
+#' aci2 <- sr.confint(rvs,df,type="Z",opy=opy)
+#'
+#'@export
+srstar.confint <- function(srstar,df1,df2,level=0.95,
+											     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
+	#2FIX: the order of arguments is really wonky. where does opy go?
+	#if (!missing(opy)) {
+		#srstar <- .deannualize(srstar,opy)
+	#}
+
+	ci.lo <- qco.srstar(level.lo,df1=df1,df2=df2,srstar=srstar,opy=opy,lower.tail=TRUE)
+	ci.hi <- qco.srstar(level.hi,df1=df1,df2=df2,srstar=srstar,opy=opy,lower.tail=TRUE)
+	ci <- c(ci.lo,ci.hi)
+
+	retval <- matrix(ci,nrow=1)
+	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+	return(retval)
+}
 
 # 2FIX: start here:
 
@@ -258,7 +315,7 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 	return(delta2)
 }
 
-#' @title Inference on noncentrality parameter of observed F statistic
+#' @title Inference on noncentrality parameter of observed F statistic 
 #'
 #' @description 
 #'
@@ -335,7 +392,6 @@ T2_ncp_est <- function(T2,df1,df2,...) {
 }
 #UNFOLD
 
-
 # extract statistics (t-stat) from lm object:
 # https://stat.ethz.ch/pipermail/r-help/2009-February/190021.html
 #
@@ -351,53 +407,6 @@ T2_ncp_est <- function(T2,df1,df2,...) {
 #t_power_rule <- function(n,alpha = 0.05,beta = 0.20,
 
 
-
-########################################################################
-#inversions#FOLDUP
-
-#
-#
-#find the non-centrality parameter; that is, find
-#ncp such that pt(t,df,ncp) = alpha
-f_nct_cdf_ncp <- function(t,df,alpha) {
-	#find approximate endpoints;
-	flo <- min(-1,t - qnorm((1 + alpha)/2))
-	fhi <- max(1,t - qnorm((alpha)/2))
-	#expand them until pt(t,df,flo) > alpha and pt(t,df,fhi) < alpha
-	while ((pt(t,df,flo) < alpha) && (flo > -100000)) { flo <- 2 * flo }
-	while ((pt(t,df,fhi) > alpha) && (fhi < 100000)) { fhi <- 2 * fhi }
-	ncp <- uniroot(function(ncp,t,df,alpha)(pt(t,df,ncp) - alpha),
-								 c(flo,fhi),t = t,df = df,alpha = alpha)
-	return(ncp$root)
-}
-
-#find some t such that
-# phi(t-ncp) = f(t;df,ncp) 
-#where phi is the density function of the normal
-#and f(x;df,ncp) is the density function of a noncentral
-#t-distribution with n d.o.f. and noncentrality parameter ncp
-
-f_eq_t_pdf_disc <- function(df,ncp = 0) {
-	lims <- c(-abs(ncp) - 20,ncp)
-	foo <- uniroot(function(t,ncp,df)(dnorm(t,mean = ncp,sd=1) -
-																		dt(t,df=df,ncp=ncp)),
-								 lims,df = df,ncp = ncp)
-	return(foo$root)
-}
-
-#find 
-# max_t | Phi(t-ncp) - F(t;df,ncp) |
-#where Phi is the distribution function of the normal
-#and F(x;df,ncp) is the distribution function of a noncentral
-#t-distribution with n d.o.f. and noncentrality parameter ncp
-
-f_max_t_cdf_disc <- function(df,ncp = 0) {
-	opt_t <- f_eq_t_pdf_disc(df=df,ncp=ncp)
-	disc <- abs(pnorm(opt_t,mean = ncp,sd=1) -
-							pt(opt_t,df=df,ncp=ncp))
-	return(disc)
-}
-#UNFOLD
 
 #compute the asymptotic mean and variance of the sqrt of a
 #non-central F distribution
@@ -428,10 +437,6 @@ f_sqrt_ncf_apx_pow <- function(df1,df2,ncp,alpha = 0.05) {
 # HLT <- sum(myt$Eigenvalues) #?
 # ...
 # 
-
-
-	
-
 
 ########################################################################
 # confidence intervals
@@ -527,98 +532,5 @@ T2ncp.mle <- function(T2,p,n,ub=NULL) {
 }
 #UNFOLD
 
-# SR^* is a Hotelling, basically. 
-
-# convert SR^* <-> T2
-f_srstar2hot <- function(sample.sr,n) {
-	return(n * sample.sr^2)
-}
-f_hot2srstar <- function(T2,n) {
-	return(sqrt(T2 / n))
-}
-
-# inference on SR^*'s ncp, by extension#FOLDUP
-
-# confidence distribution, gives CIs
-qcosrstarncp <- function(plev,srs,p,n,ub=NULL) {
-	# convert to T2
-	T2 <- f_srstar2hot(sample.sr=srs,n=n)
-	if (!is.null(ub)) {
-		ub <- f_srstar2hot(sample.sr=ub,n=n)
-	}
-	# delegate
-	T2.ncp <- qcoT2ncp(plev,T2,p=p,n=n,ub=ub)
-	# convert back
-	return(f_hot2srstar(T2.ncp,n=n))
-}
-
-# use same to construct confidence intervals
-srstarncp.ci <- function(srs,p,n,alpha.lo=0.025,alpha.hi=1-alpha.lo) {
-	# convert to T2
-	T2 <- f_srstar2hot(sample.sr=srs,n=n)
-	# delegate
-	T2.ci <- T2ncp.ci(T2,p=p,n=n,alpha.lo=alpha.lo,alpha.hi=alpha.hi)
-	# convert back
-	return(list('lo' = f_hot2srstar(T2.ci$lo,n=n),'hi' = f_hot2srstar(T2.ci$hi,n=n)))
-}
-
-#MLE of the ncp
-srstarncp.mle <- function(srs,p,n,ub=NULL) {
-	# convert to T2
-	T2 <- f_srstar2hot(sample.sr=srs,n=n)
-	if (!is.null(ub)) {
-		ub <- f_srstar2hot(sample.sr=ub,n=n)
-	}
-	# delegate
-	T2.mle <- T2ncp.mle(T2,p=p,n=n,ub=ub)
-	# convert back
-	return(f_hot2srstar(T2.mle,n=n))
-}
-#UNFOLD
-
-## confidence intervals on optimal Sharpe#FOLDUP
-#2FIX: export the guts of this...
-#(1 - alpha) confidence interval on optimal SNR under assumption that portfolio
-#optimizes in-sample Sharpe ratio, with n observations on p assets.
-f_srstar_ci <- function(sample.sr,n,p,alpha = 0.05) {
-	xval <- (n * (n-p) / (p * (n-1))) * sample.sr^2
-	zerf <- function(z,n,xv,limv) { pf(xv,p,n-p,n*z^2) - limv }
-
-	pfzero <- pf(xval, p, n-p, 0)
-	if (pfzero < alpha / 2) {
-		cihi <- 0
-		cilo <- 0
-	} else {
-		#approximate upper bound 
-		up <- 2 * (sample.sr + pnorm(1 - alpha / 4) / sqrt(2 * n))
-		fup <- zerf(up,n,xv = xval,limv = 1 - alpha/2)
-		while (fup < 0) {
-			up <- 2 * up;
-			fup <- zerf(up,n,xv = xval,limv = 1 - alpha/2)
-		}
-
-		if (pfzero < 1 - alpha / 2) {
-			cilo <- 0
-		} else {
-			cilo <- uniroot(zerf,
-											c(0,up),n = n,xv = xval,limv = 1 - alpha/2)$root
-		}
-		cihi <- uniroot(zerf,
-										c(cilo,up),n = n,xv = xval,limv = alpha/2)$root
-	}
-	return(list('lo' = cilo,'hi' = cihi))
-}
-#UNFOLD
-
-# convert SR^* <-> T2
-f_srstar2hot <- function(sample.sr,n) {
-	return(n * sample.sr^2)
-}
-f_hot2srstar <- function(T2,n) {
-	return(sqrt(T2 / n))
-}
-
-
-# standard errors and confidence intervals
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:

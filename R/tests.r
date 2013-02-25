@@ -374,7 +374,8 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' 
 #' @usage
 #'
-#' srstar.test(X,alternative=c("greater","two.sided","less"),snrstar=0,opy=1,conf.level=0.95)
+#' srstar.test(X,alternative=c("greater","two.sided","less"),
+#'             snrstar=0,opy=1,conf.level=0.95)
 #'
 #' @param X a (non-empty) numeric matrix of data values, each row independent,
 #        each column representing an asset.

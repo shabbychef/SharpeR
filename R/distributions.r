@@ -634,6 +634,13 @@ plambdap <- function(q,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 }
 # create a scalar function that we later vectorize. 
 .qlambdap <- function(p,df,tstat,lower.tail=TRUE,log.p=FALSE) {
+	if (p == 1)
+		return(ifelse(lower.tail,Inf,-Inf))
+	if (p == 0)
+		return(ifelse(lower.tail,-Inf,Inf))
+	if ((p < 0) || (p > 1))
+		return (NaN)
+
 	# create a function increasing in its argument that
 	# we wish to zero
 	if (lower.tail) {
@@ -664,5 +671,120 @@ qlambdap <- Vectorize(.qlambdap,
 											SIMPLIFY = TRUE)
 #UNFOLD
 
+# co-SR^*
+# pco.srstar, qco.srstar#FOLDUP
+#' @title The 'confidence distribution' for maximal Sharpe ratio.
+#'
+#' @description 
+#'
+#' Distribution function and quantile function for the 'confidence
+#' distribution' of the maximal Sharpe ratio. This is just an inversion
+#' to perform inference on snrstar given observed statistic srstar.
+#'
+#' @details
+#'
+#' 2FIX
+#' 
+#'
+#' @usage
+#'
+#' pco.srstar(q,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
+#'
+#' qco.srstar(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
+#'
+#' @param q vector of quantiles.
+#' @param p vector of probabilities.
+#' @param df1 the number of assets in the portfolio.
+#' @param df2 the number of observations.
+#' @param srstar the observed maximal Sharpe ratio statistic.
+#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
+#'        \code{snrstar} are quoted in 'annualized' units, that is, per 'year',
+#'        but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#'        \eqn{P[X \le x]}{P\[X <= x\]}, otherwise, \eqn{P[X > x]}{P\[X > x\]}.
+#' @keywords distribution 
+#' @return \code{dco.srstar} gives the density, \code{pco.srstar} gives the distribution function,
+#' \code{qco.srstar} gives the quantile function, and \code{rco.srstar} generates random deviates.
+#'
+#' Invalid arguments will result in return value \code{NaN} with a warning.
+#' @aliases pco.srstar qco.srstar rco.srstar
+#' @seealso \code{\link{dsrstar},\link{psrstar},\link{qsrstar},\link{rsrstar}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @note
+#' \code{pco.srstar} should be an increasing function of the argument \code{q},
+#' and decreasing in \code{srstar}. \code{qco.srstar} should be increasing
+#' in \code{p}
+#' @examples 
+#' snrstar <- 2.0
+#' opy <- 253
+#' ntest <- 2000
+#' df1 <- 4
+#' df2 <- 6 * opy
+#' rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
+#' qvs <- qco.srstar(0.05,df1=df1,df2=df2,srstar=rvs)
+#' mean(qvs > snrstar)
+#' qvs <- qco.srstar(0.5,df1=df1,df2=df2,srstar=rvs)
+#' mean(qvs > snrstar)
+#' qvs <- qco.srstar(0.95,df1=df1,df2=df2,srstar=rvs)
+#' mean(qvs > snrstar)
+#' # test vectorization:
+#' qv <- qco.srstar(0.1,df1,df2,rvs)
+#' qv <- qco.srstar(c(0.1,0.2),df1,df2,rvs)
+#' qv <- qco.srstar(c(0.1,0.2),c(df1,2*df1),df2,rvs)
+#' qv <- qco.srstar(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
+#'
+# 2FIX: add opy?
+pco.srstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
+	# 2FIX: do the annualization just once for efficiency?
+	# this is just a silly wrapper on psrstar
+	retv <- psrstar(q=srstar,df1=df1,df2=df2,snrstar=q,opy=opy,lower.tail=!lower.tail,log.p=log.p)
+	return(retv)
+}
+# create a scalar function that we later vectorize. 
+.qco.srstar <- function(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) {
+	if (p == 1)
+		return(ifelse(lower.tail,Inf,-Inf))
+	if (p == 0)
+		return(ifelse(lower.tail,-Inf,Inf))
+	if ((p < 0) || (p > 1))
+		return (NaN)
+	if (!missing(opy)) 
+		srstar <- .deannualize(srstar,opy)
+
+	# create a function increasing in its argument that
+	# we wish to zero
+	# do *not* pass on opy b/c this function is a tight loop
+	if (lower.tail) {
+		zerf <- function(q) {
+			return(pco.srstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p) - p)
+		}
+	} else {
+		zerf <- function(q) {
+			return(p - pco.srstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p))
+		}
+	}
+	# not sure why this is relevant here. just cut and pasted from elsewhere.
+	zmax = 2 * max(qnorm(p,lower.tail=TRUE,log.p=log.p),qnorm(p,lower.tail=FALSE,log.p=log.p))
+	flo <- min(-1,srstar - zmax)
+	fhi <- max( 1,srstar + zmax)
+
+	#find approximate endpoints;
+	#expand them until pt(tstat,df,flo) > p and pt(tstat,df,fhi) < p
+	FLIM <- 1e8
+	while ((zerf(flo) > 0) && (flo > -FLIM)) { flo <- 2 * flo }
+	while ((zerf(fhi) < 0) && (fhi < FLIM))  { fhi <- 2 * fhi }
+
+	ncp <- uniroot(zerf,c(flo,fhi))
+	retval <- ifelse(missing(opy),ncp$root,.annualize(ncp$root,opy))
+	return(retval)
+}
+#' @export 
+qco.srstar <- Vectorize(.qco.srstar,
+											vectorize.args = c("p","df1","df2","srstar"),
+											SIMPLIFY = TRUE)
+#UNFOLD
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:
