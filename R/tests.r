@@ -28,10 +28,8 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
-#         @include utils.r
-#source("utils.r")
-#         @include distributions.r
-#source("distributions.r")
+#' @include utils.r
+#' @include distributions.r
 
 # 2FIX:
 # add britten-jones weights CI
@@ -230,7 +228,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' \item{statistic}{the value of the t- or Z-statistic.}
 #' \item{parameter}{the degrees of freedom for the statistic.}
 #' \item{p.value}{the p-value for the test.}
-#' \item{conf.int} a confidence interval appropriate to the specified alternative hypothesis. NYI.}
+#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
 #' \item{estimate}{the estimated Sharpe or difference in Sharpes depending on whether it was a one-sample test or a two-sample test. Annualized}
 #' \item{null.value}{the specified hypothesized value of the Sharpe or difference of Sharpes depending on whether it was a one-sample test or a two-sample test.}
 #' \item{alternative}{a character string describing the alternative hypothesis.}
@@ -357,6 +355,102 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	retval <- list(statistic = statistic, parameter = df,
 								 estimate = estimate, p.value = pval, 
 								 alternative = alternative, null.value = snr,
+								 method = method, data.name = dname)
+	class(retval) <- "htest"
+	return(retval)
+}
+#UNFOLD
+
+# SRstar test#FOLDUP
+#' @title test for maximal Sharpe ratio
+#'
+#' @description 
+#'
+#' Performs one sample tests of Sharpe ratio of the Markowitz portfolio.
+#'
+#' @details 
+#'
+#' fill these in.
+#' 
+#' @usage
+#'
+#' srstar.test(X,alternative=c("greater","two.sided","less"),snrstar=0,opy=1,conf.level=0.95)
+#'
+#' @param X a (non-empty) numeric matrix of data values, each row independent,
+#        each column representing an asset.
+#' @param alternative a character string specifying the alternative hypothesis,
+#'       must be one of \code{"two.sided"}, \code{"greater"} (default) or
+#'       \code{"less"}.  You can specify just the initial letter.
+#' @param snrstar a number indicating the null hypothesis value.
+#' @param opy the number of observations per 'year'. 
+#'        \code{snrstar} is quoted in 'annualized' units, that is, per square root 
+#'        'year', but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param conf.level confidence level of the interval. (not used yet)
+#' @keywords htest
+#' @return A list with class \code{"htest"} containing the following components:
+#' \item{statistic}{the value of the \eqn{T^2}-statistic.}
+#' \item{parameter}{a list of the degrees of freedom for the statistic.}
+#' \item{p.value}{the p-value for the test.}
+#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
+#' \item{estimate}{the estimated maximal Sharpe, annualized}
+#' \item{null.value}{the specified hypothesized value of the maximal Sharpe.}
+#' \item{alternative}{a character string describing the alternative hypothesis.}
+#' \item{method}{a character string indicating what type of test was performed.}
+#' \item{data.name}{a character string giving the name(s) of the data.}
+#' @seealso \code{\link{sr.test}}, \code{\link{t.test}}.
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @examples 
+#'
+#' # test for uniformity
+#' pvs <- replicate(1000,{ x <- srstar.test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
+#'                         x$p.value })
+#' plot(ecdf(pvs))
+#' abline(0,1,col='red') 
+#' 
+#'
+#'@export
+srstar.test <- function(X,alternative=c("greater","two.sided","less"),
+										snrstar=0,opy=1,conf.level=0.95) {
+	# all this stolen from t.test.default:
+	alternative <- match.arg(alternative)
+	if (!missing(snrstar) && (length(snrstar) != 1 || is.na(snrstar))) 
+		stop("'snrstar' must be a single number")
+	if (!missing(conf.level) && (length(conf.level) != 1 || !is.finite(conf.level) || 
+		conf.level < 0 || conf.level > 1)) 
+		stop("'conf.level' must be a single number between 0 and 1")
+
+	dname <- deparse(substitute(X))
+	subtest <- .sharpe.star(X,opy=opy)
+	statistic <- subtest$T2
+	names(statistic) <- "T2"
+	estimate <- subtest$srstar
+	names(estimate) <- "optimal Sharpe ratio of X"
+
+	method <- "One Sample srstar test"
+
+	df1 <- subtest$df1
+	df2 <- subtest$n
+
+	# 2FIX: add CIs here.
+	if (alternative == "less") {
+		pval <- psrstar(estimate, df1=df1, df2=df2, snr=snrstar, opy=opy)
+	}
+	else if (alternative == "greater") {
+		pval <- psrstar(estimate, df1=df1, df2=df2, snr=snrstar, opy=opy, lower.tail = FALSE)
+	}
+	else {
+		pval <- .oneside2two(psrstar(estimate, df1=df1, df2=df2, snr=snrstar, opy=opy))
+	}
+
+	names(df1) <- "df1"
+	names(df2) <- "df2"
+	df <- c(df1,df2)
+	#attr(cint, "conf.level") <- conf.level
+	retval <- list(statistic = statistic, parameter = df,
+								 estimate = estimate, p.value = pval, 
+								 alternative = alternative, null.value = snrstar,
 								 method = method, data.name = dname)
 	class(retval) <- "htest"
 	return(retval)

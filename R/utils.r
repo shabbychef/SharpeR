@@ -93,14 +93,37 @@ sharpe <- function(x,c0=0,opy=1,na.rm=FALSE) {
 		mu <- colMeans(X)
 	if (is.null(Sigma)) 
 		Sigma <- cov(X)
-	w <- solve(Sigma,t(mu))
+	w <- solve(Sigma,mu)
 	n <- dim(X)[1]
 	retval <- list(w = w, mu = mu, Sigma = Sigma, n = n)
 	return(retval)
 }
 
+# compute Hotelling's statistic.
+.hotelling <- function(X) {
+	retval <- .markowitz(X)
+	retval$T2 <- retval$n * (retval$mu %*% retval$w)
+	retval$df1 <- length(retval$w)
+	return(retval)
+}
+
+.sharpe.star <- function(X,opy=1) {
+	retval <- .hotelling(X)
+	retval$srstar <- sqrt(retval$T2 / retval$n)
+	if (!missing(opy))
+		retval$srstar <- .annualize(retval$srstar,opy)
+	return(retval)
+}
+
+# convert p-value for a 1-sided test into one for a two-sided test.
+.oneside2two <- function(pv) {
+	retval <- 1 - 2 * abs(0.5 - pv)
+	return(retval)
+}
+
 
 #UNFOLD
+
 # annualize and deannualize a Sharpe Ratio#FOLDUP
 #' @param sr the Sharpe Ratio, in per sqrt(epoch) units.
 #' @param opy the number of observations per year. no default here.

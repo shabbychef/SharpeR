@@ -28,10 +28,8 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
-#         @include utils.r
-#source("utils.r")
-#         @include distributions.r
-#source("distributions.r")
+#' @include utils.r
+#' @include distributions.r
 
 # note: on citations, use the Chicago style from google scholar. tks.
 
@@ -143,6 +141,8 @@ sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 #' Computes approximate confidence intervals on the Signal-Noise ratio given the Sharpe ratio.
 #'
 #' @details 
+#'
+#' none yet...
 #'
 #' @usage
 #'

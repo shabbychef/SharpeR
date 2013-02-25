@@ -28,8 +28,7 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
-#         @include utils.r
-#source("utils.r")
+#' @include utils.r
 
 # 2FIX: is df the # of observations or the d.f. of the t-stat? ack!
 
@@ -39,6 +38,14 @@
 # showMethods("print") 
 # getAnywhere("t.test.default")
 
+# ' Kan, Raymond and Zhou, GuoFu. "Tests of Mean-Variance Spanning."
+# ' Annals of Economics and Finance 13, no. 1 (2012)
+# ' \url{http://www.aeconf.net/Articles/May2012/aef130105.pdf}
+# '
+# ' Britten-Jones, Mark. "The Sampling Error in Estimates of Mean-Variance 
+# ' Efficient Portfolio Weights." The Journal of Finance 54, no. 2 (1999):
+# ' 655--671. \url{http://www.jstor.org/stable/2697722}
+#
 ########################################################################
 # Distributions
 ########################################################################
@@ -294,6 +301,9 @@ rsr <- function(n, df, snr, opy) {
 #'
 #' Timm, Neil H. Applied multivariate analysis: methods and case studies. Springer, 2002.
 #' \url{http://books.google.com/books?id=vtiyg6fnnskC}
+#' 
+#' Hotelling, Harold. "The Generalization of Student's Ratio." Annals of Mathematical 
+#' Statistics 2, no. 3 (1931): 360--378. \url{http://projecteuclid.org/euclid.aoms/1177732979}
 #'
 #' @examples 
 #' rvs <- rT2(2048, 4, 253*6, 0)
@@ -437,6 +447,12 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @note
 #' This is a thin wrapper on the Hotelling T-squared distribution, provided for
 #' convenience.
+#' @references 
+#'
+#' Kan, Raymond and Smith, Daniel R. "The Distribution of the Sample Minimum-Variance Frontier."
+#' Journal of Management Science 54, no. 7 (2008): 1364--1380.
+#' \url{http://mansci.journal.informs.org/cgi/doi/10.1287/mnsc.1070.0852}
+#'
 #' @examples 
 #' # generate some variates 
 #' rvs <- rsrstar(2048, 8, 253*6, 0, 253)
@@ -585,6 +601,9 @@ rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
 #' Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
 #' Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107-116.
 #' \url{http://www.univ-rouen.fr/LMRS/Persopage/Lecoutre/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
+#'
+#' Lecoutre, Bruno. "Two useful distributions for Bayesian predictive procedures under normal models."
+#' Journal of Statistical Planning and Inference 79  (1999): 93--105. 
 #'
 #' @note
 #' \code{plambdap} should be an increasing function of the argument \code{q},
