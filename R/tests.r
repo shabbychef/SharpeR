@@ -152,7 +152,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 		ts <- ESR * sqrt(n / COC)
 		names(ts) <- "t"
 		pval <- switch(alternative,
-									 two.sided = 1 - 2 * abs(pt(ts,df=n-1,lower.tail=TRUE) - 0.5),
+									 two.sided = .oneside2two(pt(ts,df=n-1)),
 									 less = pt(ts,df=n-1,lower.tail=TRUE),
 									 greater = pt(ts,df=n-1,lower.tail=FALSE))
 		statistic <- ts
@@ -299,7 +299,7 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			pval <- psr(estimate, df=nx, snr=snr, opy=opy, lower.tail = FALSE)
 		}
 		else {
-			pval <- 1 - 2 * abs(0.5 - psr(estimate, df=nx, snr=snr, opy=opy))
+			pval <- .oneside2two(psr(estimate, df=nx, snr=snr, opy=opy))
 		}
 	} #UNFOLD
 	else {#FOLDUP
@@ -337,7 +337,7 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 				pval <- pnorm(estimate, mean = snr, sd = se.z, lower.tail = FALSE)
 			}
 			else {
-				pval <- 1 - 2 * abs(0.5 - pnorm(estimate, mean = snr, sd = se.z))
+				pval <- .oneside2two(pnorm(estimate, mean = snr, sd = se.z))
 			}
 			statistic <- (sx - sy - snr) / se.z
 			names(statistic) <- "Z"
