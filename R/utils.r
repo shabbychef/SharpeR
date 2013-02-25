@@ -85,6 +85,21 @@ sharpe <- function(x,c0=0,opy=1,na.rm=FALSE) {
 		sr <- .annualize(sr,opy)
 	return(sr)
 }
+
+# compute the markowitz portfolio
+.markowitz <- function(X,mu=NULL,Sigma=NULL) {
+	na.omit(X)
+	if (is.null(mu)) 
+		mu <- colMeans(X)
+	if (is.null(Sigma)) 
+		Sigma <- cov(X)
+	w <- solve(Sigma,t(mu))
+	n <- dim(X)[1]
+	retval <- list(w = w, mu = mu, Sigma = Sigma, n = n)
+	return(retval)
+}
+
+
 #UNFOLD
 # annualize and deannualize a Sharpe Ratio#FOLDUP
 #' @param sr the Sharpe Ratio, in per sqrt(epoch) units.

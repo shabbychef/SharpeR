@@ -191,7 +191,21 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #'
 #' @details 
 #'
-#' 2FIX
+#' Given \eqn{n}{n} observations \eqn{x_i}{xi} from a normal random variable,
+#' with mean \eqn{\mu}{mu} and standard deviation \eqn{\sigma}{sigma}, tests
+#' \deqn{H_0: \frac{\mu}{\sigma} = S}{H0: mu/sigma = S}
+#' against two or one sided alternatives.
+#' 
+#' Can also perform two sample tests of Sharpe ratio. For paired observations
+#' \eqn{x_i}{xi} and \eqn{y_i}{yi}, tests
+#' \deqn{H_0: \frac{\mu_x}{\sigma_x} = \frac{\mu_u}{\sigma_y}}{H0: mu_x sigma_y = mu_y sigma_x}
+#' against two or one sided alternative, via 
+#' \code{\link{sr.equality.test}}.
+#'
+#' For unpaired (and independent) observations, tests
+#' \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
+#' against two or one-sided alternatives via a normal approximation 
+#' (which is probably not very good for small sample sizes).
 #' 
 #' @usage
 #'
@@ -200,9 +214,28 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #'
 #' @param x a (non-empty) numeric vector of data values.
 #' @param y an optional (non-empty) numeric vector of data values.
-#' @param snr a number indicating .... 2FIX START HERE ... 
+#' @param alternative a character string specifying the alternative hypothesis,
+#'       must be one of \code{"two.sided"} (default), \code{"greater"} or
+#'       \code{"less"}.  You can specify just the initial letter.
+#' @param snr a number indicating the null hypothesis offset value, the
+#' \eqn{S} value.
+#' @param opy the number of observations per 'year'. 
+#'        \code{snr} is quoted in 'annualized' units, that is, per square root 
+#'        'year', but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param paired a logical indicating whether you want a paired test.
+#' @param conf.level confidence level of the interval. (not used yet)
 #' @keywords htest
-#' @return  2FIX ... 
+#' @return A list with class \code{"htest"} containing the following components:
+#' \item{statistic}{the value of the t- or Z-statistic.}
+#' \item{parameter}{the degrees of freedom for the statistic.}
+#' \item{p.value}{the p-value for the test.}
+#' \item{conf.int} a confidence interval appropriate to the specified alternative hypothesis. NYI.}
+#' \item{estimate}{the estimated Sharpe or difference in Sharpes depending on whether it was a one-sample test or a two-sample test. Annualized}
+#' \item{null.value}{the specified hypothesized value of the Sharpe or difference of Sharpes depending on whether it was a one-sample test or a two-sample test.}
+#' \item{alternative}{a character string describing the alternative hypothesis.}
+#' \item{method}{a character string indicating what type of test was performed.}
+#' \item{data.name}{a character string giving the name(s) of the data.}
 #' @seealso \code{\link{sr.equality.test}}, \code{\link{t.test}}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
@@ -253,7 +286,8 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			stop("not enough 'x' observations")
 		sx <- sharpe(x,c0=0)
 		estimate <- .annualize(sx,opy)
-		tstat <- .sr_to_t(sx,nx)
+		statistic <- .sr_to_t(sx,nx)
+		names(statistic) <- "t"
 		df <- nx - 1
 
 		method <- "One Sample sr test"
@@ -272,7 +306,9 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	} #UNFOLD
 	else {#FOLDUP
 		ny <- length(y)
-		if (paired) {
+		if (paired) {#FOLDUP
+			if (snr != 0)
+				stop("cannot test 'snr' != 0 for paired test")
 			if (nx != ny)
 				stop("'x','y' must be same length")
 			df <- nx - 1
@@ -280,26 +316,45 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			subtest <- sr.equality.test(cbind(x,y),type="t",alternative=alternative)
 			# x minus y
 			estimate <- - diff(as.vector(subtest$SR))
+			estimate <- .annualize(estimate,opy)
 			method <- "Paired sr-test"
+
+			statistic <- subtest$statistic
+			names(statistic) <- "t"
+			# 2FIX: take df from subtest?
 			pval <- subtest$p.value
-		} else {
+		} #UNFOLD
+		else {#FOLDUP
 			sx <- sharpe(x,c0=0)
 			sy <- sharpe(y,c0=0)
 			se.x <- sr.se(sx,nx,type="t")
 			se.y <- sr.se(sy,ny,type="t")
-			estimate <- .annualize(sx - sy,opy)
+			se.z <- sqrt(se.x^2 + se.y^2)
+			estimate <- sx - sy
+			snr <- .deannualize(snr,opy)
+			if (alternative == "less") {
+				pval <- pnorm(estimate, mean = snr, sd = se.z)
+			}
+			else if (alternative == "greater") {
+				pval <- pnorm(estimate, mean = snr, sd = se.z, lower.tail = FALSE)
+			}
+			else {
+				pval <- 1 - 2 * abs(0.5 - pnorm(estimate, mean = snr, sd = se.z))
+			}
+			statistic <- (sx - sy - snr) / se.z
+			names(statistic) <- "Z"
+			# ??
+			df <- nx + ny - 2 
 
-			stop("NYI")
-
+			estimate <- .annualize(estimate,opy)
 			method <- "unpaired sr-test"
-		}
+		}#UNFOLD
 		names(estimate) <- "difference in Sharpe ratios"
 	}#UNFOLD
 
-	names(tstat) <- "t"
 	names(df) <- "df"
 	#attr(cint, "conf.level") <- conf.level
-	retval <- list(statistic = tstat, parameter = df,
+	retval <- list(statistic = statistic, parameter = df,
 								 estimate = estimate, p.value = pval, 
 								 alternative = alternative, null.value = snr,
 								 method = method, data.name = dname)
