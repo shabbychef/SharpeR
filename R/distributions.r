@@ -101,7 +101,7 @@
 #'
 #' dsr(x, df, snr, opy, log = FALSE)
 #'
-#' psr(q, df, snr, opy, lower.tail = TRUE, log.p = FALSE) 
+#' psr(q, df, snr, opy, ...)
 #'
 #' qsr(p, df, snr, opy, lower.tail = TRUE, log.p = FALSE) 
 #'
@@ -123,6 +123,8 @@
 #' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
+#' @param ... arguments passed on to the respective F distribution functions, namely
+#' \code{lower.tail} with default \code{TRUE}, and \code{log.p}, with default \code{FALSE}.
 #' @keywords distribution 
 #' @return \code{dsr} gives the density, \code{psr} gives the distribution function,
 #' \code{qsr} gives the quantile function, and \code{rsr} generates random deviates.
@@ -259,9 +261,9 @@ rsr <- function(n, df, snr, opy) {
 #'
 #' dT2(x, df1, df2, delta2, log = FALSE)
 #'
-#' pT2(q, df1, df2, delta2, lower.tail = TRUE, log.p = FALSE) 
+#' pT2(q, df1, df2, delta2, ...)
 #'
-#' qT2(p, df1, df2, delta2, lower.tail = TRUE, log.p = FALSE) 
+#' qT2(p, df1, df2, delta2, ...)
 #'
 #' rT2(n, df1, df2, delta2)
 #'
@@ -275,9 +277,9 @@ rsr <- function(n, df, snr, opy) {
 #' @param delta2 the population non-centrality parameter, defined as 
 #'        \eqn{\delta^2 = n \mu^{\top}\Sigma^{-1}\mu}{delta^2 = n (mu' Sigma^-1 mu)}.
 #'        defaults to 0, i.e. a central \eqn{T^2}{T2} distribution.
-#' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
-#' @param lower.tail logical; if TRUE (default), probabilities are
-#'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
+#' @param log logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param ... arguments passed on to the respective F distribution functions, namely
+#' \code{lower.tail} with default \code{TRUE}, and \code{log.p}, with default \code{FALSE}.
 #' @keywords distribution 
 #' @return \code{dT2} gives the density, \code{pT2} gives the distribution function,
 #' \code{qT2} gives the quantile function, and \code{rT2} generates random deviates.
@@ -410,11 +412,11 @@ rT2 <- function(n, df1, df2, delta2) {
 #'
 #' dsrstar(x, df1, df2, snrstar, opy, drag = 0, log = FALSE)
 #'
-#' psrstar(q, df1, df2, snrstar, opy, drag = 0, lower.tail = TRUE, log.p = FALSE) 
+#' psrstar(q, df1, df2, snrstar, opy, drag = 0, ...)
 #'
-#' qsrstar(p, df1, df2, snrstar, opy, drag = 0, lower.tail = TRUE, log.p = FALSE) 
+#' qsrstar(p, df1, df2, snrstar, opy, drag = 0, ...)
 #'
-#' rsrstar(n, df1, df2, snrstar, opy, drag = 0)
+#' rsrstar(n, df1, df2, snrstar, opy, drag = 0, ...)
 #'
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
@@ -432,16 +434,15 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
 #'        that \code{drag} has been annualized, \emph{i.e.} is given in the
 #'        same units as \code{x} and \code{q}.
-#' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
-#' @param lower.tail logical; if TRUE (default), probabilities are
-#'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
+#' @param log logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param ... arguments passed on to the respective Hotelling \eqn{T^2} functions.
 #' @keywords distribution 
 #' @return \code{dsrstar} gives the density, \code{psrstar} gives the distribution function,
 #' \code{qsrstar} gives the quantile function, and \code{rsrstar} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
 #' @aliases psrstar qsrstar rsrstar
-#' @seealso Hotelling T2-distribution functions, \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
+#' @seealso Hotelling \eqn{T^2}-distribution functions, \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @note

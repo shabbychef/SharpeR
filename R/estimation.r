@@ -228,8 +228,8 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #'
 #' @usage
 #'
-#' sr.confint(sr,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
-#'            level.lo=(1-level)/2,level.hi=1-level.lo)
+#' srstar.confint(srstar,df1,df2,level=0.95,
+#'                opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
 #' @param sr an observed Sharpe ratio statistic, annualized.
 #' @param df the number of observations the statistic is based on. This 
@@ -303,7 +303,7 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 		}
 		lb <- ifelse(ub > 2,ub/4,lb)
 	}
-	ncp.MLE <- optimize(max_func,c(lb,ub),maximum=TRUE)$maximum;
+	ncp.MLE <- optimize(max.func,c(lb,ub),maximum=TRUE)$maximum;
 	return(ncp.MLE)
 }
 # KRS estimator of the ncp based on a single F-stat
@@ -341,20 +341,32 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 #' up to scaling, the same estimators can be used to estimate the 
 #' non-centrality parameter of a non-central Hotelling T-squared statistic.
 #'
+#' 2FIX: describe srstar and drag.
+#'
 #' @usage
 #'
-#' F_ncp_est(Fs, df1, df2, type=c("KRS","MLE","unbiased"))
+#' F.inference(Fs, df1, df2, type=c("KRS","MLE","unbiased"))
 #'
-#' T2_ncp_est(T2,df1,df2,...) 
+#' T2.inference(T2,df1,df2,...) 
+#'
+#' srstar.inference(srstar,df1,df2,opy=1,drag=0,...)
 #'
 #' @param Fs a (non-central) F statistic.
 #' @param T2 a (non-central) Hotelling T-squared statistic.
 #' @param df1 the numerator degrees of freedom.
 #' @param df2 the denominator degrees of freedom.
 #' @param type the estimator type. one of \code{"KRS", "MLE", "unbiased"}
+#' @param opy the number of observations per 'year'. \code{srstar} is  
+#'        assumed given in 'annualized' units, that is, per 'year',
+#'        but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
+#'        that \code{drag} has been annualized, \emph{i.e.} is given in the
+#'        same units as \code{srstar}.
+#' @param ... the \code{type} which is passed on to \code{F.inference}.
 #' @keywords htest
 #' @return an estimate of the non-centrality parameter.
-#' @aliases T2_ncp_est
+#' @aliases T2.inference srstar.inference
 #' @seealso F-distribution functions, \code{\link{df}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
@@ -369,9 +381,9 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 #'
 #' @examples 
 #' rvs <- rf(1024, 4, 1000, 5)
-#' unbs <- F_ncp_est(rvs, 4, 1000, type="unbiased")
+#' unbs <- F.inference(rvs, 4, 1000, type="unbiased")
 #'
-F_ncp_est <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
+F.inference <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
 	# type defaults to "KRS":
 	type <- match.arg(type)
 	Fncp <- switch(type,
@@ -381,14 +393,28 @@ F_ncp_est <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
 	return(Fncp)
 }
 #' @export 
-T2_ncp_est <- function(T2,df1,df2,...) {
+T2.inference <- function(T2,df1,df2,...) {
 	Fs <- .T2_to_F(T2, df1, df2)
 	Fdf1 <- df1
 	Fdf2 <- df2 - df1
-	retv <- F_ncp_est(Fs,Fdf1,Fdf2,...)
+	retv <- F.inference(Fs,Fdf1,Fdf2,...)
 	# the NCP is legit
-	retv <- Fncp
+	retv <- retv
 	return(retv)
+}
+#' @export 
+srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
+	if (!missing(drag) && (drag != 0)) 
+		srstar <- srstar + drag
+	if (!missing(opy)) 
+		srstar <- .deannualize(srstar, opy)
+	T2 <- .srstar_to_T2(srstar, df2)
+	retval <- T2.inference(T2,df1,df2,...)
+	if (!missing(opy)) 
+		retval <- .annualize(retval, opy)
+	if (!missing(drag) && (drag != 0)) 
+		retval <- retval - drag
+	return(retval)
 }
 #UNFOLD
 
@@ -491,45 +517,6 @@ fncp.ci <- function(F,df1,df2,alpha.lo=0.025,alpha.hi=1-alpha.lo) {
 	return(list('lo' = cilo,'hi' = cihi))
 }
 
-#UNFOLD
-
-# inference on Hotelling's ncp, by extension#FOLDUP
-
-# confidence distribution, gives CIs
-qcoT2ncp <- function(plev,T2,p,n,ub=NULL) {
-	# convert to F
-	Fs <- f_hot2F(T2=T2,p=p,n=n)
-	if (!is.null(ub)) {
-		ub <- f_hot2F(T2=ub,p=p,n=n)
-	}
-	# delegate
-	F.ncp <- qcofncp(plev,Fs,df1=p,df2=n-p,ub=ub)
-	# they have the same ncp; no back conversion
-	return(F.ncp)
-}
-
-# use same to construct confidence intervals
-T2ncp.ci <- function(T2,p,n,alpha.lo=0.025,alpha.hi=1-alpha.lo) {
-	# convert to F
-	Fs <- f_hot2F(T2=T2,p=p,n=n)
-	# delegate
-	F.ci <- fncp.ci(Fs,df1=p,df2=n-p,alpha.lo=alpha.lo,alpha.hi=alpha.hi)
-	# they have the same ncp; no back conversion
-	return(F.ci)
-}
-
-#MLE of the ncp
-T2ncp.mle <- function(T2,p,n,ub=NULL) {
-	# convert to F
-	Fs <- f_hot2F(T2=T2,p=p,n=n)
-	if (!is.null(ub)) {
-		ub <- f_hot2F(T2=ub,p=p,n=n)
-	}
-	# delegate
-	F.mle <- fncp.mle(Fs,df1=p,df2=n-p,ub=ub)
-	# they have the same ncp; no back conversion
-	return(F.mle)
-}
 #UNFOLD
 
 #for vim modeline: (do not edit)

@@ -4,9 +4,8 @@ Author: Steven E. Pav
 Authors@R: c(person("Steven", "Pav", role="aut", email="shabbychef@gmail.com"))
 Version: 0.1302
 License: LGPL-3
-Title: Rat-arb
-Description: a collection of tools for analyzing significance of trading
-    strategies, based on the Sharpe ratio and overfit of same.
+Title: Pay me 20 dollars and I'll tell you what 'Rat-arb' is.
+Description: a collection of tools for analyzing significance of trading strategies, based on the Sharpe ratio and overfit of the same.
 Collate:
     'ratarb.r'
     'utils.r'
