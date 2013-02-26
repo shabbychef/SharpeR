@@ -279,10 +279,11 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	}
 	x <- x[xok]
 	if (is.null(y)) {#FOLDUP
-		nx <- length(x)
+		subsr <- sharpe(x,c0=0)
+		nx <- subsr$df
 		if (nx < 2) 
 			stop("not enough 'x' observations")
-		sx <- sharpe(x,c0=0)
+		sx <- subsr$sr
 		estimate <- .annualize(sx,opy)
 		statistic <- .sr_to_t(sx,nx)
 		names(statistic) <- "t"
@@ -323,8 +324,14 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			pval <- subtest$p.value
 		} #UNFOLD
 		else {#FOLDUP
-			sx <- sharpe(x,c0=0)
-			sy <- sharpe(y,c0=0)
+			srx <- sharpe(x,c0=0)
+			sry <- sharpe(y,c0=0)
+
+			sx <- srx$sr
+			sy <- sry$sr
+			nx <- srx$df
+			ny <- sry$df
+
 			se.x <- sr.se(sx,nx,type="t")
 			se.y <- sr.se(sy,ny,type="t")
 			se.z <- sqrt(se.x^2 + se.y^2)
@@ -436,13 +443,13 @@ srstar.test <- function(X,alternative=c("greater","two.sided","less"),
 
 	# 2FIX: add CIs here.
 	if (alternative == "less") {
-		pval <- psrstar(estimate, df1=df1, df2=df2, snr=snrstar, opy=opy)
+		pval <- psrstar(estimate, df1=df1, df2=df2, snrstar=snrstar, opy=opy)
 	}
 	else if (alternative == "greater") {
-		pval <- psrstar(estimate, df1=df1, df2=df2, snr=snrstar, opy=opy, lower.tail = FALSE)
+		pval <- psrstar(estimate, df1=df1, df2=df2, snrstar=snrstar, opy=opy, lower.tail = FALSE)
 	}
 	else {
-		pval <- .oneside2two(psrstar(estimate, df1=df1, df2=df2, snr=snrstar, opy=opy))
+		pval <- .oneside2two(psrstar(estimate, df1=df1, df2=df2, snrstar=snrstar, opy=opy))
 	}
 
 	names(df1) <- "df1"

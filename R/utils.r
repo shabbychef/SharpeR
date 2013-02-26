@@ -10,6 +10,8 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
+require(Hmisc)
+
 # asymetric toeplitz, like Matlab's; 
 # allows you to give the first row vector and the first column vector.
 .atoeplitz <- function(rv,cv=rv) {
@@ -64,7 +66,9 @@
 #'        'annualize' the answer.
 #' @param na.rm logical.  Should missing values be removed?
 #' @keywords univar 
-#' @return the annualized Sharpe ratio.
+#' @return A list with containing the following components:
+#' \item{sr}{the annualized Sharpe ratio.}
+#' \item{df}{the number of observations.}
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
@@ -83,7 +87,10 @@ sharpe <- function(x,c0=0,opy=1,na.rm=FALSE) {
 	sr <- (mean(x,na.rm=na.rm) - c0) / sd(x,na.rm=na.rm)
 	if (!missing(opy))
 		sr <- .annualize(sr,opy)
-	return(sr)
+	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
+	units(sr) <- "yr^-0.5"
+	retval <- list(sr = sr,df = df)
+	return(retval)
 }
 
 # compute the markowitz portfolio
@@ -107,22 +114,24 @@ sharpe <- function(x,c0=0,opy=1,na.rm=FALSE) {
 	return(retval)
 }
 
+# 2FIX: wrap this into a class?
 .sharpe.star <- function(X,opy=1) {
 	retval <- .hotelling(X)
 	retval$srstar <- sqrt(retval$T2 / retval$n)
 	if (!missing(opy))
 		retval$srstar <- .annualize(retval$srstar,opy)
+	units(retval$srstar) <- "yr^-0.5"
 	return(retval)
 }
+
+
+#UNFOLD
 
 # convert p-value for a 1-sided test into one for a two-sided test.
 .oneside2two <- function(pv) {
 	retval <- 1 - 2 * abs(0.5 - pv)
 	return(retval)
 }
-
-
-#UNFOLD
 
 # annualize and deannualize a Sharpe Ratio#FOLDUP
 #' @param sr the Sharpe Ratio, in per sqrt(epoch) units.

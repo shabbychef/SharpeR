@@ -127,7 +127,7 @@ sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 							 t = .sr_se_lo(sr,df,ss.adjust=TRUE),
 							 Lo = .sr_se_lo(sr,df,ss.adjust=FALSE),
 							 Z = .sr_se_walck(sr,df),
-							 F = .sr_se_weirdo(sr,n))
+							 F = .sr_se_weirdo(sr,df))
 	if (!missing(opy)) {
 		se <- .annualize(se,opy)
 	}
@@ -231,13 +231,10 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #' srstar.confint(srstar,df1,df2,level=0.95,
 #'                opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
-#' @param sr an observed Sharpe ratio statistic, annualized.
-#' @param df the number of observations the statistic is based on. This 
-#'        is one more than the number of degrees of freedom in the
-#'        corresponding t-statistic, although the effect will be small
-#'        when \code{df} is large.
+#' @param srstar an observed Sharpe ratio statistic, annualized.
+#' @param df1 the numerator degrees of freedom, the number of assets.
+#' @param df2 the denominator degrees of freedom, the number of observations.
 #' @param level the confidence level required.
-#' @param type the estimator type. one of \code{"t", "Lo", "Z", "F"}
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{snr} are quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
@@ -256,8 +253,7 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #' opy <- 253
 #' df <- opy * 6
 #' rvs <- rsr(1, df, 1.0, opy)
-#' aci <- sr.confint(rvs,df,type="t",opy=opy)
-#' aci2 <- sr.confint(rvs,df,type="Z",opy=opy)
+#' aci <- sr.confint(rvs,df,opy=opy)
 #'
 #'@export
 srstar.confint <- function(srstar,df1,df2,level=0.95,
@@ -315,12 +311,32 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 	return(delta2)
 }
 
-#' @title Inference on noncentrality parameter of observed F statistic 
+#' @export 
+F.inference <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
+	# type defaults to "KRS":
+	type <- match.arg(type)
+	Fncp <- switch(type,
+								 MLE = .F_ncp_MLE(Fs,df1,df2),
+								 KRS = .F_ncp_KRS(Fs,df1,df2),
+								 unbiased = .F_ncp_unbiased(Fs,df1,df2))
+	return(Fncp)
+}
+#' @export 
+T2.inference <- function(T2,df1,df2,...) {
+	Fs <- .T2_to_F(T2, df1, df2)
+	Fdf1 <- df1
+	Fdf2 <- df2 - df1
+	retv <- F.inference(Fs,Fdf1,Fdf2,...)
+	# the NCP is legit
+	retv <- retv
+	return(retv)
+}
+#' @title Inference on noncentrality parameter of F or F-like statistic 
 #'
 #' @description 
 #'
 #' Estimates the non-centrality parameter associated with an observed
-#' statistic following a (non-central) F distribution.
+#' statistic following a (non-central) F, \eqn{T^2}, or srstar distribution. 
 #'
 #' @details 
 #'
@@ -352,10 +368,11 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 #' srstar.inference(srstar,df1,df2,opy=1,drag=0,...)
 #'
 #' @param Fs a (non-central) F statistic.
-#' @param T2 a (non-central) Hotelling T-squared statistic.
-#' @param df1 the numerator degrees of freedom.
-#' @param df2 the denominator degrees of freedom.
-#' @param type the estimator type. one of \code{"KRS", "MLE", "unbiased"}
+#' @param T2 a (non-central) Hotelling \eqn{T^2} statistic.
+#' @param srstar an observed Sharpe ratio statistic, annualized.
+#' @param df1 the numerator degrees of freedom, the number of assets.
+#' @param df2 the denominator degrees of freedom, the number of observations.
+#' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
 #' @param opy the number of observations per 'year'. \code{srstar} is  
 #'        assumed given in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
@@ -366,7 +383,7 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 #' @param ... the \code{type} which is passed on to \code{F.inference}.
 #' @keywords htest
 #' @return an estimate of the non-centrality parameter.
-#' @aliases T2.inference srstar.inference
+#' @aliases F.inference T2.inference srstar.inference
 #' @seealso F-distribution functions, \code{\link{df}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
@@ -383,26 +400,6 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 #' rvs <- rf(1024, 4, 1000, 5)
 #' unbs <- F.inference(rvs, 4, 1000, type="unbiased")
 #'
-F.inference <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
-	# type defaults to "KRS":
-	type <- match.arg(type)
-	Fncp <- switch(type,
-								 MLE = .F_ncp_MLE(Fs,df1,df2),
-								 KRS = .F_ncp_KRS(Fs,df1,df2),
-								 unbiased = .F_ncp_unbiased(Fs,df1,df2))
-	return(Fncp)
-}
-#' @export 
-T2.inference <- function(T2,df1,df2,...) {
-	Fs <- .T2_to_F(T2, df1, df2)
-	Fdf1 <- df1
-	Fdf2 <- df2 - df1
-	retv <- F.inference(Fs,Fdf1,Fdf2,...)
-	# the NCP is legit
-	retv <- retv
-	return(retv)
-}
-#' @export 
 srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
 	if (!missing(drag) && (drag != 0)) 
 		srstar <- srstar + drag
