@@ -8,7 +8,6 @@ Title: Pay me 20 dollars and I'll tell you what 'Rat-arb' is.
 Description: a collection of tools for analyzing significance of trading strategies, based on the Sharpe ratio and overfit of the same.
 Depends: R (>= 2.4.0), Hmisc
 Collate:
-    'ratarb.r' 
     'utils.r' 
     'distributions.r' 
     'estimation.r' 
