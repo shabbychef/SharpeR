@@ -37,7 +37,7 @@ endif
 EXTRA_FILES = Makefile rebuildTags.sh .gitignore .tags .R_tags
 EXTRA_DIRS = .git
 
-.PHONY: help news
+.PHONY: help news gitpush gitpull
 
 help:
 	@echo "\nExecute development tasks for $(PKGNAME)\n"
@@ -149,6 +149,13 @@ test: install
 	#@echo 'Perform final touchups and commit with `git commit --amend`.'
 	#@echo 'Remember to run `git svn dcommit` before `git push` as synching with'
 	#@echo 'R-Forge SVN will alter the SHA.'
+
+gitpush :
+	git push origin master
+
+gitpull :
+	git pull origin master
+
 
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:tags=tags;:syntax=make:filetype=make:ai:si:cin:nu:fo=croqt:cino=p0t0c5(0:
