@@ -228,7 +228,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' \item{statistic}{the value of the t- or Z-statistic.}
 #' \item{parameter}{the degrees of freedom for the statistic.}
 #' \item{p.value}{the p-value for the test.}
-#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
+#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
 #' \item{estimate}{the estimated Sharpe or difference in Sharpes depending on whether it was a one-sample test or a two-sample test. Annualized}
 #' \item{null.value}{the specified hypothesized value of the Sharpe or difference of Sharpes depending on whether it was a one-sample test or a two-sample test.}
 #' \item{alternative}{a character string describing the alternative hypothesis.}
@@ -292,15 +292,20 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 		method <- "One Sample sr test"
 		names(estimate) <- "Sharpe ratio of x"
 
-		# 2FIX: add CIs here.
 		if (alternative == "less") {
 			pval <- psr(estimate, df=nx, snr=snr, opy=opy)
+			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
+												 level.lo=0,level.hi=conf.level)
 		}
 		else if (alternative == "greater") {
 			pval <- psr(estimate, df=nx, snr=snr, opy=opy, lower.tail = FALSE)
+			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
+												 level.lo=1-conf.level,level.hi=1)
 		}
 		else {
 			pval <- .oneside2two(psr(estimate, df=nx, snr=snr, opy=opy))
+			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
+												 level=conf.level)
 		}
 	} #UNFOLD
 	else {#FOLDUP
@@ -364,6 +369,89 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 								 alternative = alternative, null.value = snr,
 								 method = method, data.name = dname)
 	class(retval) <- "htest"
+	return(retval)
+}
+
+#' @title Power calculations for Sharpe ratio tests
+#'
+#' @description 
+#'
+#' Compute power of test, or determine parameters to obtain target power.
+#'
+#' @details 
+#'
+#' Suppose you perform a single-sample test for significance of the
+#' Sharpe ratio based on the corresponding single-sample t-test. 
+#' Given any three of: the effect size (the population SNR), the
+#' number of observations, and the type I and type II rates,
+#' this computes the fourth.
+#'
+#' This is a thin wrapper on \code{\link{power.t.test}}.
+#'
+#' Exactly one of the parameters \code{n}, \code{snr}, \code{power}, and 
+#' \code{sig.level} must be passed as NULL, and that parameter is determined 
+#' from the others.  Notice that \code{sig.level} has non-NULL default, so NULL 
+#' must be explicitly passed if you want to compute it.
+#' 
+#' @usage
+#'
+#' power.sr.test(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
+#'                           alternative=c("one.sided","two.sided"),opy=NULL) 
+#'
+#' @param n Number of observations
+#' @param snr the 'signal-to-noise' parameter, defined as the population
+#'        mean divided by the population standard deviation, 'annualized'.
+#' @param sig.level Significance level (Type I error probability).
+#' @param power Power of test (1 minus Type II error probability).
+#' @param alternative One- or two-sided test.
+#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
+#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#'        'year', but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @keywords htest
+#' @return Object of class \code{power.htest}, a list of the arguments
+#' (including the computed one) augmented with \code{method}, \code{note}
+#' and \code{n.yr} elements, the latter is the number of years under the
+#' given annualization (\code{opy}), \code{NA} if none given.
+#' @seealso \code{\link{power.t.test}}, \code{\link{sr.test}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @examples 
+#' anex <- power.sr.test(253,1,0.05,NULL,opy=253) 
+#' anex <- power.sr.test(n=253,snr=NULL,sig.level=0.05,power=0.5,opy=253) 
+#' anex <- power.sr.test(n=NULL,snr=0.6,sig.level=0.05,power=0.5,opy=253) 
+#'
+#'@export
+#2FIX: this is hosed. remake it.
+power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
+													alternative=c("one.sided","two.sided"),
+													opy=NULL) {
+	# stolen from power.t.test
+	if (sum(sapply(list(n, snr, power, sig.level), is.null)) != 1) 
+			stop("exactly one of 'n', 'snr', 'power', and 'sig.level' must be NULL")
+	if (!is.null(sig.level) && !is.numeric(sig.level) || any(0 > 
+			sig.level | sig.level > 1)) 
+			stop("'sig.level' must be numeric in [0, 1]")
+	type <- "one.sample"
+	alternative <- match.arg(alternative)
+	if (!missing(opy) && !is.null(opy) && !is.null(snr)) {
+		snr <- .deannualize(snr,opy)
+	}
+	# delegate
+	subval <- power.t.test(n=n,delta=snr,sd=1,sig.level=sig.level,
+												 power=power,type=type,alternative=alternative,
+												 strict=FALSE)
+	# interpret
+	subval$snr <- subval$delta
+	if (!missing(opy) && !is.null(opy)) {
+		subval$snr <- .annualize(subval$snr,opy)
+		subval$n.yr <- subval$n / opy
+	} else {
+		subval$n.yr <- NA
+	}
+	
+	retval <- subval[c("n","n.yr","snr","sig.level","power","alternative","note","method")]
+	retval <- structure(retval,class=class(subval))
 	return(retval)
 }
 #UNFOLD
@@ -466,88 +554,6 @@ srstar.test <- function(X,alternative=c("greater","two.sided","less"),
 #UNFOLD
 
 # power of tests:#FOLDUP
-
-#' @title Power calculations for Sharpe ratio tests
-#'
-#' @description 
-#'
-#' Compute power of test, or determine parameters to obtain target power.
-#'
-#' @details 
-#'
-#' Suppose you perform a single-sample test for significance of the
-#' Sharpe ratio based on the corresponding single-sample t-test. 
-#' Given any three of: the effect size (the population SNR), the
-#' number of observations, and the type I and type II rates,
-#' this computes the fourth.
-#'
-#' This is a thin wrapper on \code{\link{power.t.test}}.
-#'
-#' Exactly one of the parameters \code{n}, \code{snr}, \code{power}, and 
-#' \code{sig.level} must be passed as NULL, and that parameter is determined 
-#' from the others.  Notice that \code{sig.level} has non-NULL default, so NULL 
-#' must be explicitly passed if you want to compute it.
-#' 
-#' @usage
-#'
-#' power.sr.test(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
-#'                           alternative=c("one.sided","two.sided"),opy=NULL) 
-#'
-#' @param n Number of observations
-#' @param snr the 'signal-to-noise' parameter, defined as the population
-#'        mean divided by the population standard deviation, 'annualized'.
-#' @param sig.level Significance level (Type I error probability).
-#' @param power Power of test (1 minus Type II error probability).
-#' @param alternative One- or two-sided test.
-#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
-#'        'year', but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
-#' @keywords htest
-#' @return Object of class \code{power.htest}, a list of the arguments
-#' (including the computed one) augmented with \code{method}, \code{note}
-#' and \code{n.yr} elements, the latter is the number of years under the
-#' given annualization (\code{opy}), \code{NA} if none given.
-#' @seealso \code{\link{power.t.test}}
-#' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @examples 
-#' anex <- power.sr.test(253,1,0.05,NULL,opy=253) 
-#' anex <- power.sr.test(n=253,snr=NULL,sig.level=0.05,power=0.5,opy=253) 
-#' anex <- power.sr.test(n=NULL,snr=0.6,sig.level=0.05,power=0.5,opy=253) 
-#'
-#'@export
-power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
-													alternative=c("one.sided","two.sided"),
-													opy=NULL) {
-	# stolen from power.t.test
-	if (sum(sapply(list(n, snr, power, sig.level), is.null)) != 1) 
-			stop("exactly one of 'n', 'snr', 'power', and 'sig.level' must be NULL")
-	if (!is.null(sig.level) && !is.numeric(sig.level) || any(0 > 
-			sig.level | sig.level > 1)) 
-			stop("'sig.level' must be numeric in [0, 1]")
-	type <- "one.sample"
-	alternative <- match.arg(alternative)
-	if (!missing(opy) && !is.null(opy) && !is.null(snr)) {
-		snr <- .deannualize(snr,opy)
-	}
-	# delegate
-	subval <- power.t.test(n=n,delta=snr,sd=1,sig.level=sig.level,
-												 power=power,type=type,alternative=alternative,
-												 strict=FALSE)
-	# interpret
-	subval$snr <- subval$delta
-	if (!missing(opy) && !is.null(opy)) {
-		subval$snr <- .annualize(subval$snr,opy)
-		subval$n.yr <- subval$n / opy
-	} else {
-		subval$n.yr <- NA
-	}
-	
-	retval <- subval[c("n","n.yr","snr","sig.level","power","alternative","note","method")]
-	retval <- structure(retval,class=class(subval))
-	return(retval)
-}
 
 # 2FIX: should this be expanded in its own right?
 power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) {

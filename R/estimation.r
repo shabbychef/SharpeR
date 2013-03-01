@@ -107,8 +107,11 @@
 #' Johnson, N. L., and Welch, B. L. "Applications of the non-central t-distribution."
 #' Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31.3-4.362}
 #'
-#' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal (2002): 36-52.
-#' \url{http://ssrn.com/paper=377260}
+#' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
+#' (2002): 36-52. \url{http://ssrn.com/paper=377260}
+#'
+#' Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the p-values?" Journal of Asset
+#' Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}
 #'
 #' @examples 
 #' opy <- 253
@@ -119,6 +122,8 @@
 #'
 #'@export
 sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) { 
+	# 2FIX: add opdyke corrections for skew and kurtosis?
+	# 2FIX: add autocorrelation correction?
 	if (!missing(opy)) {
 		sr <- .deannualize(sr,opy)
 	}
