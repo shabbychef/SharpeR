@@ -279,7 +279,7 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	}
 	x <- x[xok]
 	if (is.null(y)) {#FOLDUP
-		subsr <- sharpe(x,c0=0)
+		subsr <- full.sr(x,c0=0)
 		nx <- subsr$df
 		if (nx < 2) 
 			stop("not enough 'x' observations")
@@ -329,8 +329,8 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			pval <- subtest$p.value
 		} #UNFOLD
 		else {#FOLDUP
-			srx <- sharpe(x,c0=0)
-			sry <- sharpe(y,c0=0)
+			srx <- full.sr(x,c0=0)
+			sry <- full.sr(y,c0=0)
 
 			sx <- srx$sr
 			sy <- sry$sr
@@ -518,7 +518,7 @@ srstar.test <- function(X,alternative=c("greater","two.sided","less"),
 		stop("'conf.level' must be a single number between 0 and 1")
 
 	dname <- deparse(substitute(X))
-	subtest <- .sharpe.star(X,opy=opy)
+	subtest <- full.srstar(X,opy=opy)
 	statistic <- subtest$T2
 	names(statistic) <- "T2"
 	estimate <- subtest$srstar
@@ -527,7 +527,7 @@ srstar.test <- function(X,alternative=c("greater","two.sided","less"),
 	method <- "One Sample srstar test"
 
 	df1 <- subtest$df1
-	df2 <- subtest$n
+	df2 <- subtest$df2
 
 	# 2FIX: add CIs here.
 	if (alternative == "less") {

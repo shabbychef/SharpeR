@@ -49,26 +49,32 @@ require(Hmisc)
 #' \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} 
 #' is the (sample) Sharpe ratio.
 #' 
-#' The units of \eqn{z}{z} is \eqn{\mbox{time}^{-1/2}}{per root time}.
+#' The units of \eqn{z}{z} are \eqn{\mbox{time}^{-1/2}}{per root time}.
 #' Typically the Sharpe ratio is \emph{annualized} by multiplying by
 #' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
 #' is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
-#'
 #' @usage
 #'
-#' sharpe(x,c0=0,opy=1,na.rm=FALSE)
+#' full.sr(x,c0=0,opy=1,na.rm=FALSE)
+#'
+#' sr(x,...)
 #'
 #' @param x vector of returns.
-#' @param c0 the 'risk-free' or 'disastrous' rate of return.
+#' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
+#'        assumed to be given in the same units as x, \emph{not}
+#'        in 'annualized' terms.
 #' @param opy the number of observations per 'year'. This is used to
 #'        'annualize' the answer.
 #' @param na.rm logical.  Should missing values be removed?
+#' @param ... the above extra parameters,  passed on to \code{full.sr}
 #' @keywords univar 
-#' @return A list with containing the following components:
+#' @return \code{full.sr} returns a list with containing the following components:
 #' \item{sr}{the annualized Sharpe ratio.}
 #' \item{df}{the number of observations.}
+#' \code{sr} just returns the numeric annualized Sharpe.
+#' @aliases sr
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
@@ -81,16 +87,23 @@ require(Hmisc)
 #' \url{http://ssrn.com/paper=377260}
 #'
 #' @examples 
-#' rvs <- sharpe(rnorm(253*8),opy=253)
+#' rvs <- full.sr(rnorm(253*8),opy=253)
+#' rvs <- sr(rnorm(253*8),opy=253)
 #'
-sharpe <- function(x,c0=0,opy=1,na.rm=FALSE) {
+full.sr <- function(x,c0=0,opy=1,na.rm=FALSE) {
 	sr <- (mean(x,na.rm=na.rm) - c0) / sd(x,na.rm=na.rm)
 	if (!missing(opy))
 		sr <- .annualize(sr,opy)
 	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
 	units(sr) <- "yr^-0.5"
-	retval <- list(sr = sr,df = df)
+	retval <- list(sr = sr,df = df,c0 = c0,opy = opy)
 	return(retval)
+}
+#' @export 
+sr <- function(x,...) {
+	# delegate
+	subret <- full.sr(x,...)
+	return(subret$sr)
 }
 
 # compute the markowitz portfolio
@@ -102,26 +115,101 @@ sharpe <- function(x,c0=0,opy=1,na.rm=FALSE) {
 		Sigma <- cov(X)
 	w <- solve(Sigma,mu)
 	n <- dim(X)[1]
-	retval <- list(w = w, mu = mu, Sigma = Sigma, n = n)
+	retval <- list(w = w, mu = mu, Sigma = Sigma, df1 = length(w), df2 = n)
 	return(retval)
 }
 
 # compute Hotelling's statistic.
 .hotelling <- function(X) {
 	retval <- .markowitz(X)
-	retval$T2 <- retval$n * (retval$mu %*% retval$w)
-	retval$df1 <- length(retval$w)
+	retval$T2 <- retval$df2 * (retval$mu %*% retval$w)
 	return(retval)
 }
 
-# 2FIX: wrap this into a class?
-.sharpe.star <- function(X,opy=1) {
+#' @title Compute the Sharpe ratio of the Markowitz portfolio.
+#'
+#' @description 
+#'
+#' Computes the Sharpe ratio of the Markowitz portfolio of some observed returns.
+#'
+#' @details
+#' 
+#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+#' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
+#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). Let
+#' \deqn{\zeta(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar - c0)/sqrt(w'Sw)}
+#' be the (sample) Sharpe ratio of the portfolio \eqn{w}{w}, subject to 
+#' risk free rate \eqn{c_0}{c0}.
+#'
+#' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
+#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},}
+#' with maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* = zeta(w*)}.
+#' Then 
+#' \deqn{w_* = R \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
+#' w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)}
+#' and
+#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
+#' z* = sqrt(xbar' S^-1 xbar) - c0/R}
+#'
+#' The units of \eqn{z_*}{z*} are \eqn{\mbox{time}^{-1/2}}{per root time}.
+#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
+#' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
+#' is the number of observations
+#' per year (or whatever the target annualization epoch.)
+#'
+#' @usage
+#'
+#' full.srstar(X,drag=0,opy=1)
+#'
+#' srstar(X,...)
+#'
+#' @param X matrix of returns.
+#' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
+#'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
+#'        by \eqn{\sqrt{opy}}{sqrt(opy)}. This is in contrast to the \code{c0}
+#'        term given to \code{\link{sr}}.
+#' @param opy the number of observations per 'year'. The returns are observed
+#'        at a rate of \code{opy} per 'year.' default value is 1, meaning no 
+#'        annualization is performed.
+#' @param ... the above extra parameters,  passed on to \code{full.srstar}
+#' @keywords univar 
+#' @return A list with containing the following components:
+#' \item{w}{the optimal portfolio.}
+#' \item{mu}{the estimated mean return vector.}
+#' \item{Sigma}{the estimated covariance matrix.}
+#' \item{df1}{the number of assets.}
+#' \item{df2}{the number of observed vectors.}
+#' \item{T2}{the Hotelling \eqn{T^2} statistic.}
+#' \item{srstar}{the maximal Sharpe statistic.}
+#' \item{drag}{the input \code{drag} term.}
+#' \item{opy}{the input \code{opy} term.}
+#' @aliases srstar
+#' @seealso \code{\link{full.sr}}, srstar-distribution functions, 
+#' \code{\link{dsrstar}, \link{psrstar}, \link{qsrstar}, \link{rsrstar}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#'
+#' @examples 
+#' rvs <- full.srstar(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
+#' rvs <- srstar(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
+#'
+full.srstar <- function(X,drag=0,opy=1) {
 	retval <- .hotelling(X)
-	retval$srstar <- sqrt(retval$T2 / retval$n)
+	zeta.star <- sqrt(retval$T2 / retval$df2)
 	if (!missing(opy))
-		retval$srstar <- .annualize(retval$srstar,opy)
+		zeta.star <- .annualize(zeta.star,opy)
+	retval$srstar <- zeta.star - drag
+
 	units(retval$srstar) <- "yr^-0.5"
+	retval$drag <- drag
+	retval$opy <- opy
 	return(retval)
+}
+#' @export 
+srstar <- function(X,...) {
+	subret <- full.srstar(X,...)
+	return(subret$srstar)
 }
 
 
