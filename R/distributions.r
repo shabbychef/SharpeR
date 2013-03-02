@@ -1,7 +1,7 @@
 # Copyright 2012 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
-# This file is part of Sharper.
+# This file is part of SharpeR.
 #
 # SharpeR is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -38,14 +38,6 @@
 # showMethods("print") 
 # getAnywhere("t.test.default")
 
-# ' Kan, Raymond and Zhou, GuoFu. "Tests of Mean-Variance Spanning."
-# ' Annals of Economics and Finance 13, no. 1 (2012)
-# ' \url{http://www.aeconf.net/Articles/May2012/aef130105.pdf}
-# '
-# ' Britten-Jones, Mark. "The Sampling Error in Estimates of Mean-Variance 
-# ' Efficient Portfolio Weights." The Journal of Finance 54, no. 2 (1999):
-# ' 655--671. \url{http://www.jstor.org/stable/2697722}
-#
 ########################################################################
 # Distributions
 ########################################################################
