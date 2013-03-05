@@ -99,6 +99,9 @@
 #' @seealso sr-distribution functions, \code{\link{dsr}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @note
+#' Eventually this should include corrections for autocorrelation, skew,
+#' kurtosis.
 #' @references 
 #'
 #' Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
@@ -147,7 +150,17 @@ sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 #'
 #' @details 
 #'
-#' none yet...
+#' Constructs confidence intervals on the Signal-Noise ratio given observed
+#' Sharpe ratio statistic. The available methods are:
+#'
+#' \itemize{
+#' \item The default, \code{exact}, which is only exact when returns are
+#' normal, based on inverting the non-central t
+#' distribution.
+#' \item A method based on the standard error of a non-central t distribution.
+#' \item A method based on a normal approximation.
+#' \item A method based on an F statistic.
+#' }
 #'
 #' @usage
 #'
@@ -229,7 +242,15 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #'
 #' @details 
 #'
-#' none yet...
+#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+#' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
+#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). 
+#' Let 
+#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}}}{z* = sqrt(xbar' S^-1 xbar)}
+#' Given observations of \eqn{z_*}{z*}, compute confidence intervals on the
+#' population analogue, defined as
+#' \deqn{\zeta_* = \sqrt{\mu^{\top} \Sigma^{-1} \mu}}{zeta* = sqrt(mu' Sigma^-1 mu)}
 #'
 #' @usage
 #'
@@ -250,7 +271,7 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qco.srstar}}
+#' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qco.srstar}}, \code{\link{srstar.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #'
@@ -420,6 +441,7 @@ srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
 }
 #UNFOLD
 
+# notes:
 # extract statistics (t-stat) from lm object:
 # https://stat.ethz.ch/pipermail/r-help/2009-February/190021.html
 #
@@ -428,31 +450,6 @@ srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
 # or
 # sigma <- sqrt(deviance(fit) / df.residual(fit))
 # then base on confint? coef/vcov
-#
-# junkyard
-
-
-#t_power_rule <- function(n,alpha = 0.05,beta = 0.20,
-
-
-
-#compute the asymptotic mean and variance of the sqrt of a
-#non-central F distribution
-
-f_sqrt_ncf_asym_mu <- function(df1,df2,ncp = 0) {
-	return(sqrt((df2 / (df2 - 2)) * (df1 + ncp) / df1))
-}
-f_sqrt_ncf_asym_var <- function(df1,df2,ncp = 0) {
-	return((1 / (2 * df1)) * 
-				 (((df1 + ncp) / (df2 - 2)) + (2 * ncp + df1) / (df1 + ncp)))
-}
-f_sqrt_ncf_apx_pow <- function(df1,df2,ncp,alpha = 0.05) {
-	zalp <- qnorm(1 - alpha)
-	numr <- 1 - f_sqrt_ncf_asym_mu(df1,df2,ncp = ncp) + zalp / sqrt(2 * df1)
-	deno <- sqrt(f_sqrt_ncf_asym_var(df1,df2,ncp = ncp))
-	return(1 - pnorm(numr / deno))
-}
-
 
 # to get a hotelling statistic from n x k matrix x:
 # myt <- summary(manova(lm(x ~ 1)),test="Hotelling-Lawley",intercept=TRUE)
@@ -466,60 +463,80 @@ f_sqrt_ncf_apx_pow <- function(df1,df2,ncp,alpha = 0.05) {
 # ...
 # 
 
-########################################################################
-# confidence intervals
+## junkyard#FOLDUP
 
-# inference on F's ncp#FOLDUP
+#t_power_rule <- function(n,alpha = 0.05,beta = 0.20,
 
-# confidence distribution, gives CIs
-qcofncp <- function(p,Fs,df1,df2,ub=NULL) {
-	# return max{0 <= ncp <= ub | pf(Fs,df1,df2,ncp) >= 1 - p}
-	# or 0 if none exist
-	f.zer <- pf(Fs,df1,df2,0)
-	if (f.zer < (1-p)) {
-		return(0)
-	} else {
-		if (is.null(ub)) {
-			ub <- 1.0
-			fpf <- pf(Fs,df1,df2,ub)
-			while (fpf >= (1-p)) {
-				ub <- 2.0 * ub
-				fpf <- pf(Fs,df1,df2,ub)
-			}
-			lb <- 0.5 * ub
-		} else {
-			lb <- 0
-			fpf <- pf(Fs,df1,df2,ub)
-		}
-		# now call uniroot
-		zerf <- function(z,n,xv,limv) { pf(xv,p,n-p,n*z^2) - limv }
-		ncp <- uniroot(function(ncp,Fs,df1,df2,tgt){pf(Fs,df1,df2,ncp) - tgt},
-									 c(lb,ub),Fs=Fs,df1=df1,df2=df2,tgt=1-p)$root
-		return(ncp)
-	}
-}
+##compute the asymptotic mean and variance of the sqrt of a
+##non-central F distribution
 
-# use same to construct confidence intervals
-fncp.ci <- function(F,df1,df2,alpha.lo=0.025,alpha.hi=1-alpha.lo) {
-	if (alpha.hi >= 1) {
-		cihi <- Inf
-	} else {
-		cihi <- qcofncp(alpha.hi,F,df1,df2)
-	}
+#f_sqrt_ncf_asym_mu <- function(df1,df2,ncp = 0) {
+	#return(sqrt((df2 / (df2 - 2)) * (df1 + ncp) / df1))
+#}
+#f_sqrt_ncf_asym_var <- function(df1,df2,ncp = 0) {
+	#return((1 / (2 * df1)) * 
+				 #(((df1 + ncp) / (df2 - 2)) + (2 * ncp + df1) / (df1 + ncp)))
+#}
+#f_sqrt_ncf_apx_pow <- function(df1,df2,ncp,alpha = 0.05) {
+	#zalp <- qnorm(1 - alpha)
+	#numr <- 1 - f_sqrt_ncf_asym_mu(df1,df2,ncp = ncp) + zalp / sqrt(2 * df1)
+	#deno <- sqrt(f_sqrt_ncf_asym_var(df1,df2,ncp = ncp))
+	#return(1 - pnorm(numr / deno))
+#}
 
-	if (alpha.lo <= 0) {
-		cilo <- 0
-	} else {
-		if (is.finite(cihi)) {
-			cilo <- qcofncp(alpha.lo,F,df1,df2,ub=cihi)
-		} else {
-			cilo <- qcofncp(alpha.lo,F,df1,df2)
-		}
-	}
-	return(list('lo' = cilo,'hi' = cihi))
-}
 
-#UNFOLD
+## inference on F's ncp
+
+## confidence distribution, gives CIs
+#qcofncp <- function(p,Fs,df1,df2,ub=NULL) {
+	## return max{0 <= ncp <= ub | pf(Fs,df1,df2,ncp) >= 1 - p}
+	## or 0 if none exist
+	#f.zer <- pf(Fs,df1,df2,0)
+	#if (f.zer < (1-p)) {
+		#return(0)
+	#} else {
+		#if (is.null(ub)) {
+			#ub <- 1.0
+			#fpf <- pf(Fs,df1,df2,ub)
+			#while (fpf >= (1-p)) {
+				#ub <- 2.0 * ub
+				#fpf <- pf(Fs,df1,df2,ub)
+			#}
+			#lb <- 0.5 * ub
+		#} else {
+			#lb <- 0
+			#fpf <- pf(Fs,df1,df2,ub)
+		#}
+		## now call uniroot
+		#zerf <- function(z,n,xv,limv) { pf(xv,p,n-p,n*z^2) - limv }
+		#ncp <- uniroot(function(ncp,Fs,df1,df2,tgt){pf(Fs,df1,df2,ncp) - tgt},
+									 #c(lb,ub),Fs=Fs,df1=df1,df2=df2,tgt=1-p)$root
+		#return(ncp)
+	#}
+#}
+
+## use same to construct confidence intervals
+#fncp.ci <- function(F,df1,df2,alpha.lo=0.025,alpha.hi=1-alpha.lo) {
+	#if (alpha.hi >= 1) {
+		#cihi <- Inf
+	#} else {
+		#cihi <- qcofncp(alpha.hi,F,df1,df2)
+	#}
+
+	#if (alpha.lo <= 0) {
+		#cilo <- 0
+	#} else {
+		#if (is.finite(cihi)) {
+			#cilo <- qcofncp(alpha.lo,F,df1,df2,ub=cihi)
+		#} else {
+			#cilo <- qcofncp(alpha.lo,F,df1,df2)
+		#}
+	#}
+	#return(list('lo' = cilo,'hi' = cihi))
+#}
+
+
+##UNFOLD
 
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:

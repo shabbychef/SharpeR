@@ -465,7 +465,17 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #'
 #' @details 
 #'
-#' fill these in.
+#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+#' \eqn{\Sigma}{Sigma}. This code tests the hypothesis
+#' \deqn{H_0: \mu^{\top}\Sigma^{-1}\mu = \delta_0^2}{H0: mu' Sigma^-1 mu = delta_0^2}
+#'
+#' The default alternative hypothesis is the one-sided 
+#' \deqn{H_0: \mu^{\top}\Sigma^{-1}\mu > \delta_0^2}{H0: mu' Sigma^-1 mu > delta_0^2}
+#' but this can be set otherwise.
+#' 
+#' Note there is no 'drag' term here since this represents a linear offset of
+#' the population parameter.
 #' 
 #' @usage
 #'
@@ -482,6 +492,7 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #'        \code{snrstar} is quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
+#'        This is only used if \code{snrstar} is nonzero.
 #' @param conf.level confidence level of the interval. (not used yet)
 #' @keywords htest
 #' @return A list with class \code{"htest"} containing the following components:
