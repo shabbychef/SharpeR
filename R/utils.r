@@ -10,8 +10,6 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
-require(Hmisc)
-
 # asymetric toeplitz, like Matlab's; 
 # allows you to give the first row vector and the first column vector.
 .atoeplitz <- function(rv,cv=rv) {
@@ -95,7 +93,7 @@ full.sr <- function(x,c0=0,opy=1,na.rm=FALSE) {
 	if (!missing(opy))
 		sr <- .annualize(sr,opy)
 	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
-	units(sr) <- "yr^-0.5"
+	#units(sr) <- "yr^-0.5"
 	retval <- list(sr = sr,df = df,c0 = c0,opy = opy)
 	return(retval)
 }
@@ -201,7 +199,7 @@ full.srstar <- function(X,drag=0,opy=1) {
 		zeta.star <- .annualize(zeta.star,opy)
 	retval$srstar <- zeta.star - drag
 
-	units(retval$srstar) <- "yr^-0.5"
+	#units(retval$srstar) <- "yr^-0.5"
 	retval$drag <- drag
 	retval$opy <- opy
 	return(retval)

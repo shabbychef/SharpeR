@@ -59,6 +59,7 @@ help:
 	@echo ""
 	@echo "Packaging Tasks"
 	@echo "---------------"
+	@echo "  gitpush    Yes, I am lazy"
 	@echo "  release    Populate a release branch"
 	@echo ""
 	@echo "Using R in: $(RBIN)"
