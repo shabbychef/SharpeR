@@ -131,6 +131,7 @@
 #' may have to be made here for large \code{snr}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sr
 #' @references 
 #'
 #' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
@@ -277,11 +278,14 @@ rsr <- function(n, df, snr, opy) {
 #' \code{qT2} gives the quantile function, and \code{rT2} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
-#' @aliases pT2 qT2 rT2 
+#' @aliases pT2 
+#' @aliases qT2 
+#' @aliases rT2 
 #' @seealso F-distribution functions, \code{\link{df}, \link{pf}, \link{qf}, \link{rf}},
 #' Sharpe ratio distribution, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family Hotelling
 #' @note
 #' This is a thin wrapper on the F distribution, provided for convenience.
 #' @references 
@@ -433,10 +437,13 @@ rT2 <- function(n, df1, df2, delta2) {
 #' \code{qsrstar} gives the quantile function, and \code{rsrstar} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
-#' @aliases psrstar qsrstar rsrstar
+#' @aliases psrstar
+#' @aliases qsrstar 
+#' @aliases rsrstar
 #' @seealso Hotelling \eqn{T^2}-distribution functions, \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family srstar
 #' @note
 #' This is a thin wrapper on the Hotelling T-squared distribution, provided for
 #' convenience.
@@ -578,17 +585,21 @@ rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
 #' @param df the degrees of freedom of the t-statistic.
 #' @param tstat the observed (non-central) t-statistic.
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
-#' @param lower.tail logical; if TRUE (default), probabilities are
-#'        \eqn{P[X \le x]}{P\[X <= x\]}, otherwise, \eqn{P[X > x]}{P\[X > x\]}.
+#' @inheritParams qsr
+#' @inheritParams psr
+#' @inheritParams dsr
 #' @keywords distribution 
 #' @return \code{dlambdap} gives the density, \code{plambdap} gives the distribution function,
 #' \code{qlambdap} gives the quantile function, and \code{rlambdap} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
-#' @aliases plambdap qlambdap rlambdap
+#' @aliases plambdap
+#' @aliases qlambdap 
+#' @aliases rlambdap
 #' @seealso t-distribution functions, \code{\link{dt},\link{pt},\link{qt},\link{rt}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sr
 #' @references 
 #'
 #' Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
@@ -687,25 +698,28 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
-#' @param df1 the number of assets in the portfolio.
-#' @param df2 the number of observations.
 #' @param srstar the observed maximal Sharpe ratio statistic.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{snrstar} are quoted in 'annualized' units, that is, per 'year',
+#'        \code{srstar} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
-#' @param lower.tail logical; if TRUE (default), probabilities are
-#'        \eqn{P[X \le x]}{P\[X <= x\]}, otherwise, \eqn{P[X > x]}{P\[X > x\]}.
+#' @inheritParams dsrstar
+#' @inheritParams qsrstar
+#' @inheritParams psrstar
+#' @inheritParams qsr
+#' @inheritParams dsr
+#' @inheritParams psr
 #' @keywords distribution 
 #' @return \code{dco.srstar} gives the density, \code{pco.srstar} gives the distribution function,
 #' \code{qco.srstar} gives the quantile function, and \code{rco.srstar} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
-#' @aliases pco.srstar qco.srstar rco.srstar
+#' @aliases qco.srstar 
 #' @seealso \code{\link{dsrstar},\link{psrstar},\link{qsrstar},\link{rsrstar}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family srstar
 #' @note
 #' \code{pco.srstar} should be an increasing function of the argument \code{q},
 #' and decreasing in \code{srstar}. \code{qco.srstar} should be increasing

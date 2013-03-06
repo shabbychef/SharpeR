@@ -90,6 +90,7 @@
 #' @seealso \code{\link{sr.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sr
 #' @references 
 #'
 #' Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
@@ -237,6 +238,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' @seealso \code{\link{sr.equality.test}}, \code{\link{t.test}}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sr
 #' @examples 
 #' # should reject null
 #' x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
@@ -416,6 +418,7 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @seealso \code{\link{power.t.test}}, \code{\link{sr.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sr
 #' @examples 
 #' anex <- power.sr.test(253,1,0.05,NULL,opy=253) 
 #' anex <- power.sr.test(n=253,snr=NULL,sig.level=0.05,power=0.5,opy=253) 
@@ -508,6 +511,7 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #' @seealso \code{\link{sr.test}}, \code{\link{t.test}}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family srstar
 #' @examples 
 #'
 #' # test for uniformity

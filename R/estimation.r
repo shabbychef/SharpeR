@@ -99,6 +99,7 @@
 #' @seealso sr-distribution functions, \code{\link{dsr}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sr
 #' @note
 #' Eventually this should include corrections for autocorrelation, skew,
 #' kurtosis.
@@ -187,7 +188,7 @@ sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 #' @seealso \code{\link{confint}}, \code{\link{sr.se}}, \code{\link{qlambdap}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#'
+#' @family sr
 #' @examples 
 #' opy <- 253
 #' df <- opy * 6
@@ -274,7 +275,7 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qco.srstar}}, \code{\link{srstar.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#'
+#' @family srstar
 #' @examples 
 #' opy <- 253
 #' df <- opy * 6
@@ -413,6 +414,7 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @seealso F-distribution functions, \code{\link{df}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family srstar Hotelling
 #' @references 
 #'
 #' Kubokawa, T., C. P. Robert, and A. K. Saleh. "Estimation of noncentrality parameters." 

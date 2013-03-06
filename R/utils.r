@@ -76,6 +76,7 @@
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sr
 #' @references 
 #'
 #' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
@@ -187,7 +188,7 @@ sr <- function(x,...) {
 #' \code{\link{dsrstar}, \link{psrstar}, \link{qsrstar}, \link{rsrstar}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#'
+#' @family srstar
 #' @examples 
 #' rvs <- full.srstar(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
 #' rvs <- srstar(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
