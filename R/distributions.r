@@ -603,7 +603,7 @@ rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
 #' @references 
 #'
 #' Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
-#' Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107-116.
+#' Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107--116.
 #' \url{http://www.univ-rouen.fr/LMRS/Persopage/Lecoutre/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
 #'
 #' Lecoutre, Bruno. "Two useful distributions for Bayesian predictive procedures under normal models."
@@ -636,14 +636,24 @@ plambdap <- function(q,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 	retv <- pt(q=tstat,df=df,ncp=q,lower.tail=!lower.tail,log.p=log.p)
 	return(retv)
 }
+
 # create a scalar function that we later vectorize. 
 .qlambdap <- function(p,df,tstat,lower.tail=TRUE,log.p=FALSE) {
-	if (p == 1)
-		return(ifelse(lower.tail,Inf,-Inf))
-	if (p == 0)
-		return(ifelse(lower.tail,-Inf,Inf))
-	if ((p < 0) || (p > 1))
-		return (NaN)
+	if (!log.p) {
+		if (p == 1)
+			return(ifelse(lower.tail,Inf,-Inf))
+		if (p == 0)
+			return(ifelse(lower.tail,-Inf,Inf))
+		if ((p < 0) || (p > 1))
+			return (NaN)
+	} else {
+		if (p == 0)
+			return(ifelse(lower.tail,Inf,-Inf))
+		if (p > 0)
+			return (NaN)
+		if (is.infinite(p))
+			return(ifelse(lower.tail,-Inf,Inf))
+	}
 
 	# create a function increasing in its argument that
 	# we wish to zero
@@ -675,8 +685,59 @@ qlambdap <- Vectorize(.qlambdap,
 											SIMPLIFY = TRUE)
 #UNFOLD
 
+# possibly degenerate confidence distribution on non-central F;
+#
+# this function computes
+# max{0 <= ncp <= ub | pf(Fs,df1,df2,ncp) >= 1 - p}
+# or 0 if that set is empty.
+#
+# useful for constructing CIs
+# 
+.qcof.ncp <- function(p,Fs,df1,df2,ub=Inf,lower.tail=TRUE,log.p=FALSE) {
+	# this is a godamned mess.
+	if (!log.p) {
+		if (p == 1)
+			return(ifelse(lower.tail,Inf,-Inf))
+		if (p == 0)
+			return(ifelse(lower.tail,-Inf,Inf))
+		if ((p < 0) || (p > 1))
+			return (NaN)
+	} else {
+		if (p == 0)
+			return(ifelse(lower.tail,Inf,-Inf))
+		if (p > 0)
+			return (NaN)
+		if (is.infinite(p))
+			return(ifelse(lower.tail,-Inf,Inf))
+	}
+
+
+	f.zer <- pf(Fs,df1,df2,0)
+	if (f.zer < (1-p)) {
+		return(0)
+	} else {
+		if (is.null(ub) || is.infinite(ub)) {
+			ub <- 1.0
+			fpf <- pf(Fs,df1,df2,ub)
+			while (fpf >= (1-p)) {
+				ub <- 2.0 * ub
+				fpf <- pf(Fs,df1,df2,ub)
+			}
+			lb <- 0.5 * ub
+		} else {
+			lb <- 0
+			fpf <- pf(Fs,df1,df2,ub)
+		}
+		# now call uniroot
+		zerf <- function(z,n,xv,limv) { pf(xv,p,n-p,n*z^2) - limv }
+		ncp <- uniroot(function(ncp,Fs,df1,df2,tgt){pf(Fs,df1,df2,ncp) - tgt},
+									 c(lb,ub),Fs=Fs,df1=df1,df2=df2,tgt=1-p)$root
+		return(ncp)
+	}
+}
+
 # co-SR^*
-# pco.srstar, qco.srstar#FOLDUP
+# pcosrstar, qcosrstar#FOLDUP
 #' @title The 'confidence distribution' for maximal Sharpe ratio.
 #'
 #' @description 
@@ -692,9 +753,9 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' @usage
 #'
-#' pco.srstar(q,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
+#' pcosrstar(q,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
 #'
-#' qco.srstar(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
+#' qcosrstar(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
 #'
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
@@ -711,53 +772,92 @@ qlambdap <- Vectorize(.qlambdap,
 #' @inheritParams dsr
 #' @inheritParams psr
 #' @keywords distribution 
-#' @return \code{dco.srstar} gives the density, \code{pco.srstar} gives the distribution function,
-#' \code{qco.srstar} gives the quantile function, and \code{rco.srstar} generates random deviates.
+#' @return \code{dco.srstar} gives the density, \code{pcosrstar} gives the distribution function,
+#' \code{qcosrstar} gives the quantile function, and \code{rco.srstar} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
-#' @aliases qco.srstar 
+#' @aliases qcosrstar 
 #' @seealso \code{\link{dsrstar},\link{psrstar},\link{qsrstar},\link{rsrstar}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family srstar
 #' @note
-#' \code{pco.srstar} should be an increasing function of the argument \code{q},
-#' and decreasing in \code{srstar}. \code{qco.srstar} should be increasing
+#' \code{pcosrstar} should be an increasing function of the argument \code{q},
+#' and decreasing in \code{srstar}. \code{qcosrstar} should be increasing
 #' in \code{p}
 #' @examples 
-#' snrstar <- 2.0
-#' opy <- 253
-#' ntest <- 2000
-#' df1 <- 4
-#' df2 <- 6 * opy
-#' rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
-#' qvs <- qco.srstar(0.05,df1=df1,df2=df2,srstar=rvs)
+#'  snrstar <- 2.0
+#'  opy <- 253
+#'  ntest <- 2000
+#'  df1 <- 4
+#'  df2 <- 6 * opy
+#'  rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
+#'  qvs <- seq(0,10,length.out=101)
+#'  pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
+#'  if (require(txtplot))
+#' 	 txtplot(qvs,pps)
+#'  pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#'  if (require(txtplot))
+#' 	 txtplot(qvs,pps)
+#' 
+#'  svs <- seq(0,4,length.out=101)
+#'  pps <- pcosrstar(2,df1,df2,svs,opy)
+#'  if (require(txtplot))
+#' 	 txtplot(svs,pps)
+#'  pps <- pcosrstar(2,df1,df2,svs,opy,lower.tail=FALSE)
+#'  if (require(txtplot))
+#' 	 txtplot(svs,pps)
+#' 
+#'  if (require(txtplot))
+#' 	 txtplot(qvs,pps)
+#'  pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#'  if (require(txtplot))
+#' 	 txtplot(qvs,pps)
+#'  pcosrstar(-1,df1,df2,rvs[1],opy)
+#'
+#' qvs <- qcosrstar(0.05,df1=df1,df2=df2,srstar=rvs)
 #' mean(qvs > snrstar)
-#' qvs <- qco.srstar(0.5,df1=df1,df2=df2,srstar=rvs)
+#' qvs <- qcosrstar(0.5,df1=df1,df2=df2,srstar=rvs)
 #' mean(qvs > snrstar)
-#' qvs <- qco.srstar(0.95,df1=df1,df2=df2,srstar=rvs)
+#' qvs <- qcosrstar(0.95,df1=df1,df2=df2,srstar=rvs)
 #' mean(qvs > snrstar)
 #' # test vectorization:
-#' qv <- qco.srstar(0.1,df1,df2,rvs)
-#' qv <- qco.srstar(c(0.1,0.2),df1,df2,rvs)
-#' qv <- qco.srstar(c(0.1,0.2),c(df1,2*df1),df2,rvs)
-#' qv <- qco.srstar(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
+#' qv <- qcosrstar(0.1,df1,df2,rvs)
+#' qv <- qcosrstar(c(0.1,0.2),df1,df2,rvs)
+#' qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),df2,rvs)
+#' qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 #'
 # 2FIX: add opy?
-pco.srstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
+pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	# 2FIX: do the annualization just once for efficiency?
 	# this is just a silly wrapper on psrstar
-	retv <- psrstar(q=srstar,df1=df1,df2=df2,snrstar=q,opy=opy,lower.tail=!lower.tail,log.p=log.p)
+	#if (q < 0)
+		#return(0)
+	#if (is.infinite(q))
+		#return(1)
+
+	# delegate
+	retv <- psrstar(q=srstar,df1=df1,df2=df2,snrstar=q,opy=opy,
+									lower.tail=!lower.tail,log.p=log.p)  # sic the tail reversal
 	return(retv)
 }
 # create a scalar function that we later vectorize. 
-.qco.srstar <- function(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) {
-	if (p == 1)
-		return(ifelse(lower.tail,Inf,-Inf))
-	if (p == 0)
-		return(ifelse(lower.tail,-Inf,Inf))
-	if ((p < 0) || (p > 1))
-		return (NaN)
+# 
+# this inverts pcosrstar; note that when lower.tail=TRUE,
+# pcosrstar is increasing in q, but decreasing in srstar.
+# pcosrstar only accepts non-negative q 
+#
+# here we try to find lb <= q < ub such that
+# pcosrstar(q,df1,df2,srstar,opy,lower.tail,log.p) = p
+# however, there may be no such q, since we are limited to
+# the range [lp,up) where
+# lp = pcosrstar(lb,df1,df2,srstar,opy,lower.tail,log.p)
+# up = pcosrstar(ub,df1,df2,srstar,opy,lower.tail,log.p)
+# if p < lp we return lb;
+# if q >= up, we return ub;
+
+.qcosrstar <- function(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE,
+												lb=0,ub=Inf) {
 	if (!missing(opy)) 
 		srstar <- .deannualize(srstar,opy)
 
@@ -766,11 +866,11 @@ pco.srstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	# do *not* pass on opy b/c this function is a tight loop
 	if (lower.tail) {
 		zerf <- function(q) {
-			return(pco.srstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p) - p)
+			return(pcosrstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p) - p)
 		}
 	} else {
 		zerf <- function(q) {
-			return(p - pco.srstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p))
+			return(p - pcosrstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p))
 		}
 	}
 	# not sure why this is relevant here. just cut and pasted from elsewhere.
@@ -789,7 +889,7 @@ pco.srstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	return(retval)
 }
 #' @export 
-qco.srstar <- Vectorize(.qco.srstar,
+qcosrstar <- Vectorize(.qcosrstar,
 											vectorize.args = c("p","df1","df2","srstar"),
 											SIMPLIFY = TRUE)
 #UNFOLD

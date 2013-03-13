@@ -293,9 +293,12 @@ srstar <- function(X,...) {
 .logT2_to_logsrstar <- function(logT2, n) {
 	return(0.5 * (logT2 - log(n)))
 }
-# convert T2 to srstar
+# convert srstar to T2; 
+# 2FIX: this is a total cluster fuck b/c negative srstar
+# are 'out of range'; silently mark them up to zero here
+# and pretend nothing happened? crap.
 .srstar_to_T2 <- function(srstar, n) {
-	return(n * srstar^2)
+	return(n * pmax(0,srstar)^2)
 }
 #UNFOLD
 

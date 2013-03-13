@@ -99,11 +99,11 @@
 #' \url{http://www.sta.cuhk.edu.hk/scpy/Preprints/John\%20Wright/A\%20test\%20for\%20the\%20equality\%20of\%20multiple\%20Sharpe\%20ratios.pdf}
 #'
 #' Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with 
-#' application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15-30.
+#' application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15--30.
 #' \url{http://papers.ssrn.com/sol3/papers.cfm?abstract_id=907270}
 #'
 #' Memmel, C. "Performance hypothesis testing with the Sharpe ratio." Finance
-#' Letters 1 (2003): 21-23.
+#' Letters 1 (2003): 21--23.
 #'
 #' @examples 
 #' rv <- sr.equality.test(matrix(rnorm(500*5),500,5))
@@ -204,7 +204,8 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' For unpaired (and independent) observations, tests
 #' \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
 #' against two or one-sided alternatives via a normal approximation 
-#' (which is probably not very good for small sample sizes).
+#' (which is probably not very good for small sample sizes). At some point, the
+#' procedure of Ghosh (1975) or variant thereof should be employed.
 #' 
 #' @usage
 #'
@@ -239,6 +240,12 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
+#' @references 
+#'
+#' Ghosh, B. K. "On the Distribution of the Difference of Two t-Variables."
+#' Journal of the American Statistical Association 70, no 350 (1975): 463--467.
+#' \url{http://www.jstor.org/stable/2285841}
+#'
 #' @examples 
 #' # should reject null
 #' x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
