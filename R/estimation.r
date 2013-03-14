@@ -272,7 +272,7 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qco.srstar}}, \code{\link{srstar.test}}
+#' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qcosrstar}}, \code{\link{srstar.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family srstar
@@ -290,8 +290,8 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 		#srstar <- .deannualize(srstar,opy)
 	#}
 
-	ci.lo <- qco.srstar(level.lo,df1=df1,df2=df2,srstar=srstar,opy=opy,lower.tail=TRUE)
-	ci.hi <- qco.srstar(level.hi,df1=df1,df2=df2,srstar=srstar,opy=opy,lower.tail=TRUE)
+	ci.hi <- qcosrstar(level.hi,df1=df1,df2=df2,srstar=srstar,opy=opy,lower.tail=TRUE)
+	ci.lo <- qcosrstar(level.lo,df1=df1,df2=df2,srstar=srstar,opy=opy,lower.tail=TRUE,ub=ci.hi)
 	ci <- c(ci.lo,ci.hi)
 
 	retval <- matrix(ci,nrow=1)

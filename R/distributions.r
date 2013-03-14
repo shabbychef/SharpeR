@@ -685,57 +685,6 @@ qlambdap <- Vectorize(.qlambdap,
 											SIMPLIFY = TRUE)
 #UNFOLD
 
-# possibly degenerate confidence distribution on non-central F;
-#
-# this function computes
-# max{0 <= ncp <= ub | pf(Fs,df1,df2,ncp) >= 1 - p}
-# or 0 if that set is empty.
-#
-# useful for constructing CIs
-# 
-.qcof.ncp <- function(p,Fs,df1,df2,ub=Inf,lower.tail=TRUE,log.p=FALSE) {
-	# this is a godamned mess.
-	if (!log.p) {
-		if (p == 1)
-			return(ifelse(lower.tail,Inf,-Inf))
-		if (p == 0)
-			return(ifelse(lower.tail,-Inf,Inf))
-		if ((p < 0) || (p > 1))
-			return (NaN)
-	} else {
-		if (p == 0)
-			return(ifelse(lower.tail,Inf,-Inf))
-		if (p > 0)
-			return (NaN)
-		if (is.infinite(p))
-			return(ifelse(lower.tail,-Inf,Inf))
-	}
-
-
-	f.zer <- pf(Fs,df1,df2,0)
-	if (f.zer < (1-p)) {
-		return(0)
-	} else {
-		if (is.null(ub) || is.infinite(ub)) {
-			ub <- 1.0
-			fpf <- pf(Fs,df1,df2,ub)
-			while (fpf >= (1-p)) {
-				ub <- 2.0 * ub
-				fpf <- pf(Fs,df1,df2,ub)
-			}
-			lb <- 0.5 * ub
-		} else {
-			lb <- 0
-			fpf <- pf(Fs,df1,df2,ub)
-		}
-		# now call uniroot
-		zerf <- function(z,n,xv,limv) { pf(xv,p,n-p,n*z^2) - limv }
-		ncp <- uniroot(function(ncp,Fs,df1,df2,tgt){pf(Fs,df1,df2,ncp) - tgt},
-									 c(lb,ub),Fs=Fs,df1=df1,df2=df2,tgt=1-p)$root
-		return(ncp)
-	}
-}
-
 # co-SR^*
 # pcosrstar, qcosrstar#FOLDUP
 #' @title The 'confidence distribution' for maximal Sharpe ratio.
@@ -747,6 +696,11 @@ qlambdap <- Vectorize(.qlambdap,
 #' to perform inference on snrstar given observed statistic srstar.
 #'
 #' @details
+#' 
+#' Let \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio} distribution
+#' (see \code{\link{psrstar}}) for known degrees of freedom, and 
+#' unknown non-centrality parameter \eqn{\delta^2}{delta^2}. 
+#' 
 #'
 #' 2FIX
 #' 
@@ -755,7 +709,7 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' pcosrstar(q,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
 #'
-#' qcosrstar(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
+#' qcosrstar(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
 #'
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
@@ -765,6 +719,8 @@ qlambdap <- Vectorize(.qlambdap,
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lb the lower bound for the output of \code{qcosrstar}.
+#' @param ub the upper bound for the output of \code{qcosrstar}.
 #' @inheritParams dsrstar
 #' @inheritParams qsrstar
 #' @inheritParams psrstar
@@ -772,8 +728,8 @@ qlambdap <- Vectorize(.qlambdap,
 #' @inheritParams dsr
 #' @inheritParams psr
 #' @keywords distribution 
-#' @return \code{dco.srstar} gives the density, \code{pcosrstar} gives the distribution function,
-#' \code{qcosrstar} gives the quantile function, and \code{rco.srstar} generates random deviates.
+#' @return \code{pcosrstar} gives the distribution function, and
+#' \code{qcosrstar} gives the quantile function.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
 #' @aliases qcosrstar 
@@ -782,38 +738,43 @@ qlambdap <- Vectorize(.qlambdap,
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family srstar
 #' @note
-#' \code{pcosrstar} should be an increasing function of the argument \code{q},
-#' and decreasing in \code{srstar}. \code{qcosrstar} should be increasing
-#' in \code{p}
+#' When \code{lower.tail} is true, \code{pcosrstar} is monotonic increasing 
+#' with respect to \code{q}, and decreasing in \code{srstar}; these are reversed
+#' when \code{lower.tail} is false. Similarly, \code{qcosrstar} is increasing
+#' in \code{sign(as.double(lower.tail) - 0.5) * p} and
+#' \code{- sign(as.double(lower.tail) - 0.5) * srstar}.
+#'
 #' @examples 
-#'  snrstar <- 2.0
-#'  opy <- 253
-#'  ntest <- 2000
-#'  df1 <- 4
-#'  df2 <- 6 * opy
-#'  rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
-#'  qvs <- seq(0,10,length.out=101)
-#'  pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
-#'  if (require(txtplot))
-#' 	 txtplot(qvs,pps)
-#'  pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
-#'  if (require(txtplot))
-#' 	 txtplot(qvs,pps)
+#'
+#' snrstar <- 2.0
+#' opy <- 253
+#' ntest <- 2000
+#' df1 <- 4
+#' df2 <- 6 * opy
+#' rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
+#' qvs <- seq(0,10,length.out=101)
+#' pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
+#' if (require(txtplot))
+#'  txtplot(qvs,pps)
+#' pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#' if (require(txtplot))
+#'  txtplot(qvs,pps)
 #' 
-#'  svs <- seq(0,4,length.out=101)
-#'  pps <- pcosrstar(2,df1,df2,svs,opy)
-#'  if (require(txtplot))
-#' 	 txtplot(svs,pps)
-#'  pps <- pcosrstar(2,df1,df2,svs,opy,lower.tail=FALSE)
-#'  if (require(txtplot))
-#' 	 txtplot(svs,pps)
+#' # 2FIX: shove these into the unit tests for monotonicity?
+#' svs <- seq(0,4,length.out=101)
+#' pps <- pcosrstar(2,df1,df2,svs,opy)
+#' if (require(txtplot))
+#'  txtplot(svs,pps)
+#' pps <- pcosrstar(2,df1,df2,svs,opy,lower.tail=FALSE)
+#' if (require(txtplot))
+#'  txtplot(svs,pps)
 #' 
-#'  if (require(txtplot))
-#' 	 txtplot(qvs,pps)
-#'  pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
-#'  if (require(txtplot))
-#' 	 txtplot(qvs,pps)
-#'  pcosrstar(-1,df1,df2,rvs[1],opy)
+#' if (require(txtplot))
+#'  txtplot(qvs,pps)
+#' pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#' if (require(txtplot))
+#'  txtplot(qvs,pps)
+#' pcosrstar(-1,df1,df2,rvs[1],opy)
 #'
 #' qvs <- qcosrstar(0.05,df1=df1,df2=df2,srstar=rvs)
 #' mean(qvs > snrstar)
@@ -831,11 +792,6 @@ qlambdap <- Vectorize(.qlambdap,
 pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	# 2FIX: do the annualization just once for efficiency?
 	# this is just a silly wrapper on psrstar
-	#if (q < 0)
-		#return(0)
-	#if (is.infinite(q))
-		#return(1)
-
 	# delegate
 	retv <- psrstar(q=srstar,df1=df1,df2=df2,snrstar=q,opy=opy,
 									lower.tail=!lower.tail,log.p=log.p)  # sic the tail reversal
@@ -855,9 +811,11 @@ pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 # up = pcosrstar(ub,df1,df2,srstar,opy,lower.tail,log.p)
 # if p < lp we return lb;
 # if q >= up, we return ub;
-
 .qcosrstar <- function(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE,
 												lb=0,ub=Inf) {
+	if ((lb > ub) || (is.infinite(lb)) || (min(lb,ub) < 0))
+		stop("nonsensical lb and/or ub")
+
 	if (!missing(opy)) 
 		srstar <- .deannualize(srstar,opy)
 
@@ -866,25 +824,33 @@ pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	# do *not* pass on opy b/c this function is a tight loop
 	if (lower.tail) {
 		zerf <- function(q) {
-			return(pcosrstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p) - p)
+			pcosrstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p) - p
 		}
 	} else {
 		zerf <- function(q) {
-			return(p - pcosrstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p))
+			p - pcosrstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p)
 		}
 	}
-	# not sure why this is relevant here. just cut and pasted from elsewhere.
-	zmax = 2 * max(qnorm(p,lower.tail=TRUE,log.p=log.p),qnorm(p,lower.tail=FALSE,log.p=log.p))
-	flo <- min(-1,srstar - zmax)
-	fhi <- max( 1,srstar + zmax)
+	flb <- zerf(lb)
+	if (flb > 0)
+		return(lb)
+	if (is.infinite(ub)) {
+		ub <- 1 + lb
+		fub <- zerf(ub)
+		while ((fub < 0) && (!is.infinite(ub))) {
+			ub <- 2 * ub
+			fub <- zerf(ub)
+		}
+		if (is.infinite(ub) && (fub < 0)) 
+			return(ub)
+	} else {
+		fub <- zerf(ub)
+		if (fub < 0)
+			return(ub)
+	}
 
-	#find approximate endpoints;
-	#expand them until pt(tstat,df,flo) > p and pt(tstat,df,fhi) < p
-	FLIM <- 1e8
-	while ((zerf(flo) > 0) && (flo > -FLIM)) { flo <- 2 * flo }
-	while ((zerf(fhi) < 0) && (fhi < FLIM))  { fhi <- 2 * fhi }
-
-	ncp <- uniroot(zerf,c(flo,fhi))
+	ncp <- uniroot(zerf,interval=c(lb,ub),
+								 f.lower=flb,f.upper=fub)
 	retval <- ifelse(missing(opy),ncp$root,.annualize(ncp$root,opy))
 	return(retval)
 }
@@ -892,6 +858,51 @@ pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 qcosrstar <- Vectorize(.qcosrstar,
 											vectorize.args = c("p","df1","df2","srstar"),
 											SIMPLIFY = TRUE)
+
+
+#snrstar <- 2.0
+#opy <- 253
+#ntest <- 1000
+#df1 <- 4
+#df2 <- 6 * opy
+#rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
+#qvs <- seq(0,4,length.out=101)
+#pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
+#if (require(txtplot))
+ #txtplot(qvs,pps)
+#pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#if (require(txtplot))
+ #txtplot(qvs,pps)
+
+#svs <- seq(0,4,length.out=101)
+#pps <- pcosrstar(2,df1,df2,svs,opy)
+#if (require(txtplot))
+ #txtplot(svs,pps)
+#pps <- pcosrstar(2,df1,df2,svs,opy,lower.tail=FALSE)
+#if (require(txtplot))
+ #txtplot(svs,pps)
+
+#if (require(txtplot))
+ #txtplot(qvs,pps)
+#pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#if (require(txtplot))
+ #txtplot(qvs,pps)
+#pcosrstar(-1,df1,df2,rvs[1],opy)
+
+## qcosrstar is slower b/c it calls uniroot...
+#qvs <- qcosrstar(0.05,df1=df1,df2=df2,srstar=rvs)
+#mean(qvs > snrstar)
+#qvs <- qcosrstar(0.5,df1=df1,df2=df2,srstar=rvs)
+#mean(qvs > snrstar)
+#qvs <- qcosrstar(0.95,df1=df1,df2=df2,srstar=rvs)
+#mean(qvs > snrstar)
+## test vectorization:
+#qv <- qcosrstar(0.1,df1,df2,rvs)
+#qv <- qcosrstar(c(0.1,0.2),df1,df2,rvs)
+#qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),df2,rvs)
+#qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
+
+
 #UNFOLD
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:
