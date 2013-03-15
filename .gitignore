@@ -1,10 +1,12 @@
 
 # for testing, ignore these
-./man
-./man/*
+man/
+man/*
 
 .tags
 .R_tags
 
 .*.swp
+
+unit_test.log
 

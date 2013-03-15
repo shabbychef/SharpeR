@@ -37,7 +37,7 @@ endif
 EXTRA_FILES = Makefile rebuildTags.sh .gitignore .tags .R_tags
 EXTRA_DIRS = .git
 
-.PHONY: help news gitpush gitpull
+.PHONY: help news gitpush gitpull testthat
 
 help:
 	@echo "\nExecute development tasks for $(PKGNAME)\n"
@@ -51,6 +51,7 @@ help:
 	@echo "             directory"
 	@echo "  news       Create NEWS.Rd and NEWS.pdf from NEWS.md. 2FIX!"
 	@echo "  vignette   Build a copy of the package vignette"
+	@echo "  testthat   Run unit tests."
 	@echo "  build      Invoke docs and then create a package"
 	@echo "  check      Invoke build and then check the package"
 	@echo "  install    Invoke build and then install the result"
@@ -131,25 +132,32 @@ test: install
 	cd tests;\
 		"$(RBIN)/Rscript" unit_tests.R $(gc_torture) $(test_tags)
 
+testthat : unit_test.log
+
+unit_test.log :
+	"$(RBIN)/Rscript" -e "if (require(testthat)) testthat::test_dir('./inst/tests')" | tee $@
+
+
 #------------------------------------------------------------------------------
 # Packaging Tasks
 #------------------------------------------------------------------------------
+
 #release:
-	#@git checkout r-forge
-	#@git clean -fdx
-	#@git merge --no-edit master -s recursive -Xtheirs
-	#@cd ..;\
-		#"$(RBIN)/R" --vanilla --slave -e "library(roxygen2); roxygenize('$(PKGSRC)','$(PKGSRC)', copy.package=FALSE, overwrite=TRUE)"
-	#@echo "\nCreating Vignette..."
-	#@make vignette >> build.log 2>&1
-	#@echo "Creating NEWS...\n"
-	#@make news >> build.log 2>&1
-	#@./updateVersion.sh
-	#@git commit --amend -m "Build `cat inst/GIT_VERSION`"
-	#@echo "\nMaster branch merged. Documentation rebuilt. Version number updated."
-	#@echo 'Perform final touchups and commit with `git commit --amend`.'
-	#@echo 'Remember to run `git svn dcommit` before `git push` as synching with'
-	#@echo 'R-Forge SVN will alter the SHA.'
+#@git checkout r-forge
+#@git clean -fdx
+#@git merge --no-edit master -s recursive -Xtheirs
+#@cd ..;\
+	#"$(RBIN)/R" --vanilla --slave -e "library(roxygen2); roxygenize('$(PKGSRC)','$(PKGSRC)', copy.package=FALSE, overwrite=TRUE)"
+#@echo "\nCreating Vignette..."
+#@make vignette >> build.log 2>&1
+#@echo "Creating NEWS...\n"
+#@make news >> build.log 2>&1
+#@./updateVersion.sh
+#@git commit --amend -m "Build `cat inst/GIT_VERSION`"
+#@echo "\nMaster branch merged. Documentation rebuilt. Version number updated."
+#@echo 'Perform final touchups and commit with `git commit --amend`.'
+#@echo 'Remember to run `git svn dcommit` before `git push` as synching with'
+#@echo 'R-Forge SVN will alter the SHA.'
 
 gitpush :
 	git push origin master

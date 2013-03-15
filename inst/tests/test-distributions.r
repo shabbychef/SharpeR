@@ -28,7 +28,7 @@
 # Comments: Steven E. Pav
 # SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
-# helper
+# helpers
 is.sorted <- function(xs,pragma=c("ascending","descending")) {
 	pragma <- match.arg(pragma)
 	retv <- switch(pragma,
@@ -36,10 +36,14 @@ is.sorted <- function(xs,pragma=c("ascending","descending")) {
 								 descending = !is.unsorted(rev(xs)))
 	return(retv)
 }
+set.char.seed <- function(str) {
+	set.seed(as.integer(charToRaw(str)))
+}
 
+context("distribution functions")
 
-test_that("pfoo/qfoo monotonicity",{#FOLDUP
-	set.seed(as.integer(charToRaw("1ccb4a05-fd09-43f7-a692-80deebfd67f4")))
+test_that("psr/qsr monotonicity",{#FOLDUP
+	set.char.seed("1ccb4a05-fd09-43f7-a692-80deebfd67f4")
 	
 	# psr
 	ps <- seq(0.1,0.9,length.out=9)
@@ -62,6 +66,11 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 			}
 		}
 	}
+})#UNFOLD
+
+test_that("pT2/qT2 monotonicity",{#FOLDUP
+	set.char.seed("f28b5cd4-dcdb-4e8e-9398-c79fb9038351")
+	
 	# pT2
 	ps <- seq(0.1,0.9,length.out=9)
 	for (df1 in c(2,4,8)) {
@@ -83,6 +92,11 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 			}
 		}
 	}
+})#UNFOLD
+
+test_that("psrstar/qsrstar monotonicity",{#FOLDUP
+	set.char.seed("22ad9afb-49c4-4f37-b32b-eab413b32750")
+	
 	# psrstar
 	ps <- seq(0.1,0.9,length.out=9)
 	for (df1 in c(2,4,8)) {
@@ -108,6 +122,11 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 			}
 		}
 	}
+})#UNFOLD
+
+test_that("plambdap/qlambdap monotonicity",{#FOLDUP
+	set.char.seed("a5ae65f3-257a-47a3-af8e-46b34dfcebb0")
+	
 	# plambdap
 	ps <- seq(0.1,0.9,length.out=9)
 	for (df in c(4,8,16)) {
@@ -129,8 +148,38 @@ test_that("pfoo/qfoo monotonicity",{#FOLDUP
 	}
 })#UNFOLD
 
-test_that("pfoo/qfoo parameter monotonicity",{#FOLDUP
-	set.seed(as.integer(charToRaw("5274138f-8db4-46bc-b015-08442166f22c")))
+test_that("pcosrstar/qcosrstar monotonicity",{#FOLDUP
+	set.char.seed("161f0496-0229-4013-a65e-ff7c8b236f4a")
+	
+	# cosrstar
+	ps <- seq(0.1,0.9,length.out=9)
+	for (df1 in c(2,4,8)) {
+		for (df2 in c(256,1024)) {
+			for (delta2 in c(0,0.02)) {
+				for (lp in c(TRUE,FALSE)) {
+					if (lp) { checkps <- log(ps) } else { checkps <- ps }
+					for (lt in c(TRUE,FALSE)) {
+						qs <- qcosrstar(checkps, df1, df2, srstar=delta2, opy=1,
+														lower.tail=lt, log.p=lp)
+						if (lt) { 
+							expect_true(is.sorted(qs,pragma="ascending"))
+						} else {
+							expect_true(is.sorted(qs,pragma="descending"))
+						}
+						pret <- pcosrstar(qs, df1, df2, srstar=delta2, opy=1,
+															lower.tail=lt, log.p=lp)
+						expect_true(ifelse(lp,all(pret <= 0),
+															 all(0 <= pret) && all(pret <= 1)))
+						#expect_equal(checkps,pret)
+					}
+				}
+			}
+		}
+	}
+})#UNFOLD
+
+test_that("psr/qsr parameter monotonicity",{#FOLDUP
+	set.char.seed("adc578c1-381c-428a-baae-8d5607732176")
 	
 	# psr:
 	# snrs
@@ -181,6 +230,8 @@ test_that("pfoo/qfoo parameter monotonicity",{#FOLDUP
 		}
 	}
 	
+})#UNFOLD
+# 2FIX: other distributions monotonicity wrt parameters...
 	## pT2
 	#ps <- seq(0.1,0.9,length.out=9)
 	#for (df1 in c(2,4,8)) {
@@ -246,11 +297,9 @@ test_that("pfoo/qfoo parameter monotonicity",{#FOLDUP
 			#}
 		#}
 	#}
-})#UNFOLD
-# 2FIX: monotonicity wrt parameters...
 
 test_that("qlambdap sensible",{#FOLDUP
-	set.seed(as.integer(charToRaw("77141b84-05df-4e90-a726-a7788b9d89bf")))
+	set.char.seed("f54698f1-ec37-49a4-8463-d4209f25afbc")
 	
 	df <- 128
 	true.ncp <- 3
