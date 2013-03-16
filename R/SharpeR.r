@@ -30,6 +30,77 @@
 
 #' Inference on Sharpe ratio and Markowitz portfolio.
 #' 
+#' @section Sharpe Ratio: 
+#'
+#' Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a normal random
+#' variable with mean \eqn{\mu}{mu} and variance \eqn{\sigma^2}{sigma^2}.
+#' Let \eqn{\bar{x}}{xbar} be the sample mean, and \eqn{s} be
+#' the sample standard deviation (using Bessel's correction). Let \eqn{c_0}{c0}
+#' be the 'risk free rate'.  Then
+#' \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} 
+#' is the (sample) Sharpe ratio.
+#' 
+#' The units of \eqn{z} is \eqn{\mbox{time}^{-1/2}}{per root time}.
+#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
+#' \eqn{\sqrt{p}}{sqrt(p)}, where \eqn{p} is the number of observations
+#' per year (or whatever the target annualization epoch.)
+#'
+#' Letting \eqn{z = \sqrt{p}\frac{\bar{x}-c_0}{s}}{z = sqrt(p)(xbar - c0)/s},
+#' where the sample estimates are based on \eqn{n} observations, 
+#' then \eqn{z}{z} takes a (non-central) Sharpe ratio distribution
+#' parametrized by \eqn{n} 'degrees of freedom', non-centrality parameter
+#' \eqn{\delta = \frac{\mu - c_0}{\sigma}}{delta = (mu - c0)/sigma}, and 
+#' annualization parameter \eqn{p}. 
+#'
+#' The parameters are encoded as follows:
+#' \itemize{
+#' \item \eqn{n} is denoted by \code{df}.
+#' \item \eqn{\delta}{delta} is denoted by \code{snr}.
+#' \item \eqn{p} is denoted by \code{opy}. ('Observations Per Year')
+#' }
+#'
+#' @section Maximal Sharpe Ratio: 
+#'
+#' Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a \eqn{q}-variate
+#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+#' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
+#' \eqn{S} be the sample covariance matrix (using Bessel's correction). Let
+#' \deqn{\zeta(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar - c0)/sqrt(w'Sw)}
+#' be the (sample) Sharpe ratio of the portfolio \eqn{w}, subject to 
+#' risk free rate \eqn{c_0}{c0}.
+#'
+#' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
+#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},}
+#' with maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* = zeta(w*)}.
+#' Then 
+#' \deqn{w_* = R \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
+#' w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)}
+#' and
+#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
+#' z* = sqrt(xbar' S^-1 xbar) - c0/R}
+#'
+#' The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio}
+#' distribution. For convenience, we may assume that the sample statistic
+#' has been annualized in the same manner as the Sharpe ratio, that is 
+#' by multiplying by \eqn{p}, the number of observations per
+#' epoch.
+#' 
+#' The Maximal Sharpe Ratio distribution is parametrized by the number of independent 
+#' observations, \eqn{n}, the number of assets, \eqn{q}, the \emph{squared}
+#' noncentrality parameter, 
+#' \deqn{\delta^2 = \mu^{\top}\Sigma^{-1}\mu}{delta^2 = mu' Sigma^-1 mu},
+#' the 'drag' term, \eqn{c_0/R}{c0/R}, and the annualization factor, \eqn{p}.
+#' The drag term makes this a location family of distributions, and 
+#' by default we assume it is zero.
+#' 
+#' The parameters are encoded as follows:
+#' \itemize{
+#' \item \eqn{q} is denoted by \code{df1}.
+#' \item \eqn{n} is denoted by \code{df2}.
+#' \item \eqn{\delta} is denoted by \code{snrstar}.
+#' \item \eqn{p} is denoted by \code{opy}.
+#' \item \eqn{c_0/R} is denoted by \code{drag}.
+#' }
 #'
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @references

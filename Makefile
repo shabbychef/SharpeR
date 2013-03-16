@@ -3,6 +3,9 @@
 #
 # stolen shamelessly from RTikZDevice/
 #
+# 2FIX: steal shamelessly from optmatch:
+# https://github.com/markmfredrickson/optmatch/blob/master/Makefile
+#
 # 2FIX: add actual dependencies.
 #
 # Created: 2012.12.28
@@ -10,17 +13,22 @@
 
 R_FILES           ?= $(wildcard R/*.r)
 
+VERSION  	 = 0.1303
+TODAY  		:= $(shell date +%Y-%m-%d)
+
 # all stolen
 
-PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
-PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
-PKGSRC  := $(shell basename $(PWD))
+PKGNAME 	:= $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
+PKGVERS 	:= $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
+PKGSRC  	:= $(shell basename $(PWD))
 
 # Specify the directory holding R binaries. To use an alternate R build (say a
 # pre-prelease version) use `make RBIN=/path/to/other/R/` or `export RBIN=...`
 # If no alternate bin folder is specified, the default is to use the folder
 # containing the first instance of R on the PATH.
-RBIN ?= $(shell dirname "`which R`")
+RBIN 			?= $(shell dirname "`which R`")
+R          = $(RBIN)/R
+RSCRIPT    = $(RBIN)/Rscript
 
 # Controls which tests to run. Use thusly:
 #
@@ -77,14 +85,16 @@ help:
 
 tags: .R_tags
 
+DESCRIPTION : DESCRIPTION.m4
+	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) $< > $@
+
 # Set a default CRAN mirror because otherwise R refuses to install anything.
 deps:
-	"$(RBIN)/R" --slave -e "options(repos = c(CRAN = 'http://cran.cnr.Berkeley.edu'));install.packages(c('roxygen2','testthat'))"
-
+	$(R) --slave -e "options(repos = c(CRAN = 'http://cran.cnr.Berkeley.edu'));install.packages(c('roxygen2','testthat'))"
 
 docs:
 	cd .. ; \
-		"$(RBIN)/R" --vanilla --slave -e "library(roxygen2); roxygenize('$(PKGSRC)', '$(PKGSRC).build', overwrite=TRUE, unlink.target=TRUE)"; \
+		$(R) --vanilla --slave -e "library(roxygen2); roxygenize('$(PKGSRC)', '$(PKGSRC).build', overwrite=TRUE, unlink.target=TRUE)"; \
 		cd -;
 	# Cripple the new folder so you don't get confused and start doing
 	# development in there.
@@ -101,7 +111,7 @@ news: NEWS.pdf
 	#./md2news.hs NEWS.md
 	## Use this instead of Rd2txt. Rd2txt *does not* produce plaintext. The output
 	## has a bunch of formatting junk for underlines and such.
-	#"$(RBIN)/R" --vanilla --slave -e "require(tools);Rd2txt('NEWS.Rd', 'NEWS', options=list(underline_titles=FALSE))"
+	#"$(R)" --vanilla --slave -e "require(tools);Rd2txt('NEWS.Rd', 'NEWS', options=list(underline_titles=FALSE))"
 	#R CMD Rd2pdf --no-preview NEWS.Rd
 	## Move news into the inst directory so that it will be available to users
 	## after installing the package.
@@ -109,33 +119,33 @@ news: NEWS.pdf
 
 vignette:
 	cd inst/doc;\
-		"$(RBIN)/R" CMD Sweave $(PKGNAME).Rnw;\
+		$(R) CMD Sweave $(PKGNAME).Rnw;\
 		texi2dvi --pdf $(PKGNAME).tex;\
-		"$(RBIN)/R" --vanilla --slave -e "tools:::compactPDF(getwd(), gs_quality='printer')"
+		$(R) --vanilla --slave -e "tools:::compactPDF(getwd(), gs_quality='printer')"
 
 
 build: docs tags
 	cd ..;\
-		"$(RBIN)/R" CMD build --no-vignettes $(PKGSRC).build
+		$(R) CMD build --no-vignettes $(PKGSRC).build
 
 
 install: build
 	cd ..;\
-		"$(RBIN)/R" CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
+		$(R) CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
 
 check: build
 	cd ..;\
-		"$(RBIN)/R" CMD check --as-cran $(PKGNAME)_$(PKGVERS).tar.gz
-# "$(RBIN)/R" CMD check --as-cran --no-tests $(PKGNAME)_$(PKGVERS).tar.gz
+		$(R) CMD check --as-cran $(PKGNAME)_$(PKGVERS).tar.gz
+# $(R) CMD check --as-cran --no-tests $(PKGNAME)_$(PKGVERS).tar.gz
 
 test: install
 	cd tests;\
-		"$(RBIN)/Rscript" unit_tests.R $(gc_torture) $(test_tags)
+		$(Rscript) unit_tests.R $(gc_torture) $(test_tags)
 
 testthat : unit_test.log
 
 unit_test.log :
-	"$(RBIN)/Rscript" -e "if (require(testthat)) testthat::test_dir('./inst/tests')" | tee $@
+	$(Rscript) -e "if (require(testthat)) testthat::test_dir('./inst/tests')" | tee $@
 
 
 #------------------------------------------------------------------------------
@@ -147,7 +157,7 @@ unit_test.log :
 #@git clean -fdx
 #@git merge --no-edit master -s recursive -Xtheirs
 #@cd ..;\
-	#"$(RBIN)/R" --vanilla --slave -e "library(roxygen2); roxygenize('$(PKGSRC)','$(PKGSRC)', copy.package=FALSE, overwrite=TRUE)"
+	#$(R) --vanilla --slave -e "library(roxygen2); roxygenize('$(PKGSRC)','$(PKGSRC)', copy.package=FALSE, overwrite=TRUE)"
 #@echo "\nCreating Vignette..."
 #@make vignette >> build.log 2>&1
 #@echo "Creating NEWS...\n"

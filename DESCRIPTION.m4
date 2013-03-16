@@ -2,8 +2,8 @@ Package: SharpeR
 Maintainer: Steven E. Pav <shabbychef@gmail.com>
 Author: Steven E. Pav
 Authors@R: c(person("Steven", "Pav", role=c("aut","cre"), email="shabbychef@gmail.com"))
-Version: 0.1303
-Date: 2013-03-15
+Version: VERSION()
+Date: DATE()
 License: LGPL-3
 Title: Statistical significance of Sharpe ratio
 Description: a collection of tools for analyzing significance of trading strategies, based on the Sharpe ratio and overfit of the same.
@@ -16,3 +16,4 @@ Collate:
     'estimation.r' 
     'tests.r' 
     'utils.r' 
+dnl vim:ts=2:sw=2:tw=79:syn=m4:ft=m4

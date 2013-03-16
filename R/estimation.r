@@ -258,9 +258,10 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #' srstar.confint(srstar,df1,df2,level=0.95,
 #'                opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
-#' @param srstar an observed Sharpe ratio statistic, annualized.
-#' @param df1 the numerator degrees of freedom, the number of assets.
-#' @param df2 the denominator degrees of freedom, the number of observations.
+#' @inheritParams qcosrstar
+#' @inheritParams dsrstar
+#' @inheritParams qsrstar
+#' @inheritParams psrstar
 #' @param level the confidence level required.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{snr} are quoted in 'annualized' units, that is, per square root 
@@ -298,8 +299,6 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
 	return(retval)
 }
-
-# 2FIX: start here:
 
 #UNFOLD
 
@@ -384,7 +383,8 @@ T2.inference <- function(T2,df1,df2,...) {
 #' up to scaling, the same estimators can be used to estimate the 
 #' non-centrality parameter of a non-central Hotelling T-squared statistic.
 #'
-#' 2FIX: describe srstar and drag.
+#' The srstar distribution is equivalent to a Hotelling up to a 
+#' square root and some rescalings. 
 #'
 #' @usage
 #'
@@ -396,9 +396,10 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' @param Fs a (non-central) F statistic.
 #' @param T2 a (non-central) Hotelling \eqn{T^2} statistic.
-#' @param srstar an observed Sharpe ratio statistic, annualized.
-#' @param df1 the numerator degrees of freedom, the number of assets.
-#' @param df2 the denominator degrees of freedom, the number of observations.
+#' @inheritParams qcosrstar
+#' @inheritParams dsrstar
+#' @inheritParams qsrstar
+#' @inheritParams psrstar
 #' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
 #' @param opy the number of observations per 'year'. \code{srstar} is  
 #'        assumed given in 'annualized' units, that is, per 'year',
@@ -435,6 +436,7 @@ srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
 		srstar <- .deannualize(srstar, opy)
 	T2 <- .srstar_to_T2(srstar, df2)
 	retval <- T2.inference(T2,df1,df2,...)
+	# 2FIX: do I have to interpret this back? ack!
 	if (!missing(opy)) 
 		retval <- .annualize(retval, opy)
 	if (!missing(drag) && (drag != 0)) 

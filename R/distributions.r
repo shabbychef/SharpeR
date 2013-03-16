@@ -713,7 +713,7 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
-#' @param srstar the observed maximal Sharpe ratio statistic.
+#' @param srstar an observed Sharpe ratio statistic, annualized.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{srstar} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
@@ -858,51 +858,6 @@ pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 qcosrstar <- Vectorize(.qcosrstar,
 											vectorize.args = c("p","df1","df2","srstar"),
 											SIMPLIFY = TRUE)
-
-
-#snrstar <- 2.0
-#opy <- 253
-#ntest <- 1000
-#df1 <- 4
-#df2 <- 6 * opy
-#rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
-#qvs <- seq(0,4,length.out=101)
-#pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
-#if (require(txtplot))
- #txtplot(qvs,pps)
-#pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
-#if (require(txtplot))
- #txtplot(qvs,pps)
-
-#svs <- seq(0,4,length.out=101)
-#pps <- pcosrstar(2,df1,df2,svs,opy)
-#if (require(txtplot))
- #txtplot(svs,pps)
-#pps <- pcosrstar(2,df1,df2,svs,opy,lower.tail=FALSE)
-#if (require(txtplot))
- #txtplot(svs,pps)
-
-#if (require(txtplot))
- #txtplot(qvs,pps)
-#pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
-#if (require(txtplot))
- #txtplot(qvs,pps)
-#pcosrstar(-1,df1,df2,rvs[1],opy)
-
-## qcosrstar is slower b/c it calls uniroot...
-#qvs <- qcosrstar(0.05,df1=df1,df2=df2,srstar=rvs)
-#mean(qvs > snrstar)
-#qvs <- qcosrstar(0.5,df1=df1,df2=df2,srstar=rvs)
-#mean(qvs > snrstar)
-#qvs <- qcosrstar(0.95,df1=df1,df2=df2,srstar=rvs)
-#mean(qvs > snrstar)
-## test vectorization:
-#qv <- qcosrstar(0.1,df1,df2,rvs)
-#qv <- qcosrstar(c(0.1,0.2),df1,df2,rvs)
-#qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),df2,rvs)
-#qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
-
-
 #UNFOLD
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:
