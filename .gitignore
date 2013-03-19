@@ -11,3 +11,4 @@ man/*
 
 unit_test.log
 
+*.tar.gz
