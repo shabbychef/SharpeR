@@ -12,3 +12,5 @@ man/*
 unit_test.log
 
 *.tar.gz
+.local/
+.staging/
