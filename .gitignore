@@ -1,7 +1,6 @@
 
 # for testing, ignore these
 man/
-man/*
 
 .tags
 .R_tags
@@ -14,3 +13,5 @@ unit_test.log
 *.tar.gz
 .local/
 .staging/
+
+*.Rcheck

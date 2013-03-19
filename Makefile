@@ -23,9 +23,10 @@ PKG_SRC 				:= $(shell basename $(PWD))
 
 PKG_TGZ 				 = $(PKG_NAME)_$(PKG_VERSION).tar.gz
 
-LOCAL 					:= ./.local
-STAGING 				:= ./.staging
+LOCAL 					:= .local
+STAGING 				:= .staging
 STAGED_PKG 			 = $(STAGING)/$(PKG_NAME)
+RCHECK 					 = $(PKG_NAME).Rcheck
 
 # Specify the directory holding R binaries. To use an alternate R build (say a
 # pre-prelease version) use `make RBIN=/path/to/other/R/` or `export RBIN=...`
@@ -44,7 +45,9 @@ TEST_DEPS  			 = testthat roxygen2
 NODIST_FILES		 = Makefile $(M4_FILES) rebuildTags.sh .gitignore .gitattributes .tags .R_tags
 NODIST_DIRS			 = .git
 
-SUPPORT_FILES 	 = ./DESCRIPTION ./NAMESPACE
+RD_DUMMY 				 = man/$(PKG_NAME).Rd
+
+SUPPORT_FILES 	 = ./DESCRIPTION ./NAMESPACE $(RD_DUMMY)
 
 #########################################################################
 # MACROS
@@ -129,16 +132,20 @@ man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
 docs: man/$(PKG_NAME).Rd
 
 #RSYNC_FLAGS     = -av
-RSYNC_FLAGS     = -vrlpgoD
+#RSYNC_FLAGS     = -vrlpgoD --delete
+RSYNC_FLAGS     = -av --delete 
 
 # a parallel version of this package, but without the support structure
 $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES) 
 	$(call WARN_DEPS)
-	$(call MKDIR,$(STAGING))
-	rsync $(RSYNC_FLAGS) --exclude-from=.gitignore $(patsubst %,--exclude=%,$(NODIST_FILES)) \
-	$(patsubst %,--exclude=%,$(NODIST_DIRS)) \
-	--exclude=$(LOCAL) --exclude=$(STAGING) \
-	. $(@D)
+	$(call MKDIR,$(STAGED_PKG))
+	rsync $(RSYNC_FLAGS) \
+		--include=man/ --include=man/* \
+		--exclude-from=.gitignore \
+		$(patsubst %,--exclude=%,$(NODIST_FILES)) \
+		$(patsubst %,--exclude=%,$(NODIST_DIRS)) \
+		--exclude=$(LOCAL) --exclude=$(STAGING) --exclude=$(RCHECK) \
+		. $(@D)
 
 parallel : $(STAGED_PKG)/DESCRIPTION
 
@@ -157,8 +164,10 @@ $(LOCAL)/$(PKG_NAME) : $(PKG_TGZ)
 install: $(LOCAL)/$(PKG_NAME)
 
 # check an install
-check: $(PKG_TGZ)
-	$(RLOCAL) CMD check --as-cran $(PKG_TGZ)
+$(RCHECK) : $(PKG_TGZ)
+	$(RLOCAL) CMD check --as-cran --outdir=$@ $^ 
+	
+check: $(RCHECK)
 
 # 2FIX:
 unit_test.log : $(LOCAL)/$(PKG_NAME) $(LOCAL)/testthat/DESCRIPTION
@@ -170,6 +179,7 @@ testthat : unit_test.log
 clean : 
 	rm -rf man/*.Rd
 	rm -rf $(STAGED_PKG)
+	rm -rf $(RCHECK)
 
 realclean : clean
 	rm -rf $(LOCAL)
