@@ -199,11 +199,31 @@ gitpull :
 R : deps $(LOCAL)/$(PKG_NAME)
 	R_LIBS=$(LOCAL) R_PROFILE=load.R R -q --no-save
 
+# yes, I am *really* lazy.
+
+# FTP junk
+~/.netrc :
+	echo -e "machine cran.r-project.org login anonymous password anonymous macdef init\ncd incoming\n\n" > $@
+
+.cran_upload : $(PKG_TGZ)
+	@-read -p 'really upload? [y/n] ' -n 1 yorn ; \
+	[[ "$$yorn" == "y" ]] && echo -e "user anonymous anonymous\nbinary\ncd incoming\nput $(PKG_TGZ)\nls\nbye\n" | ftp -n -v cran.r-project.org
+
+.send_email : 
+	@-read -p 'really send email? [y/n] ' -n 1 yorn ; \
+	[[ "$$yorn" == "y" ]] && echo "automatic message" | mail -s "CRAN submission $(PKG_NAME) $(VERSION)" CRAN@R-project.org
+
+submit : .cran_upload .send_email
+
+subadvice :
+	@-echo -e "upload $(PKG_TGZ) to cran.r-project.org/incoming via anonymous ftp"
+	@-echo -e "then email CRAN@R-project.org w/ subject 'CRAN submission $(PKG_NAME) $(VERSION)'"
+
 #vignette:
-	#cd inst/doc;\
-		#$(R) CMD Sweave $(PKG_NAME).Rnw;\
-		#texi2dvi --pdf $(PKG_NAME).tex;\
-		#$(R) --vanilla --slave -e "tools:::compactPDF(getwd(), gs_quality='printer')"
+#cd inst/doc;\
+#$(R) CMD Sweave $(PKG_NAME).Rnw;\
+#texi2dvi --pdf $(PKG_NAME).tex;\
+#$(R) --vanilla --slave -e "tools:::compactPDF(getwd(), gs_quality='printer')"
 
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:tags=tags;:syntax=make:filetype=make:ai:si:cin:nu:fo=croqt:cino=p0t0c5(0:
