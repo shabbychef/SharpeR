@@ -86,9 +86,9 @@
 #' epoch.
 #' 
 #' The Maximal Sharpe Ratio distribution is parametrized by the number of independent 
-#' observations, \eqn{n}, the number of assets, \eqn{q}, the \emph{squared}
+#' observations, \eqn{n}, the number of assets, \eqn{q}, the 
 #' noncentrality parameter, 
-#' \deqn{\delta^2 = \mu^{\top}\Sigma^{-1}\mu}{delta^2 = mu' Sigma^-1 mu},
+#' \deqn{\delta = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{delta = sqrt(mu' Sigma^-1 mu),}
 #' the 'drag' term, \eqn{c_0/R}{c0/R}, and the annualization factor, \eqn{p}.
 #' The drag term makes this a location family of distributions, and 
 #' by default we assume it is zero.

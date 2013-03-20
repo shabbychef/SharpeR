@@ -152,10 +152,10 @@ test_that("pcosrstar/qcosrstar monotonicity",{#FOLDUP
 	set.char.seed("161f0496-0229-4013-a65e-ff7c8b236f4a")
 	
 	# cosrstar
-	ps <- seq(0.1,0.9,length.out=9)
+	ps <- seq(0.05,0.95,length.out=9)
 	for (df1 in c(2,4,8)) {
 		for (df2 in c(256,1024)) {
-			for (delta2 in c(0,0.02)) {
+			for (delta2 in c(0.72,1.2)) {  # this is the observed SR stat
 				for (lp in c(TRUE,FALSE)) {
 					if (lp) { checkps <- log(ps) } else { checkps <- ps }
 					for (lt in c(TRUE,FALSE)) {
@@ -170,7 +170,7 @@ test_that("pcosrstar/qcosrstar monotonicity",{#FOLDUP
 															lower.tail=lt, log.p=lp)
 						expect_true(ifelse(lp,all(pret <= 0),
 															 all(0 <= pret) && all(pret <= 1)))
-						#expect_equal(checkps,pret)
+						expect_equal(checkps,pret,tolerance=0.001)
 					}
 				}
 			}

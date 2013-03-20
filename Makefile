@@ -64,10 +64,14 @@ WARN_DEPS = $(warning newer deps are $(?))
 
 #
 .PHONY: help tags \
+	all \
 	gitpull gitpush \
 	news doc build install testthat \
 	staging_d local_d \
 	clean realclean
+
+# the default for now.
+all : testthat
 
 # dev stuff
 .R_tags: $(R_FILES)
