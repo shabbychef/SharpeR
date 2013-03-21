@@ -698,12 +698,14 @@ qlambdap <- Vectorize(.qlambdap,
 #' @details
 #' 
 #' Let \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio} distribution
-#' (see \code{\link{psrstar}}) for known degrees of freedom, and 
-#' unknown non-centrality parameter \eqn{\delta^2}{delta^2}. 
-#' 
-#'
-#' 2FIX
-#' 
+#' (see \code{\link{SharpeR}}) for known degrees of freedom, and 
+#' unknown non-centrality parameter \eqn{\delta}{delta}. The 
+#' 'confidence distribution' views \eqn{\delta}{delta} as a random
+#' quantity once \eqn{z_*}{z*} is observed. As such, the CDF of
+#' the confidence distribution is the same as that of the 
+#' Maximal Sharpe ratio (up to a flip of \code{lower.tail});
+#' while the quantile function is used to compute confidence
+#' intervals on \eqn{\delta}{delta} given \eqn{z_*}{z*}.
 #'
 #' @usage
 #'
