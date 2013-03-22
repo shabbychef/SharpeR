@@ -113,7 +113,7 @@ tags: .R_tags
 TAGS: 
 	$(R) --slave CMD rtags
 
-DESCRIPTION : DESCRIPTION.m4
+DESCRIPTION : DESCRIPTION.m4 Makefile
 	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
 
 # macro for local R
@@ -125,7 +125,6 @@ local_d :
 
 staging_d :
 	$(call MKDIR,$(STAGING))
-
 
 # debugging
 echo :
@@ -204,6 +203,7 @@ testthat : unit_test.log
 ################################
 
 clean : 
+	rm DESCRIPTION
 	rm -rf man/*.Rd
 	rm -rf $(STAGED_PKG)
 	rm -rf $(RCHECK)

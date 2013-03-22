@@ -10,7 +10,6 @@ man/
 
 unit_test.log
 NAMESPACE
-DESCRIPTION
 
 *.tar.gz
 .local/
