@@ -1,18 +1,23 @@
-
 # for testing, ignore these
-man/
 
+# dev stuff
 .tags
 .R_tags
-
 .*.swp
 .*.swo
 
-unit_test.log
-NAMESPACE
-
+# local build check and whatnot
 *.tar.gz
 .local/
 .staging/
-
 *.Rcheck
+
+# unit testing
+unit_test.log
+
+# automagically generated?
+# ah, but these are needed for install_github:
+#NAMESPACE
+#DESCRIPTION
+#man/
+
