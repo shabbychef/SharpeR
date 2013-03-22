@@ -97,9 +97,6 @@ help:
 	@echo "Set the RBIN environment variable to change this."
 	@echo ""
 
-# the default for now.
-all : testthat
-
 # dev stuff
 ~/.ctags :
 	@-echo -E '--langdef=R' >> $@
@@ -159,7 +156,7 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 	$(call MKDIR,$(STAGED_PKG))
 	rsync $(RSYNC_FLAGS) \
 		--include=man/ --include=man/* \
-		--include=NAMESPACE \
+		--include=NAMESPACE --include=DESCRIPTION \
 		--exclude-from=.gitignore \
 		$(patsubst %,--exclude=%,$(NODIST_FILES)) \
 		$(patsubst %,--exclude=%,$(NODIST_DIRS)) \
