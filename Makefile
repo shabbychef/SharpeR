@@ -60,15 +60,16 @@ INSTALLPKG = $(RLOCAL) -e "install.packages('$(1)', repos = 'http://cran.cnr.Ber
 MKDIR = mkdir -p $(1)
 
 # warn new deps
-WARN_DEPS = $(warning newer deps are $(?))
+#WARN_DEPS = $(warning newer deps are $(?))
+WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 
 #
-.PHONY: help tags \
-	all \
+.PHONY: help tags all \
 	gitpull gitpush \
 	news doc build install testthat \
 	staging_d local_d \
-	clean realclean
+	clean realclean \
+	R
 
 # the default for now.
 all : testthat
@@ -131,7 +132,9 @@ deps: $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS))
 
 # roxygen it.
 man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
+	$(call WARN_DEPS)
 	$(RLOCAL) --slave -e "require(roxygen2); roxygenize('.', '.', overwrite=TRUE, unlink.target=TRUE)"
+	touch $@
 
 docs: man/$(PKG_NAME).Rd
 
@@ -150,6 +153,7 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 		$(patsubst %,--exclude=%,$(NODIST_DIRS)) \
 		--exclude=$(LOCAL) --exclude=$(STAGING) --exclude=$(RCHECK) \
 		. $(@D)
+	touch $@
 
 parallel : $(STAGED_PKG)/DESCRIPTION
 
@@ -160,21 +164,24 @@ $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION
 package : $(PKG_TGZ)
 
 # an 'install'
-$(LOCAL)/$(PKG_NAME) : $(PKG_TGZ) 
+$(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ) 
 	$(call WARN_DEPS)
 	$(call MKDIR,$(LOCAL))
 	$(RLOCAL) CMD INSTALL --no-multiarch --library=$(LOCAL) $<
+	touch $@
 
-install: $(LOCAL)/$(PKG_NAME)
+install: $(LOCAL)/$(PKG_NAME)/INDEX
 
 # check an install
 $(RCHECK) : $(PKG_TGZ)
+	$(call WARN_DEPS)
 	$(RLOCAL) CMD check --as-cran --outdir=$@ $^ 
 	
 check: $(RCHECK)
 
 # 2FIX:
-unit_test.log : $(LOCAL)/$(PKG_NAME) $(LOCAL)/testthat/DESCRIPTION
+unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION
+	$(call WARN_DEPS)
 	$(RLOCAL) --slave -e "if (require(testthat) && require($(PKG_NAME))) testthat::test_dir('./inst/tests')" | tee $@
 
 testthat : unit_test.log
@@ -196,8 +203,8 @@ gitpull :
 	git pull origin master
 
 # drop into R shell in the 'local context'
-R : deps $(LOCAL)/$(PKG_NAME)
-	R_LIBS=$(LOCAL) R_PROFILE=load.R R -q --no-save
+R : deps $(LOCAL)/$(PKG_NAME)/INDEX
+	R_LIBS=$(LOCAL) R_PROFILE=load.R R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
 
 # yes, I am *really* lazy.
 
