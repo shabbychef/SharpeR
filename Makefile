@@ -1,12 +1,8 @@
 # 
 # * Fri Dec 28 2012 04:15:55 PM Steven E. Pav <steven@cerebellumcapital.com>
 #
-# stolen shamelessly from RTikZDevice/
-#
-# 2FIX: steal shamelessly from optmatch:
-# https://github.com/markmfredrickson/optmatch/blob/master/Makefile
-#
-# 2FIX: add actual dependencies.
+# Makefile 'remixed' from RTikZDevice and optmatch packages. HT to Sharpie and
+# markmfredrickson.
 #
 # Created: 2012.12.28
 #
@@ -63,36 +59,17 @@ MKDIR = mkdir -p $(1)
 #WARN_DEPS = $(warning newer deps are $(?))
 WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 
-#
+#########################################################################
+# TARGETS
+#########################################################################
+
+# these are phony targets
 .PHONY: help tags all \
 	gitpull gitpush \
 	news doc build install testthat \
 	staging_d local_d \
 	clean realclean \
 	R
-
-# the default for now.
-all : testthat
-
-# dev stuff
-.R_tags: $(R_FILES)
-	./rebuildTags.sh
-
-tags: .R_tags
-
-DESCRIPTION : DESCRIPTION.m4
-	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) $< > $@
-
-# macro for local R
-RLOCAL = R_LIBS=$(LOCAL) $(R) --vanilla 
-
-# make directories
-local_d :
-	$(call MKDIR,$(LOCAL))
-
-staging_d :
-	$(call MKDIR,$(STAGING))
-
 
 help:
 	@echo "\nTasks for $(PKG_NAME)\n"
@@ -109,6 +86,8 @@ help:
 	@echo "  check      Invoke build and then check the package."
 	@echo "  install    Invoke build and then install the result."
 	@echo "  R          Invoke R in a local context with the package."
+	@echo "  clean      Do some cleanup."
+	@echo "  realclean  Do lots of cleanup."
 	@echo ""
 	@echo "Packaging Tasks"
 	@echo "---------------"
@@ -117,6 +96,38 @@ help:
 	@echo "Using R in: $(RBIN)"
 	@echo "Set the RBIN environment variable to change this."
 	@echo ""
+
+# the default for now.
+all : testthat
+
+# dev stuff
+~/.ctags :
+	@-echo -E '--langdef=R' >> $@
+	@-echo -E '--langmap=R:.s.S.R.r.q' >> $@
+	@-echo -E '--regex-R=/^[ \t]+"?([.A-Za-z][.A-Za-z0-9_]*)"?[\t]*<-[\t]*function/\1/' >> $@
+	@-echo -E '--regex-R=/^"?([.A-Za-z][.A-Za-z0-9_]*)"?[ \t]*<-/\1/' >> $@
+
+.R_tags: $(R_FILES)
+	./rebuildTags.sh
+
+tags: .R_tags
+
+# if you use emacs (shudder)
+TAGS: 
+	$(R) --slave CMD rtags
+
+DESCRIPTION : DESCRIPTION.m4
+	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) $< > $@
+
+# macro for local R
+RLOCAL = R_LIBS=$(LOCAL) $(R) --vanilla 
+
+# make directories
+local_d :
+	$(call MKDIR,$(LOCAL))
+
+staging_d :
+	$(call MKDIR,$(STAGING))
 
 
 # debugging
@@ -180,6 +191,10 @@ $(RCHECK) : $(PKG_TGZ)
 	
 check: $(RCHECK)
 
+################################
+# UNIT TESTING
+################################
+
 # 2FIX:
 unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION
 	$(call WARN_DEPS)
@@ -187,7 +202,10 @@ unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION
 
 testthat : unit_test.log
 
-# clean up.
+################################
+# CLEAN UP 
+################################
+
 clean : 
 	rm -rf man/*.Rd
 	rm -rf $(STAGED_PKG)
@@ -196,7 +214,10 @@ clean :
 realclean : clean
 	rm -rf $(LOCAL)
 
-# git foo
+################################
+# git FOO 
+################################
+
 gitpush :
 	git push origin master
 
@@ -207,7 +228,9 @@ gitpull :
 R : deps $(LOCAL)/$(PKG_NAME)/INDEX
 	R_LIBS=$(LOCAL) R_PROFILE=load.R R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
 
-# yes, I am *really* lazy.
+################################
+# CRAN SUBMISSION
+################################
 
 # FTP junk
 ~/.netrc :
