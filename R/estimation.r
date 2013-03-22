@@ -309,8 +309,9 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 	ncp.unb <- (Fs * (df2 - 2) * df1 / df2) - df1
 	return(ncp.unb)
 }
+
 #MLE of the ncp based on a single F-stat
-.F_ncp_MLE <- function(Fs,df1,df2,ub=NULL,lb=0) {
+.F_ncp_MLE_single <- function(Fs,df1,df2,ub=NULL,lb=0) {
 	if (Fs <= 1) { return(0.0) }  # Spruill's Thm 3.1, eqn 8
 	max.func <- function(z) { df(Fs,df1,df2,ncp=z,log=TRUE) }
 
@@ -328,12 +329,16 @@ srstar.confint <- function(srstar,df1,df2,level=0.95,
 	ncp.MLE <- optimize(max.func,c(lb,ub),maximum=TRUE)$maximum;
 	return(ncp.MLE)
 }
+.F_ncp_MLE <- Vectorize(.F_ncp_MLE_single,
+											vectorize.args = c("Fs","df1","df2"),
+											SIMPLIFY = TRUE)
+
 # KRS estimator of the ncp based on a single F-stat
 .F_ncp_KRS <- function(Fs,df1,df2) {
 	xbs <- Fs * (df1/df2)
 	delta0 <- (df2 - 2) * xbs - df1
 	phi2 <- 2 * xbs * (df2 - 2) / (df1 + 2)
-	delta2 <- max(delta0,phi2)
+	delta2 <- pmax(delta0,phi2)
 	return(delta2)
 }
 
@@ -385,6 +390,11 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' The srstar distribution is equivalent to a Hotelling up to a 
 #' square root and some rescalings. 
+#' 
+#' The non-centrality parameter of the srstar distribution is 
+#' the square root of that of the Hotelling, \emph{i.e.} has
+#' units 'per square root time'. As such, the \code{'unbiased'}
+#' type can be problematic!
 #'
 #' @usage
 #'
@@ -428,6 +438,15 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @examples 
 #' rvs <- rf(1024, 4, 1000, 5)
 #' unbs <- F.inference(rvs, 4, 1000, type="unbiased")
+#' # generate some srstars
+#' true.snrstar <- 1.25
+#' df1 <- 6
+#' df2 <- 2000
+#' opy <- 253
+#' rvs <- rsrstar(500, df1, df2, true.snrstar, opy)
+#' est1 <- srstar.inference(rvs,df1,df2,opy,type='unbiased')  
+#' est2 <- srstar.inference(rvs,df1,df2,opy,type='KRS')  
+#' est3 <- srstar.inference(rvs,df1,df2,opy,type='MLE')
 #'
 srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
 	if (!missing(drag) && (drag != 0)) 
@@ -436,7 +455,8 @@ srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
 		srstar <- .deannualize(srstar, opy)
 	T2 <- .srstar_to_T2(srstar, df2)
 	retval <- T2.inference(T2,df1,df2,...)
-	# 2FIX: do I have to interpret this back? ack!
+	# convert back
+	retval <- .T2_to_srstar(retval, df2)
 	if (!missing(opy)) 
 		retval <- .annualize(retval, opy)
 	if (!missing(drag) && (drag != 0)) 
@@ -469,8 +489,6 @@ srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
 
 ## junkyard#FOLDUP
 
-#t_power_rule <- function(n,alpha = 0.05,beta = 0.20,
-
 ##compute the asymptotic mean and variance of the sqrt of a
 ##non-central F distribution
 
@@ -487,59 +505,6 @@ srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
 	#deno <- sqrt(f_sqrt_ncf_asym_var(df1,df2,ncp = ncp))
 	#return(1 - pnorm(numr / deno))
 #}
-
-
-## inference on F's ncp
-
-## confidence distribution, gives CIs
-#qcofncp <- function(p,Fs,df1,df2,ub=NULL) {
-	## return max{0 <= ncp <= ub | pf(Fs,df1,df2,ncp) >= 1 - p}
-	## or 0 if none exist
-	#f.zer <- pf(Fs,df1,df2,0)
-	#if (f.zer < (1-p)) {
-		#return(0)
-	#} else {
-		#if (is.null(ub)) {
-			#ub <- 1.0
-			#fpf <- pf(Fs,df1,df2,ub)
-			#while (fpf >= (1-p)) {
-				#ub <- 2.0 * ub
-				#fpf <- pf(Fs,df1,df2,ub)
-			#}
-			#lb <- 0.5 * ub
-		#} else {
-			#lb <- 0
-			#fpf <- pf(Fs,df1,df2,ub)
-		#}
-		## now call uniroot
-		#zerf <- function(z,n,xv,limv) { pf(xv,p,n-p,n*z^2) - limv }
-		#ncp <- uniroot(function(ncp,Fs,df1,df2,tgt){pf(Fs,df1,df2,ncp) - tgt},
-									 #c(lb,ub),Fs=Fs,df1=df1,df2=df2,tgt=1-p)$root
-		#return(ncp)
-	#}
-#}
-
-## use same to construct confidence intervals
-#fncp.ci <- function(F,df1,df2,alpha.lo=0.025,alpha.hi=1-alpha.lo) {
-	#if (alpha.hi >= 1) {
-		#cihi <- Inf
-	#} else {
-		#cihi <- qcofncp(alpha.hi,F,df1,df2)
-	#}
-
-	#if (alpha.lo <= 0) {
-		#cilo <- 0
-	#} else {
-		#if (is.finite(cihi)) {
-			#cilo <- qcofncp(alpha.lo,F,df1,df2,ub=cihi)
-		#} else {
-			#cilo <- qcofncp(alpha.lo,F,df1,df2)
-		#}
-	#}
-	#return(list('lo' = cilo,'hi' = cihi))
-#}
-
-
 ##UNFOLD
 
 #for vim modeline: (do not edit)
