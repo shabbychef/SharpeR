@@ -9,6 +9,7 @@ man/
 .*.swo
 
 unit_test.log
+NAMESPACE
 
 *.tar.gz
 .local/

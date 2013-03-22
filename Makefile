@@ -148,6 +148,7 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 	$(call MKDIR,$(STAGED_PKG))
 	rsync $(RSYNC_FLAGS) \
 		--include=man/ --include=man/* \
+		--include=NAMESPACE \
 		--exclude-from=.gitignore \
 		$(patsubst %,--exclude=%,$(NODIST_FILES)) \
 		$(patsubst %,--exclude=%,$(NODIST_DIRS)) \
