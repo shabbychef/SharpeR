@@ -117,7 +117,7 @@ TAGS:
 	$(R) --slave CMD rtags
 
 DESCRIPTION : DESCRIPTION.m4
-	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) $< > $@
+	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
 
 # macro for local R
 RLOCAL = R_LIBS=$(LOCAL) $(R) --vanilla 

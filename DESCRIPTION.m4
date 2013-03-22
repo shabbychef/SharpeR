@@ -1,4 +1,4 @@
-Package: SharpeR
+Package: PKG_NAME()
 Maintainer: Steven E. Pav <shabbychef@gmail.com>
 Author: Steven E. Pav
 Authors@R: c(person("Steven", "Pav", role=c("aut","cre"), email="shabbychef@gmail.com"))
