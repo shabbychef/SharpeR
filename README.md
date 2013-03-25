@@ -6,4 +6,12 @@ Markowitz portfolio, and, in general, overfit of trading strategies based on
 
 -- Steven E. Pav, shabbychef@gmail.com
 
+## Installation
+
+The package is not yet CRAN-ready, but can be installed from github via devtools:
+
+```
+require(devtools)
+install_github(repo='SharpeR',username='shabbychef',ref='master')
+```
 
