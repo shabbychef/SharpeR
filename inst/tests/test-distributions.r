@@ -159,14 +159,14 @@ test_that("pcosrstar/qcosrstar monotonicity",{#FOLDUP
 				for (lp in c(TRUE,FALSE)) {
 					if (lp) { checkps <- log(ps) } else { checkps <- ps }
 					for (lt in c(TRUE,FALSE)) {
-						qs <- qcosrstar(checkps, df1, df2, srstar=delta2, opy=1,
+						qs <- qcosrstar(checkps, df1, df2, z.s=delta2, opy=1,
 														lower.tail=lt, log.p=lp)
 						if (lt) { 
 							expect_true(is.sorted(qs,pragma="ascending"))
 						} else {
 							expect_true(is.sorted(qs,pragma="descending"))
 						}
-						pret <- pcosrstar(qs, df1, df2, srstar=delta2, opy=1,
+						pret <- pcosrstar(qs, df1, df2, z.s=delta2, opy=1,
 															lower.tail=lt, log.p=lp)
 						expect_true(ifelse(lp,all(pret <= 0),
 															 all(0 <= pret) && all(pret <= 1)))

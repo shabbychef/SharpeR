@@ -42,6 +42,7 @@
 # Distributions
 ########################################################################
 
+# some facts about t-stats#FOLDUP
 # geometric bias in the expectation of the non-central t-stat with a
 # given number of d.f.
 # this is 1 over 'c4', essentially:
@@ -53,9 +54,10 @@
 	return(retval)
 }
 # same, but for sr:
-.srbias <- function(n) { 
-	return(.tbias(n-1))
+.srbias <- function(df) { 
+	return(.tbias(df-1))
 }
+#UNFOLD
 
 # Sharpe ratio as a distribution
 # dsr, psr, qsr, rsr#FOLDUP
@@ -65,39 +67,46 @@
 #'
 #' Density, distribution function, quantile function and random
 #' generation for the Sharpe ratio distribution with \code{df} degrees of freedom
-#' (and optional signal-noise-ratio \code{snr}).
+#' (and optional signal-noise-ratio \code{zeta}).
 #'
 #' @details
 #'
-#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a normal random
+#' Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a normal random
 #' variable with mean \eqn{\mu}{mu} and variance \eqn{\sigma^2}{sigma^2}.
-#' Let \eqn{\bar{x}}{xbar} be the sample mean, and \eqn{s}{s} be
+#' Let \eqn{\bar{x}}{xbar} be the sample mean, and \eqn{s} be
 #' the sample standard deviation (using Bessel's correction). Let \eqn{c_0}{c0}
 #' be the 'risk free rate'.  Then
 #' \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} 
 #' is the (sample) Sharpe ratio.
 #' 
-#' The units of \eqn{z}{z} is \eqn{\mbox{time}^{-1/2}}{per root time}.
+#' The units of \eqn{z} is \eqn{\mbox{time}^{-1/2}}{per root time}.
 #' Typically the Sharpe ratio is \emph{annualized} by multiplying by
-#' \eqn{\sqrt{p}}{sqrt(p)}, where \eqn{p}{p} is the number of observations
+#' \eqn{\sqrt{d}}{sqrt(d)}, where \eqn{d} is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
-#' Letting \eqn{z = \sqrt{p}\frac{\bar{x}-c_0}{s}}{z = sqrt(p)(xbar - c0)/s},
-#' where the sample estimates are based on \eqn{n}{n} observations, 
+#' Letting \eqn{z = \sqrt{d}\frac{\bar{x}-c_0}{s}}{z = sqrt(d)(xbar - c0)/s},
+#' where the sample estimates are based on \eqn{n} observations, 
 #' then \eqn{z}{z} takes a (non-central) Sharpe ratio distribution
-#' with \eqn{n}{n} 'degrees of freedom', non-centrality parameter
-#' \eqn{\delta = \frac{\mu - c_0}{\sigma}}{delta = (mu - c0)/sigma}, and 
-#' annualization parameter \eqn{p}{p}.
+#' parametrized by \eqn{n} 'degrees of freedom', non-centrality parameter
+#' \eqn{\zeta = \frac{\mu - c_0}{\sigma}}{zeta = (mu - c0)/sigma}, and 
+#' annualization parameter \eqn{d}. 
+#'
+#' The parameters are encoded as follows:
+#' \itemize{
+#' \item \eqn{n} is denoted by \code{df}.
+#' \item \eqn{\zeta}{zeta} is denoted by \code{zeta}.
+#' \item \eqn{d} is denoted by \code{opy}. ('Observations Per Year')
+#' }
 #'
 #' @usage
 #'
-#' dsr(x, df, snr, opy, log = FALSE)
+#' dsr(x, df, zeta, opy, log = FALSE)
 #'
-#' psr(q, df, snr, opy, ...)
+#' psr(q, df, zeta, opy, ...)
 #'
-#' qsr(p, df, snr, opy, lower.tail = TRUE, log.p = FALSE) 
+#' qsr(p, df, zeta, opy, lower.tail = TRUE, log.p = FALSE) 
 #'
-#' rsr(n, df, snr, opy)
+#' rsr(n, df, zeta, opy)
 #'
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
@@ -106,10 +115,10 @@
 #'        is one more than the number of degrees of freedom in the
 #'        corresponding t-statistic, although the effect will be small
 #'        when \code{df} is large.
-#' @param snr the 'signal-to-noise' parameter, defined as the population
+#' @param zeta the 'signal-to-noise' parameter, \eqn{\zeta}{zeta} defined as the population
 #'        mean divided by the population standard deviation, 'annualized'.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#'        \code{zeta} are quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
@@ -128,7 +137,7 @@
 #' This is a thin wrapper on the t distribution. 
 #' The functions \code{\link{dt}, \link{pt}, \link{qt}} can accept ncp from
 #' limited range (\eqn{|\delta|\le 37.62}{delta <= 37.62}). Some corrections
-#' may have to be made here for large \code{snr}.
+#' may have to be made here for large \code{zeta}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
@@ -148,52 +157,52 @@
 #' pvs <- psr(rvs, 253*6, 1, 253)
 #' plot(ecdf(pvs))
 #'
-dsr <- function(x, df, snr, opy, log = FALSE) {
+dsr <- function(x, df, zeta, opy, log = FALSE) {
 	if (!missing(opy)) {
 		x <- .deannualize(x,opy)
-		if (!missing(snr)) { snr <- .deannualize(x,opy) }
+		if (!missing(zeta)) { zeta <- .deannualize(x,opy) }
 	}
 
 	tx <- .sr_to_t(x, df)
-	if (missing(snr)) {
+	if (missing(zeta)) {
 		xd <- dt(tx, df = df - 1, log = log)
 	} else {
-		ncp <- .sr_to_t(snr, df)
+		ncp <- .sr_to_t(zeta, df)
 		xd <- dt(tx, df = df - 1, ncp = ncp, log = log)
 	}
 	if (log) {
-		retv <- xd + log(.d_sr_to_t(snr, df))		
+		retv <- xd + log(.d_sr_to_t(zeta, df))		
 	} else {
-		retv <- xd * .d_sr_to_t(snr, df)
+		retv <- xd * .d_sr_to_t(zeta, df)
 	}
 	return(retv)	
 }
 #' @export 
-psr <- function(q, df, snr, opy, ...) {
+psr <- function(q, df, zeta, opy, ...) {
 	if (!missing(opy)) {
 		q <- .deannualize(q, opy)
-		if (!missing(snr)) {
-			snr <- .deannualize(snr, opy)
+		if (!missing(zeta)) {
+			zeta <- .deannualize(zeta, opy)
 		}
 	}
 	tq <- .sr_to_t(q, df)
-	if (missing(snr)) {
+	if (missing(zeta)) {
 		retv <- pt(q = tq, df = df - 1, ...)		
 	} else {
-		ncp <- .sr_to_t(snr, df)
+		ncp <- .sr_to_t(zeta, df)
 		retv <- pt(q = tq, df = df - 1, ncp = ncp, ...)		
 	}
 	return(retv)	
 }
 #' @export 
-qsr <- function(p, df, snr, opy, lower.tail = TRUE, log.p = FALSE) {
-	if (!missing(opy) && !missing(snr)) {
-		snr <- .deannualize(snr, opy)
+qsr <- function(p, df, zeta, opy, lower.tail = TRUE, log.p = FALSE) {
+	if (!missing(opy) && !missing(zeta)) {
+		zeta <- .deannualize(zeta, opy)
 	}
-	if (missing(snr)) {
+	if (missing(zeta)) {
 		tq <- qt(p, df = df - 1, lower.tail = lower.tail, log.p = log.p)
 	} else {
-		ncp <- .sr_to_t(snr, df)
+		ncp <- .sr_to_t(zeta, df)
 		tq <- qt(p, df = df - 1, ncp = ncp, 
 						 lower.tail = lower.tail, log.p = log.p)
 	}
@@ -205,14 +214,14 @@ qsr <- function(p, df, snr, opy, lower.tail = TRUE, log.p = FALSE) {
 	return(retv)
 }
 #' @export 
-rsr <- function(n, df, snr, opy) {
-	if (!missing(opy) && !missing(snr)) {
-		snr <- .deannualize(snr, opy)
+rsr <- function(n, df, zeta, opy) {
+	if (!missing(opy) && !missing(zeta)) {
+		zeta <- .deannualize(zeta, opy)
 	}
-	if (missing(snr)) {
+	if (missing(zeta)) {
 		tr <- rt(n, df = df - 1)
 	} else {
-		ncp <- .sr_to_t(snr, df)
+		ncp <- .sr_to_t(zeta, df)
 		tr <- rt(n, df = df - 1, ncp = ncp) 
 	}
 	retv <- .t_to_sr(tr, df)
@@ -368,21 +377,21 @@ rT2 <- function(n, df1, df2, delta2) {
 #' Density, distribution function, quantile function and random
 #' generation for the maximal Sharpe ratio distribution with 
 #' \code{df1} and \code{df2} degrees of freedom
-#' (and optional maximal signal-noise-ratio \code{snrstar}).
+#' (and optional maximal signal-noise-ratio \code{zeta.s}).
 #'
 #' @details
 #'
-#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+#' Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a \eqn{q}-variate
 #' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
 #' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
-#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). Let
-#' \deqn{\zeta(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar - c0)/sqrt(w'Sw)}
-#' be the (sample) Sharpe ratio of the portfolio \eqn{w}{w}, subject to 
+#' \eqn{S} be the sample covariance matrix (using Bessel's correction). Let
+#' \deqn{Z(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{Z(w) = (w'xbar - c0)/sqrt(w'Sw)}
+#' be the (sample) Sharpe ratio of the portfolio \eqn{w}, subject to 
 #' risk free rate \eqn{c_0}{c0}.
 #'
 #' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
-#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},}
-#' with maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* = zeta(w*)}.
+#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2} Z(w),}{max {Z(w) | 0 < w'Sw <= R^2},}
+#' with maximum value \eqn{z_* = Z\left(w_*\right)}{z* = Z(w*)}.
 #' Then 
 #' \deqn{w_* = R \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
 #' w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)}
@@ -392,39 +401,48 @@ rT2 <- function(n, df1, df2, delta2) {
 #'
 #' The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio}
 #' distribution. For convenience, we may assume that the sample statistic
-#' has been annualized by 
-#' in the same manner as the Sharpe ratio (see \code{\link{dsr}}), that
-#' is, by multiplying by \eqn{p}{p}, the number of observations per
+#' has been annualized in the same manner as the Sharpe ratio, that is 
+#' by multiplying by \eqn{d}, the number of observations per
 #' epoch.
 #' 
-#' The distribution is parametrized by the number of independent observations,
-#' \eqn{n}, the number of assets, \eqn{q}, the noncentrality parameter,
-#' \eqn{\delta^2 = \mu^{\top}\Sigma^{-1}\mu}{delta^2 = mu' Sigma^-1 mu},
-#' the 'drag' term, \eqn{c_0/R}{c0/R}, and the annualization factor, \eqn{p}.
+#' The Maximal Sharpe Ratio distribution is parametrized by the number 
+#' of assets, \eqn{q}, the number of independent observations, \eqn{n}, the 
+#' noncentrality parameter, 
+#' \deqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* = sqrt(mu' Sigma^-1 mu),}
+#' the 'drag' term, \eqn{c_0/R}{c0/R}, and the annualization factor, \eqn{d}.
 #' The drag term makes this a location family of distributions, and 
 #' by default we assume it is zero.
+#' 
+#' The parameters are encoded as follows:
+#' \itemize{
+#' \item \eqn{q} is denoted by \code{df1}.
+#' \item \eqn{n} is denoted by \code{df2}.
+#' \item \eqn{\zeta_*}{zeta*} is denoted by \code{zeta.s}.
+#' \item \eqn{d} is denoted by \code{opy}.
+#' \item \eqn{c_0/R} is denoted by \code{drag}.
+#' }
 #'
 #' @usage
 #'
-#' dsrstar(x, df1, df2, snrstar, opy, drag = 0, log = FALSE)
+#' dsrstar(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE)
 #'
-#' psrstar(q, df1, df2, snrstar, opy, drag = 0, ...)
+#' psrstar(q, df1, df2, zeta.s, opy, drag = 0, ...)
 #'
-#' qsrstar(p, df1, df2, snrstar, opy, drag = 0, ...)
+#' qsrstar(p, df1, df2, zeta.s, opy, drag = 0, ...)
 #'
-#' rsrstar(n, df1, df2, snrstar, opy, drag = 0, ...)
+#' rsrstar(n, df1, df2, zeta.s, opy, drag = 0, ...)
 #'
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
 #' @param n number of observations. 
 #' @param df1 the number of assets in the portfolio.
 #' @param df2 the number of observations.
-#' @param snrstar the non-centrality parameter, defined as 
-#'        \eqn{\delta = \sqrt{\mu' \Sigma^{-1} \mu}}{delta = sqrt(mu' Sigma^-1 mu)}
+#' @param zeta.s the non-centrality parameter, defined as 
+#'        \eqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* = sqrt(mu' Sigma^-1 mu),}
 #'        for population parameters.
 #'        defaults to 0, \emph{i.e.} a central maximal Sharpe ratio distribution.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{snrstar} are quoted in 'annualized' units, that is, per 'year',
+#'        \code{zeta.s} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
@@ -461,21 +479,21 @@ rT2 <- function(n, df1, df2, delta2) {
 #' isp <- psrstar(rvs, 8, 253*6, 0, 253)
 #' plot(ecdf(isp))
 #'
-dsrstar <- function(x, df1, df2, snrstar, opy, drag = 0, log = FALSE) {
+dsrstar <- function(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE) {
 	if (!missing(drag) && (drag != 0)) {
 		x <- x + drag
 	}
 	if (!missing(opy)) {
 		x <- .deannualize(x, opy)
-		if (!missing(snrstar)) {
-			snrstar <- .deannualize(snrstar, opy)
+		if (!missing(zeta.s)) {
+			zeta.s <- .deannualize(zeta.s, opy)
 		}
 	}
 	x.T2 <- .srstar_to_T2(x, df2)
-	if (missing(snrstar)) {
+	if (missing(zeta.s)) {
 		delta2 <- 0
 	} else {
-		delta2 <- .srstar_to_T2(snrstar, df2)
+		delta2 <- .srstar_to_T2(zeta.s, df2)
 	}
 	d.T2 <- dT2(x.T2, df1, df2, delta2, log=log)
 	if (log) {
@@ -486,34 +504,34 @@ dsrstar <- function(x, df1, df2, snrstar, opy, drag = 0, log = FALSE) {
 	return(retv)
 }
 #' @export 
-psrstar <- function(q, df1, df2, snrstar, opy, drag = 0, ...) {
+psrstar <- function(q, df1, df2, zeta.s, opy, drag = 0, ...) {
 	if (!missing(drag) && (drag != 0)) {
 		q <- q + drag
 	}
 	if (!missing(opy)) {
 		q <- .deannualize(q, opy)
-		if (!missing(snrstar)) {
-			snrstar <- .deannualize(snrstar, opy)
+		if (!missing(zeta.s)) {
+			zeta.s <- .deannualize(zeta.s, opy)
 		}
 	}
 	q.T2 <- .srstar_to_T2(q, df2)
-	if (missing(snrstar)) {
+	if (missing(zeta.s)) {
 		delta2 = 0.0
 	} else {
-		delta2 <- .srstar_to_T2(snrstar, df2)
+		delta2 <- .srstar_to_T2(zeta.s, df2)
 	}
 	retv <- pT2(q.T2, df1, df2, delta2, ...)
 	return(retv)
 }
 #' @export 
-qsrstar <- function(p, df1, df2, snrstar, opy, drag = 0, ...) {
-	if (missing(snrstar)) {
+qsrstar <- function(p, df1, df2, zeta.s, opy, drag = 0, ...) {
+	if (missing(zeta.s)) {
 		delta2 = 0.0
 	} else {
 		if (!missing(opy)) {
-			snrstar <- .deannualize(snrstar, opy)
+			zeta.s <- .deannualize(zeta.s, opy)
 		}
-		delta2 <- .srstar_to_T2(snrstar, df2)
+		delta2 <- .srstar_to_T2(zeta.s, df2)
 	}
 	q.T2 <- qT2(p, df1, df2, delta2, ...)
 	retv <- .T2_to_srstar(q.T2, df2)
@@ -526,14 +544,14 @@ qsrstar <- function(p, df1, df2, snrstar, opy, drag = 0, ...) {
 	return(retv)
 }
 #' @export 
-rsrstar <- function(n, df1, df2, snrstar, opy, drag = 0, ...) {
-	if (missing(snrstar)) {
+rsrstar <- function(n, df1, df2, zeta.s, opy, drag = 0, ...) {
+	if (missing(zeta.s)) {
 		delta2 = 0.0
 	} else {
 		if (!missing(opy)) {
-			snrstar <- .deannualize(snrstar, opy)
+			zeta.s <- .deannualize(zeta.s, opy)
 		}
-		delta2 <- .srstar_to_T2(snrstar, df2)
+		delta2 <- .srstar_to_T2(zeta.s, df2)
 	}
 	r.T2 <- rT2(n, df1, df2, delta2, ...) 
 	retv <- .T2_to_srstar(r.T2, df2)
@@ -693,31 +711,32 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' Distribution function and quantile function for the 'confidence
 #' distribution' of the maximal Sharpe ratio. This is just an inversion
-#' to perform inference on snrstar given observed statistic srstar.
+#' to perform inference on \eqn{\zeta_*}{zeta*} given observed statistic 
+#' \eqn{z_*}{z*}.
 #'
 #' @details
 #' 
-#' Let \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio} distribution
+#' Suppose \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio} distribution
 #' (see \code{\link{SharpeR}}) for known degrees of freedom, and 
-#' unknown non-centrality parameter \eqn{\delta}{delta}. The 
-#' 'confidence distribution' views \eqn{\delta}{delta} as a random
+#' unknown non-centrality parameter \eqn{\zeta_*}{zeta*}. The 
+#' 'confidence distribution' views \eqn{\zeta_*}{zeta*} as a random
 #' quantity once \eqn{z_*}{z*} is observed. As such, the CDF of
 #' the confidence distribution is the same as that of the 
 #' Maximal Sharpe ratio (up to a flip of \code{lower.tail});
 #' while the quantile function is used to compute confidence
-#' intervals on \eqn{\delta}{delta} given \eqn{z_*}{z*}.
+#' intervals on \eqn{\zeta_*}{zeta*} given \eqn{z_*}{z*}.
 #'
 #' @usage
 #'
-#' pcosrstar(q,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE) 
+#' pcosrstar(q,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE) 
 #'
-#' qcosrstar(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
+#' qcosrstar(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
 #'
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
-#' @param srstar an observed Sharpe ratio statistic, annualized.
-#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{srstar} are quoted in 'annualized' units, that is, per 'year',
+#' @param z.s an observed Sharpe ratio statistic, annualized.
+#' @param opy the number of observations per 'year'. \code{z.s}, \code{q}, and
+#'        \code{zeta.s} are quoted in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
@@ -748,12 +767,12 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' @examples 
 #'
-#' snrstar <- 2.0
+#' zeta.s <- 2.0
 #' opy <- 253
 #' ntest <- 2000
 #' df1 <- 4
 #' df2 <- 6 * opy
-#' rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
+#' rvs <- rsrstar(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
 #' qvs <- seq(0,10,length.out=101)
 #' pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
 #' if (require(txtplot))
@@ -778,12 +797,12 @@ qlambdap <- Vectorize(.qlambdap,
 #'  txtplot(qvs,pps)
 #' pcosrstar(-1,df1,df2,rvs[1],opy)
 #'
-#' qvs <- qcosrstar(0.05,df1=df1,df2=df2,srstar=rvs)
-#' mean(qvs > snrstar)
-#' qvs <- qcosrstar(0.5,df1=df1,df2=df2,srstar=rvs)
-#' mean(qvs > snrstar)
-#' qvs <- qcosrstar(0.95,df1=df1,df2=df2,srstar=rvs)
-#' mean(qvs > snrstar)
+#' qvs <- qcosrstar(0.05,df1=df1,df2=df2,z.s=rvs)
+#' mean(qvs > zeta.s)
+#' qvs <- qcosrstar(0.5,df1=df1,df2=df2,z.s=rvs)
+#' mean(qvs > zeta.s)
+#' qvs <- qcosrstar(0.95,df1=df1,df2=df2,z.s=rvs)
+#' mean(qvs > zeta.s)
 #' # test vectorization:
 #' qv <- qcosrstar(0.1,df1,df2,rvs)
 #' qv <- qcosrstar(c(0.1,0.2),df1,df2,rvs)
@@ -791,11 +810,11 @@ qlambdap <- Vectorize(.qlambdap,
 #' qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 #'
 # 2FIX: add opy?
-pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
+pcosrstar <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	# 2FIX: do the annualization just once for efficiency?
 	# this is just a silly wrapper on psrstar
 	# delegate
-	retv <- psrstar(q=srstar,df1=df1,df2=df2,snrstar=q,opy=opy,
+	retv <- psrstar(q=z.s,df1=df1,df2=df2,zeta.s=q,opy=opy,
 									lower.tail=!lower.tail,log.p=log.p)  # sic the tail reversal
 	return(retv)
 }
@@ -813,24 +832,24 @@ pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 # up = pcosrstar(ub,df1,df2,srstar,opy,lower.tail,log.p)
 # if p < lp we return lb;
 # if q >= up, we return ub;
-.qcosrstar <- function(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE,
+.qcosrstar <- function(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,
 												lb=0,ub=Inf) {
 	if ((lb > ub) || (is.infinite(lb)) || (min(lb,ub) < 0))
 		stop("nonsensical lb and/or ub")
 
 	if (!missing(opy)) 
-		srstar <- .deannualize(srstar,opy)
+		z.s <- .deannualize(z.s,opy)
 
 	# create a function increasing in its argument that
 	# we wish to zero
 	# do *not* pass on opy b/c this function is a tight loop
 	if (lower.tail) {
 		zerf <- function(q) {
-			pcosrstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p) - p
+			pcosrstar(q,df1=df1,df2=df2,z.s=z.s,lower.tail=lower.tail,log.p=log.p) - p
 		}
 	} else {
 		zerf <- function(q) {
-			p - pcosrstar(q,df1=df1,df2=df2,srstar=srstar,lower.tail=lower.tail,log.p=log.p)
+			p - pcosrstar(q,df1=df1,df2=df2,z.s=z.s,lower.tail=lower.tail,log.p=log.p)
 		}
 	}
 	flb <- zerf(lb)
@@ -858,7 +877,7 @@ pcosrstar <- function(q,df1,df2,srstar,opy=1,lower.tail=TRUE,log.p=FALSE) {
 }
 #' @export 
 qcosrstar <- Vectorize(.qcosrstar,
-											vectorize.args = c("p","df1","df2","srstar"),
+											vectorize.args = c("p","df1","df2","z.s"),
 											SIMPLIFY = TRUE)
 #UNFOLD
 

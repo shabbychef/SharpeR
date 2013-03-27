@@ -198,6 +198,10 @@ unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION
 
 testthat : unit_test.log
 
+# drop into R shell in the 'local context'
+R : deps $(LOCAL)/$(PKG_NAME)/INDEX
+	R_LIBS=$(LOCAL) R_PROFILE=load.R R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
+
 ################################
 # CLEAN UP 
 ################################
@@ -221,9 +225,8 @@ gitpush :
 gitpull :
 	git pull origin master
 
-# drop into R shell in the 'local context'
-R : deps $(LOCAL)/$(PKG_NAME)/INDEX
-	R_LIBS=$(LOCAL) R_PROFILE=load.R R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
+tag :
+	echo "git tag -a v$(VERSION) -m 'version $(VERSION)'"
 
 ################################
 # CRAN SUBMISSION

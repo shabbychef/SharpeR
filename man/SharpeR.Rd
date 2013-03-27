@@ -25,23 +25,22 @@
 
   The units of \eqn{z} is \eqn{\mbox{time}^{-1/2}}{per root
   time}. Typically the Sharpe ratio is \emph{annualized} by
-  multiplying by \eqn{\sqrt{p}}{sqrt(p)}, where \eqn{p} is
+  multiplying by \eqn{\sqrt{d}}{sqrt(d)}, where \eqn{d} is
   the number of observations per year (or whatever the
   target annualization epoch.)
 
-  Letting \eqn{z = \sqrt{p}\frac{\bar{x}-c_0}{s}}{z =
-  sqrt(p)(xbar - c0)/s}, where the sample estimates are
+  Letting \eqn{z = \sqrt{d}\frac{\bar{x}-c_0}{s}}{z =
+  sqrt(d)(xbar - c0)/s}, where the sample estimates are
   based on \eqn{n} observations, then \eqn{z}{z} takes a
   (non-central) Sharpe ratio distribution parametrized by
   \eqn{n} 'degrees of freedom', non-centrality parameter
-  \eqn{\delta = \frac{\mu - c_0}{\sigma}}{delta = (mu -
-  c0)/sigma}, and annualization parameter \eqn{p}.
+  \eqn{\zeta = \frac{\mu - c_0}{\sigma}}{zeta = (mu -
+  c0)/sigma}, and annualization parameter \eqn{d}.
 
   The parameters are encoded as follows: \itemize{ \item
-  \eqn{n} is denoted by \code{df}. \item
-  \eqn{\delta}{delta} is denoted by \code{snr}. \item
-  \eqn{p} is denoted by \code{opy}. ('Observations Per
-  Year') }
+  \eqn{n} is denoted by \code{df}. \item \eqn{\zeta}{zeta}
+  is denoted by \code{zeta}. \item \eqn{d} is denoted by
+  \code{opy}. ('Observations Per Year') }
 }
 
 \section{Maximal Sharpe Ratio}{
@@ -50,17 +49,17 @@
   \eqn{\mu}{mu} and covariance matrix \eqn{\Sigma}{Sigma}.
   Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and
   \eqn{S} be the sample covariance matrix (using Bessel's
-  correction). Let \deqn{\zeta(w) = \frac{w^{\top}\bar{x} -
-  c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar -
+  correction). Let \deqn{Z(w) = \frac{w^{\top}\bar{x} -
+  c_0}{\sqrt{w^{\top}S w}}}{Z(w) = (w'xbar -
   c0)/sqrt(w'Sw)} be the (sample) Sharpe ratio of the
   portfolio \eqn{w}, subject to risk free rate
   \eqn{c_0}{c0}.
 
   Let \eqn{w_*}{w*} be the solution to the portfolio
   optimization problem: \deqn{\max_{w: 0 < w^{\top}S w \le
-  R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},} with
-  maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* =
-  zeta(w*)}. Then \deqn{w_* = R
+  R^2} Z(w),}{max {Z(w) | 0 < w'Sw <= R^2},} with maximum
+  value \eqn{z_* = Z\left(w_*\right)}{z* = Z(w*)}. Then
+  \deqn{w_* = R
   \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
   w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)} and \deqn{z_* =
   \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
@@ -70,22 +69,23 @@
   ratio} distribution. For convenience, we may assume that
   the sample statistic has been annualized in the same
   manner as the Sharpe ratio, that is by multiplying by
-  \eqn{p}, the number of observations per epoch.
+  \eqn{d}, the number of observations per epoch.
 
   The Maximal Sharpe Ratio distribution is parametrized by
-  the number of independent observations, \eqn{n}, the
-  number of assets, \eqn{q}, the noncentrality parameter,
-  \deqn{\delta = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{delta =
+  the number of assets, \eqn{q}, the number of independent
+  observations, \eqn{n}, the noncentrality parameter,
+  \deqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* =
   sqrt(mu' Sigma^-1 mu),} the 'drag' term,
-  \eqn{c_0/R}{c0/R}, and the annualization factor, \eqn{p}.
+  \eqn{c_0/R}{c0/R}, and the annualization factor, \eqn{d}.
   The drag term makes this a location family of
   distributions, and by default we assume it is zero.
 
   The parameters are encoded as follows: \itemize{ \item
   \eqn{q} is denoted by \code{df1}. \item \eqn{n} is
-  denoted by \code{df2}. \item \eqn{\delta} is denoted by
-  \code{snrstar}. \item \eqn{p} is denoted by \code{opy}.
-  \item \eqn{c_0/R} is denoted by \code{drag}. }
+  denoted by \code{df2}. \item \eqn{\zeta_*}{zeta*} is
+  denoted by \code{zeta.s}. \item \eqn{d} is denoted by
+  \code{opy}. \item \eqn{c_0/R} is denoted by \code{drag}.
+  }
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

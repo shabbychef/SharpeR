@@ -52,6 +52,8 @@
   NULL, and that parameter is determined from the others.
   Notice that \code{sig.level} has non-NULL default, so
   NULL must be explicitly passed if you want to compute it.
+
+  2FIX: change snr to zeta?
 }
 \examples{
 anex <- power.sr.test(253,1,0.05,NULL,opy=253)

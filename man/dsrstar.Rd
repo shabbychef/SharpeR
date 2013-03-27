@@ -5,13 +5,13 @@
 \alias{rsrstar}
 \title{The (non-central) maximal Sharpe ratio distribution.}
 \usage{
-  dsrstar(x, df1, df2, snrstar, opy, drag = 0, log = FALSE)
+  dsrstar(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE)
 
-  psrstar(q, df1, df2, snrstar, opy, drag = 0, ...)
+  psrstar(q, df1, df2, zeta.s, opy, drag = 0, ...)
 
-  qsrstar(p, df1, df2, snrstar, opy, drag = 0, ...)
+  qsrstar(p, df1, df2, zeta.s, opy, drag = 0, ...)
 
-  rsrstar(n, df1, df2, snrstar, opy, drag = 0, ...)
+  rsrstar(n, df1, df2, zeta.s, opy, drag = 0, ...)
 }
 \arguments{
   \item{x,q}{vector of quantiles.}
@@ -24,14 +24,14 @@
 
   \item{df2}{the number of observations.}
 
-  \item{snrstar}{the non-centrality parameter, defined as
-  \eqn{\delta = \sqrt{\mu' \Sigma^{-1} \mu}}{delta =
-  sqrt(mu' Sigma^-1 mu)} for population parameters.
+  \item{zeta.s}{the non-centrality parameter, defined as
+  \eqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* =
+  sqrt(mu' Sigma^-1 mu),} for population parameters.
   defaults to 0, \emph{i.e.} a central maximal Sharpe ratio
   distribution.}
 
   \item{opy}{the number of observations per 'year'.
-  \code{x}, \code{q}, and \code{snrstar} are quoted in
+  \code{x}, \code{q}, and \code{zeta.s} are quoted in
   'annualized' units, that is, per 'year', but returns are
   observed possibly at a rate of \code{opy} per 'year.'
   default value is 1, meaning no deannualization is
@@ -62,25 +62,25 @@
   random generation for the maximal Sharpe ratio
   distribution with \code{df1} and \code{df2} degrees of
   freedom (and optional maximal signal-noise-ratio
-  \code{snrstar}).
+  \code{zeta.s}).
 }
 \details{
-  Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of
-  a \eqn{q}{q}-variate normal random variable with mean
+  Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a
+  \eqn{q}-variate normal random variable with mean
   \eqn{\mu}{mu} and covariance matrix \eqn{\Sigma}{Sigma}.
   Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and
-  \eqn{S}{S} be the sample covariance matrix (using
-  Bessel's correction). Let \deqn{\zeta(w) =
-  \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w)
-  = (w'xbar - c0)/sqrt(w'Sw)} be the (sample) Sharpe ratio
-  of the portfolio \eqn{w}{w}, subject to risk free rate
+  \eqn{S} be the sample covariance matrix (using Bessel's
+  correction). Let \deqn{Z(w) = \frac{w^{\top}\bar{x} -
+  c_0}{\sqrt{w^{\top}S w}}}{Z(w) = (w'xbar -
+  c0)/sqrt(w'Sw)} be the (sample) Sharpe ratio of the
+  portfolio \eqn{w}, subject to risk free rate
   \eqn{c_0}{c0}.
 
   Let \eqn{w_*}{w*} be the solution to the portfolio
   optimization problem: \deqn{\max_{w: 0 < w^{\top}S w \le
-  R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},} with
-  maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* =
-  zeta(w*)}. Then \deqn{w_* = R
+  R^2} Z(w),}{max {Z(w) | 0 < w'Sw <= R^2},} with maximum
+  value \eqn{z_* = Z\left(w_*\right)}{z* = Z(w*)}. Then
+  \deqn{w_* = R
   \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
   w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)} and \deqn{z_* =
   \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
@@ -88,19 +88,25 @@
 
   The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe
   ratio} distribution. For convenience, we may assume that
-  the sample statistic has been annualized by in the same
-  manner as the Sharpe ratio (see \code{\link{dsr}}), that
-  is, by multiplying by \eqn{p}{p}, the number of
-  observations per epoch.
+  the sample statistic has been annualized in the same
+  manner as the Sharpe ratio, that is by multiplying by
+  \eqn{d}, the number of observations per epoch.
 
-  The distribution is parametrized by the number of
-  independent observations, \eqn{n}, the number of assets,
-  \eqn{q}, the noncentrality parameter, \eqn{\delta^2 =
-  \mu^{\top}\Sigma^{-1}\mu}{delta^2 = mu' Sigma^-1 mu}, the
-  'drag' term, \eqn{c_0/R}{c0/R}, and the annualization
-  factor, \eqn{p}. The drag term makes this a location
-  family of distributions, and by default we assume it is
-  zero.
+  The Maximal Sharpe Ratio distribution is parametrized by
+  the number of assets, \eqn{q}, the number of independent
+  observations, \eqn{n}, the noncentrality parameter,
+  \deqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* =
+  sqrt(mu' Sigma^-1 mu),} the 'drag' term,
+  \eqn{c_0/R}{c0/R}, and the annualization factor, \eqn{d}.
+  The drag term makes this a location family of
+  distributions, and by default we assume it is zero.
+
+  The parameters are encoded as follows: \itemize{ \item
+  \eqn{q} is denoted by \code{df1}. \item \eqn{n} is
+  denoted by \code{df2}. \item \eqn{\zeta_*}{zeta*} is
+  denoted by \code{zeta.s}. \item \eqn{d} is denoted by
+  \code{opy}. \item \eqn{c_0/R} is denoted by \code{drag}.
+  }
 }
 \note{
   This is a thin wrapper on the Hotelling T-squared

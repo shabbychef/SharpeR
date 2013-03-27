@@ -69,6 +69,7 @@
 #'
 #' @details 
 #'
+#' 2FIX; document
 #' There are three methods:
 #'
 #' \itemize{
@@ -82,15 +83,15 @@
 #'
 #' @usage
 #'
-#' sr.se(sr,df,opy,type=c("t","Lo","Z","F")) 
+#' sr.se(z,df,opy,type=c("t","Lo","Z","F")) 
 #'
-#' @param sr an observed Sharpe ratio statistic, annualized.
+#' @param z an observed Sharpe ratio statistic, annualized.
 #' @param df the number of observations the statistic is based on. This 
 #'        is one more than the number of degrees of freedom in the
 #'        corresponding t-statistic, although the effect will be small
 #'        when \code{df} is large.
-#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#' @param opy the number of observations per 'year'. \code{z}, and \code{zeta}
+#'        are quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param type the estimator type. one of \code{"t", "Lo", "Z", "F"}
@@ -125,18 +126,18 @@
 #' anse2 <- sr.se(rvs,df,opy,type="Z")
 #'
 #'@export
-sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) { 
+sr.se <- function(z,df,opy,type=c("t","Lo","Z","F")) { 
 	# 2FIX: add opdyke corrections for skew and kurtosis?
 	# 2FIX: add autocorrelation correction?
 	if (!missing(opy)) {
-		sr <- .deannualize(sr,opy)
+		z <- .deannualize(z,opy)
 	}
 	type <- match.arg(type)
 	se <- switch(type,
-							 t = .sr_se_lo(sr,df,ss.adjust=TRUE),
-							 Lo = .sr_se_lo(sr,df,ss.adjust=FALSE),
-							 Z = .sr_se_walck(sr,df),
-							 F = .sr_se_weirdo(sr,df))
+							 t = .sr_se_lo(z,df,ss.adjust=TRUE),
+							 Lo = .sr_se_lo(z,df,ss.adjust=FALSE),
+							 Z = .sr_se_walck(z,df),
+							 F = .sr_se_weirdo(z,df))
 	if (!missing(opy)) {
 		se <- .annualize(se,opy)
 	}
@@ -165,10 +166,10 @@ sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 #'
 #' @usage
 #'
-#' sr.confint(sr,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
+#' sr.confint(z,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
 #'            level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
-#' @param sr an observed Sharpe ratio statistic, annualized.
+#' @param z an observed Sharpe ratio statistic, annualized.
 #' @param df the number of observations the statistic is based on. This 
 #'        is one more than the number of degrees of freedom in the
 #'        corresponding t-statistic, although the effect will be small
@@ -197,35 +198,35 @@ sr.se <- function(sr,df,opy,type=c("t","Lo","Z","F")) {
 #' aci2 <- sr.confint(rvs,df,type="Z",opy=opy)
 #'
 #'@export
-sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
+sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 											 opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
 	#2FIX: the order of arguments is really wonky. where does opy go?
 	if (!missing(opy)) {
-		sr <- .deannualize(sr,opy)
+		z <- .deannualize(z,opy)
 	}
 	type <- match.arg(type)
 	if  (type == "exact") {
-		tstat <- .sr_to_t(sr, df)
+		tstat <- .sr_to_t(z, df)
 		ci.lo <- qlambdap(level.lo,df-1,tstat,lower.tail=TRUE)
 		ci.hi <- qlambdap(level.hi,df-1,tstat,lower.tail=TRUE)
 		ci <- c(ci.lo,ci.hi)
 	} else if (type == "t") {
 		# already annualized;
-		se <- sr.se(sr,df,type=type)
-		midp <- sr
+		se <- sr.se(z,df,type=type)
+		midp <- z
 		zalp <- qnorm(c(level.lo,level.hi))
 		ci <- midp + zalp * se
 	} else if (type == "Z") {
 		# already annualized;
-		se <- sr.se(sr,df,type=type)
-		midp <- sr * (1 - 1 / (4 * (df - 1)))
+		se <- sr.se(z,df,type=type)
+		midp <- z * (1 - 1 / (4 * (df - 1)))
 		zalp <- qnorm(c(level.lo,level.hi))
 		ci <- midp + zalp * se
 	} else if (type == "F") {
 		# already annualized;
-		se <- sr.se(sr,df,type=type)
+		se <- sr.se(z,df,type=type)
 		cn <- .srbias(df)
-		midp <- sr / cn
+		midp <- z / cn
 		zalp <- qnorm(c(level.lo,level.hi))
 		ci <- midp + zalp * se
 	} else stop("internal error")
@@ -255,7 +256,7 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #'
 #' @usage
 #'
-#' srstar.confint(srstar,df1,df2,level=0.95,
+#' srstar.confint(z.s,df1,df2,level=0.95,
 #'                opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
 #' @inheritParams qcosrstar
@@ -284,15 +285,15 @@ sr.confint <- function(sr,df,level=0.95,type=c("exact","t","Z","F"),
 #' aci <- sr.confint(rvs,df,opy=opy)
 #'
 #'@export
-srstar.confint <- function(srstar,df1,df2,level=0.95,
+srstar.confint <- function(z.s,df1,df2,level=0.95,
 											     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
 	#2FIX: the order of arguments is really wonky. where does opy go?
 	#if (!missing(opy)) {
-		#srstar <- .deannualize(srstar,opy)
+		#z.s <- .deannualize(z.s,opy)
 	#}
 
-	ci.hi <- qcosrstar(level.hi,df1=df1,df2=df2,srstar=srstar,opy=opy,lower.tail=TRUE)
-	ci.lo <- qcosrstar(level.lo,df1=df1,df2=df2,srstar=srstar,opy=opy,lower.tail=TRUE,ub=ci.hi)
+	ci.hi <- qcosrstar(level.hi,df1=df1,df2=df2,z.s=z.s,opy=opy,lower.tail=TRUE)
+	ci.lo <- qcosrstar(level.lo,df1=df1,df2=df2,z.s=z.s,opy=opy,lower.tail=TRUE,ub=ci.hi)
 	ci <- c(ci.lo,ci.hi)
 
 	retval <- matrix(ci,nrow=1)
@@ -402,7 +403,7 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' T2.inference(T2,df1,df2,...) 
 #'
-#' srstar.inference(srstar,df1,df2,opy=1,drag=0,...)
+#' srstar.inference(z.s,df1,df2,opy=1,drag=0,...)
 #'
 #' @param Fs a (non-central) F statistic.
 #' @param T2 a (non-central) Hotelling \eqn{T^2} statistic.
@@ -411,13 +412,13 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @inheritParams qsrstar
 #' @inheritParams psrstar
 #' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
-#' @param opy the number of observations per 'year'. \code{srstar} is  
+#' @param opy the number of observations per 'year'. \code{z.s} is  
 #'        assumed given in 'annualized' units, that is, per 'year',
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
 #'        that \code{drag} has been annualized, \emph{i.e.} is given in the
-#'        same units as \code{srstar}.
+#'        same units as \code{z.s}.
 #' @param ... the \code{type} which is passed on to \code{F.inference}.
 #' @keywords htest
 #' @return an estimate of the non-centrality parameter.
@@ -448,12 +449,12 @@ T2.inference <- function(T2,df1,df2,...) {
 #' est2 <- srstar.inference(rvs,df1,df2,opy,type='KRS')  
 #' est3 <- srstar.inference(rvs,df1,df2,opy,type='MLE')
 #'
-srstar.inference <- function(srstar,df1,df2,opy=1,drag=0,...) {
+srstar.inference <- function(z.s,df1,df2,opy=1,drag=0,...) {
 	if (!missing(drag) && (drag != 0)) 
-		srstar <- srstar + drag
+		z.s <- z.s + drag
 	if (!missing(opy)) 
-		srstar <- .deannualize(srstar, opy)
-	T2 <- .srstar_to_T2(srstar, df2)
+		z.s <- .deannualize(z.s, opy)
+	T2 <- .srstar_to_T2(z.s, df2)
 	retval <- T2.inference(T2,df1,df2,...)
 	# convert back
 	retval <- .T2_to_srstar(retval, df2)

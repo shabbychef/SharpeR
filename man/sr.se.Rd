@@ -2,11 +2,10 @@
 \alias{sr.se}
 \title{Standard error of Sharpe ratio}
 \usage{
-  sr.se(sr,df,opy,type=c("t","Lo","Z","F"))
+  sr.se(z,df,opy,type=c("t","Lo","Z","F"))
 }
 \arguments{
-  \item{sr}{an observed Sharpe ratio statistic,
-  annualized.}
+  \item{z}{an observed Sharpe ratio statistic, annualized.}
 
   \item{df}{the number of observations the statistic is
   based on. This is one more than the number of degrees of
@@ -14,10 +13,10 @@
   effect will be small when \code{df} is large.}
 
   \item{opy}{the number of observations per 'year'.
-  \code{x}, \code{q}, and \code{snr} are quoted in
-  'annualized' units, that is, per square root 'year', but
-  returns are observed possibly at a rate of \code{opy} per
-  'year.' default value is 1, meaning no deannualization is
+  \code{z}, and \code{zeta} are quoted in 'annualized'
+  units, that is, per square root 'year', but returns are
+  observed possibly at a rate of \code{opy} per 'year.'
+  default value is 1, meaning no deannualization is
   performed.}
 
   \item{type}{the estimator type. one of \code{"t", "Lo",
@@ -31,7 +30,7 @@
   statistic.
 }
 \details{
-  There are three methods:
+  2FIX; document There are three methods:
 
   \itemize{ \item The default, \code{t}, based on Johnson &
   Welch, with a correction for small sample size. \item An

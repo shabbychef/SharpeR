@@ -8,7 +8,7 @@
 
   T2.inference(T2,df1,df2,...)
 
-  srstar.inference(srstar,df1,df2,opy=1,drag=0,...)
+  srstar.inference(z.s,df1,df2,opy=1,drag=0,...)
 }
 \arguments{
   \item{Fs}{a (non-central) F statistic.}
@@ -19,14 +19,14 @@
   "MLE", "unbiased")}}
 
   \item{opy}{the number of observations per 'year'.
-  \code{srstar} is assumed given in 'annualized' units,
-  that is, per 'year', but returns are observed possibly at
-  a rate of \code{opy} per 'year.' default value is 1,
+  \code{z.s} is assumed given in 'annualized' units, that
+  is, per 'year', but returns are observed possibly at a
+  rate of \code{opy} per 'year.' default value is 1,
   meaning no deannualization is performed.}
 
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,
-  \emph{i.e.} is given in the same units as \code{srstar}.}
+  \emph{i.e.} is given in the same units as \code{z.s}.}
 
   \item{...}{the \code{type} which is passed on to
   \code{F.inference}.}

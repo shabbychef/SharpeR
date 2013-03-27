@@ -2,12 +2,11 @@
 \alias{sr.confint}
 \title{Confidence Interval on Signal-Noise Ratio}
 \usage{
-  sr.confint(sr,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
+  sr.confint(z,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
     level.lo=(1-level)/2,level.hi=1-level.lo)
 }
 \arguments{
-  \item{sr}{an observed Sharpe ratio statistic,
-  annualized.}
+  \item{z}{an observed Sharpe ratio statistic, annualized.}
 
   \item{df}{the number of observations the statistic is
   based on. This is one more than the number of degrees of

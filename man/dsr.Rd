@@ -5,13 +5,13 @@
 \alias{rsr}
 \title{The (non-central) Sharpe ratio.}
 \usage{
-  dsr(x, df, snr, opy, log = FALSE)
+  dsr(x, df, zeta, opy, log = FALSE)
 
-  psr(q, df, snr, opy, ...)
+  psr(q, df, zeta, opy, ...)
 
-  qsr(p, df, snr, opy, lower.tail = TRUE, log.p = FALSE)
+  qsr(p, df, zeta, opy, lower.tail = TRUE, log.p = FALSE)
 
-  rsr(n, df, snr, opy)
+  rsr(n, df, zeta, opy)
 }
 \arguments{
   \item{x,q}{vector of quantiles.}
@@ -25,12 +25,12 @@
   freedom in the corresponding t-statistic, although the
   effect will be small when \code{df} is large.}
 
-  \item{snr}{the 'signal-to-noise' parameter, defined as
-  the population mean divided by the population standard
-  deviation, 'annualized'.}
+  \item{zeta}{the 'signal-to-noise' parameter,
+  \eqn{\zeta}{zeta} defined as the population mean divided
+  by the population standard deviation, 'annualized'.}
 
   \item{opy}{the number of observations per 'year'.
-  \code{x}, \code{q}, and \code{snr} are quoted in
+  \code{x}, \code{q}, and \code{zeta} are quoted in
   'annualized' units, that is, per square root 'year', but
   returns are observed possibly at a rate of \code{opy} per
   'year.' default value is 1, meaning no deannualization is
@@ -60,38 +60,42 @@
   Density, distribution function, quantile function and
   random generation for the Sharpe ratio distribution with
   \code{df} degrees of freedom (and optional
-  signal-noise-ratio \code{snr}).
+  signal-noise-ratio \code{zeta}).
 }
 \details{
-  Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of
-  a normal random variable with mean \eqn{\mu}{mu} and
+  Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a
+  normal random variable with mean \eqn{\mu}{mu} and
   variance \eqn{\sigma^2}{sigma^2}. Let \eqn{\bar{x}}{xbar}
-  be the sample mean, and \eqn{s}{s} be the sample standard
+  be the sample mean, and \eqn{s} be the sample standard
   deviation (using Bessel's correction). Let \eqn{c_0}{c0}
   be the 'risk free rate'.  Then \deqn{z = \frac{\bar{x} -
   c_0}{s}}{z = (xbar - c0)/s} is the (sample) Sharpe ratio.
 
-  The units of \eqn{z}{z} is \eqn{\mbox{time}^{-1/2}}{per
-  root time}. Typically the Sharpe ratio is
-  \emph{annualized} by multiplying by
-  \eqn{\sqrt{p}}{sqrt(p)}, where \eqn{p}{p} is the number
-  of observations per year (or whatever the target
-  annualization epoch.)
+  The units of \eqn{z} is \eqn{\mbox{time}^{-1/2}}{per root
+  time}. Typically the Sharpe ratio is \emph{annualized} by
+  multiplying by \eqn{\sqrt{d}}{sqrt(d)}, where \eqn{d} is
+  the number of observations per year (or whatever the
+  target annualization epoch.)
 
-  Letting \eqn{z = \sqrt{p}\frac{\bar{x}-c_0}{s}}{z =
-  sqrt(p)(xbar - c0)/s}, where the sample estimates are
-  based on \eqn{n}{n} observations, then \eqn{z}{z} takes a
-  (non-central) Sharpe ratio distribution with \eqn{n}{n}
-  'degrees of freedom', non-centrality parameter
-  \eqn{\delta = \frac{\mu - c_0}{\sigma}}{delta = (mu -
-  c0)/sigma}, and annualization parameter \eqn{p}{p}.
+  Letting \eqn{z = \sqrt{d}\frac{\bar{x}-c_0}{s}}{z =
+  sqrt(d)(xbar - c0)/s}, where the sample estimates are
+  based on \eqn{n} observations, then \eqn{z}{z} takes a
+  (non-central) Sharpe ratio distribution parametrized by
+  \eqn{n} 'degrees of freedom', non-centrality parameter
+  \eqn{\zeta = \frac{\mu - c_0}{\sigma}}{zeta = (mu -
+  c0)/sigma}, and annualization parameter \eqn{d}.
+
+  The parameters are encoded as follows: \itemize{ \item
+  \eqn{n} is denoted by \code{df}. \item \eqn{\zeta}{zeta}
+  is denoted by \code{zeta}. \item \eqn{d} is denoted by
+  \code{opy}. ('Observations Per Year') }
 }
 \note{
   This is a thin wrapper on the t distribution. The
   functions \code{\link{dt}, \link{pt}, \link{qt}} can
   accept ncp from limited range (\eqn{|\delta|\le
   37.62}{delta <= 37.62}). Some corrections may have to be
-  made here for large \code{snr}.
+  made here for large \code{zeta}.
 }
 \examples{
 rvs <- rsr(2048, 253*6, 0, 253)

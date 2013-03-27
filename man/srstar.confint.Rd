@@ -2,7 +2,7 @@
 \alias{srstar.confint}
 \title{Confidence Interval on Maximal Signal-Noise Ratio}
 \usage{
-  srstar.confint(srstar,df1,df2,level=0.95,
+  srstar.confint(z.s,df1,df2,level=0.95,
     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 }
 \arguments{

@@ -3,20 +3,20 @@
 \alias{qcosrstar}
 \title{The 'confidence distribution' for maximal Sharpe ratio.}
 \usage{
-  pcosrstar(q,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE)
+  pcosrstar(q,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE)
 
-  qcosrstar(p,df1,df2,srstar,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf)
+  qcosrstar(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf)
 }
 \arguments{
   \item{q}{vector of quantiles.}
 
   \item{p}{vector of probabilities.}
 
-  \item{srstar}{an observed Sharpe ratio statistic,
+  \item{z.s}{an observed Sharpe ratio statistic,
   annualized.}
 
   \item{opy}{the number of observations per 'year'.
-  \code{x}, \code{q}, and \code{srstar} are quoted in
+  \code{z.s}, \code{q}, and \code{zeta.s} are quoted in
   'annualized' units, that is, per 'year', but returns are
   observed possibly at a rate of \code{opy} per 'year.'
   default value is 1, meaning no deannualization is
@@ -49,20 +49,21 @@
 \description{
   Distribution function and quantile function for the
   'confidence distribution' of the maximal Sharpe ratio.
-  This is just an inversion to perform inference on snrstar
-  given observed statistic srstar.
+  This is just an inversion to perform inference on
+  \eqn{\zeta_*}{zeta*} given observed statistic
+  \eqn{z_*}{z*}.
 }
 \details{
-  Let \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio}
-  distribution (see \code{\link{SharpeR}}) for known
+  Suppose \eqn{z_*}{z*} follows a \emph{Maximal Sharpe
+  ratio} distribution (see \code{\link{SharpeR}}) for known
   degrees of freedom, and unknown non-centrality parameter
-  \eqn{\delta}{delta}. The 'confidence distribution' views
-  \eqn{\delta}{delta} as a random quantity once
+  \eqn{\zeta_*}{zeta*}. The 'confidence distribution' views
+  \eqn{\zeta_*}{zeta*} as a random quantity once
   \eqn{z_*}{z*} is observed. As such, the CDF of the
   confidence distribution is the same as that of the
   Maximal Sharpe ratio (up to a flip of \code{lower.tail});
   while the quantile function is used to compute confidence
-  intervals on \eqn{\delta}{delta} given \eqn{z_*}{z*}.
+  intervals on \eqn{\zeta_*}{zeta*} given \eqn{z_*}{z*}.
 }
 \note{
   When \code{lower.tail} is true, \code{pcosrstar} is
@@ -74,12 +75,12 @@
   srstar}.
 }
 \examples{
-snrstar <- 2.0
+zeta.s <- 2.0
 opy <- 253
 ntest <- 2000
 df1 <- 4
 df2 <- 6 * opy
-rvs <- rsrstar(ntest,df1=df1,df2=df2,snrstar=snrstar)
+rvs <- rsrstar(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
 qvs <- seq(0,10,length.out=101)
 pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
 if (require(txtplot))
@@ -104,12 +105,12 @@ if (require(txtplot))
  txtplot(qvs,pps)
 pcosrstar(-1,df1,df2,rvs[1],opy)
 
-qvs <- qcosrstar(0.05,df1=df1,df2=df2,srstar=rvs)
-mean(qvs > snrstar)
-qvs <- qcosrstar(0.5,df1=df1,df2=df2,srstar=rvs)
-mean(qvs > snrstar)
-qvs <- qcosrstar(0.95,df1=df1,df2=df2,srstar=rvs)
-mean(qvs > snrstar)
+qvs <- qcosrstar(0.05,df1=df1,df2=df2,z.s=rvs)
+mean(qvs > zeta.s)
+qvs <- qcosrstar(0.5,df1=df1,df2=df2,z.s=rvs)
+mean(qvs > zeta.s)
+qvs <- qcosrstar(0.95,df1=df1,df2=df2,z.s=rvs)
+mean(qvs > zeta.s)
 # test vectorization:
 qv <- qcosrstar(0.1,df1,df2,rvs)
 qv <- qcosrstar(c(0.1,0.2),df1,df2,rvs)

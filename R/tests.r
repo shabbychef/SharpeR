@@ -302,17 +302,17 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 		names(estimate) <- "Sharpe ratio of x"
 
 		if (alternative == "less") {
-			pval <- psr(estimate, df=nx, snr=snr, opy=opy)
+			pval <- psr(estimate, df=nx, zeta=snr, opy=opy)
 			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
 												 level.lo=0,level.hi=conf.level)
 		}
 		else if (alternative == "greater") {
-			pval <- psr(estimate, df=nx, snr=snr, opy=opy, lower.tail = FALSE)
+			pval <- psr(estimate, df=nx, zeta=snr, opy=opy, lower.tail = FALSE)
 			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
 												 level.lo=1-conf.level,level.hi=1)
 		}
 		else {
-			pval <- .oneside2two(psr(estimate, df=nx, snr=snr, opy=opy))
+			pval <- .oneside2two(psr(estimate, df=nx, zeta=snr, opy=opy))
 			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
 												 level=conf.level)
 		}
@@ -402,6 +402,8 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' from the others.  Notice that \code{sig.level} has non-NULL default, so NULL 
 #' must be explicitly passed if you want to compute it.
 #' 
+#' 2FIX: change snr to zeta?
+#'
 #' @usage
 #'
 #' power.sr.test(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
@@ -553,13 +555,13 @@ srstar.test <- function(X,alternative=c("greater","two.sided","less"),
 
 	# 2FIX: add CIs here.
 	if (alternative == "less") {
-		pval <- psrstar(estimate, df1=df1, df2=df2, snrstar=snrstar, opy=opy)
+		pval <- psrstar(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy)
 	}
 	else if (alternative == "greater") {
-		pval <- psrstar(estimate, df1=df1, df2=df2, snrstar=snrstar, opy=opy, lower.tail = FALSE)
+		pval <- psrstar(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy, lower.tail = FALSE)
 	}
 	else {
-		pval <- .oneside2two(psrstar(estimate, df1=df1, df2=df2, snrstar=snrstar, opy=opy))
+		pval <- .oneside2two(psrstar(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy))
 	}
 
 	names(df1) <- "df1"
