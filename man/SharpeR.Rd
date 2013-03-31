@@ -2,7 +2,7 @@
 \name{SharpeR}
 \alias{SharpeR}
 \alias{SharpeR-package}
-\title{...}
+\title{statistics concerning Sharpe ratio and Markowitz portfolio}
 \description{
   Inference on Sharpe ratio and Markowitz portfolio.
 }
@@ -43,7 +43,7 @@
   \code{opy}. ('Observations Per Year') }
 }
 
-\section{Maximal Sharpe Ratio}{
+\section{Optimal Sharpe Ratio}{
   Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a
   \eqn{q}-variate normal random variable with mean
   \eqn{\mu}{mu} and covariance matrix \eqn{\Sigma}{Sigma}.
@@ -65,13 +65,14 @@
   \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
   z* = sqrt(xbar' S^-1 xbar) - c0/R}
 
-  The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe
-  ratio} distribution. For convenience, we may assume that
-  the sample statistic has been annualized in the same
-  manner as the Sharpe ratio, that is by multiplying by
-  \eqn{d}, the number of observations per epoch.
+  The variable \eqn{z_*}{z*} follows an \emph{Optimal
+  Sharpe ratio} distribution. For convenience, we may
+  assume that the sample statistic has been annualized in
+  the same manner as the Sharpe ratio, that is by
+  multiplying by \eqn{d}, the number of observations per
+  epoch.
 
-  The Maximal Sharpe Ratio distribution is parametrized by
+  The Optimal Sharpe Ratio distribution is parametrized by
   the number of assets, \eqn{q}, the number of independent
   observations, \eqn{n}, the noncentrality parameter,
   \deqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* =

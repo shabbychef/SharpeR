@@ -1,17 +1,17 @@
-\name{dsrstar}
-\alias{dsrstar}
-\alias{psrstar}
-\alias{qsrstar}
-\alias{rsrstar}
+\name{dsropt}
+\alias{dsropt}
+\alias{psropt}
+\alias{qsropt}
+\alias{rsropt}
 \title{The (non-central) maximal Sharpe ratio distribution.}
 \usage{
-  dsrstar(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE)
+  dsropt(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE)
 
-  psrstar(q, df1, df2, zeta.s, opy, drag = 0, ...)
+  psropt(q, df1, df2, zeta.s, opy, drag = 0, ...)
 
-  qsrstar(p, df1, df2, zeta.s, opy, drag = 0, ...)
+  qsropt(p, df1, df2, zeta.s, opy, drag = 0, ...)
 
-  rsrstar(n, df1, df2, zeta.s, opy, drag = 0, ...)
+  rsropt(n, df1, df2, zeta.s, opy, drag = 0, ...)
 }
 \arguments{
   \item{x,q}{vector of quantiles.}
@@ -49,10 +49,9 @@
   Hotelling \eqn{T^2} functions.}
 }
 \value{
-  \code{dsrstar} gives the density, \code{psrstar} gives
-  the distribution function, \code{qsrstar} gives the
-  quantile function, and \code{rsrstar} generates random
-  deviates.
+  \code{dsropt} gives the density, \code{psropt} gives the
+  distribution function, \code{qsropt} gives the quantile
+  function, and \code{rsropt} generates random deviates.
 
   Invalid arguments will result in return value \code{NaN}
   with a warning.
@@ -86,13 +85,14 @@
   \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
   z* = sqrt(xbar' S^-1 xbar) - c0/R}
 
-  The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe
-  ratio} distribution. For convenience, we may assume that
-  the sample statistic has been annualized in the same
-  manner as the Sharpe ratio, that is by multiplying by
-  \eqn{d}, the number of observations per epoch.
+  The variable \eqn{z_*}{z*} follows an \emph{Optimal
+  Sharpe ratio} distribution. For convenience, we may
+  assume that the sample statistic has been annualized in
+  the same manner as the Sharpe ratio, that is by
+  multiplying by \eqn{d}, the number of observations per
+  epoch.
 
-  The Maximal Sharpe Ratio distribution is parametrized by
+  The Optimal Sharpe Ratio distribution is parametrized by
   the number of assets, \eqn{q}, the number of independent
   observations, \eqn{n}, the noncentrality parameter,
   \deqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* =
@@ -114,10 +114,10 @@
 }
 \examples{
 # generate some variates
-rvs <- rsrstar(2048, 8, 253*6, 0, 253)
+rvs <- rsropt(2048, 8, 253*6, 0, 253)
 hist(rvs)
 # these should be uniform:
-isp <- psrstar(rvs, 8, 253*6, 0, 253)
+isp <- psropt(rvs, 8, 253*6, 0, 253)
 plot(ecdf(isp))
 }
 \author{
@@ -133,9 +133,9 @@ plot(ecdf(isp))
   Hotelling \eqn{T^2}-distribution functions,
   \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
 
-  Other srstar: \code{\link{full.srstar}},
-  \code{\link{pcosrstar}}, \code{\link{srstar.confint}},
-  \code{\link{srstar.test}}
+  Other sropt: \code{\link{full.sropt}},
+  \code{\link{pco_sropt}}, \code{\link{sropt.confint}},
+  \code{\link{sropt.test}}
 }
 \keyword{distribution}
 

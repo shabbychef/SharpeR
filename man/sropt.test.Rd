@@ -1,8 +1,8 @@
-\name{srstar.test}
-\alias{srstar.test}
+\name{sropt.test}
+\alias{sropt.test}
 \title{test for maximal Sharpe ratio}
 \usage{
-  srstar.test(X,alternative=c("greater","two.sided","less"),
+  sropt.test(X,alternative=c("greater","two.sided","less"),
     snrstar=0,opy=1,conf.level=0.95)
 }
 \arguments{
@@ -64,7 +64,7 @@
 }
 \examples{
 # test for uniformity
-pvs <- replicate(1000,{ x <- srstar.test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
+pvs <- replicate(1000,{ x <- sropt.test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
                         x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')
@@ -75,9 +75,9 @@ abline(0,1,col='red')
 \seealso{
   \code{\link{sr.test}}, \code{\link{t.test}}.
 
-  Other srstar: \code{\link{dsrstar}},
-  \code{\link{full.srstar}}, \code{\link{pcosrstar}},
-  \code{\link{srstar.confint}}
+  Other sropt: \code{\link{dsropt}},
+  \code{\link{full.sropt}}, \code{\link{pco_sropt}},
+  \code{\link{sropt.confint}}
 }
 \keyword{htest}
 

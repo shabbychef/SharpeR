@@ -1,11 +1,11 @@
-\name{pcosrstar}
-\alias{pcosrstar}
-\alias{qcosrstar}
+\name{pco_sropt}
+\alias{pco_sropt}
+\alias{qco_sropt}
 \title{The 'confidence distribution' for maximal Sharpe ratio.}
 \usage{
-  pcosrstar(q,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE)
+  pco_sropt(q,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE)
 
-  qcosrstar(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf)
+  qco_sropt(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf)
 }
 \arguments{
   \item{q}{vector of quantiles.}
@@ -26,10 +26,10 @@
   as \eqn{\mbox{log}(p)}{log(p)}.}
 
   \item{lb}{the lower bound for the output of
-  \code{qcosrstar}.}
+  \code{qco_sropt}.}
 
   \item{ub}{the upper bound for the output of
-  \code{qcosrstar}.}
+  \code{qco_sropt}.}
 
   \item{df1}{the number of assets in the portfolio.}
 
@@ -40,8 +40,8 @@
   \eqn{P[X > x]}{P[X > x]}.}
 }
 \value{
-  \code{pcosrstar} gives the distribution function, and
-  \code{qcosrstar} gives the quantile function.
+  \code{pco_sropt} gives the distribution function, and
+  \code{qco_sropt} gives the quantile function.
 
   Invalid arguments will result in return value \code{NaN}
   with a warning.
@@ -66,13 +66,13 @@
   intervals on \eqn{\zeta_*}{zeta*} given \eqn{z_*}{z*}.
 }
 \note{
-  When \code{lower.tail} is true, \code{pcosrstar} is
+  When \code{lower.tail} is true, \code{pco_sropt} is
   monotonic increasing with respect to \code{q}, and
-  decreasing in \code{srstar}; these are reversed when
-  \code{lower.tail} is false. Similarly, \code{qcosrstar}
+  decreasing in \code{sropt}; these are reversed when
+  \code{lower.tail} is false. Similarly, \code{qco_sropt}
   is increasing in \code{sign(as.double(lower.tail) - 0.5)
   * p} and \code{- sign(as.double(lower.tail) - 0.5) *
-  srstar}.
+  sropt}.
 }
 \examples{
 zeta.s <- 2.0
@@ -80,52 +80,52 @@ opy <- 253
 ntest <- 2000
 df1 <- 4
 df2 <- 6 * opy
-rvs <- rsrstar(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
+rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
 qvs <- seq(0,10,length.out=101)
-pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
+pps <- pco_sropt(qvs,df1,df2,rvs[1],opy)
 if (require(txtplot))
  txtplot(qvs,pps)
-pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+pps <- pco_sropt(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
 if (require(txtplot))
  txtplot(qvs,pps)
 
 # 2FIX: shove these into the unit tests for monotonicity?
 svs <- seq(0,4,length.out=101)
-pps <- pcosrstar(2,df1,df2,svs,opy)
+pps <- pco_sropt(2,df1,df2,svs,opy)
 if (require(txtplot))
  txtplot(svs,pps)
-pps <- pcosrstar(2,df1,df2,svs,opy,lower.tail=FALSE)
+pps <- pco_sropt(2,df1,df2,svs,opy,lower.tail=FALSE)
 if (require(txtplot))
  txtplot(svs,pps)
 
 if (require(txtplot))
  txtplot(qvs,pps)
-pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+pps <- pco_sropt(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
 if (require(txtplot))
  txtplot(qvs,pps)
-pcosrstar(-1,df1,df2,rvs[1],opy)
+pco_sropt(-1,df1,df2,rvs[1],opy)
 
-qvs <- qcosrstar(0.05,df1=df1,df2=df2,z.s=rvs)
+qvs <- qco_sropt(0.05,df1=df1,df2=df2,z.s=rvs)
 mean(qvs > zeta.s)
-qvs <- qcosrstar(0.5,df1=df1,df2=df2,z.s=rvs)
+qvs <- qco_sropt(0.5,df1=df1,df2=df2,z.s=rvs)
 mean(qvs > zeta.s)
-qvs <- qcosrstar(0.95,df1=df1,df2=df2,z.s=rvs)
+qvs <- qco_sropt(0.95,df1=df1,df2=df2,z.s=rvs)
 mean(qvs > zeta.s)
 # test vectorization:
-qv <- qcosrstar(0.1,df1,df2,rvs)
-qv <- qcosrstar(c(0.1,0.2),df1,df2,rvs)
-qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),df2,rvs)
-qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
+qv <- qco_sropt(0.1,df1,df2,rvs)
+qv <- qco_sropt(c(0.1,0.2),df1,df2,rvs)
+qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),df2,rvs)
+qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
-  \code{\link{dsrstar},\link{psrstar},\link{qsrstar},\link{rsrstar}}
+  \code{\link{dsropt},\link{psropt},\link{qsropt},\link{rsropt}}
 
-  Other srstar: \code{\link{dsrstar}},
-  \code{\link{full.srstar}}, \code{\link{srstar.confint}},
-  \code{\link{srstar.test}}
+  Other sropt: \code{\link{dsropt}},
+  \code{\link{full.sropt}}, \code{\link{sropt.confint}},
+  \code{\link{sropt.test}}
 }
 \keyword{distribution}
 

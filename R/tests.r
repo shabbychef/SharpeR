@@ -26,7 +26,6 @@
 # Copyright: Steven E. Pav, 2012-2013
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
-# SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
 #' @include utils.r
 #' @include distributions.r
@@ -491,7 +490,7 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #' 
 #' @usage
 #'
-#' srstar.test(X,alternative=c("greater","two.sided","less"),
+#' sropt.test(X,alternative=c("greater","two.sided","less"),
 #'             snrstar=0,opy=1,conf.level=0.95)
 #'
 #' @param X a (non-empty) numeric matrix of data values, each row independent,
@@ -520,18 +519,18 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #' @seealso \code{\link{sr.test}}, \code{\link{t.test}}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family srstar
+#' @family sropt
 #' @examples 
 #'
 #' # test for uniformity
-#' pvs <- replicate(1000,{ x <- srstar.test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
+#' pvs <- replicate(1000,{ x <- sropt.test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
 #'                         x$p.value })
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
 #' 
 #'
 #'@export
-srstar.test <- function(X,alternative=c("greater","two.sided","less"),
+sropt.test <- function(X,alternative=c("greater","two.sided","less"),
 										snrstar=0,opy=1,conf.level=0.95) {
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
@@ -542,26 +541,26 @@ srstar.test <- function(X,alternative=c("greater","two.sided","less"),
 		stop("'conf.level' must be a single number between 0 and 1")
 
 	dname <- deparse(substitute(X))
-	subtest <- full.srstar(X,opy=opy)
+	subtest <- full.sropt(X,opy=opy)
 	statistic <- subtest$T2
 	names(statistic) <- "T2"
-	estimate <- subtest$srstar
+	estimate <- subtest$sropt
 	names(estimate) <- "optimal Sharpe ratio of X"
 
-	method <- "One Sample srstar test"
+	method <- "One Sample sropt test"
 
 	df1 <- subtest$df1
 	df2 <- subtest$df2
 
 	# 2FIX: add CIs here.
 	if (alternative == "less") {
-		pval <- psrstar(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy)
+		pval <- psropt(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy)
 	}
 	else if (alternative == "greater") {
-		pval <- psrstar(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy, lower.tail = FALSE)
+		pval <- psropt(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy, lower.tail = FALSE)
 	}
 	else {
-		pval <- .oneside2two(psrstar(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy))
+		pval <- .oneside2two(psropt(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy))
 	}
 
 	names(df1) <- "df1"

@@ -1,6 +1,6 @@
-\name{srstar.inference}
+\name{sropt.inference}
 \alias{F.inference}
-\alias{srstar.inference}
+\alias{sropt.inference}
 \alias{T2.inference}
 \title{Inference on noncentrality parameter of F or F-like statistic}
 \usage{
@@ -8,12 +8,15 @@
 
   T2.inference(T2,df1,df2,...)
 
-  srstar.inference(z.s,df1,df2,opy=1,drag=0,...)
+  sropt.inference(z.s,df1,df2,opy=1,drag=0,...)
 }
 \arguments{
   \item{Fs}{a (non-central) F statistic.}
 
   \item{T2}{a (non-central) Hotelling \eqn{T^2} statistic.}
+
+  \item{z.s}{an observed Sharpe ratio statistic,
+  annualized.}
 
   \item{type}{the estimator type. one of \code{c("KRS",
   "MLE", "unbiased")}}
@@ -41,7 +44,7 @@
 \description{
   Estimates the non-centrality parameter associated with an
   observed statistic following a (non-central) F,
-  \eqn{T^2}, or srstar distribution.
+  \eqn{T^2}, or sropt distribution.
 }
 \details{
   Let \eqn{F}{F} be an observed statistic distributed as a
@@ -61,26 +64,26 @@
   used to estimate the non-centrality parameter of a
   non-central Hotelling T-squared statistic.
 
-  The srstar distribution is equivalent to a Hotelling up
-  to a square root and some rescalings.
+  The sropt distribution is equivalent to a Hotelling up to
+  a square root and some rescalings.
 
-  The non-centrality parameter of the srstar distribution
-  is the square root of that of the Hotelling, \emph{i.e.}
-  has units 'per square root time'. As such, the
+  The non-centrality parameter of the sropt distribution is
+  the square root of that of the Hotelling, \emph{i.e.} has
+  units 'per square root time'. As such, the
   \code{'unbiased'} type can be problematic!
 }
 \examples{
 rvs <- rf(1024, 4, 1000, 5)
 unbs <- F.inference(rvs, 4, 1000, type="unbiased")
-# generate some srstars
+# generate some sropts
 true.snrstar <- 1.25
 df1 <- 6
 df2 <- 2000
 opy <- 253
-rvs <- rsrstar(500, df1, df2, true.snrstar, opy)
-est1 <- srstar.inference(rvs,df1,df2,opy,type='unbiased')
-est2 <- srstar.inference(rvs,df1,df2,opy,type='KRS')
-est3 <- srstar.inference(rvs,df1,df2,opy,type='MLE')
+rvs <- rsropt(500, df1, df2, true.snrstar, opy)
+est1 <- sropt.inference(rvs,df1,df2,opy,type='unbiased')
+est2 <- sropt.inference(rvs,df1,df2,opy,type='KRS')
+est3 <- sropt.inference(rvs,df1,df2,opy,type='MLE')
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

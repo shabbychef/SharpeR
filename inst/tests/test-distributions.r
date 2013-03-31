@@ -26,7 +26,6 @@
 # Copyright: Steven E. Pav, 2013-2013
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
-# SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
 # helpers
 is.sorted <- function(xs,pragma=c("ascending","descending")) {
@@ -94,10 +93,10 @@ test_that("pT2/qT2 monotonicity",{#FOLDUP
 	}
 })#UNFOLD
 
-test_that("psrstar/qsrstar monotonicity",{#FOLDUP
+test_that("psropt/qsropt monotonicity",{#FOLDUP
 	set.char.seed("22ad9afb-49c4-4f37-b32b-eab413b32750")
 	
-	# psrstar
+	# psropt
 	ps <- seq(0.1,0.9,length.out=9)
 	for (df1 in c(2,4,8)) {
 		for (df2 in c(256,1024)) {
@@ -107,13 +106,13 @@ test_that("psrstar/qsrstar monotonicity",{#FOLDUP
 						for (lp in c(TRUE,FALSE)) {
 							if (lp) { checkps <- log(ps) } else { checkps <- ps }
 							for (lt in c(TRUE,FALSE)) {
-								qs <- qsrstar(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								qs <- qsropt(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
 								if (lt) { 
 									expect_true(is.sorted(qs,pragma="ascending"))
 								} else {
 									expect_true(is.sorted(qs,pragma="descending"))
 								}
-								pret <- psrstar(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								pret <- psropt(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
 								expect_equal(checkps,pret)
 							}
 						}
@@ -148,10 +147,10 @@ test_that("plambdap/qlambdap monotonicity",{#FOLDUP
 	}
 })#UNFOLD
 
-test_that("pcosrstar/qcosrstar monotonicity",{#FOLDUP
+test_that("pco_sropt/qco_sropt monotonicity",{#FOLDUP
 	set.char.seed("161f0496-0229-4013-a65e-ff7c8b236f4a")
 	
-	# cosrstar
+	# co_sropt
 	ps <- seq(0.05,0.95,length.out=9)
 	for (df1 in c(2,4,8)) {
 		for (df2 in c(256,1024)) {
@@ -159,14 +158,14 @@ test_that("pcosrstar/qcosrstar monotonicity",{#FOLDUP
 				for (lp in c(TRUE,FALSE)) {
 					if (lp) { checkps <- log(ps) } else { checkps <- ps }
 					for (lt in c(TRUE,FALSE)) {
-						qs <- qcosrstar(checkps, df1, df2, z.s=delta2, opy=1,
+						qs <- qco_sropt(checkps, df1, df2, z.s=delta2, opy=1,
 														lower.tail=lt, log.p=lp)
 						if (lt) { 
 							expect_true(is.sorted(qs,pragma="ascending"))
 						} else {
 							expect_true(is.sorted(qs,pragma="descending"))
 						}
-						pret <- pcosrstar(qs, df1, df2, z.s=delta2, opy=1,
+						pret <- pco_sropt(qs, df1, df2, z.s=delta2, opy=1,
 															lower.tail=lt, log.p=lp)
 						expect_true(ifelse(lp,all(pret <= 0),
 															 all(0 <= pret) && all(pret <= 1)))
@@ -253,7 +252,7 @@ test_that("psr/qsr parameter monotonicity",{#FOLDUP
 			#}
 		#}
 	#}
-	## psrstar
+	## psropt
 	#ps <- seq(0.1,0.9,length.out=9)
 	#for (df1 in c(2,4,8)) {
 		#for (df2 in c(256,1024)) {
@@ -263,13 +262,13 @@ test_that("psr/qsr parameter monotonicity",{#FOLDUP
 						#for (lp in c(TRUE,FALSE)) {
 							#if (lp) { checkps <- log(ps) } else { checkps <- ps }
 							#for (lt in c(TRUE,FALSE)) {
-								#qs <- qsrstar(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								#qs <- qsropt(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
 								#if (lt) { 
 									#expect_true(!is.unsorted(qs))
 								#} else {
 									#expect_true(!is.unsorted(rev(qs)))
 								#}
-								#pret <- psrstar(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								#pret <- psropt(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
 								#expect_equal(checkps,pret)
 							#}
 						#}

@@ -11,7 +11,7 @@ Markowitz portfolio, and, in general, overfit of trading strategies based on
 The package is not yet CRAN-ready, but can be installed from github via devtools:
 
 ```
-require(devtools)
-install_github(repo='SharpeR',username='shabbychef',ref='master')
+if (require(devtools))
+	install_github(repo='SharpeR',username='shabbychef',ref='master')
 ```
 

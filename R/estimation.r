@@ -26,7 +26,6 @@
 # Copyright: Steven E. Pav, 2012-2013
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
-# SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
 #' @include utils.r
 #' @include distributions.r
@@ -36,6 +35,189 @@
 ########################################################################
 # Estimation 
 ########################################################################
+# Sharpe Ratio#FOLDUP
+#' @title Compute the Sharpe ratio.
+#'
+#' @description 
+#'
+#' Computes the Sharpe ratio of some observed returns.
+#'
+#' @details
+#'
+#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent returns of some
+#' asset.
+#' Let \eqn{\bar{x}}{xbar} be the sample mean, and \eqn{s}{s} be
+#' the sample standard deviation (using Bessel's correction). Let \eqn{c_0}{c0}
+#' be the 'risk free rate'.  Then
+#' \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} 
+#' is the (sample) Sharpe ratio.
+#' 
+#' The units of \eqn{z}{z} are \eqn{\mbox{time}^{-1/2}}{per root time}.
+#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
+#' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
+#' is the number of observations
+#' per year (or whatever the target annualization epoch.)
+#'
+#' @usage
+#'
+#' full.sr(x,c0=0,opy=1,na.rm=FALSE)
+#'
+#' sr(x,...)
+#'
+#' @param x vector of returns.
+#' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
+#'        assumed to be given in the same units as x, \emph{not}
+#'        in 'annualized' terms.
+#' @param opy the number of observations per 'year'. This is used to
+#'        'annualize' the answer.
+#' @param na.rm logical.  Should missing values be removed?
+#' @param ... the above extra parameters,  passed on to \code{full.sr}
+#' @keywords univar 
+#' @return \code{full.sr} returns a list with containing the following components:
+#' \item{sr}{the annualized Sharpe ratio.}
+#' \item{df}{the number of observations.}
+#' \code{sr} just returns the numeric annualized Sharpe.
+#' @aliases sr
+#' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sr
+#' @references 
+#'
+#' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
+#' \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+#' 
+#' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal (2002): 36-52.
+#' \url{http://ssrn.com/paper=377260}
+#'
+#' @examples 
+#' rvs <- full.sr(rnorm(253*8),opy=253)
+#' rvs <- sr(rnorm(253*8),opy=253)
+#'
+full.sr <- function(x,c0=0,opy=1,na.rm=FALSE) {
+	sr <- (mean(x,na.rm=na.rm) - c0) / sd(x,na.rm=na.rm)
+	if (!missing(opy))
+		sr <- .annualize(sr,opy)
+	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
+	#units(sr) <- "yr^-0.5"
+	retval <- list(sr = sr,df = df,c0 = c0,opy = opy)
+	return(retval)
+}
+#' @export 
+sr <- function(x,...) {
+	# delegate
+	subret <- full.sr(x,...)
+	return(subret$sr)
+}
+
+# compute the markowitz portfolio
+.markowitz <- function(X,mu=NULL,Sigma=NULL) {
+	na.omit(X)
+	if (is.null(mu)) 
+		mu <- colMeans(X)
+	if (is.null(Sigma)) 
+		Sigma <- cov(X)
+	w <- solve(Sigma,mu)
+	n <- dim(X)[1]
+	retval <- list(w = w, mu = mu, Sigma = Sigma, df1 = length(w), df2 = n)
+	return(retval)
+}
+
+# compute Hotelling's statistic.
+.hotelling <- function(X) {
+	retval <- .markowitz(X)
+	retval$T2 <- retval$df2 * (retval$mu %*% retval$w)
+	return(retval)
+}
+
+#' @title Compute the Sharpe ratio of the Markowitz portfolio.
+#'
+#' @description 
+#'
+#' Computes the Sharpe ratio of the Markowitz portfolio of some observed returns.
+#'
+#' @details
+#' 
+#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+#' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
+#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). Let
+#' \deqn{\zeta(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar - c0)/sqrt(w'Sw)}
+#' be the (sample) Sharpe ratio of the portfolio \eqn{w}{w}, subject to 
+#' risk free rate \eqn{c_0}{c0}.
+#'
+#' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
+#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},}
+#' with maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* = zeta(w*)}.
+#' Then 
+#' \deqn{w_* = R \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
+#' w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)}
+#' and
+#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
+#' z* = sqrt(xbar' S^-1 xbar) - c0/R}
+#'
+#' The units of \eqn{z_*}{z*} are \eqn{\mbox{time}^{-1/2}}{per root time}.
+#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
+#' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
+#' is the number of observations
+#' per year (or whatever the target annualization epoch.)
+#'
+#' @usage
+#'
+#' full.sropt(X,drag=0,opy=1)
+#'
+#' sropt(X,...)
+#'
+#' @param X matrix of returns.
+#' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
+#'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
+#'        by \eqn{\sqrt{opy}}{sqrt(opy)}. This is in contrast to the \code{c0}
+#'        term given to \code{\link{sr}}.
+#' @param opy the number of observations per 'year'. The returns are observed
+#'        at a rate of \code{opy} per 'year.' default value is 1, meaning no 
+#'        annualization is performed.
+#' @param ... the above extra parameters,  passed on to \code{full.sropt}
+#' @keywords univar 
+#' @return A list with containing the following components:
+#' \item{w}{the optimal portfolio.}
+#' \item{mu}{the estimated mean return vector.}
+#' \item{Sigma}{the estimated covariance matrix.}
+#' \item{df1}{the number of assets.}
+#' \item{df2}{the number of observed vectors.}
+#' \item{T2}{the Hotelling \eqn{T^2} statistic.}
+#' \item{sropt}{the maximal Sharpe statistic.}
+#' \item{drag}{the input \code{drag} term.}
+#' \item{opy}{the input \code{opy} term.}
+#' @aliases sropt
+#' @seealso \code{\link{full.sr}}, sropt-distribution functions, 
+#' \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
+#' @export 
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @family sropt
+#' @examples 
+#' rvs <- full.sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
+#' rvs <- sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
+#'
+full.sropt <- function(X,drag=0,opy=1) {
+	retval <- .hotelling(X)
+	zeta.star <- sqrt(retval$T2 / retval$df2)
+	if (!missing(opy))
+		zeta.star <- .annualize(zeta.star,opy)
+	retval$sropt <- zeta.star - drag
+
+	#units(retval$sropt) <- "yr^-0.5"
+	retval$drag <- drag
+	retval$opy <- opy
+	return(retval)
+}
+#' @export 
+sropt <- function(X,...) {
+	subret <- full.sropt(X,...)
+	return(subret$sropt)
+}
+
+
+#UNFOLD
 
 # confidence intervals on the Sharpe ratio#FOLDUP
 
@@ -256,13 +438,14 @@ sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 #'
 #' @usage
 #'
-#' srstar.confint(z.s,df1,df2,level=0.95,
+#' sropt.confint(z.s,df1,df2,level=0.95,
 #'                opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
-#' @inheritParams qcosrstar
-#' @inheritParams dsrstar
-#' @inheritParams qsrstar
-#' @inheritParams psrstar
+#' @param z.s an observed Sharpe ratio statistic, annualized.
+#' @inheritParams qco_sropt
+#' @inheritParams dsropt
+#' @inheritParams qsropt
+#' @inheritParams psropt
 #' @param level the confidence level required.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
 #'        \code{snr} are quoted in 'annualized' units, that is, per square root 
@@ -274,10 +457,10 @@ sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qcosrstar}}, \code{\link{srstar.test}}
+#' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qco_sropt}}, \code{\link{sropt.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family srstar
+#' @family sropt
 #' @examples 
 #' opy <- 253
 #' df <- opy * 6
@@ -285,15 +468,15 @@ sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 #' aci <- sr.confint(rvs,df,opy=opy)
 #'
 #'@export
-srstar.confint <- function(z.s,df1,df2,level=0.95,
+sropt.confint <- function(z.s,df1,df2,level=0.95,
 											     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
 	#2FIX: the order of arguments is really wonky. where does opy go?
 	#if (!missing(opy)) {
 		#z.s <- .deannualize(z.s,opy)
 	#}
 
-	ci.hi <- qcosrstar(level.hi,df1=df1,df2=df2,z.s=z.s,opy=opy,lower.tail=TRUE)
-	ci.lo <- qcosrstar(level.lo,df1=df1,df2=df2,z.s=z.s,opy=opy,lower.tail=TRUE,ub=ci.hi)
+	ci.hi <- qco_sropt(level.hi,df1=df1,df2=df2,z.s=z.s,opy=opy,lower.tail=TRUE)
+	ci.lo <- qco_sropt(level.lo,df1=df1,df2=df2,z.s=z.s,opy=opy,lower.tail=TRUE,ub=ci.hi)
 	ci <- c(ci.lo,ci.hi)
 
 	retval <- matrix(ci,nrow=1)
@@ -303,7 +486,7 @@ srstar.confint <- function(z.s,df1,df2,level=0.95,
 
 #UNFOLD
 
-# point inference on srstar/ncp of F#FOLDUP
+# point inference on sropt/ncp of F#FOLDUP
 
 # compute an unbiased estimator of the non-centrality parameter
 .F_ncp_unbiased <- function(Fs,df1,df2) {
@@ -368,7 +551,7 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @description 
 #'
 #' Estimates the non-centrality parameter associated with an observed
-#' statistic following a (non-central) F, \eqn{T^2}, or srstar distribution. 
+#' statistic following a (non-central) F, \eqn{T^2}, or sropt distribution. 
 #'
 #' @details 
 #'
@@ -389,10 +572,10 @@ T2.inference <- function(T2,df1,df2,...) {
 #' up to scaling, the same estimators can be used to estimate the 
 #' non-centrality parameter of a non-central Hotelling T-squared statistic.
 #'
-#' The srstar distribution is equivalent to a Hotelling up to a 
+#' The sropt distribution is equivalent to a Hotelling up to a 
 #' square root and some rescalings. 
 #' 
-#' The non-centrality parameter of the srstar distribution is 
+#' The non-centrality parameter of the sropt distribution is 
 #' the square root of that of the Hotelling, \emph{i.e.} has
 #' units 'per square root time'. As such, the \code{'unbiased'}
 #' type can be problematic!
@@ -403,14 +586,15 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' T2.inference(T2,df1,df2,...) 
 #'
-#' srstar.inference(z.s,df1,df2,opy=1,drag=0,...)
+#' sropt.inference(z.s,df1,df2,opy=1,drag=0,...)
 #'
 #' @param Fs a (non-central) F statistic.
 #' @param T2 a (non-central) Hotelling \eqn{T^2} statistic.
-#' @inheritParams qcosrstar
-#' @inheritParams dsrstar
-#' @inheritParams qsrstar
-#' @inheritParams psrstar
+#' @param z.s an observed Sharpe ratio statistic, annualized.
+#' @inheritParams qco_sropt
+#' @inheritParams dsropt
+#' @inheritParams qsropt
+#' @inheritParams psropt
 #' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
 #' @param opy the number of observations per 'year'. \code{z.s} is  
 #'        assumed given in 'annualized' units, that is, per 'year',
@@ -422,11 +606,11 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @param ... the \code{type} which is passed on to \code{F.inference}.
 #' @keywords htest
 #' @return an estimate of the non-centrality parameter.
-#' @aliases F.inference T2.inference srstar.inference
+#' @aliases F.inference T2.inference sropt.inference
 #' @seealso F-distribution functions, \code{\link{df}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family srstar Hotelling
+#' @family sropt Hotelling
 #' @references 
 #'
 #' Kubokawa, T., C. P. Robert, and A. K. Saleh. "Estimation of noncentrality parameters." 
@@ -439,25 +623,25 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @examples 
 #' rvs <- rf(1024, 4, 1000, 5)
 #' unbs <- F.inference(rvs, 4, 1000, type="unbiased")
-#' # generate some srstars
+#' # generate some sropts
 #' true.snrstar <- 1.25
 #' df1 <- 6
 #' df2 <- 2000
 #' opy <- 253
-#' rvs <- rsrstar(500, df1, df2, true.snrstar, opy)
-#' est1 <- srstar.inference(rvs,df1,df2,opy,type='unbiased')  
-#' est2 <- srstar.inference(rvs,df1,df2,opy,type='KRS')  
-#' est3 <- srstar.inference(rvs,df1,df2,opy,type='MLE')
+#' rvs <- rsropt(500, df1, df2, true.snrstar, opy)
+#' est1 <- sropt.inference(rvs,df1,df2,opy,type='unbiased')  
+#' est2 <- sropt.inference(rvs,df1,df2,opy,type='KRS')  
+#' est3 <- sropt.inference(rvs,df1,df2,opy,type='MLE')
 #'
-srstar.inference <- function(z.s,df1,df2,opy=1,drag=0,...) {
+sropt.inference <- function(z.s,df1,df2,opy=1,drag=0,...) {
 	if (!missing(drag) && (drag != 0)) 
 		z.s <- z.s + drag
 	if (!missing(opy)) 
 		z.s <- .deannualize(z.s, opy)
-	T2 <- .srstar_to_T2(z.s, df2)
+	T2 <- .sropt_to_T2(z.s, df2)
 	retval <- T2.inference(T2,df1,df2,...)
 	# convert back
-	retval <- .T2_to_srstar(retval, df2)
+	retval <- .T2_to_sropt(retval, df2)
 	if (!missing(opy)) 
 		retval <- .annualize(retval, opy)
 	if (!missing(drag) && (drag != 0)) 

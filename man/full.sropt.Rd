@@ -1,11 +1,11 @@
-\name{full.srstar}
-\alias{full.srstar}
-\alias{srstar}
+\name{full.sropt}
+\alias{full.sropt}
+\alias{sropt}
 \title{Compute the Sharpe ratio of the Markowitz portfolio.}
 \usage{
-  full.srstar(X,drag=0,opy=1)
+  full.sropt(X,drag=0,opy=1)
 
-  srstar(X,...)
+  sropt(X,...)
 }
 \arguments{
   \item{X}{matrix of returns.}
@@ -22,7 +22,7 @@
   performed.}
 
   \item{...}{the above extra parameters, passed on to
-  \code{full.srstar}}
+  \code{full.sropt}}
 }
 \value{
   A list with containing the following components:
@@ -30,7 +30,7 @@
   mean return vector.} \item{Sigma}{the estimated
   covariance matrix.} \item{df1}{the number of assets.}
   \item{df2}{the number of observed vectors.} \item{T2}{the
-  Hotelling \eqn{T^2} statistic.} \item{srstar}{the maximal
+  Hotelling \eqn{T^2} statistic.} \item{sropt}{the maximal
   Sharpe statistic.} \item{drag}{the input \code{drag}
   term.} \item{opy}{the input \code{opy} term.}
 }
@@ -68,20 +68,20 @@
   year (or whatever the target annualization epoch.)
 }
 \examples{
-rvs <- full.srstar(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
-rvs <- srstar(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
+rvs <- full.sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
+rvs <- sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
-  \code{\link{full.sr}}, srstar-distribution functions,
-  \code{\link{dsrstar}, \link{psrstar}, \link{qsrstar},
-  \link{rsrstar}}
+  \code{\link{full.sr}}, sropt-distribution functions,
+  \code{\link{dsropt}, \link{psropt}, \link{qsropt},
+  \link{rsropt}}
 
-  Other srstar: \code{\link{dsrstar}},
-  \code{\link{pcosrstar}}, \code{\link{srstar.confint}},
-  \code{\link{srstar.test}}
+  Other sropt: \code{\link{dsropt}},
+  \code{\link{pco_sropt}}, \code{\link{sropt.confint}},
+  \code{\link{sropt.test}}
 }
 \keyword{univar}
 

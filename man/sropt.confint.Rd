@@ -1,11 +1,14 @@
-\name{srstar.confint}
-\alias{srstar.confint}
+\name{sropt.confint}
+\alias{sropt.confint}
 \title{Confidence Interval on Maximal Signal-Noise Ratio}
 \usage{
-  srstar.confint(z.s,df1,df2,level=0.95,
+  sropt.confint(z.s,df1,df2,level=0.95,
     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 }
 \arguments{
+  \item{z.s}{an observed Sharpe ratio statistic,
+  annualized.}
+
   \item{level}{the confidence level required.}
 
   \item{opy}{the number of observations per 'year'.
@@ -58,11 +61,11 @@ aci <- sr.confint(rvs,df,opy=opy)
 }
 \seealso{
   \code{\link{confint}}, \code{\link{sr.confint}},
-  \code{\link{qcosrstar}}, \code{\link{srstar.test}}
+  \code{\link{qco_sropt}}, \code{\link{sropt.test}}
 
-  Other srstar: \code{\link{dsrstar}},
-  \code{\link{full.srstar}}, \code{\link{pcosrstar}},
-  \code{\link{srstar.test}}
+  Other sropt: \code{\link{dsropt}},
+  \code{\link{full.sropt}}, \code{\link{pco_sropt}},
+  \code{\link{sropt.test}}
 }
 \keyword{htest}
 

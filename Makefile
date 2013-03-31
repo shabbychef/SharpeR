@@ -10,7 +10,7 @@
 R_FILES 				?= $(wildcard ./R/*.r)
 M4_FILES				?= $(wildcard *.m4)
 
-VERSION 				 = 0.1303
+VERSION 				 = 0.1304
 TODAY 					:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 				:= SharpeR
@@ -143,7 +143,7 @@ man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
 	$(RLOCAL) --slave -e "require(roxygen2); roxygenize('.', '.', overwrite=TRUE, unlink.target=TRUE)"
 	touch $@
 
-docs: man/$(PKG_NAME).Rd
+docs: DESCRIPTION man/$(PKG_NAME).Rd 
 
 #RSYNC_FLAGS     = -av
 #RSYNC_FLAGS     = -vrlpgoD --delete
@@ -227,6 +227,7 @@ gitpull :
 
 tag :
 	echo "git tag -a v$(VERSION) -m 'version $(VERSION)'"
+	echo "git push --tags"
 
 ################################
 # CRAN SUBMISSION

@@ -1,4 +1,4 @@
-# Copyright 2012 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2013 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -26,7 +26,6 @@
 # Copyright: Steven E. Pav, 2012-2013
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
-# SVN: $Id: blankheader.txt 25454 2012-02-14 23:35:25Z steven $
 
 #' @include utils.r
 
@@ -369,7 +368,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #UNFOLD
 
 # SR^*
-# dsrstar, psrstar, qsrstar, rsrstar#FOLDUP
+# dsropt, psropt, qsropt, rsropt#FOLDUP
 #' @title The (non-central) maximal Sharpe ratio distribution.
 #'
 #' @description 
@@ -399,13 +398,13 @@ rT2 <- function(n, df1, df2, delta2) {
 #' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
 #' z* = sqrt(xbar' S^-1 xbar) - c0/R}
 #'
-#' The variable \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio}
+#' The variable \eqn{z_*}{z*} follows an \emph{Optimal Sharpe ratio}
 #' distribution. For convenience, we may assume that the sample statistic
 #' has been annualized in the same manner as the Sharpe ratio, that is 
 #' by multiplying by \eqn{d}, the number of observations per
 #' epoch.
 #' 
-#' The Maximal Sharpe Ratio distribution is parametrized by the number 
+#' The Optimal Sharpe Ratio distribution is parametrized by the number 
 #' of assets, \eqn{q}, the number of independent observations, \eqn{n}, the 
 #' noncentrality parameter, 
 #' \deqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* = sqrt(mu' Sigma^-1 mu),}
@@ -424,13 +423,13 @@ rT2 <- function(n, df1, df2, delta2) {
 #'
 #' @usage
 #'
-#' dsrstar(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE)
+#' dsropt(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE)
 #'
-#' psrstar(q, df1, df2, zeta.s, opy, drag = 0, ...)
+#' psropt(q, df1, df2, zeta.s, opy, drag = 0, ...)
 #'
-#' qsrstar(p, df1, df2, zeta.s, opy, drag = 0, ...)
+#' qsropt(p, df1, df2, zeta.s, opy, drag = 0, ...)
 #'
-#' rsrstar(n, df1, df2, zeta.s, opy, drag = 0, ...)
+#' rsropt(n, df1, df2, zeta.s, opy, drag = 0, ...)
 #'
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
@@ -451,17 +450,17 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @param log logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
 #' @param ... arguments passed on to the respective Hotelling \eqn{T^2} functions.
 #' @keywords distribution 
-#' @return \code{dsrstar} gives the density, \code{psrstar} gives the distribution function,
-#' \code{qsrstar} gives the quantile function, and \code{rsrstar} generates random deviates.
+#' @return \code{dsropt} gives the density, \code{psropt} gives the distribution function,
+#' \code{qsropt} gives the quantile function, and \code{rsropt} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
-#' @aliases psrstar
-#' @aliases qsrstar 
-#' @aliases rsrstar
+#' @aliases psropt
+#' @aliases qsropt 
+#' @aliases rsropt
 #' @seealso Hotelling \eqn{T^2}-distribution functions, \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family srstar
+#' @family sropt
 #' @note
 #' This is a thin wrapper on the Hotelling T-squared distribution, provided for
 #' convenience.
@@ -473,13 +472,13 @@ rT2 <- function(n, df1, df2, delta2) {
 #'
 #' @examples 
 #' # generate some variates 
-#' rvs <- rsrstar(2048, 8, 253*6, 0, 253)
+#' rvs <- rsropt(2048, 8, 253*6, 0, 253)
 #' hist(rvs)
 #' # these should be uniform:
-#' isp <- psrstar(rvs, 8, 253*6, 0, 253)
+#' isp <- psropt(rvs, 8, 253*6, 0, 253)
 #' plot(ecdf(isp))
 #'
-dsrstar <- function(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE) {
+dsropt <- function(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE) {
 	if (!missing(drag) && (drag != 0)) {
 		x <- x + drag
 	}
@@ -489,22 +488,22 @@ dsrstar <- function(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE) {
 			zeta.s <- .deannualize(zeta.s, opy)
 		}
 	}
-	x.T2 <- .srstar_to_T2(x, df2)
+	x.T2 <- .sropt_to_T2(x, df2)
 	if (missing(zeta.s)) {
 		delta2 <- 0
 	} else {
-		delta2 <- .srstar_to_T2(zeta.s, df2)
+		delta2 <- .sropt_to_T2(zeta.s, df2)
 	}
 	d.T2 <- dT2(x.T2, df1, df2, delta2, log=log)
 	if (log) {
-		retv <- (d.T2 - log(.d_T2_to_srstar(x, df2)))
+		retv <- (d.T2 - log(.d_T2_to_sropt(x, df2)))
 	} else {
-		retv <- (d.T2 / .d_T2_to_srstar(x, df2))
+		retv <- (d.T2 / .d_T2_to_sropt(x, df2))
 	}
 	return(retv)
 }
 #' @export 
-psrstar <- function(q, df1, df2, zeta.s, opy, drag = 0, ...) {
+psropt <- function(q, df1, df2, zeta.s, opy, drag = 0, ...) {
 	if (!missing(drag) && (drag != 0)) {
 		q <- q + drag
 	}
@@ -514,27 +513,27 @@ psrstar <- function(q, df1, df2, zeta.s, opy, drag = 0, ...) {
 			zeta.s <- .deannualize(zeta.s, opy)
 		}
 	}
-	q.T2 <- .srstar_to_T2(q, df2)
+	q.T2 <- .sropt_to_T2(q, df2)
 	if (missing(zeta.s)) {
 		delta2 = 0.0
 	} else {
-		delta2 <- .srstar_to_T2(zeta.s, df2)
+		delta2 <- .sropt_to_T2(zeta.s, df2)
 	}
 	retv <- pT2(q.T2, df1, df2, delta2, ...)
 	return(retv)
 }
 #' @export 
-qsrstar <- function(p, df1, df2, zeta.s, opy, drag = 0, ...) {
+qsropt <- function(p, df1, df2, zeta.s, opy, drag = 0, ...) {
 	if (missing(zeta.s)) {
 		delta2 = 0.0
 	} else {
 		if (!missing(opy)) {
 			zeta.s <- .deannualize(zeta.s, opy)
 		}
-		delta2 <- .srstar_to_T2(zeta.s, df2)
+		delta2 <- .sropt_to_T2(zeta.s, df2)
 	}
 	q.T2 <- qT2(p, df1, df2, delta2, ...)
-	retv <- .T2_to_srstar(q.T2, df2)
+	retv <- .T2_to_sropt(q.T2, df2)
 	if (!missing(opy)) {
 		retv <- .annualize(retv,opy)
 	}
@@ -544,17 +543,17 @@ qsrstar <- function(p, df1, df2, zeta.s, opy, drag = 0, ...) {
 	return(retv)
 }
 #' @export 
-rsrstar <- function(n, df1, df2, zeta.s, opy, drag = 0, ...) {
+rsropt <- function(n, df1, df2, zeta.s, opy, drag = 0, ...) {
 	if (missing(zeta.s)) {
 		delta2 = 0.0
 	} else {
 		if (!missing(opy)) {
 			zeta.s <- .deannualize(zeta.s, opy)
 		}
-		delta2 <- .srstar_to_T2(zeta.s, df2)
+		delta2 <- .sropt_to_T2(zeta.s, df2)
 	}
 	r.T2 <- rT2(n, df1, df2, delta2, ...) 
-	retv <- .T2_to_srstar(r.T2, df2)
+	retv <- .T2_to_sropt(r.T2, df2)
 	if (!missing(opy)) {
 		retv <- .annualize(retv,opy)
 	}
@@ -704,7 +703,7 @@ qlambdap <- Vectorize(.qlambdap,
 #UNFOLD
 
 # co-SR^*
-# pcosrstar, qcosrstar#FOLDUP
+# pco_sropt, qco_sropt#FOLDUP
 #' @title The 'confidence distribution' for maximal Sharpe ratio.
 #'
 #' @description 
@@ -728,9 +727,9 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' @usage
 #'
-#' pcosrstar(q,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE) 
+#' pco_sropt(q,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE) 
 #'
-#' qcosrstar(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
+#' qco_sropt(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
 #'
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
@@ -740,30 +739,30 @@ qlambdap <- Vectorize(.qlambdap,
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
-#' @param lb the lower bound for the output of \code{qcosrstar}.
-#' @param ub the upper bound for the output of \code{qcosrstar}.
-#' @inheritParams dsrstar
-#' @inheritParams qsrstar
-#' @inheritParams psrstar
+#' @param lb the lower bound for the output of \code{qco_sropt}.
+#' @param ub the upper bound for the output of \code{qco_sropt}.
+#' @inheritParams dsropt
+#' @inheritParams qsropt
+#' @inheritParams psropt
 #' @inheritParams qsr
 #' @inheritParams dsr
 #' @inheritParams psr
 #' @keywords distribution 
-#' @return \code{pcosrstar} gives the distribution function, and
-#' \code{qcosrstar} gives the quantile function.
+#' @return \code{pco_sropt} gives the distribution function, and
+#' \code{qco_sropt} gives the quantile function.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
-#' @aliases qcosrstar 
-#' @seealso \code{\link{dsrstar},\link{psrstar},\link{qsrstar},\link{rsrstar}}
+#' @aliases qco_sropt 
+#' @seealso \code{\link{dsropt},\link{psropt},\link{qsropt},\link{rsropt}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family srstar
+#' @family sropt
 #' @note
-#' When \code{lower.tail} is true, \code{pcosrstar} is monotonic increasing 
-#' with respect to \code{q}, and decreasing in \code{srstar}; these are reversed
-#' when \code{lower.tail} is false. Similarly, \code{qcosrstar} is increasing
+#' When \code{lower.tail} is true, \code{pco_sropt} is monotonic increasing 
+#' with respect to \code{q}, and decreasing in \code{sropt}; these are reversed
+#' when \code{lower.tail} is false. Similarly, \code{qco_sropt} is increasing
 #' in \code{sign(as.double(lower.tail) - 0.5) * p} and
-#' \code{- sign(as.double(lower.tail) - 0.5) * srstar}.
+#' \code{- sign(as.double(lower.tail) - 0.5) * sropt}.
 #'
 #' @examples 
 #'
@@ -772,67 +771,67 @@ qlambdap <- Vectorize(.qlambdap,
 #' ntest <- 2000
 #' df1 <- 4
 #' df2 <- 6 * opy
-#' rvs <- rsrstar(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
+#' rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
 #' qvs <- seq(0,10,length.out=101)
-#' pps <- pcosrstar(qvs,df1,df2,rvs[1],opy)
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],opy)
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
-#' pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
 #' 
 #' # 2FIX: shove these into the unit tests for monotonicity?
 #' svs <- seq(0,4,length.out=101)
-#' pps <- pcosrstar(2,df1,df2,svs,opy)
+#' pps <- pco_sropt(2,df1,df2,svs,opy)
 #' if (require(txtplot))
 #'  txtplot(svs,pps)
-#' pps <- pcosrstar(2,df1,df2,svs,opy,lower.tail=FALSE)
+#' pps <- pco_sropt(2,df1,df2,svs,opy,lower.tail=FALSE)
 #' if (require(txtplot))
 #'  txtplot(svs,pps)
 #' 
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
-#' pps <- pcosrstar(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
-#' pcosrstar(-1,df1,df2,rvs[1],opy)
+#' pco_sropt(-1,df1,df2,rvs[1],opy)
 #'
-#' qvs <- qcosrstar(0.05,df1=df1,df2=df2,z.s=rvs)
+#' qvs <- qco_sropt(0.05,df1=df1,df2=df2,z.s=rvs)
 #' mean(qvs > zeta.s)
-#' qvs <- qcosrstar(0.5,df1=df1,df2=df2,z.s=rvs)
+#' qvs <- qco_sropt(0.5,df1=df1,df2=df2,z.s=rvs)
 #' mean(qvs > zeta.s)
-#' qvs <- qcosrstar(0.95,df1=df1,df2=df2,z.s=rvs)
+#' qvs <- qco_sropt(0.95,df1=df1,df2=df2,z.s=rvs)
 #' mean(qvs > zeta.s)
 #' # test vectorization:
-#' qv <- qcosrstar(0.1,df1,df2,rvs)
-#' qv <- qcosrstar(c(0.1,0.2),df1,df2,rvs)
-#' qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),df2,rvs)
-#' qv <- qcosrstar(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
+#' qv <- qco_sropt(0.1,df1,df2,rvs)
+#' qv <- qco_sropt(c(0.1,0.2),df1,df2,rvs)
+#' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),df2,rvs)
+#' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 #'
 # 2FIX: add opy?
-pcosrstar <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
+pco_sropt <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	# 2FIX: do the annualization just once for efficiency?
-	# this is just a silly wrapper on psrstar
+	# this is just a silly wrapper on psropt
 	# delegate
-	retv <- psrstar(q=z.s,df1=df1,df2=df2,zeta.s=q,opy=opy,
+	retv <- psropt(q=z.s,df1=df1,df2=df2,zeta.s=q,opy=opy,
 									lower.tail=!lower.tail,log.p=log.p)  # sic the tail reversal
 	return(retv)
 }
 # create a scalar function that we later vectorize. 
 # 
-# this inverts pcosrstar; note that when lower.tail=TRUE,
-# pcosrstar is increasing in q, but decreasing in srstar.
-# pcosrstar only accepts non-negative q 
+# this inverts pco_sropt; note that when lower.tail=TRUE,
+# pco_sropt is increasing in q, but decreasing in sropt.
+# pco_sropt only accepts non-negative q 
 #
 # here we try to find lb <= q < ub such that
-# pcosrstar(q,df1,df2,srstar,opy,lower.tail,log.p) = p
+# pco_sropt(q,df1,df2,sropt,opy,lower.tail,log.p) = p
 # however, there may be no such q, since we are limited to
 # the range [lp,up) where
-# lp = pcosrstar(lb,df1,df2,srstar,opy,lower.tail,log.p)
-# up = pcosrstar(ub,df1,df2,srstar,opy,lower.tail,log.p)
+# lp = pco_sropt(lb,df1,df2,sropt,opy,lower.tail,log.p)
+# up = pco_sropt(ub,df1,df2,sropt,opy,lower.tail,log.p)
 # if p < lp we return lb;
 # if q >= up, we return ub;
-.qcosrstar <- function(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,
+.qco_sropt <- function(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,
 												lb=0,ub=Inf) {
 	if ((lb > ub) || (is.infinite(lb)) || (min(lb,ub) < 0))
 		stop("nonsensical lb and/or ub")
@@ -845,11 +844,11 @@ pcosrstar <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	# do *not* pass on opy b/c this function is a tight loop
 	if (lower.tail) {
 		zerf <- function(q) {
-			pcosrstar(q,df1=df1,df2=df2,z.s=z.s,lower.tail=lower.tail,log.p=log.p) - p
+			pco_sropt(q,df1=df1,df2=df2,z.s=z.s,lower.tail=lower.tail,log.p=log.p) - p
 		}
 	} else {
 		zerf <- function(q) {
-			p - pcosrstar(q,df1=df1,df2=df2,z.s=z.s,lower.tail=lower.tail,log.p=log.p)
+			p - pco_sropt(q,df1=df1,df2=df2,z.s=z.s,lower.tail=lower.tail,log.p=log.p)
 		}
 	}
 	flb <- zerf(lb)
@@ -876,7 +875,7 @@ pcosrstar <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
 	return(retval)
 }
 #' @export 
-qcosrstar <- Vectorize(.qcosrstar,
+qco_sropt <- Vectorize(.qco_sropt,
 											vectorize.args = c("p","df1","df2","z.s"),
 											SIMPLIFY = TRUE)
 #UNFOLD
