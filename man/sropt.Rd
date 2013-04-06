@@ -1,11 +1,8 @@
-\name{full.sropt}
-\alias{full.sropt}
+\name{sropt}
 \alias{sropt}
 \title{Compute the Sharpe ratio of the Markowitz portfolio.}
 \usage{
-  full.sropt(X,drag=0,opy=1)
-
-  sropt(X,...)
+  sropt(X,drag=0,opy=1)
 }
 \arguments{
   \item{X}{matrix of returns.}
@@ -20,9 +17,6 @@
   returns are observed at a rate of \code{opy} per 'year.'
   default value is 1, meaning no annualization is
   performed.}
-
-  \item{...}{the above extra parameters, passed on to
-  \code{full.sropt}}
 }
 \value{
   A list with containing the following components:
@@ -68,20 +62,19 @@
   year (or whatever the target annualization epoch.)
 }
 \examples{
-rvs <- full.sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
 rvs <- sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
-  \code{\link{full.sr}}, sropt-distribution functions,
+  \code{\link{sr}}, sropt-distribution functions,
   \code{\link{dsropt}, \link{psropt}, \link{qsropt},
   \link{rsropt}}
 
-  Other sropt: \code{\link{dsropt}},
-  \code{\link{pco_sropt}}, \code{\link{sropt.confint}},
-  \code{\link{sropt.test}}
+  Other sropt: \code{\link{confint.sropt}},
+  \code{\link{dsropt}}, \code{\link{pco_sropt}},
+  \code{\link{sropt_confint}}, \code{\link{sropt.test}}
 }
 \keyword{univar}
 

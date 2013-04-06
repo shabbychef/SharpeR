@@ -60,9 +60,7 @@
 #'
 #' @usage
 #'
-#' full.sr(x,c0=0,opy=1,na.rm=FALSE)
-#'
-#' sr(x,...)
+#' sr(x,c0=0,opy=1,na.rm=FALSE)
 #'
 #' @param x vector of returns.
 #' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
@@ -71,15 +69,15 @@
 #' @param opy the number of observations per 'year'. This is used to
 #'        'annualize' the answer.
 #' @param na.rm logical.  Should missing values be removed?
-#' @param ... the above extra parameters,  passed on to \code{full.sr}
 #' @keywords univar 
-#' @return \code{full.sr} returns a list with containing the following components:
+#' @return a list containing the following components:
 #' \item{sr}{the annualized Sharpe ratio.}
 #' \item{df}{the number of observations.}
-#' \code{sr} just returns the numeric annualized Sharpe.
-#' @aliases sr
+#' \item{opy}{the annualization factor.}
+#' this is of class \code{sr}.
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
-#' @export 
+#' @rdname sr
+#' @export sr
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
 #' @references 
@@ -91,24 +89,52 @@
 #' \url{http://ssrn.com/paper=377260}
 #'
 #' @examples 
-#' rvs <- full.sr(rnorm(253*8),opy=253)
 #' rvs <- sr(rnorm(253*8),opy=253)
+sr <- function(x, ...) {
+	UseMethod("sr", x)
+}
+
+#  ' @return \code{NULL}
 #'
-full.sr <- function(x,c0=0,opy=1,na.rm=FALSE) {
+#' @rdname sr
+#' @method sr default
+#' @S3method sr default
+sr.default <- function(x,c0=0,opy=1,na.rm=FALSE) {
 	sr <- (mean(x,na.rm=na.rm) - c0) / sd(x,na.rm=na.rm)
 	if (!missing(opy))
 		sr <- .annualize(sr,opy)
 	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
 	#units(sr) <- "yr^-0.5"
 	retval <- list(sr = sr,df = df,c0 = c0,opy = opy)
+	class(retval) <- "sr"
 	return(retval)
 }
-#' @export 
-sr <- function(x,...) {
-	# delegate
-	subret <- full.sr(x,...)
-	return(subret$sr)
-}
+
+#' @title Is this in the "sr" class?
+#'
+#' @description 
+#'
+#' Checks if an object is in the class \code{'sr'}
+#'
+#' @details
+#'
+#' To satisfy the minimum requirements of an S3 class.
+#'
+#' @usage
+#'
+#' is.sr(x)
+#'
+#' @param x an object of some kind.
+#' @return a boolean.
+#' @seealso sr
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @export
+#'
+#' @examples 
+#' rvs <- sr(rnorm(253*8),opy=253)
+#' is.sr(rvs)
+is.sr <- function(x) inherits(x,"sr")
+
 
 # compute the markowitz portfolio
 .markowitz <- function(X,mu=NULL,Sigma=NULL) {
@@ -164,9 +190,7 @@ sr <- function(x,...) {
 #'
 #' @usage
 #'
-#' full.sropt(X,drag=0,opy=1)
-#'
-#' sropt(X,...)
+#' sropt(X,drag=0,opy=1)
 #'
 #' @param X matrix of returns.
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
@@ -176,7 +200,6 @@ sr <- function(x,...) {
 #' @param opy the number of observations per 'year'. The returns are observed
 #'        at a rate of \code{opy} per 'year.' default value is 1, meaning no 
 #'        annualization is performed.
-#' @param ... the above extra parameters,  passed on to \code{full.sropt}
 #' @keywords univar 
 #' @return A list with containing the following components:
 #' \item{w}{the optimal portfolio.}
@@ -189,16 +212,15 @@ sr <- function(x,...) {
 #' \item{drag}{the input \code{drag} term.}
 #' \item{opy}{the input \code{opy} term.}
 #' @aliases sropt
-#' @seealso \code{\link{full.sr}}, sropt-distribution functions, 
+#' @seealso \code{\link{sr}}, sropt-distribution functions, 
 #' \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sropt
 #' @examples 
-#' rvs <- full.sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
 #' rvs <- sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
 #'
-full.sropt <- function(X,drag=0,opy=1) {
+sropt <- function(X,drag=0,opy=1) {
 	retval <- .hotelling(X)
 	zeta.star <- sqrt(retval$T2 / retval$df2)
 	if (!missing(opy))
@@ -208,15 +230,9 @@ full.sropt <- function(X,drag=0,opy=1) {
 	#units(retval$sropt) <- "yr^-0.5"
 	retval$drag <- drag
 	retval$opy <- opy
+	class(retval) <- "sropt"
 	return(retval)
 }
-#' @export 
-sropt <- function(X,...) {
-	subret <- full.sropt(X,...)
-	return(subret$sropt)
-}
-
-
 #UNFOLD
 
 # confidence intervals on the Sharpe ratio#FOLDUP
@@ -243,6 +259,20 @@ sropt <- function(X,...) {
 	return(se)
 }
 
+# 2FIX: add documentation for 'se'
+#' @title Standard error computation
+#' @rdname se
+#' @export
+se <- function(x, ...) {
+	UseMethod("se", x)
+}
+#'
+#' @rdname se
+#' @method se default
+#' @S3method se default
+se.default <- function(x, ...) {
+	stop("no generic standard error computation available")
+}
 #' @title Standard error of Sharpe ratio
 #'
 #' @description 
@@ -265,7 +295,7 @@ sropt <- function(X,...) {
 #'
 #' @usage
 #'
-#' sr.se(z,df,opy,type=c("t","Lo","Z","F")) 
+#' sr_se(z,df,opy,type=c("t","Lo","Z","F")) 
 #'
 #' @param z an observed Sharpe ratio statistic, annualized.
 #' @param df the number of observations the statistic is based on. This 
@@ -283,6 +313,7 @@ sropt <- function(X,...) {
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
+#' @rdname sr_se
 #' @note
 #' Eventually this should include corrections for autocorrelation, skew,
 #' kurtosis.
@@ -304,11 +335,11 @@ sropt <- function(X,...) {
 #' opy <- 253
 #' df <- opy * 6
 #' rvs <- rsr(1, df, 1.0, opy)
-#' anse <- sr.se(rvs,df,opy,type="t")
-#' anse2 <- sr.se(rvs,df,opy,type="Z")
+#' anse <- sr_se(rvs,df,opy,type="t")
+#' anse2 <- sr_se(rvs,df,opy,type="Z")
 #'
 #'@export
-sr.se <- function(z,df,opy,type=c("t","Lo","Z","F")) { 
+sr_se <- function(z,df,opy,type=c("t","Lo","Z","F")) { 
 	# 2FIX: add opdyke corrections for skew and kurtosis?
 	# 2FIX: add autocorrelation correction?
 	if (!missing(opy)) {
@@ -324,6 +355,14 @@ sr.se <- function(z,df,opy,type=c("t","Lo","Z","F")) {
 		se <- .annualize(se,opy)
 	}
 	return(se)
+}
+#'
+#' @rdname se
+#' @method se sr
+#' @S3method se sr
+se.sr <- function(z, ...) {
+	retval <- sr_se(z$sr,z$df,z$opy,...)
+	return(retval)
 }
 
 #' @title Confidence Interval on Signal-Noise Ratio
@@ -348,7 +387,7 @@ sr.se <- function(z,df,opy,type=c("t","Lo","Z","F")) {
 #'
 #' @usage
 #'
-#' sr.confint(z,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
+#' sr_confint(z,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
 #'            level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
 #' @param z an observed Sharpe ratio statistic, annualized.
@@ -368,19 +407,25 @@ sr.se <- function(z,df,opy,type=c("t","Lo","Z","F")) {
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{sr.se}}, \code{\link{qlambdap}}
+#' @seealso \code{\link{confint}}, \code{\link{sr_se}}, \code{\link{qlambdap}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
+#' @rdname sr_confint
 #' @examples 
 #' opy <- 253
 #' df <- opy * 6
 #' rvs <- rsr(1, df, 1.0, opy)
-#' aci <- sr.confint(rvs,df,type="t",opy=opy)
-#' aci2 <- sr.confint(rvs,df,type="Z",opy=opy)
+#' aci <- sr_confint(rvs,df,type="t",opy=opy)
+#' aci2 <- sr_confint(rvs,df,type="Z",opy=opy)
+#' # using "sr" class:
+#' xv <- rnorm(df, 1 / sqrt(opy))
+#' mysr <- sr(xv)
+#' confint(mysr,level=0.90)
+#' 
 #'
 #'@export
-sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
+sr_confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 											 opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
 	#2FIX: the order of arguments is really wonky. where does opy go?
 	if (!missing(opy)) {
@@ -392,21 +437,22 @@ sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 		ci.lo <- qlambdap(level.lo,df-1,tstat,lower.tail=TRUE)
 		ci.hi <- qlambdap(level.hi,df-1,tstat,lower.tail=TRUE)
 		ci <- c(ci.lo,ci.hi)
+		ci <- .t_to_sr(ci, df)
 	} else if (type == "t") {
 		# already annualized;
-		se <- sr.se(z,df,type=type)
+		se <- sr_se(z,df,type=type)
 		midp <- z
 		zalp <- qnorm(c(level.lo,level.hi))
 		ci <- midp + zalp * se
 	} else if (type == "Z") {
 		# already annualized;
-		se <- sr.se(z,df,type=type)
+		se <- sr_se(z,df,type=type)
 		midp <- z * (1 - 1 / (4 * (df - 1)))
 		zalp <- qnorm(c(level.lo,level.hi))
 		ci <- midp + zalp * se
 	} else if (type == "F") {
 		# already annualized;
-		se <- sr.se(z,df,type=type)
+		se <- sr_se(z,df,type=type)
 		cn <- .srbias(df)
 		midp <- z / cn
 		zalp <- qnorm(c(level.lo,level.hi))
@@ -415,6 +461,15 @@ sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 
 	retval <- matrix(ci,nrow=1)
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+	return(retval)
+}
+#' @export
+#' @param parm ignored here
+#' @rdname sr_confint
+#' @method confint sr 
+#' @S3method confint sr 
+confint.sr <- function(z,parm,level=0.95,...) {
+	retval <- sr_confint(z$sr,z$df,level=level,opy=z$opy,...)
 	return(retval)
 }
 											 
@@ -438,7 +493,7 @@ sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 #'
 #' @usage
 #'
-#' sropt.confint(z.s,df1,df2,level=0.95,
+#' sropt_confint(z.s,df1,df2,level=0.95,
 #'                opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
 #' @param z.s an observed Sharpe ratio statistic, annualized.
@@ -457,18 +512,20 @@ sr.confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{sr.confint}}, \code{\link{qco_sropt}}, \code{\link{sropt.test}}
+#' @seealso \code{\link{confint}}, \code{\link{sr_confint}}, \code{\link{qco_sropt}}, \code{\link{sropt.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sropt
+#' @rdname sropt_confint
 #' @examples 
+#' # fix these!
 #' opy <- 253
 #' df <- opy * 6
 #' rvs <- rsr(1, df, 1.0, opy)
-#' aci <- sr.confint(rvs,df,opy=opy)
+#' aci <- sropt_confint(rvs,df,opy=opy)
 #'
 #'@export
-sropt.confint <- function(z.s,df1,df2,level=0.95,
+sropt_confint <- function(z.s,df1,df2,level=0.95,
 											     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
 	#2FIX: the order of arguments is really wonky. where does opy go?
 	#if (!missing(opy)) {
@@ -481,6 +538,15 @@ sropt.confint <- function(z.s,df1,df2,level=0.95,
 
 	retval <- matrix(ci,nrow=1)
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+	return(retval)
+}
+#' @export
+#' @param parm ignored here
+#' @rdname sropt_confint
+#' @method confint sropt
+#' @S3method confint sropt
+confint.sropt <- function(z,parm,level=0.95,...) {
+	retval <- sropt_confint(z$sropt,z$df1,z$df2,level=level,opy=z$opy,...)
 	return(retval)
 }
 

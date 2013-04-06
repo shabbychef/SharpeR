@@ -1,0 +1,35 @@
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{Statistics of the Sharpe ratio}
+%\VignetteKeywords{Finance}
+%\VignettePackage{SharpeR}
+\documentclass{article}
+
+\usepackage{url}
+\usepackage[authoryear]{natbib}
+
+\makeatletter
+
+\makeatother
+
+\begin{document}
+
+\title{SharpeR}
+
+
+\author{Steven E. Pav}
+
+\maketitle
+
+blah blah blah.
+\cite{Sharpe:1966}
+
+<<show-off>>=
+rnorm(5)
+df=data.frame(y=rnorm(100), x=1:100)
+summary(lm(y~x, data=df))
+@
+
+%\bibliographystyle{jss}
+\bibliography{SharpeR}
+
+\end{document}

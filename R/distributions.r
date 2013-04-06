@@ -37,6 +37,9 @@
 # showMethods("print") 
 # getAnywhere("t.test.default")
 
+# roxygen2 tiparoonie on S3 methods:
+# http://stackoverflow.com/a/7199577/164611
+
 ########################################################################
 # Distributions
 ########################################################################
@@ -96,6 +99,11 @@
 #' \item \eqn{\zeta}{zeta} is denoted by \code{zeta}.
 #' \item \eqn{d} is denoted by \code{opy}. ('Observations Per Year')
 #' }
+#' 
+#' If the returns violate the assumptions of normality, independence, etc
+#' (\emph{as they always should in the real world}), the sample Sharpe Ratio
+#' will not follow this distribution. It does provide, however, a reasonable
+#' approximation in many cases.
 #'
 #' @usage
 #'

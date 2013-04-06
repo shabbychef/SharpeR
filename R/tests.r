@@ -287,7 +287,7 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	}
 	x <- x[xok]
 	if (is.null(y)) {#FOLDUP
-		subsr <- full.sr(x,c0=0)
+		subsr <- sr(x,c0=0)
 		nx <- subsr$df
 		if (nx < 2) 
 			stop("not enough 'x' observations")
@@ -302,17 +302,17 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 
 		if (alternative == "less") {
 			pval <- psr(estimate, df=nx, zeta=snr, opy=opy)
-			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
+			cint <- sr_confint(estimate,df=nx,type="exact",opy=opy,
 												 level.lo=0,level.hi=conf.level)
 		}
 		else if (alternative == "greater") {
 			pval <- psr(estimate, df=nx, zeta=snr, opy=opy, lower.tail = FALSE)
-			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
+			cint <- sr_confint(estimate,df=nx,type="exact",opy=opy,
 												 level.lo=1-conf.level,level.hi=1)
 		}
 		else {
 			pval <- .oneside2two(psr(estimate, df=nx, zeta=snr, opy=opy))
-			cint <- sr.confint(estimate,df=nx,type="exact",opy=opy,
+			cint <- sr_confint(estimate,df=nx,type="exact",opy=opy,
 												 level=conf.level)
 		}
 	} #UNFOLD
@@ -337,8 +337,8 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			pval <- subtest$p.value
 		} #UNFOLD
 		else {#FOLDUP
-			srx <- full.sr(x,c0=0)
-			sry <- full.sr(y,c0=0)
+			srx <- sr(x,c0=0)
+			sry <- sr(y,c0=0)
 
 			sx <- srx$sr
 			sy <- sry$sr
@@ -541,7 +541,7 @@ sropt.test <- function(X,alternative=c("greater","two.sided","less"),
 		stop("'conf.level' must be a single number between 0 and 1")
 
 	dname <- deparse(substitute(X))
-	subtest <- full.sropt(X,opy=opy)
+	subtest <- sropt(X,opy=opy)
 	statistic <- subtest$T2
 	names(statistic) <- "T2"
 	estimate <- subtest$sropt

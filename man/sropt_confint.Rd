@@ -1,9 +1,12 @@
-\name{sropt.confint}
-\alias{sropt.confint}
+\name{sropt_confint}
+\alias{confint.sropt}
+\alias{sropt_confint}
 \title{Confidence Interval on Maximal Signal-Noise Ratio}
 \usage{
-  sropt.confint(z.s,df1,df2,level=0.95,
+  sropt_confint(z.s,df1,df2,level=0.95,
     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
+
+  \method{confint}{sropt} (z, parm, level = 0.95, ...)
 }
 \arguments{
   \item{z.s}{an observed Sharpe ratio statistic,
@@ -24,9 +27,14 @@
   \item{level.hi}{the upper bound for the confidence
   interval.}
 
+  \item{parm}{ignored here}
+
   \item{df1}{the number of assets in the portfolio.}
 
   \item{df2}{the number of observations.}
+
+  \item{...}{arguments passed on to the respective
+  Hotelling \eqn{T^2} functions.}
 }
 \value{
   A matrix (or vector) with columns giving lower and upper
@@ -51,20 +59,21 @@
   \mu}}{zeta* = sqrt(mu' Sigma^-1 mu)}
 }
 \examples{
+# fix these!
 opy <- 253
 df <- opy * 6
 rvs <- rsr(1, df, 1.0, opy)
-aci <- sr.confint(rvs,df,opy=opy)
+aci <- sropt_confint(rvs,df,opy=opy)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
-  \code{\link{confint}}, \code{\link{sr.confint}},
+  \code{\link{confint}}, \code{\link{sr_confint}},
   \code{\link{qco_sropt}}, \code{\link{sropt.test}}
 
   Other sropt: \code{\link{dsropt}},
-  \code{\link{full.sropt}}, \code{\link{pco_sropt}},
+  \code{\link{pco_sropt}}, \code{\link{sropt}},
   \code{\link{sropt.test}}
 }
 \keyword{htest}

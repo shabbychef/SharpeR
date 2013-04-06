@@ -97,9 +97,10 @@ qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
   t-distribution functions,
   \code{\link{dt},\link{pt},\link{qt},\link{rt}}
 
-  Other sr: \code{\link{dsr}}, \code{\link{full.sr}},
-  \code{\link{power.sr.test}}, \code{\link{sr.confint}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.se}},
+  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
+  \code{\link{power.sr.test}}, \code{\link{sr}},
+  \code{\link{sr_confint}}, \code{\link{sr.default}},
+  \code{\link{sr.equality.test}}, \code{\link{sr_se}},
   \code{\link{sr.test}}
 }
 \keyword{distribution}

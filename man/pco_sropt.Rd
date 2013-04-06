@@ -123,9 +123,9 @@ qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 \seealso{
   \code{\link{dsropt},\link{psropt},\link{qsropt},\link{rsropt}}
 
-  Other sropt: \code{\link{dsropt}},
-  \code{\link{full.sropt}}, \code{\link{sropt.confint}},
-  \code{\link{sropt.test}}
+  Other sropt: \code{\link{confint.sropt}},
+  \code{\link{dsropt}}, \code{\link{sropt}},
+  \code{\link{sropt_confint}}, \code{\link{sropt.test}}
 }
 \keyword{distribution}
 

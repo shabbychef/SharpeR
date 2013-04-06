@@ -66,9 +66,10 @@ anex <- power.sr.test(n=NULL,snr=0.6,sig.level=0.05,power=0.5,opy=253)
 \seealso{
   \code{\link{power.t.test}}, \code{\link{sr.test}}
 
-  Other sr: \code{\link{dsr}}, \code{\link{full.sr}},
-  \code{\link{plambdap}}, \code{\link{sr.confint}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.se}},
+  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
+  \code{\link{plambdap}}, \code{\link{sr}},
+  \code{\link{sr_confint}}, \code{\link{sr.default}},
+  \code{\link{sr.equality.test}}, \code{\link{sr_se}},
   \code{\link{sr.test}}
 }
 \keyword{htest}

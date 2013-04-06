@@ -1,8 +1,8 @@
-\name{sr.se}
-\alias{sr.se}
+\name{sr_se}
+\alias{sr_se}
 \title{Standard error of Sharpe ratio}
 \usage{
-  sr.se(z,df,opy,type=c("t","Lo","Z","F"))
+  sr_se(z,df,opy,type=c("t","Lo","Z","F"))
 }
 \arguments{
   \item{z}{an observed Sharpe ratio statistic, annualized.}
@@ -48,8 +48,8 @@
 opy <- 253
 df <- opy * 6
 rvs <- rsr(1, df, 1.0, opy)
-anse <- sr.se(rvs,df,opy,type="t")
-anse2 <- sr.se(rvs,df,opy,type="Z")
+anse <- sr_se(rvs,df,opy,type="t")
+anse2 <- sr_se(rvs,df,opy,type="Z")
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
@@ -75,9 +75,10 @@ anse2 <- sr.se(rvs,df,opy,type="Z")
 \seealso{
   sr-distribution functions, \code{\link{dsr}}
 
-  Other sr: \code{\link{dsr}}, \code{\link{full.sr}},
+  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
-  \code{\link{sr.confint}}, \code{\link{sr.equality.test}},
+  \code{\link{sr}}, \code{\link{sr_confint}},
+  \code{\link{sr.default}}, \code{\link{sr.equality.test}},
   \code{\link{sr.test}}
 }
 \keyword{htest}

@@ -100,10 +100,11 @@ abline(0,1,col='red')
 \seealso{
   \code{\link{sr.equality.test}}, \code{\link{t.test}}.
 
-  Other sr: \code{\link{dsr}}, \code{\link{full.sr}},
+  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
-  \code{\link{sr.confint}}, \code{\link{sr.equality.test}},
-  \code{\link{sr.se}}
+  \code{\link{sr}}, \code{\link{sr_confint}},
+  \code{\link{sr.default}}, \code{\link{sr.equality.test}},
+  \code{\link{sr_se}}
 }
 \keyword{htest}
 

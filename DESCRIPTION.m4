@@ -8,8 +8,9 @@ License: LGPL-3
 Title: Statistical significance of Sharpe ratio
 Description: a collection of tools for analyzing significance of trading strategies, based on the Sharpe ratio and overfit of the same.
 Depends: R (>= 2.4.0)
-Suggests: fPortfolio, testthat, txtplot
+Suggests: testthat, txtplot, knitr
 URL: http://www.r-project.org, https://github.com/shabbychef/SharpeR
+VignetteBuilder: knitr
 Collate:
     'SharpeR.r'
     'distributions.r' 

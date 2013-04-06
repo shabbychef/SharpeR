@@ -89,6 +89,12 @@
   \eqn{n} is denoted by \code{df}. \item \eqn{\zeta}{zeta}
   is denoted by \code{zeta}. \item \eqn{d} is denoted by
   \code{opy}. ('Observations Per Year') }
+
+  If the returns violate the assumptions of normality,
+  independence, etc (\emph{as they always should in the
+  real world}), the sample Sharpe Ratio will not follow
+  this distribution. It does provide, however, a reasonable
+  approximation in many cases.
 }
 \note{
   This is a thin wrapper on the t distribution. The
@@ -121,10 +127,11 @@ plot(ecdf(pvs))
   t-distribution functions, \code{\link{dt}, \link{pt},
   \link{qt}, \link{rt}}
 
-  Other sr: \code{\link{full.sr}}, \code{\link{plambdap}},
-  \code{\link{power.sr.test}}, \code{\link{sr.confint}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.se}},
-  \code{\link{sr.test}}
+  Other sr: \code{\link{confint.sr}},
+  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{sr}}, \code{\link{sr_confint}},
+  \code{\link{sr.default}}, \code{\link{sr.equality.test}},
+  \code{\link{sr_se}}, \code{\link{sr.test}}
 }
 \keyword{distribution}
 

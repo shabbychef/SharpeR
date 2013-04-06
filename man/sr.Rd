@@ -1,11 +1,11 @@
-\name{full.sr}
-\alias{full.sr}
+\name{sr}
 \alias{sr}
+\alias{sr.default}
 \title{Compute the Sharpe ratio.}
 \usage{
-  full.sr(x,c0=0,opy=1,na.rm=FALSE)
+  sr(x,c0=0,opy=1,na.rm=FALSE)
 
-  sr(x,...)
+  \method{sr}{default} (x, c0 = 0, opy = 1, na.rm = FALSE)
 }
 \arguments{
   \item{x}{vector of returns.}
@@ -18,15 +18,12 @@
   used to 'annualize' the answer.}
 
   \item{na.rm}{logical.  Should missing values be removed?}
-
-  \item{...}{the above extra parameters, passed on to
-  \code{full.sr}}
 }
 \value{
-  \code{full.sr} returns a list with containing the
-  following components: \item{sr}{the annualized Sharpe
-  ratio.} \item{df}{the number of observations.} \code{sr}
-  just returns the numeric annualized Sharpe.
+  a list containing the following components: \item{sr}{the
+  annualized Sharpe ratio.} \item{df}{the number of
+  observations.} \item{opy}{the annualization factor.} this
+  is of class \code{sr}.
 }
 \description{
   Computes the Sharpe ratio of some observed returns.
@@ -47,7 +44,6 @@
   year (or whatever the target annualization epoch.)
 }
 \examples{
-rvs <- full.sr(rnorm(253*8),opy=253)
 rvs <- sr(rnorm(253*8),opy=253)
 }
 \author{
@@ -66,10 +62,10 @@ rvs <- sr(rnorm(253*8),opy=253)
   sr-distribution functions, \code{\link{dsr}, \link{psr},
   \link{qsr}, \link{rsr}}
 
-  Other sr: \code{\link{dsr}}, \code{\link{plambdap}},
-  \code{\link{power.sr.test}}, \code{\link{sr.confint}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.se}},
-  \code{\link{sr.test}}
+  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
+  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{sr_confint}}, \code{\link{sr.equality.test}},
+  \code{\link{sr_se}}, \code{\link{sr.test}}
 }
 \keyword{univar}
 

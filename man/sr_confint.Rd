@@ -1,9 +1,12 @@
-\name{sr.confint}
-\alias{sr.confint}
+\name{sr_confint}
+\alias{confint.sr}
+\alias{sr_confint}
 \title{Confidence Interval on Signal-Noise Ratio}
 \usage{
-  sr.confint(z,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
+  sr_confint(z,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
     level.lo=(1-level)/2,level.hi=1-level.lo)
+
+  \method{confint}{sr} (z, parm, level = 0.95, ...)
 }
 \arguments{
   \item{z}{an observed Sharpe ratio statistic, annualized.}
@@ -30,6 +33,8 @@
 
   \item{level.hi}{the upper bound for the confidence
   interval.}
+
+  \item{parm}{ignored here}
 }
 \value{
   A matrix (or vector) with columns giving lower and upper
@@ -56,20 +61,24 @@
 opy <- 253
 df <- opy * 6
 rvs <- rsr(1, df, 1.0, opy)
-aci <- sr.confint(rvs,df,type="t",opy=opy)
-aci2 <- sr.confint(rvs,df,type="Z",opy=opy)
+aci <- sr_confint(rvs,df,type="t",opy=opy)
+aci2 <- sr_confint(rvs,df,type="Z",opy=opy)
+# using "sr" class:
+xv <- rnorm(df, 1 / sqrt(opy))
+mysr <- sr(xv)
+confint(mysr,level=0.90)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
-  \code{\link{confint}}, \code{\link{sr.se}},
+  \code{\link{confint}}, \code{\link{sr_se}},
   \code{\link{qlambdap}}
 
-  Other sr: \code{\link{dsr}}, \code{\link{full.sr}},
-  \code{\link{plambdap}}, \code{\link{power.sr.test}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.se}},
-  \code{\link{sr.test}}
+  Other sr: \code{\link{dsr}}, \code{\link{plambdap}},
+  \code{\link{power.sr.test}}, \code{\link{sr}},
+  \code{\link{sr.default}}, \code{\link{sr.equality.test}},
+  \code{\link{sr_se}}, \code{\link{sr.test}}
 }
 \keyword{htest}
 

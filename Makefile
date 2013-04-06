@@ -4,6 +4,10 @@
 # Makefile 'remixed' from RTikZDevice and optmatch packages. HT to Sharpie and
 # markmfredrickson.
 #
+# you may have too
+# sudo apt-get install -y texinfo
+#
+#
 # Created: 2012.12.28
 #
 
@@ -33,7 +37,7 @@ R         			 = $(RBIN)/R
 RSCRIPT   			 = $(RBIN)/Rscript
 
 # packages I need to test this one
-TEST_DEPS  			 = testthat roxygen2
+TEST_DEPS  			 = testthat roxygen2 knitr txtplot 
 
 #INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%,$(TEST_DEPS)) 
 
@@ -165,9 +169,12 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 
 parallel : $(STAGED_PKG)/DESCRIPTION
 
+#PACKAGING_FLAGS   = --no-vignettes
+PACKAGING_FLAGS   = 
+
 # make the 'package', which is a tar.gz
 $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION
-	$(RLOCAL) CMD build --no-vignettes $(<D)
+	$(RLOCAL) CMD build $(PACKAGING_FLAGS) $(<D)
 
 package : $(PKG_TGZ)
 
