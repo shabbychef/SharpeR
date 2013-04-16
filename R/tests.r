@@ -1,4 +1,4 @@
-# Copyright 2012 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2013 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -288,32 +288,27 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	x <- x[xok]
 	if (is.null(y)) {#FOLDUP
 		subsr <- sr(x,c0=0)
-		nx <- subsr$df
-		if (nx < 2) 
+		df <- subsr$df
+		if (df < 1) 
 			stop("not enough 'x' observations")
-		sx <- subsr$sr
-		estimate <- .annualize(sx,opy)
-		statistic <- .sr_to_t(sx,nx)
+		statistic <- .sr2t(subsr)
 		names(statistic) <- "t"
-		df <- nx - 1
-
-		method <- "One Sample sr test"
+		estimate <- subsr$sr
 		names(estimate) <- "Sharpe ratio of x"
 
+		method <- "One Sample sr test"
+
 		if (alternative == "less") {
-			pval <- psr(estimate, df=nx, zeta=snr, opy=opy)
-			cint <- sr_confint(estimate,df=nx,type="exact",opy=opy,
-												 level.lo=0,level.hi=conf.level)
+			pval <- .psr(subsr, zeta=snr, lower.tail=TRUE)
+			cint <- confint(subsr,type="exact",level.lo=0,level.hi=conf.level)
 		}
 		else if (alternative == "greater") {
-			pval <- psr(estimate, df=nx, zeta=snr, opy=opy, lower.tail = FALSE)
-			cint <- sr_confint(estimate,df=nx,type="exact",opy=opy,
-												 level.lo=1-conf.level,level.hi=1)
+			pval <- .psr(subsr, zeta=snr, lower.tail=FALSE)
+			cint <- confint(subsr,type="exact",level.lo=1-conf.level,level.hi=1)
 		}
 		else {
-			pval <- .oneside2two(psr(estimate, df=nx, zeta=snr, opy=opy))
-			cint <- sr_confint(estimate,df=nx,type="exact",opy=opy,
-												 level=conf.level)
+			pval <- .oneside2two(.psr(subsr, zeta=snr, lower.tail=TRUE))
+			cint <- confint(subsr,type="exact",level=conf.level)
 		}
 	} #UNFOLD
 	else {#FOLDUP
@@ -612,4 +607,4 @@ power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) 
 #UNFOLD
 
 #for vim modeline: (do not edit)
-# vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:
+# vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r

@@ -1,4 +1,4 @@
-# Copyright 2012 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2013 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -60,7 +60,8 @@
 #'
 #' @usage
 #'
-#' sr(x,c0=0,opy=1,na.rm=FALSE)
+#' sr(x,...)
+#' c0=0,opy=1,na.rm=FALSE)
 #'
 #' @param x vector of returns.
 #' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
@@ -68,13 +69,12 @@
 #'        in 'annualized' terms.
 #' @param opy the number of observations per 'year'. This is used to
 #'        'annualize' the answer.
-#' @param na.rm logical.  Should missing values be removed?
 #' @keywords univar 
 #' @return a list containing the following components:
 #' \item{sr}{the annualized Sharpe ratio.}
 #' \item{df}{the number of observations.}
 #' \item{opy}{the annualization factor.}
-#' this is of class \code{sr}.
+#' cast to class \code{sr}.
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @rdname sr
 #' @export sr
@@ -89,27 +89,112 @@
 #' \url{http://ssrn.com/paper=377260}
 #'
 #' @examples 
-#' rvs <- sr(rnorm(253*8),opy=253)
-sr <- function(x, ...) {
+#' # Sharpe's 'model': just given a bunch of returns.
+#' asr <- sr(rnorm(253*8),opy=253)
+#' # given an xts object:
+#' if (require(quantmod)) {
+#'   getSymbols('IBM')
+#'   lrets <- diff(log(IBM[,"IBM.Adjusted"]))
+#'   asr <- sr(lrets,na.rm=TRUE)
+#' }
+#' # on a linear model, find the 'Sharpe' of the residual term
+#' Factors <- matrix(rnorm(253*5*6),ncol=6)
+#' Returns <- rnorm(dim(Factors)[1],0.003)
+#' APT_mod <- lm(Returns ~ Factors)
+#' asr <- sr(APT_mod,opy=253)
+#'   
+sr <- function(x,c0=0,opy=1,...) {
 	UseMethod("sr", x)
 }
+# spawn a "SR" object.
+# the Sharpe Ratio is a rescaled t-statistic.
+#
+# SR = R t
+#
+# where R is the 'rescaling', and
+# t = (betahat' v - c0) / sigmahat
+# is distributed as a non-central t with
+# df degrees of freedom and non-centrality
+# parameter
+# delta = (beta' v - c0) / (sigma R)
+#
+# for 'convenience' we re-express SR and delta
+# in 'annualized' units by multiplying them by
+# sqrt(opy)
+.spawn_sr <- function(sr,df,c0,opy,rescal) {
+	retval <- list(sr = sr,df = df,c0 = c0,opy = opy,rescal = rescal)
+	class(retval) <- "sr"
+	return(retval)
+}
+# get the t-stat associated with an SR object.
+.sr2t <- function(x) {
+	tval <- x$sr / (x$rescal * sqrt(x$opy))
+	return(tval)
+}
+# and the reverse
+.t2sr <- function(x,tval) {
+	srval <- tval * (x$rescal * sqrt(x$opy))
+	return(srval)
+}
+.psr <- function(q,zeta,...) {
+	retv <- prt(q$sr,df=q$df,K=(q$rescal * sqrt(q$opy)),rho=zeta,...)
+	return(retv)
+}
+.dsr <- function(q,zeta,...) {
+	retv <- drt(q$sr,df=q$df,K=(q$rescal * sqrt(q$opy)),rho=zeta,...)
+	return(retv)
+}
 
-#  ' @return \code{NULL}
+# compute SR in only one place. I hope.
+.compute_sr <- function(mu,c0,sigma,opy) {
+	sr <- (mu - c0) / sigma
+	if (!missing(opy))
+		sr <- sr * sqrt(opy)
+	return(sr)
+}
 #'
+#' @param na.rm logical.  Should missing values be removed?
 #' @rdname sr
 #' @method sr default
 #' @S3method sr default
 sr.default <- function(x,c0=0,opy=1,na.rm=FALSE) {
-	sr <- (mean(x,na.rm=na.rm) - c0) / sd(x,na.rm=na.rm)
-	if (!missing(opy))
-		sr <- .annualize(sr,opy)
+	mu <- mean(x,na.rm=na.rm)
+	sigma <- sd(x,na.rm=na.rm)
+	sr <- .compute_sr(mu,c0,sigma,opy)
 	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
-	#units(sr) <- "yr^-0.5"
-	retval <- list(sr = sr,df = df,c0 = c0,opy = opy)
-	class(retval) <- "sr"
+	retval <- .spawn_sr(sr,df=df-1,c0=c0,opy=opy,rescal=1/sqrt(df))
 	return(retval)
 }
-
+#'
+#' @param x a fit model of class \code{lm}.
+#' @rdname sr
+#' @method sr lm 
+#' @S3method sr lm
+sr.lm <- function(x,c0=0,opy=1,na.rm=FALSE) {
+	modl <- x
+	mu <- modl$coefficients["(Intercept)"]
+	sigma <- sqrt(deviance(modl) / modl$df.residual)
+	sr <- .compute_sr(mu,c0,sigma,opy)
+	XXinv <- vcov(modl) / sigma^2
+	rescal <- sqrt(XXinv["(Intercept)","(Intercept)"])
+	retval <- .spawn_sr(sr,df=modl$df.residual,c0=c0,opy=opy,rescal=rescal)
+	return(retval)
+}
+#'
+#' @param anxts an xts object.
+#' @rdname sr
+#' @method sr xts 
+#' @S3method sr xts
+sr.xts <- function(x,c0=0,opy=1,na.rm=FALSE) {
+	anxts <- x
+	if (missing(opy)) {
+		TEO <- time(anxts)
+		days.per.row <- as.double((TEO[length(TEO)] - TEO[1]) / (length(TEO) - 1))
+		opy <- 365.25 / days.per.row
+	}
+	retval <- sr.default(anxts,c0=c0,opy=opy,na.rm=na.rm)
+	return(retval)
+}
 #' @title Is this in the "sr" class?
 #'
 #' @description 
@@ -134,6 +219,26 @@ sr.default <- function(x,c0=0,opy=1,na.rm=FALSE) {
 #' rvs <- sr(rnorm(253*8),opy=253)
 #' is.sr(rvs)
 is.sr <- function(x) inherits(x,"sr")
+
+#' @S3method format sr
+#' @export
+format.sr <- function(x,...) {
+	# oh! ugly! ugly!
+	retval <- capture.output(print(x,...))
+	return(retval)
+}
+#' @S3method print sr
+#' @export
+print.sr <- function(x,...) {
+	tval <- .sr2t(x)
+	pval <- pt(tval,x$df,lower.tail=FALSE)
+	coefs <- cbind(x$sr,tval,pval)
+	colnames(coefs) <- c("stat","t.stat","p.value")
+	rownames(coefs) <- c("Sharpe")
+	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE)
+}
+
+# print.sr <- function(x,...) cat(format(x,...), "\n")
 
 
 # compute the markowitz portfolio
@@ -235,29 +340,66 @@ sropt <- function(X,drag=0,opy=1) {
 }
 #UNFOLD
 
+# confidence intervals on the non-centrality parameter of a t-stat
+
+
+# See Walck, section 33.3
+.t_se_weird <- function(tstat,df) {
+	cn <- .tbias(df)
+	dn <- tstat / cn
+	se <- sqrt(((1+dn**2) * (df/df-2)) - tstat**2)
+	return(se)
+}
+# See Walck, section 33.5
+.t_se_normal <- function(tstat,df) {
+	se <- sqrt(1 + (tstat**2) / (2*df))
+	return(se)
+}
+.t_se <- function(t,df,type=c("t","Lo","exact")) {
+	# 2FIX: add opdyke corrections for skew and kurtosis?
+	# 2FIX: add autocorrelation correction?
+	type <- match.arg(type)
+	se <- switch(type,
+							 t = .t_se_normal(t,df),
+							 Lo = .t_se_normal(t,df),
+							 exact = .t_se_weird(t,df))
+	return(se)
+}
+# confidence intervals.
+.t_confint <- function(tstat,df,level=0.95,type=c("exact","t","Z","F"),
+					 level.lo=(1-level)/2,level.hi=1-level.lo) {
+	type <- match.arg(type)
+	if  (type == "exact") {
+		ci.lo <- qlambdap(level.lo,df-1,tstat,lower.tail=TRUE)
+		ci.hi <- qlambdap(level.hi,df-1,tstat,lower.tail=TRUE)
+		ci <- c(ci.lo,ci.hi)
+	} else if (type == "t") {
+		se <- .t_se(tstat,df,type=type)
+		midp <- tstat
+		zalp <- qnorm(c(level.lo,level.hi))
+		ci <- midp + zalp * se
+	} else if (type == "Z") {
+		se <- .t_se(tstat,df,type="t")
+		midp <- tstat * (1 - 1 / (4 * df))
+		zalp <- qnorm(c(level.lo,level.hi))
+		ci <- midp + zalp * se
+	} else if (type == "F") {
+		# this is silly.
+		se <- .t_se(tstat,df,type="exact")
+		cn <- .tbias(df)
+		midp <- z / cn
+		zalp <- qnorm(c(level.lo,level.hi))
+		ci <- midp + zalp * se
+	} else stop("internal error")
+
+	retval <- matrix(ci,nrow=1)
+	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+	return(retval)
+}
+
+
+
 # confidence intervals on the Sharpe ratio#FOLDUP
-
-# standard errors
-#the sample.sr should *not* be annualized
-.sr_se_weirdo <- function(sample.sr,n) {
-	cn <- .srbias(n)
-	dn <- (n-1) / ((n-3) * cn * cn)
-	W  <- (sample.sr / cn) ** 2
-	se <- sqrt((dn/n) + W * (dn - 1))
-	return(se)
-}
-
-.sr_se_walck <- function(sample.sr,n) {
-	se <- sqrt((1/n) + 0.5 * sample.sr ** 2 / (n - 1))
-	return(se)
-}
-
-.sr_se_lo <- function(sample.sr,n,ss.adjust=FALSE) {
-	# small sample adjustment; works better in practice.
-	df <- ifelse(ss.adjust,n-1,n)
-	se <- sqrt((1 + 0.5 * sample.sr ** 2) / df)
-	return(se)
-}
 
 # 2FIX: add documentation for 'se'
 #' @title Standard error computation
@@ -282,38 +424,30 @@ se.default <- function(x, ...) {
 #' @details 
 #'
 #' 2FIX; document
-#' There are three methods:
+#' There are two methods:
 #'
 #' \itemize{
 #' \item The default, \code{t}, based on Johnson & Welch, with a correction
-#' for small sample size. 
-#' \item An asymptotically equivalent method, \code{Lo}, based on Lo,
-#' which is Johnson & Welch's method but without correcting for d.f.
-#' \item An approximation based on normality, \code{Z}.
-#' \item An approximation based on an F statistic, \code{F}.
+#' for small sample size, also known as \code{Lo}.
+#' \item A method based on the exact variance of the non-central t-distribution,
+#' \code{exact}.
 #' }
+#' There should be very little difference between these except for very small
+#' sample sizes.
 #'
 #' @usage
 #'
-#' sr_se(z,df,opy,type=c("t","Lo","Z","F")) 
+#' se(z, type=c("t","Lo","exact"))
 #'
-#' @param z an observed Sharpe ratio statistic, annualized.
-#' @param df the number of observations the statistic is based on. This 
-#'        is one more than the number of degrees of freedom in the
-#'        corresponding t-statistic, although the effect will be small
-#'        when \code{df} is large.
-#' @param opy the number of observations per 'year'. \code{z}, and \code{zeta}
-#'        are quoted in 'annualized' units, that is, per square root 
-#'        'year', but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
-#' @param type the estimator type. one of \code{"t", "Lo", "Z", "F"}
+#' @param z an observed Sharpe ratio statistic, of class \code{sr}.
+#' @param type the estimator type. one of \code{"t", "Lo", "exact"}
 #' @keywords htest
 #' @return an estimate of standard error.
 #' @seealso sr-distribution functions, \code{\link{dsr}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
-#' @rdname sr_se
+#' @rdname se
 #' @note
 #' Eventually this should include corrections for autocorrelation, skew,
 #' kurtosis.
@@ -332,36 +466,18 @@ se.default <- function(x, ...) {
 #' Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}
 #'
 #' @examples 
-#' opy <- 253
-#' df <- opy * 6
-#' rvs <- rsr(1, df, 1.0, opy)
-#' anse <- sr_se(rvs,df,opy,type="t")
-#' anse2 <- sr_se(rvs,df,opy,type="Z")
+#' asr <- sr(rnorm(1000,0.2))
+#' anse <- se(asr,type="t")
+#' anse2 <- se(asr,type="exact")
 #'
 #'@export
-sr_se <- function(z,df,opy,type=c("t","Lo","Z","F")) { 
-	# 2FIX: add opdyke corrections for skew and kurtosis?
-	# 2FIX: add autocorrelation correction?
-	if (!missing(opy)) {
-		z <- .deannualize(z,opy)
-	}
-	type <- match.arg(type)
-	se <- switch(type,
-							 t = .sr_se_lo(z,df,ss.adjust=TRUE),
-							 Lo = .sr_se_lo(z,df,ss.adjust=FALSE),
-							 Z = .sr_se_walck(z,df),
-							 F = .sr_se_weirdo(z,df))
-	if (!missing(opy)) {
-		se <- .annualize(se,opy)
-	}
-	return(se)
-}
 #'
-#' @rdname se
 #' @method se sr
 #' @S3method se sr
-se.sr <- function(z, ...) {
-	retval <- sr_se(z$sr,z$df,z$opy,...)
+se.sr <- function(z, type=c("t","Lo","exact")) {
+	tstat <- .sr2t(z)
+	retval <- .t_se(tstat,df=z$df,type=type)
+	retval <- .t2sr(z,retval)
 	return(retval)
 }
 
@@ -387,89 +503,40 @@ se.sr <- function(z, ...) {
 #'
 #' @usage
 #'
-#' sr_confint(z,df,level=0.95,type=c("exact","t","Z","F"),opy=1,
-#'            level.lo=(1-level)/2,level.hi=1-level.lo)
+#' confint(z,parm,level=0.95,...)
 #'
-#' @param z an observed Sharpe ratio statistic, annualized.
-#' @param df the number of observations the statistic is based on. This 
-#'        is one more than the number of degrees of freedom in the
-#'        corresponding t-statistic, although the effect will be small
-#'        when \code{df} is large.
+#' @param z an observed Sharpe ratio statistic, of class \code{sr}.
+#' @param parm ignored here
 #' @param level the confidence level required.
-#' @param type the estimator type. one of \code{"t", "Lo", "Z", "F"}
-#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
-#'        'year', but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
-#' @param level.lo the lower bound for the confidence interval.
-#' @param level.hi the upper bound for the confidence interval.
+#' @param ... the following parameters are relevant:
+#' \itemize{
+#' \item \code{type} is oe of \code{c("exact","t","Z","F")}
+#' \item \code{level.lo}, and \code{level.hi} allow one to compute
+#' non-symmetric CI.
+#' }
 #' @keywords htest
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{sr_se}}, \code{\link{qlambdap}}
+#' @seealso \code{\link{confint}}, \code{\link{se}}, \code{\link{qlambdap}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
-#' @rdname sr_confint
 #' @examples 
+#' # using "sr" class:
 #' opy <- 253
 #' df <- opy * 6
-#' rvs <- rsr(1, df, 1.0, opy)
-#' aci <- sr_confint(rvs,df,type="t",opy=opy)
-#' aci2 <- sr_confint(rvs,df,type="Z",opy=opy)
-#' # using "sr" class:
 #' xv <- rnorm(df, 1 / sqrt(opy))
 #' mysr <- sr(xv)
 #' confint(mysr,level=0.90)
-#' 
 #'
-#'@export
-sr_confint <- function(z,df,level=0.95,type=c("exact","t","Z","F"),
-											 opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
-	#2FIX: the order of arguments is really wonky. where does opy go?
-	if (!missing(opy)) {
-		z <- .deannualize(z,opy)
-	}
-	type <- match.arg(type)
-	if  (type == "exact") {
-		tstat <- .sr_to_t(z, df)
-		ci.lo <- qlambdap(level.lo,df-1,tstat,lower.tail=TRUE)
-		ci.hi <- qlambdap(level.hi,df-1,tstat,lower.tail=TRUE)
-		ci <- c(ci.lo,ci.hi)
-		ci <- .t_to_sr(ci, df)
-	} else if (type == "t") {
-		# already annualized;
-		se <- sr_se(z,df,type=type)
-		midp <- z
-		zalp <- qnorm(c(level.lo,level.hi))
-		ci <- midp + zalp * se
-	} else if (type == "Z") {
-		# already annualized;
-		se <- sr_se(z,df,type=type)
-		midp <- z * (1 - 1 / (4 * (df - 1)))
-		zalp <- qnorm(c(level.lo,level.hi))
-		ci <- midp + zalp * se
-	} else if (type == "F") {
-		# already annualized;
-		se <- sr_se(z,df,type=type)
-		cn <- .srbias(df)
-		midp <- z / cn
-		zalp <- qnorm(c(level.lo,level.hi))
-		ci <- midp + zalp * se
-	} else stop("internal error")
-
-	retval <- matrix(ci,nrow=1)
-	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
-	return(retval)
-}
-#' @export
-#' @param parm ignored here
-#' @rdname sr_confint
+#' @rdname confint
 #' @method confint sr 
 #' @S3method confint sr 
 confint.sr <- function(z,parm,level=0.95,...) {
-	retval <- sr_confint(z$sr,z$df,level=level,opy=z$opy,...)
+	tstat <- .sr2t(z)
+	retval <- .t_confint(tstat,df=z$df,level=level,...)
+	retval <- .t2sr(z,retval)
 	return(retval)
 }
 											 
@@ -512,7 +579,7 @@ confint.sr <- function(z,parm,level=0.95,...) {
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{sr_confint}}, \code{\link{qco_sropt}}, \code{\link{sropt.test}}
+#' @seealso \code{\link{confint}}, \code{\link{qco_sropt}}, \code{\link{sropt.test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sropt
@@ -520,9 +587,11 @@ confint.sr <- function(z,parm,level=0.95,...) {
 #' @examples 
 #' # fix these!
 #' opy <- 253
-#' df <- opy * 6
-#' rvs <- rsr(1, df, 1.0, opy)
-#' aci <- sropt_confint(rvs,df,opy=opy)
+#' df1 <- 6
+#' df2 <- opy * 6
+#' rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
+#' sro <- sropt(rvs)
+#' aci <- confint(sro)
 #'
 #'@export
 sropt_confint <- function(z.s,df1,df2,level=0.95,
@@ -759,4 +828,4 @@ sropt.inference <- function(z.s,df1,df2,opy=1,drag=0,...) {
 ##UNFOLD
 
 #for vim modeline: (do not edit)
-# vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:
+# vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r

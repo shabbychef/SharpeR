@@ -61,16 +61,18 @@
 \examples{
 # fix these!
 opy <- 253
-df <- opy * 6
-rvs <- rsr(1, df, 1.0, opy)
-aci <- sropt_confint(rvs,df,opy=opy)
+df1 <- 6
+df2 <- opy * 6
+rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
+sro <- sropt(rvs)
+aci <- confint(sro)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
-  \code{\link{confint}}, \code{\link{sr_confint}},
-  \code{\link{qco_sropt}}, \code{\link{sropt.test}}
+  \code{\link{confint}}, \code{\link{qco_sropt}},
+  \code{\link{sropt.test}}
 
   Other sropt: \code{\link{dsropt}},
   \code{\link{pco_sropt}}, \code{\link{sropt}},

@@ -13,6 +13,8 @@
   positivity constraint. (\emph{c.f.} Silvapulle) \item
   Portfolio spanning tests. \item Tests on portfolio
   weights. \item Tests of hedge restrictions. }
+
+  This package is maintained as a hobby.
 }
 \section{Sharpe Ratio}{
   Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a
@@ -20,27 +22,45 @@
   variance \eqn{\sigma^2}{sigma^2}. Let \eqn{\bar{x}}{xbar}
   be the sample mean, and \eqn{s} be the sample standard
   deviation (using Bessel's correction). Let \eqn{c_0}{c0}
-  be the 'risk free rate'.  Then \deqn{z = \frac{\bar{x} -
-  c_0}{s}}{z = (xbar - c0)/s} is the (sample) Sharpe ratio.
+  be the 'risk free' or 'disastrous rate' of return.  Then
+  \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} is
+  the (sample) Sharpe ratio.
 
-  The units of \eqn{z} is \eqn{\mbox{time}^{-1/2}}{per root
-  time}. Typically the Sharpe ratio is \emph{annualized} by
-  multiplying by \eqn{\sqrt{d}}{sqrt(d)}, where \eqn{d} is
-  the number of observations per year (or whatever the
-  target annualization epoch.)
+  The units of \eqn{z} are \eqn{\mbox{time}^{-1/2}}{per
+  root time}. Typically the Sharpe ratio is
+  \emph{annualized} by multiplying by
+  \eqn{\sqrt{d}}{sqrt(d)}, where \eqn{d} is the number of
+  observations per year (or whatever the target
+  annualization epoch.) It is \emph{not} common practice to
+  include units when quoting Sharpe ratio, though doing so
+  could avoid confusion.
 
-  Letting \eqn{z = \sqrt{d}\frac{\bar{x}-c_0}{s}}{z =
-  sqrt(d)(xbar - c0)/s}, where the sample estimates are
-  based on \eqn{n} observations, then \eqn{z}{z} takes a
-  (non-central) Sharpe ratio distribution parametrized by
-  \eqn{n} 'degrees of freedom', non-centrality parameter
-  \eqn{\zeta = \frac{\mu - c_0}{\sigma}}{zeta = (mu -
-  c0)/sigma}, and annualization parameter \eqn{d}.
+  The Sharpe ratio follows a rescaled non-central t
+  distribution. That is, \eqn{z/K} follows a non-central
+  t-distribution with \eqn{m} degrees of freedom and
+  non-centrality parameter \eqn{\zeta / K}, for some
+  \eqn{K}, \eqn{m} and \eqn{\zeta}{zeta}.
+
+  We can generalize Sharpe's model to APT, wherein we write
+  \deqn{x_i = \alpha + \sum_j \beta_j F_{j,i} +
+  \epsilon_i,}{ x_i = alpha + sum_j beta_j F_j,i +
+  epsilon_i,} where the \eqn{F_{j,i}} are observed 'factor
+  returns', and the variance of the noise term is
+  \eqn{\sigma^2}{sigma^2}. Via linear regression, one can
+  compute estimates \eqn{\hat{\alpha}}{alpha}, and
+  \eqn{\hat{\sigma}}{sigma}, and then let the 'Sharpe
+  ratio' be \deqn{z = \frac{\hat{\alpha} -
+  c_0}{\hat{\sigma}}.}{z = (alpha - c0)/sigma.} As above,
+  this Sharpe ratio follows a rescaled t-distribution under
+  normality, \emph{etc.}
 
   The parameters are encoded as follows: \itemize{ \item
-  \eqn{n} is denoted by \code{df}. \item \eqn{\zeta}{zeta}
-  is denoted by \code{zeta}. \item \eqn{d} is denoted by
-  \code{opy}. ('Observations Per Year') }
+  \code{df} stands for the degrees of freedom, typically
+  \eqn{n-1}, but \eqn{n-J-1} in general. \item
+  \eqn{\zeta}{zeta} is denoted by \code{zeta}. \item
+  \eqn{d} is denoted by \code{opy}. ('Observations Per
+  Year') \item For the APT form of Sharpe, \code{K} stands
+  for the rescaling parameter. }
 }
 
 \section{Optimal Sharpe Ratio}{

@@ -40,6 +40,10 @@
 # roxygen2 tiparoonie on S3 methods:
 # http://stackoverflow.com/a/7199577/164611
 
+# @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+# @param lower.tail logical; if TRUE (default), probabilities are
+#        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
+
 ########################################################################
 # Distributions
 ########################################################################
@@ -52,12 +56,66 @@
 # http://finzi.psych.upenn.edu/R/library/IQCC/html/c4.html
 # http://math.stackexchange.com/questions/71573/the-limit-of-the-ratio-of-two-gammax-functions
 .tbias <- function(df) { 
-	retval <- sqrt(df / 2) * exp(lgamma((df-1)/2) - lgamma(df/2))
-	return(retval)
+	retv <- sqrt(df / 2) * exp(lgamma((df-1)/2) - lgamma(df/2))
+	return(retv)
 }
 # same, but for sr:
 .srbias <- function(df) { 
 	return(.tbias(df-1))
+}
+#UNFOLD
+
+# rescaled t-distributions
+# drt, prt, qrt, rrt#FOLDUP
+#
+# the rescaled t-distributions. r follows a rescaled t-distribution
+# with m df, rescaling K, and non-centrality parameter rho if
+# f/K follows a non-central t with m df and non-centrality parameter rho.
+# this is a very thin wrapper.
+drt <- function(x, df, K, rho = 0, log = FALSE) {
+	tx <- x / K
+	if (missing(rho)) {
+		xd <- dt(tx, df = df, log = log)
+	} else {
+		ncp <- rho / K
+		xd <- dt(tx, df = df, ncp = ncp, log = log)
+	}
+	if (log) {
+		retv <- xd - log(K)
+	} else {
+		retv <- xd / K
+	}
+	return(retv)	
+}
+prt <- function(q, df, K, rho = 0, ...) {
+	tq <- q / K
+	if (missing(rho)) {
+		retv <- pt(q = tq, df = df, ...)		
+	} else {
+		ncp <- rho / K
+		retv <- pt(q = tq, df = df, ncp = ncp, ...)		
+	}
+	return(retv)	
+}
+qrt <- function(p, df, K, rho = 0, ...) {
+	if (missing(rho)) {
+		tq <- qt(p, df = df, ...)
+	} else {
+		ncp <- rho / K
+		tq <- qt(p, df = df, ncp, ...)
+	}
+	retv <- tq * K
+	return(retv)
+}
+rrt <- function(n, df, K, rho = 0) {
+	if (missing(rho)) {
+		tr <- rt(n, df = df)
+	} else {
+		ncp <- rho / K
+		tr <- rt(n, df = df, ncp = ncp)
+	}
+	retv <- tr * K
+	return(retv)
 }
 #UNFOLD
 
@@ -107,11 +165,11 @@
 #'
 #' @usage
 #'
-#' dsr(x, df, zeta, opy, log = FALSE)
+#' dsr(x, df, zeta, opy, ...)
 #'
 #' psr(q, df, zeta, opy, ...)
 #'
-#' qsr(p, df, zeta, opy, lower.tail = TRUE, log.p = FALSE) 
+#' qsr(p, df, zeta, opy, ...)
 #'
 #' rsr(n, df, zeta, opy)
 #'
@@ -128,11 +186,9 @@
 #'        \code{zeta} are quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
-#' @param log,log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
-#' @param lower.tail logical; if TRUE (default), probabilities are
-#'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
-#' @param ... arguments passed on to the respective F distribution functions, namely
-#' \code{lower.tail} with default \code{TRUE}, and \code{log.p}, with default \code{FALSE}.
+#' @param ... arguments passed on to the respective t-distribution functions, namely
+#' \code{lower.tail} with default \code{TRUE}, \code{log} with default \code{FALSE}, 
+#' and \code{log.p} with default \code{FALSE}.
 #' @keywords distribution 
 #' @return \code{dsr} gives the density, \code{psr} gives the distribution function,
 #' \code{qsr} gives the quantile function, and \code{rsr} generates random deviates.
@@ -164,77 +220,42 @@
 #' pvs <- psr(rvs, 253*6, 1, 253)
 #' plot(ecdf(pvs))
 #'
-dsr <- function(x, df, zeta, opy, log = FALSE) {
-	if (!missing(opy)) {
-		x <- .deannualize(x,opy)
-		if (!missing(zeta)) { zeta <- .deannualize(x,opy) }
-	}
-
-	tx <- .sr_to_t(x, df)
+dsr <- function(x, df, zeta, opy = 1, ...) {
+	K <- sqrt(opy / df)
 	if (missing(zeta)) {
-		xd <- dt(tx, df = df - 1, log = log)
+		retv <- drt(x, df-1, K, ...)
 	} else {
-		ncp <- .sr_to_t(zeta, df)
-		xd <- dt(tx, df = df - 1, ncp = ncp, log = log)
-	}
-	if (log) {
-		retv <- xd + log(.d_sr_to_t(zeta, df))		
-	} else {
-		retv <- xd * .d_sr_to_t(zeta, df)
+		retv <- drt(x, df-1, K, rho = zeta, ...)
 	}
 	return(retv)	
 }
 #' @export 
 psr <- function(q, df, zeta, opy, ...) {
-	if (!missing(opy)) {
-		q <- .deannualize(q, opy)
-		if (!missing(zeta)) {
-			zeta <- .deannualize(zeta, opy)
-		}
-	}
-	tq <- .sr_to_t(q, df)
+	K <- sqrt(opy / df)
 	if (missing(zeta)) {
-		retv <- pt(q = tq, df = df - 1, ...)		
+		retv <- prt(q, df-1, K, ...)
 	} else {
-		ncp <- .sr_to_t(zeta, df)
-		retv <- pt(q = tq, df = df - 1, ncp = ncp, ...)		
+		retv <- prt(q, df-1, K, rho = zeta, ...)
 	}
 	return(retv)	
 }
 #' @export 
-qsr <- function(p, df, zeta, opy, lower.tail = TRUE, log.p = FALSE) {
-	if (!missing(opy) && !missing(zeta)) {
-		zeta <- .deannualize(zeta, opy)
-	}
+qsr <- function(p, df, zeta, opy, ...) {
+	K <- sqrt(opy / df)
 	if (missing(zeta)) {
-		tq <- qt(p, df = df - 1, lower.tail = lower.tail, log.p = log.p)
+		retv <- qrt(p, df-1, K, ...)
 	} else {
-		ncp <- .sr_to_t(zeta, df)
-		tq <- qt(p, df = df - 1, ncp = ncp, 
-						 lower.tail = lower.tail, log.p = log.p)
-	}
-	retv <- .t_to_sr(tq, df)
-	# annualize
-	if (!missing(opy)) {
-		retv <- .annualize(retv, opy)
+		retv <- qrt(p, df-1, K, rho = zeta, ...)
 	}
 	return(retv)
 }
 #' @export 
 rsr <- function(n, df, zeta, opy) {
-	if (!missing(opy) && !missing(zeta)) {
-		zeta <- .deannualize(zeta, opy)
-	}
+	K <- sqrt(opy / df)
 	if (missing(zeta)) {
-		tr <- rt(n, df = df - 1)
+		retv <- rrt(n, df-1, K)
 	} else {
-		ncp <- .sr_to_t(zeta, df)
-		tr <- rt(n, df = df - 1, ncp = ncp) 
-	}
-	retv <- .t_to_sr(tr, df)
-	# annualize
-	if (!missing(opy)) {
-		retv <- .annualize(retv, opy)
+		retv <- rrt(n, df-1, K, rho = zeta)
 	}
 	return(retv)
 }
@@ -572,6 +593,9 @@ rsropt <- function(n, df1, df2, zeta.s, opy, drag = 0, ...) {
 }
 #UNFOLD
 
+########################################################################
+# 'confidence distributions'
+
 # lambda prime
 # plambdap, qlambdap#FOLDUP
 #' @title The lambda-prime distribution.
@@ -610,6 +634,8 @@ rsropt <- function(n, df1, df2, zeta.s, opy, drag = 0, ...) {
 #' @param df the degrees of freedom of the t-statistic.
 #' @param tstat the observed (non-central) t-statistic.
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
 #' @inheritParams qsr
 #' @inheritParams psr
 #' @inheritParams dsr
@@ -747,6 +773,8 @@ qlambdap <- Vectorize(.qlambdap,
 #'        but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
 #' @param lb the lower bound for the output of \code{qco_sropt}.
 #' @param ub the upper bound for the output of \code{qco_sropt}.
 #' @inheritParams dsropt
@@ -879,8 +907,8 @@ pco_sropt <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
 
 	ncp <- uniroot(zerf,interval=c(lb,ub),
 								 f.lower=flb,f.upper=fub)
-	retval <- ifelse(missing(opy),ncp$root,.annualize(ncp$root,opy))
-	return(retval)
+	retv <- ifelse(missing(opy),ncp$root,.annualize(ncp$root,opy))
+	return(retv)
 }
 #' @export 
 qco_sropt <- Vectorize(.qco_sropt,
@@ -889,4 +917,4 @@ qco_sropt <- Vectorize(.qco_sropt,
 #UNFOLD
 
 #for vim modeline: (do not edit)
-# vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:
+# vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r

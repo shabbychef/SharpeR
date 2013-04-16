@@ -5,11 +5,11 @@
 \alias{rsr}
 \title{The (non-central) Sharpe ratio.}
 \usage{
-  dsr(x, df, zeta, opy, log = FALSE)
+  dsr(x, df, zeta, opy, ...)
 
   psr(q, df, zeta, opy, ...)
 
-  qsr(p, df, zeta, opy, lower.tail = TRUE, log.p = FALSE)
+  qsr(p, df, zeta, opy, ...)
 
   rsr(n, df, zeta, opy)
 }
@@ -36,16 +36,10 @@
   'year.' default value is 1, meaning no deannualization is
   performed.}
 
-  \item{log,log.p}{logical; if TRUE, probabilities p are
-  given as \eqn{\mbox{log}(p)}{log(p)}.}
-
-  \item{lower.tail}{logical; if TRUE (default),
-  probabilities are \eqn{P[X \le x]}{P[X <= x]}, otherwise,
-  \eqn{P[X > x]}{P[X > x]}.}
-
-  \item{...}{arguments passed on to the respective F
-  distribution functions, namely \code{lower.tail} with
-  default \code{TRUE}, and \code{log.p}, with default
+  \item{...}{arguments passed on to the respective
+  t-distribution functions, namely \code{lower.tail} with
+  default \code{TRUE}, \code{log} with default
+  \code{FALSE}, and \code{log.p} with default
   \code{FALSE}.}
 }
 \value{
@@ -129,9 +123,11 @@ plot(ecdf(pvs))
 
   Other sr: \code{\link{confint.sr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
-  \code{\link{sr}}, \code{\link{sr_confint}},
+  \code{\link{se}}, \code{\link{se.default}},
+  \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr.default}}, \code{\link{sr.equality.test}},
-  \code{\link{sr_se}}, \code{\link{sr.test}}
+  \code{\link{sr.lm}}, \code{\link{sr.test}},
+  \code{\link{sr.xts}}
 }
 \keyword{distribution}
 

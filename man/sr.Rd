@@ -1,11 +1,17 @@
 \name{sr}
 \alias{sr}
 \alias{sr.default}
+\alias{sr.lm}
+\alias{sr.xts}
 \title{Compute the Sharpe ratio.}
 \usage{
-  sr(x,c0=0,opy=1,na.rm=FALSE)
+  sr(x,...) c0=0,opy=1,na.rm=FALSE)
 
   \method{sr}{default} (x, c0 = 0, opy = 1, na.rm = FALSE)
+
+  \method{sr}{lm} (x, c0 = 0, opy = 1, na.rm = FALSE)
+
+  \method{sr}{xts} (x, c0 = 0, opy = 1, na.rm = FALSE)
 }
 \arguments{
   \item{x}{vector of returns.}
@@ -18,12 +24,16 @@
   used to 'annualize' the answer.}
 
   \item{na.rm}{logical.  Should missing values be removed?}
+
+  \item{x}{a fit model of class \code{lm}.}
+
+  \item{anxts}{an xts object.}
 }
 \value{
   a list containing the following components: \item{sr}{the
   annualized Sharpe ratio.} \item{df}{the number of
-  observations.} \item{opy}{the annualization factor.} this
-  is of class \code{sr}.
+  observations.} \item{opy}{the annualization factor.} cast
+  to class \code{sr}.
 }
 \description{
   Computes the Sharpe ratio of some observed returns.
@@ -44,7 +54,19 @@
   year (or whatever the target annualization epoch.)
 }
 \examples{
-rvs <- sr(rnorm(253*8),opy=253)
+# Sharpe's 'model': just given a bunch of returns.
+asr <- sr(rnorm(253*8),opy=253)
+# given an xts object:
+if (require(quantmod)) {
+  getSymbols('IBM')
+  lrets <- diff(log(IBM[,"IBM.Adjusted"]))
+  asr <- sr(lrets,na.rm=TRUE)
+}
+# on a linear model, find the 'Sharpe' of the residual term
+Factors <- matrix(rnorm(253*5*6),ncol=6)
+Returns <- rnorm(dim(Factors)[1],0.003)
+APT_mod <- lm(Returns ~ Factors)
+asr <- sr(APT_mod,opy=253)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
@@ -64,8 +86,9 @@ rvs <- sr(rnorm(253*8),opy=253)
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
-  \code{\link{sr_confint}}, \code{\link{sr.equality.test}},
-  \code{\link{sr_se}}, \code{\link{sr.test}}
+  \code{\link{se}}, \code{\link{se.default}},
+  \code{\link{se.sr}}, \code{\link{sr.equality.test}},
+  \code{\link{sr.test}}
 }
 \keyword{univar}
 

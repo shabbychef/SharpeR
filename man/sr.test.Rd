@@ -102,9 +102,10 @@ abline(0,1,col='red')
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
-  \code{\link{sr}}, \code{\link{sr_confint}},
+  \code{\link{se}}, \code{\link{se.default}},
+  \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr.default}}, \code{\link{sr.equality.test}},
-  \code{\link{sr_se}}
+  \code{\link{sr.lm}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 
