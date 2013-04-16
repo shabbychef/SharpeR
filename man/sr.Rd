@@ -5,13 +5,13 @@
 \alias{sr.xts}
 \title{Compute the Sharpe ratio.}
 \usage{
-  sr(x,...) c0=0,opy=1,na.rm=FALSE)
+  sr(x,...)
 
   \method{sr}{default} (x, c0 = 0, opy = 1, na.rm = FALSE)
 
   \method{sr}{lm} (x, c0 = 0, opy = 1, na.rm = FALSE)
 
-  \method{sr}{xts} (x, c0 = 0, opy = 1, na.rm = FALSE)
+  \method{sr}{xts} (anxts, c0 = 0, opy = 1, na.rm = FALSE)
 }
 \arguments{
   \item{x}{vector of returns.}
@@ -87,8 +87,8 @@ asr <- sr(APT_mod,opy=253)
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
   \code{\link{se}}, \code{\link{se.default}},
-  \code{\link{se.sr}}, \code{\link{sr.equality.test}},
-  \code{\link{sr.test}}
+  \code{\link{se.sr}}, \code{\link{sr_equality_test}},
+  \code{\link{sr_test}}
 }
 \keyword{univar}
 

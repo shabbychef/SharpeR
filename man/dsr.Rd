@@ -125,8 +125,8 @@ plot(ecdf(pvs))
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
   \code{\link{se}}, \code{\link{se.default}},
   \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr.default}}, \code{\link{sr.equality.test}},
-  \code{\link{sr.lm}}, \code{\link{sr.test}},
+  \code{\link{sr.default}}, \code{\link{sr_equality_test}},
+  \code{\link{sr.lm}}, \code{\link{sr_test}},
   \code{\link{sr.xts}}
 }
 \keyword{distribution}

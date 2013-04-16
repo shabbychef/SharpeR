@@ -73,7 +73,7 @@ abline(0,1,col='red')
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
-  \code{\link{sr.test}}, \code{\link{t.test}}.
+  \code{\link{sr_test}}, \code{\link{t.test}}.
 
   Other sropt: \code{\link{confint.sropt}},
   \code{\link{dsropt}}, \code{\link{pco_sropt}},

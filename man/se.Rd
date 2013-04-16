@@ -4,9 +4,11 @@
 \alias{se.sr}
 \title{Standard error computation}
 \usage{
-  se(x, ...)
+  se(z, ...)
 
-  \method{se}{default} (x, ...)
+  \method{se}{default} (z, ...)
+
+  se(z, ...)
 
   se(z, type=c("t","Lo","exact"))
 }
@@ -14,8 +16,9 @@
   \item{z}{an observed Sharpe ratio statistic, of class
   \code{sr}.}
 
-  \item{type}{the estimator type. one of \code{"t", "Lo",
-  "exact"}}
+  \item{...}{the following variables: \itemize{ \item
+  \code{type} estimator type. one of \code{"t", "Lo",
+  "exact"} }}
 }
 \value{
   an estimate of standard error.
@@ -72,8 +75,8 @@ anse2 <- se(asr,type="exact")
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
   \code{\link{sr}}, \code{\link{sr.default}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.lm}},
-  \code{\link{sr.test}}, \code{\link{sr.xts}}
+  \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
+  \code{\link{sr_test}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 

@@ -15,6 +15,7 @@ Collate:
     'SharpeR.r'
     'distributions.r' 
     'estimation.r' 
+    'sr.r' 
     'tests.r' 
     'utils.r' 
 dnl vim:ts=2:sw=2:tw=79:syn=m4:ft=m4

@@ -6,7 +6,7 @@
   sropt_confint(z.s,df1,df2,level=0.95,
     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 
-  \method{confint}{sropt} (z, parm, level = 0.95, ...)
+  \method{confint}{sropt} (z.s, parm, level = 0.95, ...)
 }
 \arguments{
   \item{z.s}{an observed Sharpe ratio statistic,

@@ -101,8 +101,8 @@ qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
   \code{\link{power.sr.test}}, \code{\link{se}},
   \code{\link{se.default}}, \code{\link{se.sr}},
   \code{\link{sr}}, \code{\link{sr.default}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.lm}},
-  \code{\link{sr.test}}, \code{\link{sr.xts}}
+  \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
+  \code{\link{sr_test}}, \code{\link{sr.xts}}
 }
 \keyword{distribution}
 

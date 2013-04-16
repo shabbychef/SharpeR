@@ -2,11 +2,11 @@
 \alias{confint.sr}
 \title{Confidence Interval on Signal-Noise Ratio}
 \usage{
-  confint(z,parm,level=0.95,...)
+  confint(object,parm,level=0.95,...)
 }
 \arguments{
-  \item{z}{an observed Sharpe ratio statistic, of class
-  \code{sr}.}
+  \item{object}{an observed Sharpe ratio statistic, of
+  class \code{sr}.}
 
   \item{parm}{ignored here}
 
@@ -57,8 +57,8 @@ confint(mysr,level=0.90)
   \code{\link{power.sr.test}}, \code{\link{se}},
   \code{\link{se.default}}, \code{\link{se.sr}},
   \code{\link{sr}}, \code{\link{sr.default}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.lm}},
-  \code{\link{sr.test}}, \code{\link{sr.xts}}
+  \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
+  \code{\link{sr_test}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 

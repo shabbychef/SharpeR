@@ -69,7 +69,7 @@
 #' 
 #' @usage
 #'
-#' sr.equality.test(X,contrasts=NULL,type=c("chisq","F","t"),
+#' sr_equality_test(X,contrasts=NULL,type=c("chisq","F","t"),
 #'                  alternative=c("two.sided","less","greater"))
 #'
 #' @param X an \eqn{n \times p}{n x p} matrix of paired observations.
@@ -86,7 +86,7 @@
 #' @keywords htest
 #' @return Object of class \code{htest}, a list of the test statistic,
 #' the size of \code{X}, and the \code{method} noted.
-#' @seealso \code{\link{sr.test}}
+#' @seealso \code{\link{sr_test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
@@ -105,15 +105,15 @@
 #' Letters 1 (2003): 21--23.
 #'
 #' @examples 
-#' rv <- sr.equality.test(matrix(rnorm(500*5),500,5))
+#' rv <- sr_equality_test(matrix(rnorm(500*5),500,5))
 #' # test for uniformity
-#' pvs <- replicate(500,{ x <- sr.equality.test(matrix(rnorm(400*5),400,5),type="chisq")
+#' pvs <- replicate(500,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
 #'                        x$p.value })
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
 #'
 #'@export
-sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
+sr_equality_test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 														 alternative=c("two.sided","less","greater")) {
 	dname <- deparse(substitute(X))
 	type <- match.arg(type)
@@ -198,7 +198,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' \eqn{x_i}{xi} and \eqn{y_i}{yi}, tests
 #' \deqn{H_0: \frac{\mu_x}{\sigma_x} = \frac{\mu_u}{\sigma_y}}{H0: mu_x sigma_y = mu_y sigma_x}
 #' against two or one sided alternative, via 
-#' \code{\link{sr.equality.test}}.
+#' \code{\link{sr_equality_test}}.
 #'
 #' For unpaired (and independent) observations, tests
 #' \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
@@ -208,7 +208,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' 
 #' @usage
 #'
-#' sr.test(x,y=NULL,alternative=c("two.sided","less","greater"),
+#' sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
 #'         snr=0,opy=1,paired=FALSE,conf.level=0.95)
 #'
 #' @param x a (non-empty) numeric vector of data values.
@@ -235,7 +235,7 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' \item{alternative}{a character string describing the alternative hypothesis.}
 #' \item{method}{a character string indicating what type of test was performed.}
 #' \item{data.name}{a character string giving the name(s) of the data.}
-#' @seealso \code{\link{sr.equality.test}}, \code{\link{t.test}}.
+#' @seealso \code{\link{sr_equality_test}}, \code{\link{t.test}}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
@@ -247,19 +247,19 @@ sr.equality.test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #'
 #' @examples 
 #' # should reject null
-#' x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
-#' x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="two.sided")
+#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
+#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="two.sided")
 #' # should not reject null
-#' x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="less")
+#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="less")
 #'
 #' # test for uniformity
-#' pvs <- replicate(1000,{ x <- sr.test(rnorm(1000),opy=253,alternative="two.sided")
+#' pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),opy=253,alternative="two.sided")
 #'                         x$p.value })
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
 #'
 #'@export
-sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
+sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 										snr=0,opy=1,paired=FALSE,conf.level=0.95) {
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
@@ -320,7 +320,7 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 				stop("'x','y' must be same length")
 			df <- nx - 1
 
-			subtest <- sr.equality.test(cbind(x,y),type="t",alternative=alternative)
+			subtest <- sr_equality_test(cbind(x,y),type="t",alternative=alternative)
 			# x minus y
 			estimate <- - diff(as.vector(subtest$SR))
 			estimate <- .annualize(estimate,opy)
@@ -418,7 +418,7 @@ sr.test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' (including the computed one) augmented with \code{method}, \code{note}
 #' and \code{n.yr} elements, the latter is the number of years under the
 #' given annualization (\code{opy}), \code{NA} if none given.
-#' @seealso \code{\link{power.t.test}}, \code{\link{sr.test}}
+#' @seealso \code{\link{power.t.test}}, \code{\link{sr_test}}
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
@@ -511,7 +511,7 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #' \item{alternative}{a character string describing the alternative hypothesis.}
 #' \item{method}{a character string indicating what type of test was performed.}
 #' \item{data.name}{a character string giving the name(s) of the data.}
-#' @seealso \code{\link{sr.test}}, \code{\link{t.test}}.
+#' @seealso \code{\link{sr_test}}, \code{\link{t.test}}.
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sropt

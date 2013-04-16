@@ -29,319 +29,16 @@
 
 #' @include utils.r
 #' @include distributions.r
+#' @include sr.r
 
 # note: on citations, use the Chicago style from google scholar. tks.
 
 ########################################################################
 # Estimation 
-########################################################################
-# Sharpe Ratio#FOLDUP
-#' @title Compute the Sharpe ratio.
-#'
-#' @description 
-#'
-#' Computes the Sharpe ratio of some observed returns.
-#'
-#' @details
-#'
-#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent returns of some
-#' asset.
-#' Let \eqn{\bar{x}}{xbar} be the sample mean, and \eqn{s}{s} be
-#' the sample standard deviation (using Bessel's correction). Let \eqn{c_0}{c0}
-#' be the 'risk free rate'.  Then
-#' \deqn{z = \frac{\bar{x} - c_0}{s}}{z = (xbar - c0)/s} 
-#' is the (sample) Sharpe ratio.
-#' 
-#' The units of \eqn{z}{z} are \eqn{\mbox{time}^{-1/2}}{per root time}.
-#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
-#' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
-#' is the number of observations
-#' per year (or whatever the target annualization epoch.)
-#'
-#' @usage
-#'
-#' sr(x,...)
-#' c0=0,opy=1,na.rm=FALSE)
-#'
-#' @param x vector of returns.
-#' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
-#'        assumed to be given in the same units as x, \emph{not}
-#'        in 'annualized' terms.
-#' @param opy the number of observations per 'year'. This is used to
-#'        'annualize' the answer.
-#' @keywords univar 
-#' @return a list containing the following components:
-#' \item{sr}{the annualized Sharpe ratio.}
-#' \item{df}{the number of observations.}
-#' \item{opy}{the annualization factor.}
-#' cast to class \code{sr}.
-#' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
-#' @rdname sr
-#' @export sr
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sr
-#' @references 
-#'
-#' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
-#' \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
-#' 
-#' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal (2002): 36-52.
-#' \url{http://ssrn.com/paper=377260}
-#'
-#' @examples 
-#' # Sharpe's 'model': just given a bunch of returns.
-#' asr <- sr(rnorm(253*8),opy=253)
-#' # given an xts object:
-#' if (require(quantmod)) {
-#'   getSymbols('IBM')
-#'   lrets <- diff(log(IBM[,"IBM.Adjusted"]))
-#'   asr <- sr(lrets,na.rm=TRUE)
-#' }
-#' # on a linear model, find the 'Sharpe' of the residual term
-#' Factors <- matrix(rnorm(253*5*6),ncol=6)
-#' Returns <- rnorm(dim(Factors)[1],0.003)
-#' APT_mod <- lm(Returns ~ Factors)
-#' asr <- sr(APT_mod,opy=253)
-#'   
-sr <- function(x,c0=0,opy=1,...) {
-	UseMethod("sr", x)
-}
-# spawn a "SR" object.
-# the Sharpe Ratio is a rescaled t-statistic.
-#
-# SR = R t
-#
-# where R is the 'rescaling', and
-# t = (betahat' v - c0) / sigmahat
-# is distributed as a non-central t with
-# df degrees of freedom and non-centrality
-# parameter
-# delta = (beta' v - c0) / (sigma R)
-#
-# for 'convenience' we re-express SR and delta
-# in 'annualized' units by multiplying them by
-# sqrt(opy)
-.spawn_sr <- function(sr,df,c0,opy,rescal) {
-	retval <- list(sr = sr,df = df,c0 = c0,opy = opy,rescal = rescal)
-	class(retval) <- "sr"
-	return(retval)
-}
-# get the t-stat associated with an SR object.
-.sr2t <- function(x) {
-	tval <- x$sr / (x$rescal * sqrt(x$opy))
-	return(tval)
-}
-# and the reverse
-.t2sr <- function(x,tval) {
-	srval <- tval * (x$rescal * sqrt(x$opy))
-	return(srval)
-}
-.psr <- function(q,zeta,...) {
-	retv <- prt(q$sr,df=q$df,K=(q$rescal * sqrt(q$opy)),rho=zeta,...)
-	return(retv)
-}
-.dsr <- function(q,zeta,...) {
-	retv <- drt(q$sr,df=q$df,K=(q$rescal * sqrt(q$opy)),rho=zeta,...)
-	return(retv)
-}
 
-# compute SR in only one place. I hope.
-.compute_sr <- function(mu,c0,sigma,opy) {
-	sr <- (mu - c0) / sigma
-	if (!missing(opy))
-		sr <- sr * sqrt(opy)
-	return(sr)
-}
-#'
-#' @param na.rm logical.  Should missing values be removed?
-#' @rdname sr
-#' @method sr default
-#' @S3method sr default
-sr.default <- function(x,c0=0,opy=1,na.rm=FALSE) {
-	mu <- mean(x,na.rm=na.rm)
-	sigma <- sd(x,na.rm=na.rm)
-	sr <- .compute_sr(mu,c0,sigma,opy)
-	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
-	retval <- .spawn_sr(sr,df=df-1,c0=c0,opy=opy,rescal=1/sqrt(df))
-	return(retval)
-}
-#'
-#' @param x a fit model of class \code{lm}.
-#' @rdname sr
-#' @method sr lm 
-#' @S3method sr lm
-sr.lm <- function(x,c0=0,opy=1,na.rm=FALSE) {
-	modl <- x
-	mu <- modl$coefficients["(Intercept)"]
-	sigma <- sqrt(deviance(modl) / modl$df.residual)
-	sr <- .compute_sr(mu,c0,sigma,opy)
-	XXinv <- vcov(modl) / sigma^2
-	rescal <- sqrt(XXinv["(Intercept)","(Intercept)"])
-	retval <- .spawn_sr(sr,df=modl$df.residual,c0=c0,opy=opy,rescal=rescal)
-	return(retval)
-}
-#'
-#' @param anxts an xts object.
-#' @rdname sr
-#' @method sr xts 
-#' @S3method sr xts
-sr.xts <- function(x,c0=0,opy=1,na.rm=FALSE) {
-	anxts <- x
-	if (missing(opy)) {
-		TEO <- time(anxts)
-		days.per.row <- as.double((TEO[length(TEO)] - TEO[1]) / (length(TEO) - 1))
-		opy <- 365.25 / days.per.row
-	}
-	retval <- sr.default(anxts,c0=c0,opy=opy,na.rm=na.rm)
-	return(retval)
-}
-#' @title Is this in the "sr" class?
-#'
-#' @description 
-#'
-#' Checks if an object is in the class \code{'sr'}
-#'
-#' @details
-#'
-#' To satisfy the minimum requirements of an S3 class.
-#'
-#' @usage
-#'
-#' is.sr(x)
-#'
-#' @param x an object of some kind.
-#' @return a boolean.
-#' @seealso sr
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @export
-#'
-#' @examples 
-#' rvs <- sr(rnorm(253*8),opy=253)
-#' is.sr(rvs)
-is.sr <- function(x) inherits(x,"sr")
+# inference on the t-stat#FOLDUP
 
-#' @S3method format sr
-#' @export
-format.sr <- function(x,...) {
-	# oh! ugly! ugly!
-	retval <- capture.output(print(x,...))
-	return(retval)
-}
-#' @S3method print sr
-#' @export
-print.sr <- function(x,...) {
-	tval <- .sr2t(x)
-	pval <- pt(tval,x$df,lower.tail=FALSE)
-	coefs <- cbind(x$sr,tval,pval)
-	colnames(coefs) <- c("stat","t.stat","p.value")
-	rownames(coefs) <- c("Sharpe")
-	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE)
-}
-
-# print.sr <- function(x,...) cat(format(x,...), "\n")
-
-
-# compute the markowitz portfolio
-.markowitz <- function(X,mu=NULL,Sigma=NULL) {
-	na.omit(X)
-	if (is.null(mu)) 
-		mu <- colMeans(X)
-	if (is.null(Sigma)) 
-		Sigma <- cov(X)
-	w <- solve(Sigma,mu)
-	n <- dim(X)[1]
-	retval <- list(w = w, mu = mu, Sigma = Sigma, df1 = length(w), df2 = n)
-	return(retval)
-}
-
-# compute Hotelling's statistic.
-.hotelling <- function(X) {
-	retval <- .markowitz(X)
-	retval$T2 <- retval$df2 * (retval$mu %*% retval$w)
-	return(retval)
-}
-
-#' @title Compute the Sharpe ratio of the Markowitz portfolio.
-#'
-#' @description 
-#'
-#' Computes the Sharpe ratio of the Markowitz portfolio of some observed returns.
-#'
-#' @details
-#' 
-#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
-#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
-#' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
-#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). Let
-#' \deqn{\zeta(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar - c0)/sqrt(w'Sw)}
-#' be the (sample) Sharpe ratio of the portfolio \eqn{w}{w}, subject to 
-#' risk free rate \eqn{c_0}{c0}.
-#'
-#' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
-#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},}
-#' with maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* = zeta(w*)}.
-#' Then 
-#' \deqn{w_* = R \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
-#' w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)}
-#' and
-#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
-#' z* = sqrt(xbar' S^-1 xbar) - c0/R}
-#'
-#' The units of \eqn{z_*}{z*} are \eqn{\mbox{time}^{-1/2}}{per root time}.
-#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
-#' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
-#' is the number of observations
-#' per year (or whatever the target annualization epoch.)
-#'
-#' @usage
-#'
-#' sropt(X,drag=0,opy=1)
-#'
-#' @param X matrix of returns.
-#' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
-#'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
-#'        by \eqn{\sqrt{opy}}{sqrt(opy)}. This is in contrast to the \code{c0}
-#'        term given to \code{\link{sr}}.
-#' @param opy the number of observations per 'year'. The returns are observed
-#'        at a rate of \code{opy} per 'year.' default value is 1, meaning no 
-#'        annualization is performed.
-#' @keywords univar 
-#' @return A list with containing the following components:
-#' \item{w}{the optimal portfolio.}
-#' \item{mu}{the estimated mean return vector.}
-#' \item{Sigma}{the estimated covariance matrix.}
-#' \item{df1}{the number of assets.}
-#' \item{df2}{the number of observed vectors.}
-#' \item{T2}{the Hotelling \eqn{T^2} statistic.}
-#' \item{sropt}{the maximal Sharpe statistic.}
-#' \item{drag}{the input \code{drag} term.}
-#' \item{opy}{the input \code{opy} term.}
-#' @aliases sropt
-#' @seealso \code{\link{sr}}, sropt-distribution functions, 
-#' \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
-#' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sropt
-#' @examples 
-#' rvs <- sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
-#'
-sropt <- function(X,drag=0,opy=1) {
-	retval <- .hotelling(X)
-	zeta.star <- sqrt(retval$T2 / retval$df2)
-	if (!missing(opy))
-		zeta.star <- .annualize(zeta.star,opy)
-	retval$sropt <- zeta.star - drag
-
-	#units(retval$sropt) <- "yr^-0.5"
-	retval$drag <- drag
-	retval$opy <- opy
-	class(retval) <- "sropt"
-	return(retval)
-}
-#UNFOLD
-
-# confidence intervals on the non-centrality parameter of a t-stat
-
+# standard error on the non-centrality parameter of a t-stat
 
 # See Walck, section 33.3
 .t_se_weird <- function(tstat,df) {
@@ -365,7 +62,7 @@ sropt <- function(X,drag=0,opy=1) {
 							 exact = .t_se_weird(t,df))
 	return(se)
 }
-# confidence intervals.
+# confidence intervals on the non-centrality parameter of a t-stat
 .t_confint <- function(tstat,df,level=0.95,type=c("exact","t","Z","F"),
 					 level.lo=(1-level)/2,level.hi=1-level.lo) {
 	type <- match.arg(type)
@@ -396,8 +93,7 @@ sropt <- function(X,drag=0,opy=1) {
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
 	return(retval)
 }
-
-
+#UNFOLD
 
 # confidence intervals on the Sharpe ratio#FOLDUP
 
@@ -405,14 +101,14 @@ sropt <- function(X,drag=0,opy=1) {
 #' @title Standard error computation
 #' @rdname se
 #' @export
-se <- function(x, ...) {
-	UseMethod("se", x)
+se <- function(z, ...) {
+	UseMethod("se", z)
 }
 #'
 #' @rdname se
 #' @method se default
 #' @S3method se default
-se.default <- function(x, ...) {
+se.default <- function(z, ...) {
 	stop("no generic standard error computation available")
 }
 #' @title Standard error of Sharpe ratio
@@ -437,10 +133,15 @@ se.default <- function(x, ...) {
 #'
 #' @usage
 #'
+#' se(z, ...)
+#'
 #' se(z, type=c("t","Lo","exact"))
 #'
 #' @param z an observed Sharpe ratio statistic, of class \code{sr}.
-#' @param type the estimator type. one of \code{"t", "Lo", "exact"}
+#' @param ... the following variables:
+#' \itemize{
+#' \item \code{type} estimator type. one of \code{"t", "Lo", "exact"}
+#' }
 #' @keywords htest
 #' @return an estimate of standard error.
 #' @seealso sr-distribution functions, \code{\link{dsr}}
@@ -503,9 +204,9 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #'
 #' @usage
 #'
-#' confint(z,parm,level=0.95,...)
+#' confint(object,parm,level=0.95,...)
 #'
-#' @param z an observed Sharpe ratio statistic, of class \code{sr}.
+#' @param object an observed Sharpe ratio statistic, of class \code{sr}.
 #' @param parm ignored here
 #' @param level the confidence level required.
 #' @param ... the following parameters are relevant:
@@ -533,10 +234,10 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' @rdname confint
 #' @method confint sr 
 #' @S3method confint sr 
-confint.sr <- function(z,parm,level=0.95,...) {
-	tstat <- .sr2t(z)
-	retval <- .t_confint(tstat,df=z$df,level=level,...)
-	retval <- .t2sr(z,retval)
+confint.sr <- function(object,parm,level=0.95,...) {
+	tstat <- .sr2t(object)
+	retval <- .t_confint(tstat,df=object$df,level=level,...)
+	retval <- .t2sr(object,retval)
 	return(retval)
 }
 											 
@@ -614,8 +315,8 @@ sropt_confint <- function(z.s,df1,df2,level=0.95,
 #' @rdname sropt_confint
 #' @method confint sropt
 #' @S3method confint sropt
-confint.sropt <- function(z,parm,level=0.95,...) {
-	retval <- sropt_confint(z$sropt,z$df1,z$df2,level=level,opy=z$opy,...)
+confint.sropt <- function(z.s,parm,level=0.95,...) {
+	retval <- sropt_confint(z.s$sropt,z.s$df1,z.s$df2,level=level,opy=z.s$opy,...)
 	return(retval)
 }
 

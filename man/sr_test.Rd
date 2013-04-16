@@ -1,8 +1,8 @@
-\name{sr.test}
-\alias{sr.test}
+\name{sr_test}
+\alias{sr_test}
 \title{test for Sharpe ratio}
 \usage{
-  sr.test(x,y=NULL,alternative=c("two.sided","less","greater"),
+  sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
     snr=0,opy=1,paired=FALSE,conf.level=0.95)
 }
 \arguments{
@@ -65,7 +65,7 @@
   tests \deqn{H_0: \frac{\mu_x}{\sigma_x} =
   \frac{\mu_u}{\sigma_y}}{H0: mu_x sigma_y = mu_y sigma_x}
   against two or one sided alternative, via
-  \code{\link{sr.equality.test}}.
+  \code{\link{sr_equality_test}}.
 
   For unpaired (and independent) observations, tests
   \deqn{H_0: \frac{\mu_x}{\sigma_x} -
@@ -77,13 +77,13 @@
 }
 \examples{
 # should reject null
-x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
-x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="two.sided")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="two.sided")
 # should not reject null
-x <- sr.test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="less")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="less")
 
 # test for uniformity
-pvs <- replicate(1000,{ x <- sr.test(rnorm(1000),opy=253,alternative="two.sided")
+pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),opy=253,alternative="two.sided")
                         x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')
@@ -98,13 +98,13 @@ abline(0,1,col='red')
   \url{http://www.jstor.org/stable/2285841}
 }
 \seealso{
-  \code{\link{sr.equality.test}}, \code{\link{t.test}}.
+  \code{\link{sr_equality_test}}, \code{\link{t.test}}.
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
   \code{\link{se}}, \code{\link{se.default}},
   \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr.default}}, \code{\link{sr.equality.test}},
+  \code{\link{sr.default}}, \code{\link{sr_equality_test}},
   \code{\link{sr.lm}}, \code{\link{sr.xts}}
 }
 \keyword{htest}

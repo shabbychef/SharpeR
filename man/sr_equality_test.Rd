@@ -1,8 +1,8 @@
-\name{sr.equality.test}
-\alias{sr.equality.test}
+\name{sr_equality_test}
+\alias{sr_equality_test}
 \title{Paired test for equality of Sharpe ratio}
 \usage{
-  sr.equality.test(X,contrasts=NULL,type=c("chisq","F","t"),
+  sr_equality_test(X,contrasts=NULL,type=c("chisq","F","t"),
     alternative=c("two.sided","less","greater"))
 }
 \arguments{
@@ -56,9 +56,9 @@
   by Leung and Wong.
 }
 \examples{
-rv <- sr.equality.test(matrix(rnorm(500*5),500,5))
+rv <- sr_equality_test(matrix(rnorm(500*5),500,5))
 # test for uniformity
-pvs <- replicate(500,{ x <- sr.equality.test(matrix(rnorm(400*5),400,5),type="chisq")
+pvs <- replicate(500,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
                        x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')
@@ -82,14 +82,14 @@ abline(0,1,col='red')
   Sharpe ratio." Finance Letters 1 (2003): 21--23.
 }
 \seealso{
-  \code{\link{sr.test}}
+  \code{\link{sr_test}}
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
   \code{\link{se}}, \code{\link{se.default}},
   \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr.default}}, \code{\link{sr.lm}},
-  \code{\link{sr.test}}, \code{\link{sr.xts}}
+  \code{\link{sr_test}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 

@@ -64,14 +64,14 @@ anex <- power.sr.test(n=NULL,snr=0.6,sig.level=0.05,power=0.5,opy=253)
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
-  \code{\link{power.t.test}}, \code{\link{sr.test}}
+  \code{\link{power.t.test}}, \code{\link{sr_test}}
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{plambdap}}, \code{\link{se}},
   \code{\link{se.default}}, \code{\link{se.sr}},
   \code{\link{sr}}, \code{\link{sr.default}},
-  \code{\link{sr.equality.test}}, \code{\link{sr.lm}},
-  \code{\link{sr.test}}, \code{\link{sr.xts}}
+  \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
+  \code{\link{sr_test}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 
