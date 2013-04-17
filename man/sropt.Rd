@@ -62,7 +62,12 @@
   year (or whatever the target annualization epoch.)
 }
 \examples{
-rvs <- sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
+nfac <- 5
+nyr <- 10
+opy <- 253
+set.seed(as.integer(charToRaw("determinstic")))
+Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+asro <- sropt(Returns,drag=0,opy=opy)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

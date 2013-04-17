@@ -71,7 +71,8 @@ anex <- power.sr.test(n=NULL,snr=0.6,sig.level=0.05,power=0.5,opy=253)
   \code{\link{se.default}}, \code{\link{se.sr}},
   \code{\link{sr}}, \code{\link{sr.default}},
   \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
-  \code{\link{sr_test}}, \code{\link{sr.xts}}
+  \code{\link{sr_test}}, \code{\link{sr_test.default}},
+  \code{\link{sr_test.sr}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 

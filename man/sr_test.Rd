@@ -1,12 +1,22 @@
 \name{sr_test}
 \alias{sr_test}
+\alias{sr_test.default}
+\alias{sr_test.sr}
 \title{test for Sharpe ratio}
 \usage{
+  sr_test(x,...)
+
   sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
-    snr=0,opy=1,paired=FALSE,conf.level=0.95)
+    zeta=0,opy=1,paired=FALSE,conf.level=0.95)
+
+  sr_test(z,alternative=c("two.sided","less","greater"),
+    zeta=0,conf.level=0.95)
 }
 \arguments{
   \item{x}{a (non-empty) numeric vector of data values.}
+
+  \item{...}{further arguments to be passed to or from
+  methods.}
 
   \item{y}{an optional (non-empty) numeric vector of data
   values.}
@@ -16,11 +26,11 @@
   (default), \code{"greater"} or \code{"less"}.  You can
   specify just the initial letter.}
 
-  \item{snr}{a number indicating the null hypothesis offset
-  value, the \eqn{S} value.}
+  \item{zeta}{a number indicating the null hypothesis
+  offset value, the \eqn{S} value.}
 
   \item{opy}{the number of observations per 'year'.
-  \code{snr} is quoted in 'annualized' units, that is, per
+  \code{zeta} is quoted in 'annualized' units, that is, per
   square root 'year', but returns are observed possibly at
   a rate of \code{opy} per 'year.' default value is 1,
   meaning no deannualization is performed.}
@@ -28,8 +38,9 @@
   \item{paired}{a logical indicating whether you want a
   paired test.}
 
-  \item{conf.level}{confidence level of the interval. (not
-  used yet)}
+  \item{conf.level}{confidence level of the interval.}
+
+  \item{z}{an object of class \code{sr}.}
 }
 \value{
   A list with class \code{"htest"} containing the following
@@ -73,20 +84,23 @@
   sigma_y = S} against two or one-sided alternatives via a
   normal approximation (which is probably not very good for
   small sample sizes). At some point, the procedure of
-  Ghosh (1975) or variant thereof should be employed.
+  Ghosh (1975) or variant thereof should perhaps be
+  employed?
 }
 \examples{
 # should reject null
-x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
-x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="two.sided")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="greater")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="two.sided")
 # should not reject null
-x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="less")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="less")
 
 # test for uniformity
 pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),opy=253,alternative="two.sided")
                         x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')
+asr <- sr(rnorm(1000,1 / sqrt(253)),opy=253)
+checkit <- sr_test(asr,zeta=0)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

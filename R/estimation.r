@@ -97,7 +97,6 @@
 
 # confidence intervals on the Sharpe ratio#FOLDUP
 
-# 2FIX: add documentation for 'se'
 #' @title Standard error computation
 #' @rdname se
 #' @export
@@ -119,7 +118,7 @@ se.default <- function(z, ...) {
 #'
 #' @details 
 #'
-#' 2FIX; document
+#' For an observed Sharpe ratio, estimate the standard error.
 #' There are two methods:
 #'
 #' \itemize{
@@ -138,10 +137,8 @@ se.default <- function(z, ...) {
 #' se(z, type=c("t","Lo","exact"))
 #'
 #' @param z an observed Sharpe ratio statistic, of class \code{sr}.
-#' @param ... the following variables:
-#' \itemize{
-#' \item \code{type} estimator type. one of \code{"t", "Lo", "exact"}
-#' }
+#' @param type estimator type. one of \code{"t", "Lo", "exact"}
+#' @param ... further arguments to be passed to or from methods.
 #' @keywords htest
 #' @return an estimate of standard error.
 #' @seealso sr-distribution functions, \code{\link{dsr}}
@@ -171,7 +168,7 @@ se.default <- function(z, ...) {
 #' anse <- se(asr,type="t")
 #' anse2 <- se(asr,type="exact")
 #'
-#'@export
+#' @export
 #'
 #' @method se sr
 #' @S3method se sr
@@ -228,8 +225,13 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' opy <- 253
 #' df <- opy * 6
 #' xv <- rnorm(df, 1 / sqrt(opy))
-#' mysr <- sr(xv)
+#' mysr <- sr(xv,opy=opy)
 #' confint(mysr,level=0.90)
+#' # using "lm" class
+#' yv <- xv + rnorm(length(xv))
+#' amod <- lm(yv ~ xv)
+#' mysr <- sr(amod,opy=opy)
+#' confint(mysr,level.lo=0.05,level.hi=1.0)
 #'
 #' @rdname confint
 #' @method confint sr 

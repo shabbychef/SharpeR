@@ -43,8 +43,13 @@
 opy <- 253
 df <- opy * 6
 xv <- rnorm(df, 1 / sqrt(opy))
-mysr <- sr(xv)
+mysr <- sr(xv,opy=opy)
 confint(mysr,level=0.90)
+# using "lm" class
+yv <- xv + rnorm(length(xv))
+amod <- lm(yv ~ xv)
+mysr <- sr(amod,opy=opy)
+confint(mysr,level.lo=0.05,level.hi=1.0)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
@@ -58,7 +63,8 @@ confint(mysr,level=0.90)
   \code{\link{se.default}}, \code{\link{se.sr}},
   \code{\link{sr}}, \code{\link{sr.default}},
   \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
-  \code{\link{sr_test}}, \code{\link{sr.xts}}
+  \code{\link{sr_test}}, \code{\link{sr_test.default}},
+  \code{\link{sr_test.sr}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 

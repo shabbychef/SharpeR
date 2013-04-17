@@ -29,8 +29,7 @@
 
 #' @include utils.r
 #' @include distributions.r
-
-# note: on citations, use the Chicago style from google scholar. tks.
+#' @include estimation.r
 
 ########################################################################
 # Sharpe Ratio#FOLDUP
@@ -50,8 +49,9 @@
 # for 'convenience' we re-express SR and delta
 # in 'annualized' units by multiplying them by
 # sqrt(opy)
-.spawn_sr <- function(sr,df,c0,opy,rescal) {
-	retval <- list(sr = sr,df = df,c0 = c0,opy = opy,rescal = rescal)
+.spawn_sr <- function(sr,df,c0,opy,rescal,epoch="yr") {
+	retval <- list(sr = sr,df = df,c0 = c0,
+								 opy = opy,rescal = rescal,epoch = epoch)
 	class(retval) <- "sr"
 	return(retval)
 }
@@ -94,11 +94,17 @@
 #'        in 'annualized' terms.
 #' @param opy the number of observations per 'year'. This is used to
 #'        'annualize' the answer.
+#' @param epoch the string representation of the 'year', defaulting
+#'        to 'yr'.
+#' @param ... further arguments to be passed to or from methods.
 #' @keywords univar 
 #' @return a list containing the following components:
 #' \item{sr}{the annualized Sharpe ratio.}
-#' \item{df}{the number of observations.}
+#' \item{df}{the t-stat degrees of freedom.}
+#' \item{c0}{the risk free term.}
 #' \item{opy}{the annualization factor.}
+#' \item{rescal}{the rescaling factor.}
+#' \item{epoch}{the string epoch.}
 #' cast to class \code{sr}.
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @rdname sr
@@ -123,10 +129,19 @@
 #'   asr <- sr(lrets,na.rm=TRUE)
 #' }
 #' # on a linear model, find the 'Sharpe' of the residual term
-#' Factors <- matrix(rnorm(253*5*6),ncol=6)
-#' Returns <- rnorm(dim(Factors)[1],0.003)
+#' nfac <- 5
+#' nyr <- 10
+#' opy <- 253
+#' set.seed(as.integer(charToRaw("determinstic")))
+#' Factors <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' Betas <- exp(0.1 * rnorm(dim(Factors)[2]))
+#' Returns <- (Factors %*% Betas) + rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 #' APT_mod <- lm(Returns ~ Factors)
-#' asr <- sr(APT_mod,opy=253)
+#' asr <- sr(APT_mod,opy=opy)
+#' # try again, but make the Returns independent of the Factors.
+#' Returns <- rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
+#' APT_mod <- lm(Returns ~ Factors)
+#' asr <- sr(APT_mod,opy=opy)
 #'   
 sr <- function(x,c0=0,opy=1,...) {
 	UseMethod("sr", x)
@@ -135,39 +150,40 @@ sr <- function(x,c0=0,opy=1,...) {
 #' @rdname sr
 #' @method sr default
 #' @S3method sr default
-sr.default <- function(x,c0=0,opy=1,na.rm=FALSE) {
+sr.default <- function(x,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 	mu <- mean(x,na.rm=na.rm)
 	sigma <- sd(x,na.rm=na.rm)
 	sr <- .compute_sr(mu,c0,sigma,opy)
 	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
-	retval <- .spawn_sr(sr,df=df-1,c0=c0,opy=opy,rescal=1/sqrt(df))
+	retval <- .spawn_sr(sr,df=df-1,c0=c0,opy=opy,
+											rescal=1/sqrt(df),epoch=epoch)
 	return(retval)
 }
-#' @param x a fit model of class \code{lm}.
+#' @param modl a fit model of class \code{lm}.
 #' @rdname sr
 #' @method sr lm 
 #' @S3method sr lm
-sr.lm <- function(x,c0=0,opy=1,na.rm=FALSE) {
-	modl <- x
+sr.lm <- function(modl,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 	mu <- modl$coefficients["(Intercept)"]
 	sigma <- sqrt(deviance(modl) / modl$df.residual)
 	sr <- .compute_sr(mu,c0,sigma,opy)
 	XXinv <- vcov(modl) / sigma^2
 	rescal <- sqrt(XXinv["(Intercept)","(Intercept)"])
-	retval <- .spawn_sr(sr,df=modl$df.residual,c0=c0,opy=opy,rescal=rescal)
+	retval <- .spawn_sr(sr,df=modl$df.residual,c0=c0,opy=opy,
+											rescal=rescal,epoch=epoch)
 	return(retval)
 }
 #' @param anxts an xts object.
 #' @rdname sr
 #' @method sr xts 
 #' @S3method sr xts
-sr.xts <- function(anxts,c0=0,opy=1,na.rm=FALSE) {
+sr.xts <- function(anxts,c0=0,opy=1,...) {
 	if (missing(opy)) {
 		TEO <- time(anxts)
 		days.per.row <- as.double((TEO[length(TEO)] - TEO[1]) / (length(TEO) - 1))
 		opy <- 365.25 / days.per.row
 	}
-	retval <- sr.default(anxts,c0=c0,opy=opy,na.rm=na.rm)
+	retval <- sr.default(anxts,c0=c0,opy=opy,...)
 	return(retval)
 }
 #' @title Is this in the "sr" class?
@@ -207,10 +223,15 @@ format.sr <- function(x,...) {
 print.sr <- function(x,...) {
 	tval <- .sr2t(x)
 	pval <- pt(tval,x$df,lower.tail=FALSE)
-	coefs <- cbind(x$sr,tval,pval)
-	colnames(coefs) <- c("stat","t.stat","p.value")
+	serr <- se(x,type="t")
+	coefs <- cbind(x$sr,serr,tval,pval)
+	#colnames(coefs) <- c("stat","t.stat","p.value")
+	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
+											 "Std. Error","t value","Pr(>t)")
 	rownames(coefs) <- c("Sharpe")
-	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE)
+	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
+							 digits=max(2, getOption("digits") - 3),
+							 cs.ind=c(1,2),tst.ind=c(3),dig.tst=2)
 }
 # @hadley's suggested form
 # print.sr <- function(x,...) cat(format(x,...), "\n")
@@ -243,10 +264,11 @@ print.sr <- function(x,...) {
 #'
 #' @usage
 #'
-#' reannualize(x,opy)
+#' reannualize(x,opy,epoch="yr")
 #'
-#' @param x an object of class \code{sr}
-#' @param opy the new observations per year
+#' @param x an object of class \code{sr}.
+#' @param opy the new observations per year (or epoch).
+#' @param epoch a string representation of the epoch. 
 #' @return an object of class \code{sr} with the annualization
 #' parameter updated.
 #' @seealso sr
@@ -254,12 +276,17 @@ print.sr <- function(x,...) {
 #' @export
 #'
 #' @examples 
-#' mysr <- sr(rnorm(253*8),opy=253)
-#' # turn back to 'daily' Sharpe
-#' mysr2 <- reannualize(mysr,opy=1)
-reannualize <- function(x,opy) {
+#' # compute a 'daily' Sharpe
+#' mysr <- sr(rnorm(253*8),opy=1)
+#' # turn into annual 
+#' mysr2 <- reannualize(mysr,opy=253,epoch="yr")
+reannualize <- function(x,opy,epoch) {
 	if (!is.sr(x)) stop("must give sr object")
-	x$opy <- opy
+	if (!missing(opy)) {
+		x$sr <- x$sr * sqrt(opy / x$opy)
+		x$opy <- opy
+	}
+	if (!missing(epoch)) x$epoch <- epoch
 	return(x)
 }
 #UNFOLD
@@ -350,9 +377,20 @@ reannualize <- function(x,opy) {
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sropt
 #' @examples 
-#' rvs <- sropt(matrix(rnorm(253*8*4),ncol=4),drag=0,opy=253)
+#' nfac <- 5
+#' nyr <- 10
+#' opy <- 253
+#' # simulations with no covariance structure.
+#' # under the null:
+#' set.seed(as.integer(charToRaw("determinstic")))
+#' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- sropt(Returns,drag=0,opy=opy)
+#' # under the alternative:
+Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
+asro <- sropt(Returns,drag=0,opy=opy)
 #'
-sropt <- function(X,drag=0,opy=1) {
+#'
+sropt <- function(X,drag=0,opy=1,epoch="yr") {
 	retval <- .hotelling(X)
 	zeta.star <- sqrt(retval$T2 / retval$df2)
 	if (!missing(opy))
@@ -362,8 +400,25 @@ sropt <- function(X,drag=0,opy=1) {
 	#units(retval$sropt) <- "yr^-0.5"
 	retval$drag <- drag
 	retval$opy <- opy
+	retval$epoch <- epoch
 	class(retval) <- "sropt"
 	return(retval)
+}
+#' @S3method print sropt
+#' @export
+print.sropt <- function(x,...) {
+	Tval <- x$T2
+	pval <- pT2(Tval,x$df1,x$df2,lower.tail=FALSE)
+	coefs <- cbind(x$sropt,Tval,pval)
+	#colnames(coefs) <- c("stat","t.stat","p.value")
+	#colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
+											 #"Std. Error","t value","Pr(>t)")
+	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
+											 "T^2 value","Pr(>T^2)")
+	rownames(coefs) <- c("Sharpe")
+	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
+							 digits=max(2, getOption("digits") - 3),
+							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)
 }
 #UNFOLD
 

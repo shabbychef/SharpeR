@@ -69,8 +69,9 @@
 #' 
 #' @usage
 #'
-#' sr_equality_test(X,contrasts=NULL,type=c("chisq","F","t"),
-#'                  alternative=c("two.sided","less","greater"))
+#' sr_equality_test(X,type=c("chisq","F","t"),
+#'                  alternative=c("two.sided","less","greater"),
+#'                  contrasts=NULL)
 #'
 #' @param X an \eqn{n \times p}{n x p} matrix of paired observations.
 #' @param contrasts an \eqn{k \times p}{k x p} matrix of the contrasts
@@ -113,8 +114,9 @@
 #' abline(0,1,col='red') 
 #'
 #'@export
-sr_equality_test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
-														 alternative=c("two.sided","less","greater")) {
+sr_equality_test <- function(X,type=c("chisq","F","t"),
+														 alternative=c("two.sided","less","greater"),
+														 contrasts=NULL) {
 	dname <- deparse(substitute(X))
 	type <- match.arg(type)
 	n <- dim(X)[1]
@@ -204,26 +206,14 @@ sr_equality_test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
 #' against two or one-sided alternatives via a normal approximation 
 #' (which is probably not very good for small sample sizes). At some point, the
-#' procedure of Ghosh (1975) or variant thereof should be employed.
+#' procedure of Ghosh (1975) or variant thereof should perhaps be employed?
 #' 
 #' @usage
 #'
-#' sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
-#'         snr=0,opy=1,paired=FALSE,conf.level=0.95)
+#' sr_test(x,...)
 #'
 #' @param x a (non-empty) numeric vector of data values.
-#' @param y an optional (non-empty) numeric vector of data values.
-#' @param alternative a character string specifying the alternative hypothesis,
-#'       must be one of \code{"two.sided"} (default), \code{"greater"} or
-#'       \code{"less"}.  You can specify just the initial letter.
-#' @param snr a number indicating the null hypothesis offset value, the
-#' \eqn{S} value.
-#' @param opy the number of observations per 'year'. 
-#'        \code{snr} is quoted in 'annualized' units, that is, per square root 
-#'        'year', but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
-#' @param paired a logical indicating whether you want a paired test.
-#' @param conf.level confidence level of the interval. (not used yet)
+#' @param ... further arguments to be passed to or from methods.
 #' @keywords htest
 #' @return A list with class \code{"htest"} containing the following components:
 #' \item{statistic}{the value of the t- or Z-statistic.}
@@ -239,6 +229,7 @@ sr_equality_test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' @export 
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @family sr
+#' @rdname sr_test
 #' @references 
 #'
 #' Ghosh, B. K. "On the Distribution of the Difference of Two t-Variables."
@@ -247,10 +238,10 @@ sr_equality_test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #'
 #' @examples 
 #' # should reject null
-#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="greater")
-#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="two.sided")
+#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="greater")
+#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="two.sided")
 #' # should not reject null
-#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),snr=2,opy=1,alternative="less")
+#' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="less")
 #'
 #' # test for uniformity
 #' pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),opy=253,alternative="two.sided")
@@ -258,13 +249,38 @@ sr_equality_test <- function(X,contrasts=NULL,type=c("chisq","F","t"),
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
 #'
-#'@export
-sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
-										snr=0,opy=1,paired=FALSE,conf.level=0.95) {
+#' @export
+sr_test <- function(x,...) {
+	UseMethod("sr_test", x)
+}
+#' @rdname sr_test
+#' @method sr_test default
+#' @S3method sr_test default
+#'
+#' @usage
+#'
+#' sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
+#'         zeta=0,opy=1,paired=FALSE,conf.level=0.95)
+#'
+#'
+#' @param y an optional (non-empty) numeric vector of data values.
+#' @param alternative a character string specifying the alternative hypothesis,
+#'       must be one of \code{"two.sided"} (default), \code{"greater"} or
+#'       \code{"less"}.  You can specify just the initial letter.
+#' @param zeta a number indicating the null hypothesis offset value, the
+#' \eqn{S} value.
+#' @param opy the number of observations per 'year'. 
+#'        \code{zeta} is quoted in 'annualized' units, that is, per square root 
+#'        'year', but returns are observed possibly at a rate of \code{opy} per 
+#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @param paired a logical indicating whether you want a paired test.
+#' @param conf.level confidence level of the interval. 
+sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
+										zeta=0,opy=1,paired=FALSE,conf.level=0.95) {
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
-	if (!missing(snr) && (length(snr) != 1 || is.na(snr))) 
-		stop("'snr' must be a single number")
+	if (!missing(zeta) && (length(zeta) != 1 || is.na(zeta))) 
+		stop("'zeta' must be a single number")
 	if (!missing(conf.level) && (length(conf.level) != 1 || !is.finite(conf.level) || 
 		conf.level < 0 || conf.level > 1)) 
 		stop("'conf.level' must be a single number between 0 and 1")
@@ -278,44 +294,26 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			xok <- !is.na(x)
 		}
 		y <- y[yok]
+		x <- x[xok]
 	} else {
 		dname <- deparse(substitute(x))
 		if (paired) 
 			stop("'y' is missing for paired test")
-		xok <- !is.na(x)
-		yok <- NULL
 	}
-	x <- x[xok]
+
 	if (is.null(y)) {#FOLDUP
-		subsr <- sr(x,c0=0)
-		df <- subsr$df
-		if (df < 1) 
-			stop("not enough 'x' observations")
-		statistic <- .sr2t(subsr)
-		names(statistic) <- "t"
-		estimate <- subsr$sr
-		names(estimate) <- "Sharpe ratio of x"
-
-		method <- "One Sample sr test"
-
-		if (alternative == "less") {
-			pval <- .psr(subsr, zeta=snr, lower.tail=TRUE)
-			cint <- confint(subsr,type="exact",level.lo=0,level.hi=conf.level)
-		}
-		else if (alternative == "greater") {
-			pval <- .psr(subsr, zeta=snr, lower.tail=FALSE)
-			cint <- confint(subsr,type="exact",level.lo=1-conf.level,level.hi=1)
-		}
-		else {
-			pval <- .oneside2two(.psr(subsr, zeta=snr, lower.tail=TRUE))
-			cint <- confint(subsr,type="exact",level=conf.level)
-		}
+		# delegate
+		subsr <- sr(x,c0=0,opy=opy,na.rm=TRUE)
+		retv <- sr_test(subsr,alternative=alternative,zeta=zeta,conf.level=conf.level)
+		retv$data.name <- dname
+		names(retv$estimate) <- paste(c("Sharpe ratio of",dname),sep=" ",collapse="")
+		return(retv)
 	} #UNFOLD
 	else {#FOLDUP
 		ny <- length(y)
 		if (paired) {#FOLDUP
-			if (snr != 0)
-				stop("cannot test 'snr' != 0 for paired test")
+			if (zeta != 0)
+				stop("cannot test 'zeta' != 0 for paired test")
 			if (nx != ny)
 				stop("'x','y' must be same length")
 			df <- nx - 1
@@ -344,17 +342,17 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			se.y <- sr.se(sy,ny,type="t")
 			se.z <- sqrt(se.x^2 + se.y^2)
 			estimate <- sx - sy
-			snr <- .deannualize(snr,opy)
+			zeta <- .deannualize(zeta,opy)
 			if (alternative == "less") {
-				pval <- pnorm(estimate, mean = snr, sd = se.z)
+				pval <- pnorm(estimate, mean = zeta, sd = se.z)
 			}
 			else if (alternative == "greater") {
-				pval <- pnorm(estimate, mean = snr, sd = se.z, lower.tail = FALSE)
+				pval <- pnorm(estimate, mean = zeta, sd = se.z, lower.tail = FALSE)
 			}
 			else {
-				pval <- .oneside2two(pnorm(estimate, mean = snr, sd = se.z))
+				pval <- .oneside2two(pnorm(estimate, mean = zeta, sd = se.z))
 			}
-			statistic <- (sx - sy - snr) / se.z
+			statistic <- (sx - sy - zeta) / se.z
 			names(statistic) <- "Z"
 			# ??
 			df <- nx + ny - 2 
@@ -369,12 +367,66 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	#attr(cint, "conf.level") <- conf.level
 	retval <- list(statistic = statistic, parameter = df,
 								 estimate = estimate, p.value = pval, 
-								 alternative = alternative, null.value = snr,
+								 alternative = alternative, null.value = zeta,
 								 method = method, data.name = dname)
 	class(retval) <- "htest"
 	return(retval)
 }
+#' @rdname sr_test
+#' @method sr_test sr
+#' @S3method sr_test sr
+#'
+#' @usage
+#'
+#' sr_test(z,alternative=c("two.sided","less","greater"),
+#'         zeta=0,conf.level=0.95)
+#'
+#' @param z an object of class \code{sr}.
+#' @examples 
+#' asr <- sr(rnorm(1000,1 / sqrt(253)),opy=253)
+#' checkit <- sr_test(asr,zeta=0)
+sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
+											 zeta=0,conf.level=0.95) {
+	# all this stolen from t.test.default:
+	alternative <- match.arg(alternative)
+	if (!missing(zeta) && (length(zeta) != 1 || is.na(zeta))) 
+		stop("'zeta' must be a single number")
+	if (!missing(conf.level) && (length(conf.level) != 1 || !is.finite(conf.level) || 
+		conf.level < 0 || conf.level > 1)) 
+		stop("'conf.level' must be a single number between 0 and 1")
+	dname <- deparse(substitute(z))
 
+	df <- z$df
+	if (df < 1) stop("not enough 'x' observations")
+	statistic <- .sr2t(z)
+	names(statistic) <- "t"
+	estimate <- z$sr
+	names(estimate) <- paste(c("Sharpe ratio of",dname),sep=" ",collapse="")
+
+	method <- "One Sample sr test"
+
+	if (alternative == "less") {
+		pval <- .psr(z, zeta=zeta, lower.tail=TRUE)
+		cint <- confint(z,type="exact",level.lo=0,level.hi=conf.level)
+	}
+	else if (alternative == "greater") {
+		pval <- .psr(z, zeta=zeta, lower.tail=FALSE)
+		cint <- confint(z,type="exact",level.lo=1-conf.level,level.hi=1)
+	}
+	else {
+		pval <- .oneside2two(.psr(z, zeta=zeta, lower.tail=TRUE))
+		cint <- confint(z,type="exact",level=conf.level)
+	}
+
+	names(df) <- "df"
+	#attr(cint, "conf.level") <- conf.level
+	retval <- list(statistic = statistic, parameter = df,
+								 estimate = estimate, p.value = pval, 
+								 alternative = alternative, null.value = zeta,
+								 method = method, data.name = dname)
+	class(retval) <- "htest"
+	return(retval)
+}
 #' @title Power calculations for Sharpe ratio tests
 #'
 #' @description 

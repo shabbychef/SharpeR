@@ -16,9 +16,11 @@
   \item{z}{an observed Sharpe ratio statistic, of class
   \code{sr}.}
 
-  \item{...}{the following variables: \itemize{ \item
-  \code{type} estimator type. one of \code{"t", "Lo",
-  "exact"} }}
+  \item{type}{estimator type. one of \code{"t", "Lo",
+  "exact"}}
+
+  \item{...}{further arguments to be passed to or from
+  methods.}
 }
 \value{
   an estimate of standard error.
@@ -30,7 +32,8 @@
   statistic.
 }
 \details{
-  2FIX; document There are two methods:
+  For an observed Sharpe ratio, estimate the standard
+  error. There are two methods:
 
   \itemize{ \item The default, \code{t}, based on Johnson &
   Welch, with a correction for small sample size, also
@@ -76,7 +79,8 @@ anse2 <- se(asr,type="exact")
   \code{\link{plambdap}}, \code{\link{power.sr.test}},
   \code{\link{sr}}, \code{\link{sr.default}},
   \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
-  \code{\link{sr_test}}, \code{\link{sr.xts}}
+  \code{\link{sr_test}}, \code{\link{sr_test.default}},
+  \code{\link{sr_test.sr}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 

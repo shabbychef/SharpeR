@@ -127,6 +127,7 @@ plot(ecdf(pvs))
   \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr.default}}, \code{\link{sr_equality_test}},
   \code{\link{sr.lm}}, \code{\link{sr_test}},
+  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}},
   \code{\link{sr.xts}}
 }
 \keyword{distribution}

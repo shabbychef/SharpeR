@@ -20,7 +20,8 @@ TMP_TAG=.tmp_tags
 
 ##set up the R tags
 #for minimal disruption, write it to $TMP_TAG and then move it...
-nice $NICE_FLAGS $CTAGS -f $TMP_TAG $CTAGFLAGS --language-force=R --exclude='.r\~' --fields=+i `find . -name '*.[rR]' | grep -ve '\.git'` 2>/dev/null
+nice $NICE_FLAGS $CTAGS -f $TMP_TAG $CTAGFLAGS --language-force=R --exclude='.r\~' --fields=+i \
+  `find . -name '*.[rR]' | grep -ve '\.git\|\.staging\|\.Rcheck\|\.local'` 2>/dev/null
 if [ -s $TMP_TAG ];
 then
 	mv $TMP_TAG .R_tags;

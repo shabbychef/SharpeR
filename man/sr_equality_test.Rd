@@ -2,8 +2,9 @@
 \alias{sr_equality_test}
 \title{Paired test for equality of Sharpe ratio}
 \usage{
-  sr_equality_test(X,contrasts=NULL,type=c("chisq","F","t"),
-    alternative=c("two.sided","less","greater"))
+  sr_equality_test(X,type=c("chisq","F","t"),
+    alternative=c("two.sided","less","greater"),
+    contrasts=NULL)
 }
 \arguments{
   \item{X}{an \eqn{n \times p}{n x p} matrix of paired
@@ -89,7 +90,8 @@ abline(0,1,col='red')
   \code{\link{se}}, \code{\link{se.default}},
   \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr.default}}, \code{\link{sr.lm}},
-  \code{\link{sr_test}}, \code{\link{sr.xts}}
+  \code{\link{sr_test}}, \code{\link{sr_test.default}},
+  \code{\link{sr_test.sr}}, \code{\link{sr.xts}}
 }
 \keyword{htest}
 

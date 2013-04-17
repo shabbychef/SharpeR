@@ -38,6 +38,7 @@ RSCRIPT   			 = $(RBIN)/Rscript
 
 # packages I need to test this one
 TEST_DEPS  			 = testthat roxygen2 knitr txtplot 
+INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
 
 #INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%,$(TEST_DEPS)) 
 
@@ -139,7 +140,7 @@ $(LOCAL)/%/DESCRIPTION :
 	$(call MKDIR,$(LOCAL))
 	$(RLOCAL) -e "install.packages('$*', repos = 'http://cran.cnr.Berkeley.edu')" 
 
-deps: $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
+deps: $(INSTALLED_DEPS)
 
 # roxygen it.
 man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
@@ -173,7 +174,7 @@ parallel : $(STAGED_PKG)/DESCRIPTION
 PACKAGING_FLAGS   = 
 
 # make the 'package', which is a tar.gz
-$(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION
+$(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS)
 	$(RLOCAL) CMD build $(PACKAGING_FLAGS) $(<D)
 
 package : $(PKG_TGZ)
@@ -214,13 +215,13 @@ R : deps $(LOCAL)/$(PKG_NAME)/INDEX
 ################################
 
 clean : 
-	rm DESCRIPTION
-	rm -rf man/*.Rd
-	rm -rf $(STAGED_PKG)
-	rm -rf $(RCHECK)
+	-rm DESCRIPTION
+	-rm -rf man/*.Rd
+	-rm -rf $(STAGED_PKG)
+	-rm -rf $(RCHECK)
 
 realclean : clean
-	rm -rf $(LOCAL)
+	-rm -rf $(LOCAL)
 
 ################################
 # git FOO 
