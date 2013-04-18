@@ -109,12 +109,9 @@
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @rdname sr
 #' @export sr
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sr
+#' @template etc
+#' @template sr
 #' @references 
-#'
-#' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
-#' \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 #' 
 #' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal (2002): 36-52.
 #' \url{http://ssrn.com/paper=377260}
@@ -203,7 +200,8 @@ sr.xts <- function(anxts,c0=0,opy=1,...) {
 #' @param x an object of some kind.
 #' @return a boolean.
 #' @seealso sr
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @template etc
+#' @family sr
 #' @export
 #'
 #' @examples 
@@ -272,7 +270,8 @@ print.sr <- function(x,...) {
 #' @return an object of class \code{sr} with the annualization
 #' parameter updated.
 #' @seealso sr
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @template etc
+#' @family sr
 #' @export
 #'
 #' @examples 
@@ -374,8 +373,8 @@ reannualize <- function(x,opy,epoch) {
 #' @seealso \code{\link{sr}}, sropt-distribution functions, 
 #' \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sropt
+#' @template etc
+#' @template sropt
 #' @examples 
 #' nfac <- 5
 #' nyr <- 10
@@ -386,8 +385,8 @@ reannualize <- function(x,opy,epoch) {
 #' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 #' asro <- sropt(Returns,drag=0,opy=opy)
 #' # under the alternative:
-Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
-asro <- sropt(Returns,drag=0,opy=opy)
+#' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
+#' asro <- sropt(Returns,drag=0,opy=opy)
 #'
 #'
 sropt <- function(X,drag=0,opy=1,epoch="yr") {

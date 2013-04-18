@@ -55,6 +55,10 @@ anse2 <- se(asr,type="exact")
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \references{
+  Sharpe, William F. "Mutual fund performance." Journal of
+  business (1966): 119-138.
+  \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+
   Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for
   experimentalists." 1996.
   \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
@@ -76,7 +80,8 @@ anse2 <- se(asr,type="exact")
   sr-distribution functions, \code{\link{dsr}}
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
-  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{is.sr}}, \code{\link{plambdap}},
+  \code{\link{power.sr.test}}, \code{\link{reannualize}},
   \code{\link{sr}}, \code{\link{sr.default}},
   \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
   \code{\link{sr_test}}, \code{\link{sr_test.default}},

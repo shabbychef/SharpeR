@@ -11,7 +11,12 @@
 # Created: 2012.12.28
 #
 
-R_FILES 				?= $(wildcard ./R/*.r)
+R_DEV_FILES 		?= $(wildcard ./R/*.r)
+R_FILES 				?= $(R_DEV_FILES)
+R_FILES 				+= $(wildcard ./inst/tests/*.r)
+R_FILES 				+= $(wildcard ./man-roxygen/*.R)
+R_FILES 				+= $(wildcard ./tests/*.R)
+
 M4_FILES				?= $(wildcard *.m4)
 
 VERSION 				 = 0.1304
@@ -194,6 +199,9 @@ $(RCHECK) : $(PKG_TGZ)
 	$(RLOCAL) CMD check --as-cran --outdir=$@ $^ 
 	
 check: $(RCHECK)
+
+checksee : $(RCHECK)
+	okular $(RCHECK)/$(PKG_NAME)-manual.pdf
 
 ################################
 # UNIT TESTING

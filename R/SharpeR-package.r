@@ -27,6 +27,9 @@
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
+# for package roxygen2 help see also
+# http://stackoverflow.com/questions/7678284/roxygen2-error-titlerequires-a-value?rq=1
+
 #' Inference on Sharpe ratio and Markowitz portfolio.
 #' 
 #' @section Sharpe Ratio: 
@@ -115,7 +118,7 @@
 #' \item \eqn{c_0/R} is denoted by \code{drag}.
 #' }
 #'
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @template etc
 #' @references
 #'
 #' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
@@ -151,11 +154,11 @@
 #' and Portfolio Theory." Scandinavian Journal of Statistics 38, no. 2 (2011):
 #' 311--331. \url{http://dx.doi.org/10.1111/j.1467-9469.2011.00729.x}
 #'
-#' @name SharpeR
+#' @name package-SharpeR
 #' @docType package
 #' @title statistics concerning Sharpe ratio and Markowitz portfolio
-#' @family sr sropt
 #' @keywords package
+#' @family sr sropt
 #' @note The following are still in the works:
 #' \enumerate{
 #' \item Corrections for standard error based on skew, kurtosis and

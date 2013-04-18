@@ -89,8 +89,8 @@
 #' the size of \code{X}, and the \code{method} noted.
 #' @seealso \code{\link{sr_test}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sr
+#' @template etc
+#' @template sr
 #' @references 
 #'
 #' Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
@@ -227,8 +227,8 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' \item{data.name}{a character string giving the name(s) of the data.}
 #' @seealso \code{\link{sr_equality_test}}, \code{\link{t.test}}.
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sr
+#' @template etc
+#' @template sr
 #' @rdname sr_test
 #' @references 
 #'
@@ -472,8 +472,8 @@ sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 #' given annualization (\code{opy}), \code{NA} if none given.
 #' @seealso \code{\link{power.t.test}}, \code{\link{sr_test}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sr
+#' @template etc
+#' @template sr
 #' @examples 
 #' anex <- power.sr.test(253,1,0.05,NULL,opy=253) 
 #' anex <- power.sr.test(n=253,snr=NULL,sig.level=0.05,power=0.5,opy=253) 
@@ -565,8 +565,8 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #' \item{data.name}{a character string giving the name(s) of the data.}
 #' @seealso \code{\link{sr_test}}, \code{\link{t.test}}.
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sropt
+#' @template etc
+#' @template sropt
 #' @examples 
 #'
 #' # test for uniformity

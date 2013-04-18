@@ -68,6 +68,10 @@ abline(0,1,col='red')
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \references{
+  Sharpe, William F. "Mutual fund performance." Journal of
+  business (1966): 119-138.
+  \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+
   Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on
   the test for the equality of multiple Sharpe ratios and
   its application on the evaluation of iShares." J. Risk.
@@ -86,7 +90,8 @@ abline(0,1,col='red')
   \code{\link{sr_test}}
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
-  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{is.sr}}, \code{\link{plambdap}},
+  \code{\link{power.sr.test}}, \code{\link{reannualize}},
   \code{\link{se}}, \code{\link{se.default}},
   \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr.default}}, \code{\link{sr.lm}},

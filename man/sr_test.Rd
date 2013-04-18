@@ -106,6 +106,10 @@ checkit <- sr_test(asr,zeta=0)
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \references{
+  Sharpe, William F. "Mutual fund performance." Journal of
+  business (1966): 119-138.
+  \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+
   Ghosh, B. K. "On the Distribution of the Difference of
   Two t-Variables." Journal of the American Statistical
   Association 70, no 350 (1975): 463--467.
@@ -115,7 +119,8 @@ checkit <- sr_test(asr,zeta=0)
   \code{\link{sr_equality_test}}, \code{\link{t.test}}.
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
-  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{is.sr}}, \code{\link{plambdap}},
+  \code{\link{power.sr.test}}, \code{\link{reannualize}},
   \code{\link{se}}, \code{\link{se.default}},
   \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr.default}}, \code{\link{sr_equality_test}},

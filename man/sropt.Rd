@@ -65,8 +65,13 @@
 nfac <- 5
 nyr <- 10
 opy <- 253
+# simulations with no covariance structure.
+# under the null:
 set.seed(as.integer(charToRaw("determinstic")))
 Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+asro <- sropt(Returns,drag=0,opy=opy)
+# under the alternative:
+Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
 asro <- sropt(Returns,drag=0,opy=opy)
 }
 \author{

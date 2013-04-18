@@ -202,12 +202,9 @@ rrt <- function(n, df, K, rho = 0) {
 #' limited range (\eqn{|\delta|\le 37.62}{delta <= 37.62}). Some corrections
 #' may have to be made here for large \code{zeta}.
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sr
+#' @template etc
+#' @template sr
 #' @references 
-#'
-#' Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
-#' \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 #' 
 #' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
 #' (2002): 36-52. \url{http://ssrn.com/paper=377260}
@@ -321,7 +318,7 @@ rsr <- function(n, df, zeta, opy) {
 #' @seealso F-distribution functions, \code{\link{df}, \link{pf}, \link{qf}, \link{rf}},
 #' Sharpe ratio distribution, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @template etc
 #' @family Hotelling
 #' @note
 #' This is a thin wrapper on the F distribution, provided for convenience.
@@ -488,8 +485,8 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @aliases rsropt
 #' @seealso Hotelling \eqn{T^2}-distribution functions, \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sropt
+#' @template etc
+#' @template sropt
 #' @note
 #' This is a thin wrapper on the Hotelling T-squared distribution, provided for
 #' convenience.
@@ -649,7 +646,7 @@ rsropt <- function(n, df1, df2, zeta.s, opy, drag = 0, ...) {
 #' @aliases rlambdap
 #' @seealso t-distribution functions, \code{\link{dt},\link{pt},\link{qt},\link{rt}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @template etc
 #' @family sr
 #' @references 
 #'
@@ -791,7 +788,7 @@ qlambdap <- Vectorize(.qlambdap,
 #' @aliases qco_sropt 
 #' @seealso \code{\link{dsropt},\link{psropt},\link{qsropt},\link{rsropt}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @template etc
 #' @family sropt
 #' @note
 #' When \code{lower.tail} is true, \code{pco_sropt} is monotonic increasing 

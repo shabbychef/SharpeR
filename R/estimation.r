@@ -143,8 +143,8 @@ se.default <- function(z, ...) {
 #' @return an estimate of standard error.
 #' @seealso sr-distribution functions, \code{\link{dsr}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sr
+#' @template etc
+#' @template sr
 #' @rdname se
 #' @note
 #' Eventually this should include corrections for autocorrelation, skew,
@@ -218,8 +218,8 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
 #' @seealso \code{\link{confint}}, \code{\link{se}}, \code{\link{qlambdap}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sr
+#' @template etc
+#' @template sr
 #' @examples 
 #' # using "sr" class:
 #' opy <- 253
@@ -284,8 +284,8 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
 #' @seealso \code{\link{confint}}, \code{\link{qco_sropt}}, \code{\link{sropt.test}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
-#' @family sropt
+#' @template etc
+#' @template sropt
 #' @rdname sropt_confint
 #' @examples 
 #' # fix these!
@@ -447,7 +447,7 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @aliases F.inference T2.inference sropt.inference
 #' @seealso F-distribution functions, \code{\link{df}}
 #' @export 
-#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @template etc
 #' @family sropt Hotelling
 #' @references 
 #'

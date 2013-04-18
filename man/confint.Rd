@@ -54,12 +54,18 @@ confint(mysr,level.lo=0.05,level.hi=1.0)
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
 }
+\references{
+  Sharpe, William F. "Mutual fund performance." Journal of
+  business (1966): 119-138.
+  \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+}
 \seealso{
   \code{\link{confint}}, \code{\link{se}},
   \code{\link{qlambdap}}
 
-  Other sr: \code{\link{dsr}}, \code{\link{plambdap}},
-  \code{\link{power.sr.test}}, \code{\link{se}},
+  Other sr: \code{\link{dsr}}, \code{\link{is.sr}},
+  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{reannualize}}, \code{\link{se}},
   \code{\link{se.default}}, \code{\link{se.sr}},
   \code{\link{sr}}, \code{\link{sr.default}},
   \code{\link{sr_equality_test}}, \code{\link{sr.lm}},

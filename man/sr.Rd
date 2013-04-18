@@ -104,7 +104,8 @@ asr <- sr(APT_mod,opy=opy)
   \link{qsr}, \link{rsr}}
 
   Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
-  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{is.sr}}, \code{\link{plambdap}},
+  \code{\link{power.sr.test}}, \code{\link{reannualize}},
   \code{\link{se}}, \code{\link{se.default}},
   \code{\link{se.sr}}, \code{\link{sr_equality_test}},
   \code{\link{sr_test}}, \code{\link{sr_test.default}},
