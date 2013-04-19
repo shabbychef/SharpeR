@@ -424,23 +424,14 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' T2.inference(T2,df1,df2,...) 
 #'
-#' sropt.inference(z.s,df1,df2,opy=1,drag=0,...)
+#' sropt.inference(z.s,...)
 #'
 #' @param Fs a (non-central) F statistic.
 #' @param T2 a (non-central) Hotelling \eqn{T^2} statistic.
-#' @param z.s an observed Sharpe ratio statistic, annualized.
+#' @param z.s an object of type \code{sropt}.
 #' @inheritParams qco_sropt
 #' @inheritParams dsropt
-#' @inheritParams qsropt
-#' @inheritParams psropt
 #' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
-#' @param opy the number of observations per 'year'. \code{z.s} is  
-#'        assumed given in 'annualized' units, that is, per 'year',
-#'        but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
-#' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
-#'        that \code{drag} has been annualized, \emph{i.e.} is given in the
-#'        same units as \code{z.s}.
 #' @param ... the \code{type} which is passed on to \code{F.inference}.
 #' @keywords htest
 #' @return an estimate of the non-centrality parameter.
@@ -463,29 +454,40 @@ T2.inference <- function(T2,df1,df2,...) {
 #' unbs <- F.inference(rvs, 4, 1000, type="unbiased")
 #' # generate some sropts
 #' true.snrstar <- 1.25
-#' df1 <- 6
-#' df2 <- 2000
+#' nfac <- 5
+#' nyr <- 10
 #' opy <- 253
-#' rvs <- rsropt(500, df1, df2, true.snrstar, opy)
-#' est1 <- sropt.inference(rvs,df1,df2,opy,type='unbiased')  
-#' est2 <- sropt.inference(rvs,df1,df2,opy,type='KRS')  
-#' est3 <- sropt.inference(rvs,df1,df2,opy,type='MLE')
+#' # simulations with no covariance structure.
+#' # under the null:
+#' set.seed(as.integer(charToRaw("determinstic")))
+#' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- sropt(Returns,drag=0,opy=opy)
+#' est1 <- sropt.inference(asro,type='unbiased')  
+#' est2 <- sropt.inference(asro,type='KRS')  
+#' est3 <- sropt.inference(asro,type='MLE')
+#' 
+#' # under the alternative:
+#' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
+#' asro <- sropt(Returns,drag=0,opy=opy)
+#' est1 <- sropt.inference(asro,type='unbiased')  
+#' est2 <- sropt.inference(asro,type='KRS')  
+#' est3 <- sropt.inference(asro,type='MLE')
 #'
-sropt.inference <- function(z.s,df1,df2,opy=1,drag=0,...) {
-	if (!missing(drag) && (drag != 0)) 
-		z.s <- z.s + drag
-	if (!missing(opy)) 
-		z.s <- .deannualize(z.s, opy)
-	T2 <- .sropt_to_T2(z.s, df2)
-	retval <- T2.inference(T2,df1,df2,...)
+sropt.inference <- function(z.s,...) {
+	T2 <- .sropt2T(z.s)
+	retval <- T2.inference(T2,z.s$df1,z.s$df2,...)
 	# convert back
-	retval <- .T2_to_sropt(retval, df2)
-	if (!missing(opy)) 
-		retval <- .annualize(retval, opy)
-	if (!missing(drag) && (drag != 0)) 
-		retval <- retval - drag
+	retval <- .T2sropt(z.s,retval)
 	return(retval)
 }
+# old documentation. sigh; would be nice to have this 'fast' form again.
+# df1 <- 6
+# df2 <- 2000
+# opy <- 253
+# rvs <- rsropt(500, df1, df2, true.snrstar, opy)
+# est1 <- sropt.inference(rvs,df1,df2,opy,type='unbiased')  
+# est2 <- sropt.inference(rvs,df1,df2,opy,type='KRS')  
+# est3 <- sropt.inference(rvs,df1,df2,opy,type='MLE')
 #UNFOLD
 
 # notes:

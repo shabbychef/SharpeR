@@ -262,13 +262,14 @@ print.sr <- function(x,...) {
 #'
 #' @usage
 #'
-#' reannualize(x,opy,epoch="yr")
+#' reannualize(x,opy,epoch)
 #'
 #' @param x an object of class \code{sr}.
-#' @param opy the new observations per year (or epoch).
-#' @param epoch a string representation of the epoch. 
-#' @return an object of class \code{sr} with the annualization
-#' parameter updated.
+#' @param opy the new observations per year (or epoch). If none given, it is
+#' not updated.
+#' @param epoch a string representation of the epoch. If none given, it is not
+#' updated.
+#' @return an object of class \code{sr} with the annualization or epoch updated.
 #' @seealso sr
 #' @template etc
 #' @family sr
@@ -348,7 +349,7 @@ reannualize <- function(x,opy,epoch) {
 #'
 #' @usage
 #'
-#' sropt(X,drag=0,opy=1)
+#' sropt(X,drag=0,opy=1,epoch="yr")
 #'
 #' @param X matrix of returns.
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
@@ -358,6 +359,8 @@ reannualize <- function(x,opy,epoch) {
 #' @param opy the number of observations per 'year'. The returns are observed
 #'        at a rate of \code{opy} per 'year.' default value is 1, meaning no 
 #'        annualization is performed.
+#' @param epoch the string representation of the 'year', defaulting
+#'        to 'yr'.
 #' @keywords univar 
 #' @return A list with containing the following components:
 #' \item{w}{the optimal portfolio.}
@@ -391,15 +394,12 @@ reannualize <- function(x,opy,epoch) {
 #'
 sropt <- function(X,drag=0,opy=1,epoch="yr") {
 	retval <- .hotelling(X)
-	zeta.star <- sqrt(retval$T2 / retval$df2)
-	if (!missing(opy))
-		zeta.star <- .annualize(zeta.star,opy)
-	retval$sropt <- zeta.star - drag
-
-	#units(retval$sropt) <- "yr^-0.5"
 	retval$drag <- drag
 	retval$opy <- opy
 	retval$epoch <- epoch
+	retval$sropt <- .T2sropt(retval,retval$T2)
+
+	#units(retval$sropt) <- "yr^-0.5"
 	class(retval) <- "sropt"
 	return(retval)
 }
@@ -419,6 +419,21 @@ print.sropt <- function(x,...) {
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)
 }
+
+# SROPT methods#FOLDUP
+# get the T2-stat associated with an SROPT object.
+.sropt2T <- function(x) {
+	Tval <- x$T2
+	return(Tval)
+}
+# and the reverse
+.T2sropt <- function(x,Tval) {
+	zeta.star <- sqrt(Tval / x$df2)
+	zeta.star <- .annualize(zeta.star,x$opy)
+	zeta.star <- zeta.star - x$drag
+	return(zeta.star)
+}
+#UNFOLD
 #UNFOLD
 
 #for vim modeline: (do not edit)

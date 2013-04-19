@@ -480,6 +480,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #' \code{qsropt} gives the quantile function, and \code{rsropt} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
+#' @rdname dsropt
 #' @aliases psropt
 #' @aliases qsropt 
 #' @aliases rsropt

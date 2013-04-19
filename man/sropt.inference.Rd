@@ -8,35 +8,20 @@
 
   T2.inference(T2,df1,df2,...)
 
-  sropt.inference(z.s,df1,df2,opy=1,drag=0,...)
+  sropt.inference(z.s,...)
 }
 \arguments{
   \item{Fs}{a (non-central) F statistic.}
 
   \item{T2}{a (non-central) Hotelling \eqn{T^2} statistic.}
 
-  \item{z.s}{an observed Sharpe ratio statistic,
-  annualized.}
+  \item{z.s}{an object of type \code{sropt}.}
 
   \item{type}{the estimator type. one of \code{c("KRS",
   "MLE", "unbiased")}}
 
-  \item{opy}{the number of observations per 'year'.
-  \code{z.s} is assumed given in 'annualized' units, that
-  is, per 'year', but returns are observed possibly at a
-  rate of \code{opy} per 'year.' default value is 1,
-  meaning no deannualization is performed.}
-
-  \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
-  to 0. It is assumed that \code{drag} has been annualized,
-  \emph{i.e.} is given in the same units as \code{z.s}.}
-
   \item{...}{the \code{type} which is passed on to
   \code{F.inference}.}
-
-  \item{df1}{the number of assets in the portfolio.}
-
-  \item{df2}{the number of observations.}
 }
 \value{
   an estimate of the non-centrality parameter.
@@ -77,13 +62,24 @@ rvs <- rf(1024, 4, 1000, 5)
 unbs <- F.inference(rvs, 4, 1000, type="unbiased")
 # generate some sropts
 true.snrstar <- 1.25
-df1 <- 6
-df2 <- 2000
+nfac <- 5
+nyr <- 10
 opy <- 253
-rvs <- rsropt(500, df1, df2, true.snrstar, opy)
-est1 <- sropt.inference(rvs,df1,df2,opy,type='unbiased')
-est2 <- sropt.inference(rvs,df1,df2,opy,type='KRS')
-est3 <- sropt.inference(rvs,df1,df2,opy,type='MLE')
+# simulations with no covariance structure.
+# under the null:
+set.seed(as.integer(charToRaw("determinstic")))
+Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+asro <- sropt(Returns,drag=0,opy=opy)
+est1 <- sropt.inference(asro,type='unbiased')
+est2 <- sropt.inference(asro,type='KRS')
+est3 <- sropt.inference(asro,type='MLE')
+
+# under the alternative:
+Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
+asro <- sropt(Returns,drag=0,opy=opy)
+est1 <- sropt.inference(asro,type='unbiased')
+est2 <- sropt.inference(asro,type='KRS')
+est3 <- sropt.inference(asro,type='MLE')
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

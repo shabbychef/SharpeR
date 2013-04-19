@@ -2,18 +2,20 @@
 \alias{reannualize}
 \title{Change the annualization of a Sharpe ratio.}
 \usage{
-  reannualize(x,opy,epoch="yr")
+  reannualize(x,opy,epoch)
 }
 \arguments{
   \item{x}{an object of class \code{sr}.}
 
-  \item{opy}{the new observations per year (or epoch).}
+  \item{opy}{the new observations per year (or epoch). If
+  none given, it is not updated.}
 
-  \item{epoch}{a string representation of the epoch.}
+  \item{epoch}{a string representation of the epoch. If
+  none given, it is not updated.}
 }
 \value{
-  an object of class \code{sr} with the annualization
-  parameter updated.
+  an object of class \code{sr} with the annualization or
+  epoch updated.
 }
 \description{
   Changes the annualization factor of a Sharpe ratio

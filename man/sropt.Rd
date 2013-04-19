@@ -2,7 +2,7 @@
 \alias{sropt}
 \title{Compute the Sharpe ratio of the Markowitz portfolio.}
 \usage{
-  sropt(X,drag=0,opy=1)
+  sropt(X,drag=0,opy=1,epoch="yr")
 }
 \arguments{
   \item{X}{matrix of returns.}
@@ -17,6 +17,9 @@
   returns are observed at a rate of \code{opy} per 'year.'
   default value is 1, meaning no annualization is
   performed.}
+
+  \item{epoch}{the string representation of the 'year',
+  defaulting to 'yr'.}
 }
 \value{
   A list with containing the following components:
