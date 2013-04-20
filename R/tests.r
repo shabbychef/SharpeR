@@ -303,7 +303,7 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 
 	if (is.null(y)) {#FOLDUP
 		# delegate
-		subsr <- sr(x,c0=0,opy=opy,na.rm=TRUE)
+		subsr <- as.sr(x,c0=0,opy=opy,na.rm=TRUE)
 		retv <- sr_test(subsr,alternative=alternative,zeta=zeta,conf.level=conf.level)
 		retv$data.name <- dname
 		names(retv$estimate) <- paste(c("Sharpe ratio of",dname),sep=" ",collapse="")
@@ -330,8 +330,8 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 			pval <- subtest$p.value
 		} #UNFOLD
 		else {#FOLDUP
-			srx <- sr(x,c0=0)
-			sry <- sr(y,c0=0)
+			srx <- as.sr(x,c0=0)
+			sry <- as.sr(y,c0=0)
 
 			sx <- srx$sr
 			sy <- sry$sr
@@ -383,7 +383,7 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 #'
 #' @param z an object of class \code{sr}.
 #' @examples 
-#' asr <- sr(rnorm(1000,1 / sqrt(253)),opy=253)
+#' asr <- as.sr(rnorm(1000,1 / sqrt(253)),opy=253)
 #' checkit <- sr_test(asr,zeta=0)
 sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 											 zeta=0,conf.level=0.95) {

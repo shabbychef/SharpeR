@@ -64,7 +64,7 @@ opy <- 253
 df1 <- 6
 df2 <- opy * 6
 rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
-sro <- sropt(rvs)
+sro <- as.sropt(rvs)
 aci <- confint(sro)
 }
 \author{
@@ -74,7 +74,8 @@ aci <- confint(sro)
   \code{\link{confint}}, \code{\link{qco_sropt}},
   \code{\link{sropt.test}}
 
-  Other sropt: \code{\link{dsropt}},
+  Other sropt: \code{\link{as.sropt}},
+  \code{\link{as.sropt.default}}, \code{\link{dsropt}},
   \code{\link{pco_sropt}}, \code{\link{sropt}},
   \code{\link{sropt.test}}
 }

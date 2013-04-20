@@ -23,7 +23,7 @@
 }
 \examples{
 # compute a 'daily' Sharpe
-mysr <- sr(rnorm(253*8),opy=1)
+mysr <- as.sr(rnorm(253*8),opy=1)
 # turn into annual
 mysr2 <- reannualize(mysr,opy=253,epoch="yr")
 }
@@ -33,13 +33,14 @@ mysr2 <- reannualize(mysr,opy=253,epoch="yr")
 \seealso{
   sr
 
-  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
-  \code{\link{is.sr}}, \code{\link{plambdap}},
-  \code{\link{power.sr.test}}, \code{\link{se}},
-  \code{\link{se.default}}, \code{\link{se.sr}},
-  \code{\link{sr}}, \code{\link{sr.default}},
-  \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
-  \code{\link{sr_test}}, \code{\link{sr_test.default}},
-  \code{\link{sr_test.sr}}, \code{\link{sr.xts}}
+  Other sr: \code{\link{as.sr}},
+  \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
+  \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
+  \code{\link{dsr}}, \code{\link{is.sr}},
+  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{se}}, \code{\link{se.default}},
+  \code{\link{se.sr}}, \code{\link{sr}},
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
 }
 

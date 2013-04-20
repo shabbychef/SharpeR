@@ -55,12 +55,12 @@
 }
 \details{
   Suppose \eqn{z_*}{z*} follows a \emph{Maximal Sharpe
-  ratio} distribution (see \code{\link{SharpeR}}) for known
-  degrees of freedom, and unknown non-centrality parameter
-  \eqn{\zeta_*}{zeta*}. The 'confidence distribution' views
-  \eqn{\zeta_*}{zeta*} as a random quantity once
-  \eqn{z_*}{z*} is observed. As such, the CDF of the
-  confidence distribution is the same as that of the
+  ratio} distribution (see \code{\link{package-SharpeR}})
+  for known degrees of freedom, and unknown non-centrality
+  parameter \eqn{\zeta_*}{zeta*}. The 'confidence
+  distribution' views \eqn{\zeta_*}{zeta*} as a random
+  quantity once \eqn{z_*}{z*} is observed. As such, the CDF
+  of the confidence distribution is the same as that of the
   Maximal Sharpe ratio (up to a flip of \code{lower.tail});
   while the quantile function is used to compute confidence
   intervals on \eqn{\zeta_*}{zeta*} given \eqn{z_*}{z*}.
@@ -123,9 +123,11 @@ qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 \seealso{
   \code{\link{dsropt},\link{psropt},\link{qsropt},\link{rsropt}}
 
-  Other sropt: \code{\link{confint.sropt}},
-  \code{\link{dsropt}}, \code{\link{sropt}},
-  \code{\link{sropt_confint}}, \code{\link{sropt.test}}
+  Other sropt: \code{\link{as.sropt}},
+  \code{\link{as.sropt.default}},
+  \code{\link{confint.sropt}}, \code{\link{dsropt}},
+  \code{\link{sropt}}, \code{\link{sropt_confint}},
+  \code{\link{sropt.test}}
 }
 \keyword{distribution}
 

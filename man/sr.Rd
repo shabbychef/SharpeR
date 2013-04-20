@@ -1,22 +1,14 @@
 \name{sr}
 \alias{sr}
-\alias{sr.default}
-\alias{sr.lm}
-\alias{sr.xts}
-\title{Compute the Sharpe ratio.}
+\title{Create an 'sr' object.}
 \usage{
-  sr(x,...)
-
-  \method{sr}{default} (x, c0 = 0, opy = 1, na.rm = FALSE,
-    epoch = "yr")
-
-  \method{sr}{lm} (modl, c0 = 0, opy = 1, na.rm = FALSE,
-    epoch = "yr")
-
-  \method{sr}{xts} (anxts, c0 = 0, opy = 1, ...)
+  sr(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr")
 }
 \arguments{
-  \item{x}{vector of returns.}
+  \item{sr}{a Sharpe ratio statistic.}
+
+  \item{df}{the degrees of freedom of the equivalent
+  t-statistic.}
 
   \item{c0}{the 'risk-free' or 'disastrous' rate of return.
   this is assumed to be given in the same units as x,
@@ -25,67 +17,48 @@
   \item{opy}{the number of observations per 'year'. This is
   used to 'annualize' the answer.}
 
+  \item{rescal}{the rescaling parameter.}
+
   \item{epoch}{the string representation of the 'year',
   defaulting to 'yr'.}
-
-  \item{...}{further arguments to be passed to or from
-  methods.}
-
-  \item{na.rm}{logical.  Should missing values be removed?}
-
-  \item{modl}{a fit model of class \code{lm}.}
-
-  \item{anxts}{an xts object.}
 }
 \value{
-  a list containing the following components: \item{sr}{the
-  annualized Sharpe ratio.} \item{df}{the t-stat degrees of
-  freedom.} \item{c0}{the risk free term.} \item{opy}{the
-  annualization factor.} \item{rescal}{the rescaling
-  factor.} \item{epoch}{the string epoch.} cast to class
-  \code{sr}.
+  a list cast to class \code{sr}.
 }
 \description{
-  Computes the Sharpe ratio of some observed returns.
+  Spawns an object of class \code{sr}.
 }
 \details{
-  Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent returns
-  of some asset. Let \eqn{\bar{x}}{xbar} be the sample
-  mean, and \eqn{s}{s} be the sample standard deviation
-  (using Bessel's correction). Let \eqn{c_0}{c0} be the
-  'risk free rate'.  Then \deqn{z = \frac{\bar{x} -
-  c_0}{s}}{z = (xbar - c0)/s} is the (sample) Sharpe ratio.
+  The \code{sr} class contains information about a rescaled
+  t-statistic. The following are list attributes of the
+  object: \itemize{ \item \code{sr} The Sharpe ratio
+  statistic. \item \code{df} The d.f. of the equivalent
+  t-statistic. \item \code{c0} The drag 'risk free rate'
+  used. \item \code{opy} The 'observations per year'. \item
+  \code{rescal} The rescaling parameter. \item \code{epoch}
+  The string name of the 'epoch'. }
 
-  The units of \eqn{z}{z} are \eqn{\mbox{time}^{-1/2}}{per
-  root time}. Typically the Sharpe ratio is
-  \emph{annualized} by multiplying by
-  \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where
-  \eqn{\mbox{opy}}{opy} is the number of observations per
-  year (or whatever the target annualization epoch.)
+  The stored Sharpe statistic, \code{sr} is equal to the
+  t-statistic times \eqn{rescal * sqrt{opy}}{rescal *
+  sqrt(opy)}.
+
+  For the most part, this constructor should \emph{not} be
+  called directly, rather \code{\link{as.sr}} should be
+  called instead to compute the Sharpe ratio.
+}
+\note{
+  2FIX: allow rownames?
 }
 \examples{
-# Sharpe's 'model': just given a bunch of returns.
-asr <- sr(rnorm(253*8),opy=253)
-# given an xts object:
-if (require(quantmod)) {
-  getSymbols('IBM')
-  lrets <- diff(log(IBM[,"IBM.Adjusted"]))
-  asr <- sr(lrets,na.rm=TRUE)
-}
-# on a linear model, find the 'Sharpe' of the residual term
-nfac <- 5
-nyr <- 10
+# roll your own.
 opy <- 253
-set.seed(as.integer(charToRaw("determinstic")))
-Factors <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
-Betas <- exp(0.1 * rnorm(dim(Factors)[2]))
-Returns <- (Factors \%*\% Betas) + rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
-APT_mod <- lm(Returns ~ Factors)
-asr <- sr(APT_mod,opy=opy)
-# try again, but make the Returns independent of the Factors.
-Returns <- rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
-APT_mod <- lm(Returns ~ Factors)
-asr <- sr(APT_mod,opy=opy)
+zeta <- 1.0
+n <- 6 * opy
+rvs <- rsr(1,n,zeta,opy=opy)
+roll.own <- sr(sr=rvs,df=n-1,opy=opy,rescal=sqrt(1/n))
+# put a bunch in. naming becomes a problem.
+rvs <- rsr(5,n,zeta,opy=opy)
+roll.own <- sr(sr=rvs,df=n-1,opy=opy,rescal=sqrt(1/n))
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
@@ -94,22 +67,19 @@ asr <- sr(APT_mod,opy=opy)
   Sharpe, William F. "Mutual fund performance." Journal of
   business (1966): 119-138.
   \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
-
-  Lo, Andrew W. "The statistics of Sharpe ratios."
-  Financial Analysts Journal (2002): 36-52.
-  \url{http://ssrn.com/paper=377260}
 }
 \seealso{
-  sr-distribution functions, \code{\link{dsr}, \link{psr},
-  \link{qsr}, \link{rsr}}
+  \code{\link{as.sr}}
 
-  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
-  \code{\link{is.sr}}, \code{\link{plambdap}},
-  \code{\link{power.sr.test}}, \code{\link{reannualize}},
-  \code{\link{se}}, \code{\link{se.default}},
-  \code{\link{se.sr}}, \code{\link{sr_equality_test}},
-  \code{\link{sr_test}}, \code{\link{sr_test.default}},
-  \code{\link{sr_test.sr}}
+  Other sr: \code{\link{as.sr}},
+  \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
+  \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
+  \code{\link{dsr}}, \code{\link{is.sr}},
+  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{reannualize}}, \code{\link{se}},
+  \code{\link{se.default}}, \code{\link{se.sr}},
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
 }
 \keyword{univar}
 

@@ -164,7 +164,7 @@ se.default <- function(z, ...) {
 #' Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}
 #'
 #' @examples 
-#' asr <- sr(rnorm(1000,0.2))
+#' asr <- as.sr(rnorm(1000,0.2))
 #' anse <- se(asr,type="t")
 #' anse2 <- se(asr,type="exact")
 #'
@@ -225,12 +225,12 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' opy <- 253
 #' df <- opy * 6
 #' xv <- rnorm(df, 1 / sqrt(opy))
-#' mysr <- sr(xv,opy=opy)
+#' mysr <- as.sr(xv,opy=opy)
 #' confint(mysr,level=0.90)
 #' # using "lm" class
 #' yv <- xv + rnorm(length(xv))
 #' amod <- lm(yv ~ xv)
-#' mysr <- sr(amod,opy=opy)
+#' mysr <- as.sr(amod,opy=opy)
 #' confint(mysr,level.lo=0.05,level.hi=1.0)
 #'
 #' @rdname confint
@@ -293,7 +293,7 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #' df1 <- 6
 #' df2 <- opy * 6
 #' rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
-#' sro <- sropt(rvs)
+#' sro <- as.sropt(rvs)
 #' aci <- confint(sro)
 #'
 #'@export
@@ -461,14 +461,14 @@ T2.inference <- function(T2,df1,df2,...) {
 #' # under the null:
 #' set.seed(as.integer(charToRaw("determinstic")))
 #' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
-#' asro <- sropt(Returns,drag=0,opy=opy)
+#' asro <- as.sropt(Returns,drag=0,opy=opy)
 #' est1 <- sropt.inference(asro,type='unbiased')  
 #' est2 <- sropt.inference(asro,type='KRS')  
 #' est3 <- sropt.inference(asro,type='MLE')
 #' 
 #' # under the alternative:
 #' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
-#' asro <- sropt(Returns,drag=0,opy=opy)
+#' asro <- as.sropt(Returns,drag=0,opy=opy)
 #' est1 <- sropt.inference(asro,type='unbiased')  
 #' est2 <- sropt.inference(asro,type='KRS')  
 #' est3 <- sropt.inference(asro,type='MLE')

@@ -35,21 +35,69 @@
 # Sharpe Ratio#FOLDUP
 
 # spawn a "SR" object.
-# the Sharpe Ratio is a rescaled t-statistic.
-#
-# SR = R t
-#
-# where R is the 'rescaling', and
-# t = (betahat' v - c0) / sigmahat
-# is distributed as a non-central t with
-# df degrees of freedom and non-centrality
-# parameter
-# delta = (beta' v - c0) / (sigma R)
-#
-# for 'convenience' we re-express SR and delta
-# in 'annualized' units by multiplying them by
-# sqrt(opy)
-.spawn_sr <- function(sr,df,c0,opy,rescal,epoch="yr") {
+#' @title Create an 'sr' object.
+#'
+#' @description 
+#'
+#' Spawns an object of class \code{sr}.
+#'
+#' @details
+#'
+#' The \code{sr} class contains information about a rescaled t-statistic.
+#' The following are list attributes of the object:
+#' \itemize{
+#' \item \code{sr} The Sharpe ratio statistic.
+#' \item \code{df} The d.f. of the equivalent t-statistic.
+#' \item \code{c0} The drag 'risk free rate' used.
+#' \item \code{opy} The 'observations per year'.
+#' \item \code{rescal} The rescaling parameter.
+#' \item \code{epoch} The string name of the 'epoch'.
+#' }
+#'
+#' The stored Sharpe statistic, \code{sr} is equal to the t-statistic 
+#' times \eqn{rescal * sqrt{opy}}{rescal * sqrt(opy)}.
+#'
+#' For the most part, this constructor should \emph{not} be called directly,
+#' rather \code{\link{as.sr}} should be called instead to compute the
+#' Sharpe ratio.
+#'
+#' @usage
+#'
+#' sr(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") 
+#'
+#' @param sr a Sharpe ratio statistic.
+#' @param df the degrees of freedom of the equivalent t-statistic.
+#' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
+#'        assumed to be given in the same units as x, \emph{not}
+#'        in 'annualized' terms.
+#' @param opy the number of observations per 'year'. This is used to
+#'        'annualize' the answer.
+#' @param rescal the rescaling parameter.
+#' @param epoch the string representation of the 'year', defaulting
+#'        to 'yr'.
+#' @keywords univar 
+#' @return a list cast to class \code{sr}.
+#' @seealso \code{\link{as.sr}}
+#' @rdname sr
+#' @export sr
+#' @template etc
+#' @template sr
+#'
+#' @note
+#' 2FIX: allow rownames?
+#'
+#' @examples 
+#' # roll your own.
+#' opy <- 253
+#' zeta <- 1.0
+#' n <- 6 * opy
+#' rvs <- rsr(1,n,zeta,opy=opy)
+#' roll.own <- sr(sr=rvs,df=n-1,opy=opy,rescal=sqrt(1/n))
+#' # put a bunch in. naming becomes a problem.
+#' rvs <- rsr(5,n,zeta,opy=opy)
+#' roll.own <- sr(sr=rvs,df=n-1,opy=opy,rescal=sqrt(1/n))
+#'
+sr <- function(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 	retval <- list(sr = sr,df = df,c0 = c0,
 								 opy = opy,rescal = rescal,epoch = epoch)
 	class(retval) <- "sr"
@@ -86,7 +134,7 @@
 #'
 #' @usage
 #'
-#' sr(x,...)
+#' as.sr(x,...)
 #'
 #' @param x vector of returns.
 #' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
@@ -107,8 +155,8 @@
 #' \item{epoch}{the string epoch.}
 #' cast to class \code{sr}.
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
-#' @rdname sr
-#' @export sr
+#' @rdname as.sr
+#' @export as.sr
 #' @template etc
 #' @template sr
 #' @references 
@@ -118,12 +166,12 @@
 #'
 #' @examples 
 #' # Sharpe's 'model': just given a bunch of returns.
-#' asr <- sr(rnorm(253*8),opy=253)
+#' asr <- as.sr(rnorm(253*8),opy=253)
 #' # given an xts object:
 #' if (require(quantmod)) {
 #'   getSymbols('IBM')
 #'   lrets <- diff(log(IBM[,"IBM.Adjusted"]))
-#'   asr <- sr(lrets,na.rm=TRUE)
+#'   asr <- as.sr(lrets,na.rm=TRUE)
 #' }
 #' # on a linear model, find the 'Sharpe' of the residual term
 #' nfac <- 5
@@ -134,53 +182,53 @@
 #' Betas <- exp(0.1 * rnorm(dim(Factors)[2]))
 #' Returns <- (Factors %*% Betas) + rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 #' APT_mod <- lm(Returns ~ Factors)
-#' asr <- sr(APT_mod,opy=opy)
+#' asr <- as.sr(APT_mod,opy=opy)
 #' # try again, but make the Returns independent of the Factors.
 #' Returns <- rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 #' APT_mod <- lm(Returns ~ Factors)
-#' asr <- sr(APT_mod,opy=opy)
+#' asr <- as.sr(APT_mod,opy=opy)
 #'   
-sr <- function(x,c0=0,opy=1,...) {
-	UseMethod("sr", x)
+as.sr <- function(x,c0=0,opy=1,...) {
+	UseMethod("as.sr", x)
 }
 #' @param na.rm logical.  Should missing values be removed?
-#' @rdname sr
-#' @method sr default
-#' @S3method sr default
-sr.default <- function(x,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
+#' @rdname as.sr
+#' @method as.sr default
+#' @S3method as.sr default
+as.sr.default <- function(x,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 	mu <- mean(x,na.rm=na.rm)
 	sigma <- sd(x,na.rm=na.rm)
-	sr <- .compute_sr(mu,c0,sigma,opy)
+	z <- .compute_sr(mu,c0,sigma,opy)
 	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
-	retval <- .spawn_sr(sr,df=df-1,c0=c0,opy=opy,
-											rescal=1/sqrt(df),epoch=epoch)
+	retval <- sr(z,df=df-1,c0=c0,opy=opy,
+							 rescal=1/sqrt(df),epoch=epoch)
 	return(retval)
 }
 #' @param modl a fit model of class \code{lm}.
-#' @rdname sr
-#' @method sr lm 
-#' @S3method sr lm
-sr.lm <- function(modl,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
+#' @rdname as.sr
+#' @method as.sr lm 
+#' @S3method as.sr lm
+as.sr.lm <- function(modl,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 	mu <- modl$coefficients["(Intercept)"]
 	sigma <- sqrt(deviance(modl) / modl$df.residual)
-	sr <- .compute_sr(mu,c0,sigma,opy)
+	z <- .compute_sr(mu,c0,sigma,opy)
 	XXinv <- vcov(modl) / sigma^2
 	rescal <- sqrt(XXinv["(Intercept)","(Intercept)"])
-	retval <- .spawn_sr(sr,df=modl$df.residual,c0=c0,opy=opy,
-											rescal=rescal,epoch=epoch)
+	retval <- sr(z,df=modl$df.residual,c0=c0,opy=opy,
+							 rescal=rescal,epoch=epoch)
 	return(retval)
 }
 #' @param anxts an xts object.
-#' @rdname sr
-#' @method sr xts 
-#' @S3method sr xts
-sr.xts <- function(anxts,c0=0,opy=1,...) {
+#' @rdname as.sr
+#' @method as.sr xts 
+#' @S3method as.sr xts
+as.sr.xts <- function(anxts,c0=0,opy=1,...) {
 	if (missing(opy)) {
 		TEO <- time(anxts)
 		days.per.row <- as.double((TEO[length(TEO)] - TEO[1]) / (length(TEO) - 1))
 		opy <- 365.25 / days.per.row
 	}
-	retval <- sr.default(anxts,c0=c0,opy=opy,...)
+	retval <- as.sr.default(anxts,c0=c0,opy=opy,...)
 	return(retval)
 }
 #' @title Is this in the "sr" class?
@@ -205,7 +253,7 @@ sr.xts <- function(anxts,c0=0,opy=1,...) {
 #' @export
 #'
 #' @examples 
-#' rvs <- sr(rnorm(253*8),opy=253)
+#' rvs <- as.sr(rnorm(253*8),opy=253)
 #' is.sr(rvs)
 is.sr <- function(x) inherits(x,"sr")
 
@@ -226,7 +274,7 @@ print.sr <- function(x,...) {
 	#colnames(coefs) <- c("stat","t.stat","p.value")
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "Std. Error","t value","Pr(>t)")
-	rownames(coefs) <- c("Sharpe")
+	#rownames(coefs) <- c("Sharpe")
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1,2),tst.ind=c(3),dig.tst=2)
@@ -277,7 +325,7 @@ print.sr <- function(x,...) {
 #'
 #' @examples 
 #' # compute a 'daily' Sharpe
-#' mysr <- sr(rnorm(253*8),opy=1)
+#' mysr <- as.sr(rnorm(253*8),opy=1)
 #' # turn into annual 
 #' mysr2 <- reannualize(mysr,opy=253,epoch="yr")
 reannualize <- function(x,opy,epoch) {
@@ -315,6 +363,75 @@ reannualize <- function(x,opy,epoch) {
 	return(retval)
 }
 
+# spawn a "SROPT" object.
+#' @title Create an 'sropt' object.
+#'
+#' @description 
+#'
+#' Spawns an object of class \code{sropt}.
+#'
+#' @details
+#'
+#' The \code{sropt} class contains information about a rescaled T^2-statistic.
+#' The following are list attributes of the object:
+#' \itemize{
+#' \item \code{sropt} The (optimal) Sharpe ratio statistic.
+#' \item \code{df1} The number of assets.
+#' \item \code{df2} The number of observations.
+#' \item \code{drag} The drag term, which is the 'risk free rate' divided by
+#' the maximum risk.
+#' \item \code{opy} The 'observations per year'.
+#' \item \code{epoch} The string name of the 'epoch'.
+#' }
+#'
+#' For the most part, this constructor should \emph{not} be called directly,
+#' rather \code{\link{as.sropt}} should be called instead to compute the
+#' needed statistics.
+#'
+#' @usage
+#'
+#' sropt(sropt,df1,df2,drag=0,opy=1,epoch="yr")
+#'
+#' @param sropt an optimum Sharpe ratio statistic.
+#' @inheritParams dsropt
+#' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
+#'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
+#'        by \eqn{\sqrt{opy}}{sqrt(opy)}. This is in contrast to the \code{c0}
+#'        term given to \code{\link{sr}}.
+#' @param opy the number of observations per 'year'. The returns are observed
+#'        at a rate of \code{opy} per 'year.' default value is 1, meaning no 
+#'        annualization is performed.
+#' @param epoch the string representation of the 'year', defaulting
+#'        to 'yr'.
+#' @keywords univar 
+#' @return a list cast to class \code{sropt}.
+#' @seealso \code{\link{as.sropt}}
+#' @rdname sropt
+#' @export 
+#' @template etc
+#' @template sropt
+#'
+#' @note
+#' 2FIX: allow rownames?
+#'
+#' @examples 
+#' # roll your own.
+#' opy <- 253
+#' zeta.s <- 1.0
+#' df1 <- 10
+#' df2 <- 6 * opy
+#' rvs <- rsropt(1,df1,df2,zeta.s,opy,drag=0)
+#' roll.own <- sropt(sropt=rvs,df1,df2,drag=0,opy=opy)
+#' # put a bunch in. naming becomes a problem.
+#' rvs <- rsropt(5,df1,df2,zeta.s,opy,drag=0)
+#' roll.own <- sropt(sropt=rvs,df1,df2,drag=0,opy=opy)
+#'
+sropt <- function(sropt,df1,df2,drag=0,opy=1,epoch="yr") {
+	retval <- list(sropt = sropt,df1 = df1,df2 = df2,
+								 drag = drag,opy = opy,epoch = epoch)
+	class(retval) <- "sropt"
+	return(retval)
+}
 #' @title Compute the Sharpe ratio of the Markowitz portfolio.
 #'
 #' @description 
@@ -349,18 +466,10 @@ reannualize <- function(x,opy,epoch) {
 #'
 #' @usage
 #'
-#' sropt(X,drag=0,opy=1,epoch="yr")
+#' as.sropt(X,drag=0,opy=1,epoch="yr")
 #'
 #' @param X matrix of returns.
-#' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
-#'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
-#'        by \eqn{\sqrt{opy}}{sqrt(opy)}. This is in contrast to the \code{c0}
-#'        term given to \code{\link{sr}}.
-#' @param opy the number of observations per 'year'. The returns are observed
-#'        at a rate of \code{opy} per 'year.' default value is 1, meaning no 
-#'        annualization is performed.
-#' @param epoch the string representation of the 'year', defaulting
-#'        to 'yr'.
+#' @inheritParams sropt 
 #' @keywords univar 
 #' @return A list with containing the following components:
 #' \item{w}{the optimal portfolio.}
@@ -375,6 +484,7 @@ reannualize <- function(x,opy,epoch) {
 #' @aliases sropt
 #' @seealso \code{\link{sr}}, sropt-distribution functions, 
 #' \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
+#' @rdname as.sropt
 #' @export 
 #' @template etc
 #' @template sropt
@@ -386,20 +496,25 @@ reannualize <- function(x,opy,epoch) {
 #' # under the null:
 #' set.seed(as.integer(charToRaw("determinstic")))
 #' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
-#' asro <- sropt(Returns,drag=0,opy=opy)
+#' asro <- as.sropt(Returns,drag=0,opy=opy)
 #' # under the alternative:
 #' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
-#' asro <- sropt(Returns,drag=0,opy=opy)
-#'
-#'
-sropt <- function(X,drag=0,opy=1,epoch="yr") {
+#' asro <- as.sropt(Returns,drag=0,opy=opy)
+as.sropt <- function(X,drag=0,opy=1,epoch="yr") {
+	UseMethod("as.sropt", X)
+}
+#' @rdname as.sropt
+#' @method as.sropt default
+#' @S3method as.sropt default
+as.sropt.default <- function(X,drag=0,opy=1,epoch="yr") {
+	# somehow call sropt!
 	retval <- .hotelling(X)
 	retval$drag <- drag
 	retval$opy <- opy
 	retval$epoch <- epoch
 	retval$sropt <- .T2sropt(retval,retval$T2)
 
-	#units(retval$sropt) <- "yr^-0.5"
+	# 2FIX: should this also be of class "sr"?
 	class(retval) <- "sropt"
 	return(retval)
 }
@@ -414,7 +529,7 @@ print.sropt <- function(x,...) {
 											 #"Std. Error","t value","Pr(>t)")
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "T^2 value","Pr(>T^2)")
-	rownames(coefs) <- c("Sharpe")
+	#rownames(coefs) <- c("Sharpe")
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)
@@ -424,6 +539,10 @@ print.sropt <- function(x,...) {
 # get the T2-stat associated with an SROPT object.
 .sropt2T <- function(x) {
 	Tval <- x$T2
+	if (is.null(Tval)) {
+		tval <- .deannualize(x$sropt + x$drag,x$opy)
+		Tval <- x$df2 * (tval^2)
+	}
 	return(Tval)
 }
 # and the reverse

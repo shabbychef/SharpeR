@@ -99,7 +99,7 @@ pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),opy=253,alternative="two.sided"
                         x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')
-asr <- sr(rnorm(1000,1 / sqrt(253)),opy=253)
+asr <- as.sr(rnorm(1000,1 / sqrt(253)),opy=253)
 checkit <- sr_test(asr,zeta=0)
 }
 \author{
@@ -118,13 +118,14 @@ checkit <- sr_test(asr,zeta=0)
 \seealso{
   \code{\link{sr_equality_test}}, \code{\link{t.test}}.
 
-  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
-  \code{\link{is.sr}}, \code{\link{plambdap}},
-  \code{\link{power.sr.test}}, \code{\link{reannualize}},
-  \code{\link{se}}, \code{\link{se.default}},
-  \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr.default}}, \code{\link{sr_equality_test}},
-  \code{\link{sr.lm}}, \code{\link{sr.xts}}
+  Other sr: \code{\link{as.sr}},
+  \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
+  \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
+  \code{\link{dsr}}, \code{\link{is.sr}},
+  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{reannualize}}, \code{\link{se}},
+  \code{\link{se.default}}, \code{\link{se.sr}},
+  \code{\link{sr}}, \code{\link{sr_equality_test}}
 }
 \keyword{htest}
 

@@ -47,7 +47,7 @@
   autocorrelation, skew, kurtosis.
 }
 \examples{
-asr <- sr(rnorm(1000,0.2))
+asr <- as.sr(rnorm(1000,0.2))
 anse <- se(asr,type="t")
 anse2 <- se(asr,type="exact")
 }
@@ -79,13 +79,14 @@ anse2 <- se(asr,type="exact")
 \seealso{
   sr-distribution functions, \code{\link{dsr}}
 
-  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
-  \code{\link{is.sr}}, \code{\link{plambdap}},
-  \code{\link{power.sr.test}}, \code{\link{reannualize}},
-  \code{\link{sr}}, \code{\link{sr.default}},
-  \code{\link{sr_equality_test}}, \code{\link{sr.lm}},
-  \code{\link{sr_test}}, \code{\link{sr_test.default}},
-  \code{\link{sr_test.sr}}, \code{\link{sr.xts}}
+  Other sr: \code{\link{as.sr}},
+  \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
+  \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
+  \code{\link{dsr}}, \code{\link{is.sr}},
+  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{reannualize}}, \code{\link{sr}},
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
 }
 \keyword{htest}
 

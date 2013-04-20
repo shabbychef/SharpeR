@@ -75,9 +75,11 @@ abline(0,1,col='red')
 \seealso{
   \code{\link{sr_test}}, \code{\link{t.test}}.
 
-  Other sropt: \code{\link{confint.sropt}},
-  \code{\link{dsropt}}, \code{\link{pco_sropt}},
-  \code{\link{sropt}}, \code{\link{sropt_confint}}
+  Other sropt: \code{\link{as.sropt}},
+  \code{\link{as.sropt.default}},
+  \code{\link{confint.sropt}}, \code{\link{dsropt}},
+  \code{\link{pco_sropt}}, \code{\link{sropt}},
+  \code{\link{sropt_confint}}
 }
 \keyword{htest}
 

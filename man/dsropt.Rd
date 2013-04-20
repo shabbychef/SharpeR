@@ -133,9 +133,11 @@ plot(ecdf(isp))
   Hotelling \eqn{T^2}-distribution functions,
   \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
 
-  Other sropt: \code{\link{confint.sropt}},
-  \code{\link{pco_sropt}}, \code{\link{sropt}},
-  \code{\link{sropt_confint}}, \code{\link{sropt.test}}
+  Other sropt: \code{\link{as.sropt}},
+  \code{\link{as.sropt.default}},
+  \code{\link{confint.sropt}}, \code{\link{pco_sropt}},
+  \code{\link{sropt}}, \code{\link{sropt_confint}},
+  \code{\link{sropt.test}}
 }
 \keyword{distribution}
 
