@@ -588,7 +588,7 @@ sropt.test <- function(X,alternative=c("greater","two.sided","less"),
 		stop("'conf.level' must be a single number between 0 and 1")
 
 	dname <- deparse(substitute(X))
-	subtest <- sropt(X,opy=opy)
+	subtest <- as.sropt(X,opy=opy)
 	statistic <- subtest$T2
 	names(statistic) <- "T2"
 	estimate <- subtest$sropt

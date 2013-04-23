@@ -224,9 +224,7 @@ as.sr.lm <- function(modl,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 #' @S3method as.sr xts
 as.sr.xts <- function(anxts,c0=0,opy=1,...) {
 	if (missing(opy)) {
-		TEO <- time(anxts)
-		days.per.row <- as.double((TEO[length(TEO)] - TEO[1]) / (length(TEO) - 1))
-		opy <- 365.25 / days.per.row
+		opy <- .infer_opy_xts(anxts)
 	}
 	retval <- as.sr.default(anxts,c0=c0,opy=opy,...)
 	return(retval)
@@ -390,9 +388,9 @@ reannualize <- function(x,opy,epoch) {
 #'
 #' @usage
 #'
-#' sropt(sropt,df1,df2,drag=0,opy=1,epoch="yr")
+#' sropt(zeta.s,df1,df2,drag=0,opy=1,epoch="yr")
 #'
-#' @param sropt an optimum Sharpe ratio statistic.
+#' @param zeta.s an optimum Sharpe ratio statistic.
 #' @inheritParams dsropt
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
 #'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
@@ -421,13 +419,13 @@ reannualize <- function(x,opy,epoch) {
 #' df1 <- 10
 #' df2 <- 6 * opy
 #' rvs <- rsropt(1,df1,df2,zeta.s,opy,drag=0)
-#' roll.own <- sropt(sropt=rvs,df1,df2,drag=0,opy=opy)
+#' roll.own <- sropt(zeta.s=rvs,df1,df2,drag=0,opy=opy)
 #' # put a bunch in. naming becomes a problem.
 #' rvs <- rsropt(5,df1,df2,zeta.s,opy,drag=0)
-#' roll.own <- sropt(sropt=rvs,df1,df2,drag=0,opy=opy)
+#' roll.own <- sropt(zeta.s=rvs,df1,df2,drag=0,opy=opy)
 #'
-sropt <- function(sropt,df1,df2,drag=0,opy=1,epoch="yr") {
-	retval <- list(sropt = sropt,df1 = df1,df2 = df2,
+sropt <- function(zeta.s,df1,df2,drag=0,opy=1,epoch="yr") {
+	retval <- list(sropt = zeta.s,df1 = df1,df2 = df2,
 								 drag = drag,opy = opy,epoch = epoch)
 	class(retval) <- "sropt"
 	return(retval)
@@ -508,14 +506,21 @@ as.sropt <- function(X,drag=0,opy=1,epoch="yr") {
 #' @S3method as.sropt default
 as.sropt.default <- function(X,drag=0,opy=1,epoch="yr") {
 	# somehow call sropt!
-	retval <- .hotelling(X)
-	retval$drag <- drag
+	hotval <- .hotelling(X)
+	# what fucking bother.
+	retval <- hotval
 	retval$opy <- opy
-	retval$epoch <- epoch
-	retval$sropt <- .T2sropt(retval,retval$T2)
+	retval$drag <- drag
+	zeta.s <- .T2sropt(retval,retval$T2)
 
-	# 2FIX: should this also be of class "sr"?
-	class(retval) <- "sropt"
+	# this stink.s
+	retv <- sropt(zeta.s=zeta.s,df1=retval$df1,df2=retval$df2,
+								drag=drag,opy=opy,epoch=epoch)
+
+	# this really stinks.
+	retval <- c(retv,hotval)
+	class(retval) <- class(retv)
+
 	return(retval)
 }
 #' @S3method print sropt

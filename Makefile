@@ -32,6 +32,7 @@ LOCAL 					:= .local
 STAGING 				:= .staging
 STAGED_PKG 			 = $(STAGING)/$(PKG_NAME)
 RCHECK 					 = $(PKG_NAME).Rcheck
+RCHECK_SENTINEL  = $(RCHECK)/$(PKG_NAME)/DESCRIPTION
 
 # Specify the directory holding R binaries. To use an alternate R build (say a
 # pre-prelease version) use `make RBIN=/path/to/other/R/` or `export RBIN=...`
@@ -193,14 +194,14 @@ $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ)
 
 install: $(LOCAL)/$(PKG_NAME)/INDEX
 
-# check an install
-$(RCHECK) : $(PKG_TGZ)
+# check and install
+$(RCHECK_SENTINEL) : $(PKG_TGZ)
 	$(call WARN_DEPS)
 	$(RLOCAL) CMD check --as-cran --outdir=$@ $^ 
 	
-check: $(RCHECK)
+check: $(RCHECK_SENTINEL)
 
-checksee : $(RCHECK)
+checksee : $(RCHECK_SENTINEL)
 	okular $(RCHECK)/$(PKG_NAME)-manual.pdf
 
 ################################

@@ -2,10 +2,10 @@
 \alias{sropt}
 \title{Create an 'sropt' object.}
 \usage{
-  sropt(sropt,df1,df2,drag=0,opy=1,epoch="yr")
+  sropt(zeta.s,df1,df2,drag=0,opy=1,epoch="yr")
 }
 \arguments{
-  \item{sropt}{an optimum Sharpe ratio statistic.}
+  \item{zeta.s}{an optimum Sharpe ratio statistic.}
 
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,
@@ -56,10 +56,10 @@ zeta.s <- 1.0
 df1 <- 10
 df2 <- 6 * opy
 rvs <- rsropt(1,df1,df2,zeta.s,opy,drag=0)
-roll.own <- sropt(sropt=rvs,df1,df2,drag=0,opy=opy)
+roll.own <- sropt(zeta.s=rvs,df1,df2,drag=0,opy=opy)
 # put a bunch in. naming becomes a problem.
 rvs <- rsropt(5,df1,df2,zeta.s,opy,drag=0)
-roll.own <- sropt(sropt=rvs,df1,df2,drag=0,opy=opy)
+roll.own <- sropt(zeta.s=rvs,df1,df2,drag=0,opy=opy)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

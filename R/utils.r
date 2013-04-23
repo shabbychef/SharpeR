@@ -57,6 +57,15 @@
 }
 #UNFOLD
 
+# class utils#FOLDUP
+.infer_opy_xts <- function(anxts) {
+	TEO <- time(anxts)
+	days.per.row <- as.double((TEO[length(TEO)] - TEO[1]) / (length(TEO) - 1))
+	opy <- 365.25 / days.per.row
+	return(opy)
+}
+#UNFOLD
+
 # annualize and deannualize a Sharpe Ratio#FOLDUP
 # ' @param sr the Sharpe Ratio, in per sqrt(epoch) units.
 # ' @param opy the number of observations per year. no default here.
