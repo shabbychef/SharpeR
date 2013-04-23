@@ -363,8 +363,15 @@ confint.sropt <- function(z.s,parm,level=0.95,...) {
 	delta2 <- pmax(delta0,phi2)
 	return(delta2)
 }
-
-#' @export 
+# ' @usage
+# '
+# ' F.inference(Fs,df1,df2,...)
+# '
+# ' @export
+# ' @param Fs a (non-central) F statistic.
+# ' @examples 
+# ' rvs <- rf(1024, 4, 1000, 5)
+# ' unbs <- F.inference(rvs, 4, 1000, type="unbiased")
 F.inference <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
 	# type defaults to "KRS":
 	type <- match.arg(type)
@@ -374,7 +381,12 @@ F.inference <- function(Fs,df1,df2,type=c("KRS","MLE","unbiased")) {
 								 unbiased = .F_ncp_unbiased(Fs,df1,df2))
 	return(Fncp)
 }
-#' @export 
+# ' @usage
+# '
+# ' T2.inference(T2,df1,df2,...)
+# '
+# ' @export
+# ' @param T2 a (non-central) Hotelling \eqn{T^2} statistic.
 T2.inference <- function(T2,df1,df2,...) {
 	Fs <- .T2_to_F(T2, df1, df2)
 	Fdf1 <- df1
@@ -406,11 +418,7 @@ T2.inference <- function(T2,df1,df2,...) {
 #' is a shrinkage estimator.
 #' }
 #'
-#' Since a Hotelling distribution is equivalent to the F-distribution
-#' up to scaling, the same estimators can be used to estimate the 
-#' non-centrality parameter of a non-central Hotelling T-squared statistic.
-#'
-#' The sropt distribution is equivalent to a Hotelling up to a 
+#' The sropt distribution is equivalent to an F distribution up to a 
 #' square root and some rescalings. 
 #' 
 #' The non-centrality parameter of the sropt distribution is 
@@ -420,22 +428,14 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' @usage
 #'
-#' F.inference(Fs, df1, df2, type=c("KRS","MLE","unbiased"))
+#' inference(z.s,type=c("KRS","MLE","unbiased"))
 #'
-#' T2.inference(T2,df1,df2,...) 
-#'
-#' sropt.inference(z.s,...)
-#'
-#' @param Fs a (non-central) F statistic.
-#' @param T2 a (non-central) Hotelling \eqn{T^2} statistic.
 #' @param z.s an object of type \code{sropt}.
 #' @inheritParams qco_sropt
 #' @inheritParams dsropt
 #' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
-#' @param ... the \code{type} which is passed on to \code{F.inference}.
 #' @keywords htest
 #' @return an estimate of the non-centrality parameter.
-#' @aliases F.inference T2.inference sropt.inference
 #' @seealso F-distribution functions, \code{\link{df}}
 #' @export 
 #' @template etc
@@ -450,8 +450,6 @@ T2.inference <- function(T2,df1,df2,...) {
 #' \url{http://www.sciencedirect.com/science/article/pii/0047259X86900709}
 #'
 #' @examples 
-#' rvs <- rf(1024, 4, 1000, 5)
-#' unbs <- F.inference(rvs, 4, 1000, type="unbiased")
 #' # generate some sropts
 #' true.snrstar <- 1.25
 #' nfac <- 5
@@ -462,20 +460,22 @@ T2.inference <- function(T2,df1,df2,...) {
 #' set.seed(as.integer(charToRaw("determinstic")))
 #' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 #' asro <- as.sropt(Returns,drag=0,opy=opy)
-#' est1 <- sropt.inference(asro,type='unbiased')  
-#' est2 <- sropt.inference(asro,type='KRS')  
-#' est3 <- sropt.inference(asro,type='MLE')
+#' est1 <- inference(asro,type='unbiased')  
+#' est2 <- inference(asro,type='KRS')  
+#' est3 <- inference(asro,type='MLE')
 #' 
 #' # under the alternative:
 #' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
 #' asro <- as.sropt(Returns,drag=0,opy=opy)
-#' est1 <- sropt.inference(asro,type='unbiased')  
-#' est2 <- sropt.inference(asro,type='KRS')  
-#' est3 <- sropt.inference(asro,type='MLE')
+#' est1 <- inference(asro,type='unbiased')  
+#' est2 <- inference(asro,type='KRS')  
+#' est3 <- inference(asro,type='MLE')
 #'
-sropt.inference <- function(z.s,...) {
+inference <- function(z.s,type=c("KRS","MLE","unbiased")) {
+	# type defaults to "KRS":
+	type <- match.arg(type)
 	T2 <- .sropt2T(z.s)
-	retval <- T2.inference(T2,z.s$df1,z.s$df2,...)
+	retval <- T2.inference(T2,z.s$df1,z.s$df2,type)
 	# convert back
 	retval <- .T2sropt(z.s,retval)
 	return(retval)
@@ -485,9 +485,9 @@ sropt.inference <- function(z.s,...) {
 # df2 <- 2000
 # opy <- 253
 # rvs <- rsropt(500, df1, df2, true.snrstar, opy)
-# est1 <- sropt.inference(rvs,df1,df2,opy,type='unbiased')  
-# est2 <- sropt.inference(rvs,df1,df2,opy,type='KRS')  
-# est3 <- sropt.inference(rvs,df1,df2,opy,type='MLE')
+# est1 <- inference(rvs,df1,df2,opy,type='unbiased')  
+# est2 <- inference(rvs,df1,df2,opy,type='KRS')  
+# est3 <- inference(rvs,df1,df2,opy,type='MLE')
 #UNFOLD
 
 # notes:
