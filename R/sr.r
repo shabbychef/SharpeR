@@ -84,7 +84,7 @@
 #' @template sr
 #'
 #' @note
-#' 2FIX: allow rownames?
+#' 2FIX: allow rownames? 
 #'
 #' @examples 
 #' # roll your own.
@@ -167,9 +167,13 @@ sr <- function(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' @examples 
 #' # Sharpe's 'model': just given a bunch of returns.
 #' asr <- as.sr(rnorm(253*8),opy=253)
+#' # or a matrix, with a name
+#' my.returns <- matrix(rnorm(253*10),ncol=1)
+#' colnames(my.returns) <- c("my strategy")
+#' asr <- as.sr(my.returns)
 #' # given an xts object:
 #' if (require(quantmod)) {
-#'   getSymbols('IBM')
+#'   IBM <- getSymbols('IBM',auto.assign=FALSE)
 #'   lrets <- diff(log(IBM[,"IBM.Adjusted"]))
 #'   asr <- as.sr(lrets,na.rm=TRUE)
 #' }
@@ -199,6 +203,10 @@ as.sr.default <- function(x,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 	mu <- mean(x,na.rm=na.rm)
 	sigma <- sd(x,na.rm=na.rm)
 	z <- .compute_sr(mu,c0,sigma,opy)
+	dim(z) <- c(1,1)
+	rownames(z) <- unlist(dimnames(x))
+	if (is.null(rownames(z)))
+		rownames(z) <- deparse(substitute(x))
 	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
 	retval <- sr(z,df=df-1,c0=c0,opy=opy,
 							 rescal=1/sqrt(df),epoch=epoch)
@@ -212,6 +220,8 @@ as.sr.lm <- function(modl,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 	mu <- modl$coefficients["(Intercept)"]
 	sigma <- sqrt(deviance(modl) / modl$df.residual)
 	z <- .compute_sr(mu,c0,sigma,opy)
+	dim(z) <- c(1,1)
+	rownames(z) <- deparse(substitute(modl))
 	XXinv <- vcov(modl) / sigma^2
 	rescal <- sqrt(XXinv["(Intercept)","(Intercept)"])
 	retval <- sr(z,df=modl$df.residual,c0=c0,opy=opy,
@@ -272,7 +282,7 @@ print.sr <- function(x,...) {
 	#colnames(coefs) <- c("stat","t.stat","p.value")
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "Std. Error","t value","Pr(>t)")
-	#rownames(coefs) <- c("Sharpe")
+	rownames(coefs) <- if (is.null(rownames(x$sr))) c("Sharpe") else rownames(x$sr)
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1,2),tst.ind=c(3),dig.tst=2)
@@ -341,22 +351,36 @@ reannualize <- function(x,opy,epoch) {
 ########################################################################
 # Optimal Sharpe ratio#FOLDUP
 
+
+
+
+
+
+markowitz <- function(mu,Sigma,df2,w=NULL) {
+	if (is.null(w))
+		w <- solve(Sigma,mu)
+	retv <- list(w=w,mu=mu,Sigma=Sigma,df1=length(w),df2=df2)
+	class(retv) <- "markowitz"
+	return(retv)
+}
+as.markowitz <- function(X,...) {
+	UseMethod("as.markowitz", X)
+}
 # compute the markowitz portfolio
-.markowitz <- function(X,mu=NULL,Sigma=NULL) {
+as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 	na.omit(X)
 	if (is.null(mu)) 
 		mu <- colMeans(X)
 	if (is.null(Sigma)) 
 		Sigma <- cov(X)
-	w <- solve(Sigma,mu)
-	n <- dim(X)[1]
-	retval <- list(w = w, mu = mu, Sigma = Sigma, df1 = length(w), df2 = n)
-	return(retval)
+	df2 <- dim(X)[1]
+	retv <- markowitz(mu,Sigma,df2)
+	return(retv)
 }
 
 # compute Hotelling's statistic.
 .hotelling <- function(X) {
-	retval <- .markowitz(X)
+	retval <- as.markowitz(X)
 	retval$T2 <- retval$df2 * (retval$mu %*% retval$w)
 	return(retval)
 }
@@ -508,20 +532,20 @@ as.sropt.default <- function(X,drag=0,opy=1,epoch="yr") {
 	# somehow call sropt!
 	hotval <- .hotelling(X)
 	# what fucking bother.
-	retval <- hotval
-	retval$opy <- opy
-	retval$drag <- drag
-	zeta.s <- .T2sropt(retval,retval$T2)
+	quasi.sropt <- hotval[c("df2","T2")]
+	quasi.sropt$opy <- opy
+	quasi.sropt$drag <- drag
+	zeta.s <- .T2sropt(quasi.sropt)
 
 	# this stink.s
-	retv <- sropt(zeta.s=zeta.s,df1=retval$df1,df2=retval$df2,
+	retv <- sropt(zeta.s=zeta.s,df1=hotval$df1,df2=hotval$df2,
 								drag=drag,opy=opy,epoch=epoch)
 
-	# this really stinks.
-	retval <- c(retv,hotval)
-	class(retval) <- class(retv)
+	# 2FIX: have to store T2 in here now. bleah.
+	retv$T2 <- hotval$T2
+	# 2FIX: merge markowitz in?
 
-	return(retval)
+	return(retv)
 }
 #' @S3method print sropt
 #' @export
@@ -551,7 +575,7 @@ print.sropt <- function(x,...) {
 	return(Tval)
 }
 # and the reverse
-.T2sropt <- function(x,Tval) {
+.T2sropt <- function(x,Tval=x$T2) {
 	zeta.star <- sqrt(Tval / x$df2)
 	zeta.star <- .annualize(zeta.star,x$opy)
 	zeta.star <- zeta.star - x$drag
