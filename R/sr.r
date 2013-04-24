@@ -412,9 +412,9 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #'
 #' @usage
 #'
-#' sropt(zeta.s,df1,df2,drag=0,opy=1,epoch="yr")
+#' sropt(z.s,df1,df2,drag=0,opy=1,epoch="yr")
 #'
-#' @param zeta.s an optimum Sharpe ratio statistic.
+#' @param z.s an optimum Sharpe ratio statistic.
 #' @inheritParams dsropt
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
 #'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
@@ -443,13 +443,13 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #' df1 <- 10
 #' df2 <- 6 * opy
 #' rvs <- rsropt(1,df1,df2,zeta.s,opy,drag=0)
-#' roll.own <- sropt(zeta.s=rvs,df1,df2,drag=0,opy=opy)
+#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
 #' # put a bunch in. naming becomes a problem.
 #' rvs <- rsropt(5,df1,df2,zeta.s,opy,drag=0)
-#' roll.own <- sropt(zeta.s=rvs,df1,df2,drag=0,opy=opy)
+#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
 #'
-sropt <- function(zeta.s,df1,df2,drag=0,opy=1,epoch="yr") {
-	retval <- list(sropt = zeta.s,df1 = df1,df2 = df2,
+sropt <- function(z.s,df1,df2,drag=0,opy=1,epoch="yr") {
+	retval <- list(sropt = z.s,df1 = df1,df2 = df2,
 								 drag = drag,opy = opy,epoch = epoch)
 	class(retval) <- "sropt"
 	return(retval)
@@ -535,10 +535,11 @@ as.sropt.default <- function(X,drag=0,opy=1,epoch="yr") {
 	quasi.sropt <- hotval[c("df2","T2")]
 	quasi.sropt$opy <- opy
 	quasi.sropt$drag <- drag
-	zeta.s <- .T2sropt(quasi.sropt)
+	z.s <- .T2sropt(quasi.sropt)
+	dim(z.s) <- c(1,1)
 
-	# this stink.s
-	retv <- sropt(zeta.s=zeta.s,df1=hotval$df1,df2=hotval$df2,
+	# this stinks
+	retv <- sropt(z.s=z.s,df1=hotval$df1,df2=hotval$df2,
 								drag=drag,opy=opy,epoch=epoch)
 
 	# 2FIX: have to store T2 in here now. bleah.
@@ -553,12 +554,9 @@ print.sropt <- function(x,...) {
 	Tval <- x$T2
 	pval <- pT2(Tval,x$df1,x$df2,lower.tail=FALSE)
 	coefs <- cbind(x$sropt,Tval,pval)
-	#colnames(coefs) <- c("stat","t.stat","p.value")
-	#colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
-											 #"Std. Error","t value","Pr(>t)")
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "T^2 value","Pr(>T^2)")
-	#rownames(coefs) <- c("Sharpe")
+	rownames(coefs) <- if (is.null(rownames(x$sropt))) c("Sharpe") else rownames(x$sropt)
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)
@@ -576,10 +574,10 @@ print.sropt <- function(x,...) {
 }
 # and the reverse
 .T2sropt <- function(x,Tval=x$T2) {
-	zeta.star <- sqrt(Tval / x$df2)
-	zeta.star <- .annualize(zeta.star,x$opy)
-	zeta.star <- zeta.star - x$drag
-	return(zeta.star)
+	z.star <- sqrt(Tval / x$df2)
+	z.star <- .annualize(z.star,x$opy)
+	z.star <- z.star - x$drag
+	return(z.star)
 }
 #UNFOLD
 #UNFOLD
