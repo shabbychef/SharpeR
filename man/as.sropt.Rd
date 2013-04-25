@@ -1,6 +1,7 @@
 \name{as.sropt}
 \alias{as.sropt}
 \alias{as.sropt.default}
+\alias{as.sropt.xts}
 \alias{sropt}
 \title{Compute the Sharpe ratio of the Markowitz portfolio.}
 \usage{
@@ -8,9 +9,14 @@
 
   \method{as.sropt}{default} (X, drag = 0, opy = 1,
     epoch = "yr")
+
+  \method{as.sropt}{xts} (anxts, drag = 0, opy = 1,
+    epoch = "yr")
 }
 \arguments{
   \item{X}{matrix of returns.}
+
+  \item{anxts}{an xts object.}
 
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,
@@ -81,6 +87,18 @@ asro <- as.sropt(Returns,drag=0,opy=opy)
 # under the alternative:
 Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
 asro <- as.sropt(Returns,drag=0,opy=opy)
+# using real data.
+if (require(quantmod)) {
+  getret <- function(sym,...) {
+    OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
+    lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
+  }
+  getrets <- function(syms,...) {
+    some.rets <- do.call("cbind",lapply(syms,getret,...))
+  }
+  some.rets <- getrets(c("IBM","AAPL","NFLX","SPY"))
+  asro <- as.sropt(some.rets)
+}
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

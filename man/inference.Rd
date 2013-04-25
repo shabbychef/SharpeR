@@ -2,16 +2,13 @@
 \alias{inference}
 \title{Inference on noncentrality parameter of F or F-like statistic}
 \usage{
-  inference(z.s,...)
+  inference(z.s,type=c("KRS","MLE","unbiased"))
 }
 \arguments{
   \item{z.s}{an object of type \code{sropt}.}
 
   \item{type}{the estimator type. one of \code{c("KRS",
   "MLE", "unbiased")}}
-
-  \item{...}{the \code{type} which is passed on to
-  \code{F.inference}.}
 }
 \value{
   an estimate of the non-centrality parameter.

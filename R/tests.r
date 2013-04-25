@@ -106,7 +106,25 @@
 #' Letters 1 (2003): 21--23.
 #'
 #' @examples 
-#' rv <- sr_equality_test(matrix(rnorm(500*5),500,5))
+#' # under the null 
+#' rv <- sr_equality_test(matrix(rnorm(500*5),nrow=5))
+#' # under the alternative (but with independent returns)
+#' opy <- 253
+#' nyr <- 10
+#' nco <- 5
+#' rets <- 0.01 * sapply(seq(0,1.7/sqrt(opy),length.out=nco),
+#'   function(mu) { rnorm(opy*nyr,mean=mu,sd=1) })
+#' rv <- sr_equality_test(rets)
+#' # using real data
+#' if (require(quantmod)) {
+#'   getret <- function(sym,...) {
+#'     OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
+#'     lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
+#'   }
+#'   getrets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,getret,...)) }
+#'   some.rets <- getrets(c("IBM","AAPL","NFLX","SPY"))
+#'   pvs <- sr_equality_test(some.rets)
+#' }
 #' # test for uniformity
 #' pvs <- replicate(500,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
 #'                        x$p.value })
@@ -118,6 +136,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 														 alternative=c("two.sided","less","greater"),
 														 contrasts=NULL) {
 	dname <- deparse(substitute(X))
+	X <- na.omit(X)
 	type <- match.arg(type)
 	n <- dim(X)[1]
 	p <- dim(X)[2]

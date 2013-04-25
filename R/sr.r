@@ -368,7 +368,7 @@ as.markowitz <- function(X,...) {
 }
 # compute the markowitz portfolio
 as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
-	na.omit(X)
+	X <- na.omit(X)
 	if (is.null(mu)) 
 		mu <- colMeans(X)
 	if (is.null(Sigma)) 
@@ -522,6 +522,16 @@ sropt <- function(z.s,df1,df2,drag=0,opy=1,epoch="yr") {
 #' # under the alternative:
 #' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
 #' asro <- as.sropt(Returns,drag=0,opy=opy)
+#' # using real data.
+#' if (require(quantmod)) {
+#'   getret <- function(sym,...) {
+#'     OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
+#'     lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
+#'   }
+#'   getrets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,getret,...)) }
+#'   some.rets <- getrets(c("IBM","AAPL","A","C","SPY","XOM"))
+#'   asro <- as.sropt(some.rets)
+#' }
 as.sropt <- function(X,drag=0,opy=1,epoch="yr") {
 	UseMethod("as.sropt", X)
 }
@@ -547,6 +557,17 @@ as.sropt.default <- function(X,drag=0,opy=1,epoch="yr") {
 	# 2FIX: merge markowitz in?
 
 	return(retv)
+}
+#' @param anxts an xts object.
+#' @rdname as.sropt
+#' @method as.sropt xts
+#' @S3method as.sropt xts
+as.sropt.xts <- function(anxts,drag=0,opy=1,epoch="yr") {
+	if (missing(opy)) {
+		opy <- .infer_opy_xts(anxts)
+	}
+	retval <- as.sropt.default(anxts,drag=drag,opy=opy,epoch=epoch)
+	return(retval)
 }
 #' @S3method print sropt
 #' @export
