@@ -2,7 +2,7 @@
 \alias{sropt}
 \title{Create an 'sropt' object.}
 \usage{
-  sropt(z.s,df1,df2,drag=0,opy=1,epoch="yr")
+  sropt(z.s,df1,df2,drag=0,ope=1,epoch="yr")
 }
 \arguments{
   \item{z.s}{an optimum Sharpe ratio statistic.}
@@ -10,15 +10,18 @@
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,
   \emph{i.e.} has been multiplied by
-  \eqn{\sqrt{opy}}{sqrt(opy)}. This is in contrast to the
+  \eqn{\sqrt{ope}}{sqrt(ope)}. This is in contrast to the
   \code{c0} term given to \code{\link{sr}}.}
 
-  \item{opy}{the number of observations per 'year'. The
-  returns are observed at a rate of \code{opy} per 'year.'
-  default value is 1, meaning no annualization is
-  performed.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
-  \item{epoch}{the string representation of the 'year',
+  \item{epoch}{the string representation of the 'epoch',
   defaulting to 'yr'.}
 
   \item{df1}{the number of assets in the portfolio.}
@@ -38,8 +41,8 @@
   Sharpe ratio statistic. \item \code{df1} The number of
   assets. \item \code{df2} The number of observations.
   \item \code{drag} The drag term, which is the 'risk free
-  rate' divided by the maximum risk. \item \code{opy} The
-  'observations per year'. \item \code{epoch} The string
+  rate' divided by the maximum risk. \item \code{ope} The
+  'observations per epoch'. \item \code{epoch} The string
   name of the 'epoch'. }
 
   For the most part, this constructor should \emph{not} be
@@ -51,15 +54,15 @@
 }
 \examples{
 # roll your own.
-opy <- 253
+ope <- 253
 zeta.s <- 1.0
 df1 <- 10
-df2 <- 6 * opy
-rvs <- rsropt(1,df1,df2,zeta.s,opy,drag=0)
-roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
+df2 <- 6 * ope
+rvs <- rsropt(1,df1,df2,zeta.s,ope,drag=0)
+roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 # put a bunch in. naming becomes a problem.
-rvs <- rsropt(5,df1,df2,zeta.s,opy,drag=0)
-roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
+rvs <- rsropt(5,df1,df2,zeta.s,ope,drag=0)
+roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

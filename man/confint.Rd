@@ -40,15 +40,15 @@
 }
 \examples{
 # using "sr" class:
-opy <- 253
-df <- opy * 6
-xv <- rnorm(df, 1 / sqrt(opy))
-mysr <- as.sr(xv,opy=opy)
+ope <- 253
+df <- ope * 6
+xv <- rnorm(df, 1 / sqrt(ope))
+mysr <- as.sr(xv,ope=ope)
 confint(mysr,level=0.90)
 # using "lm" class
 yv <- xv + rnorm(length(xv))
 amod <- lm(yv ~ xv)
-mysr <- as.sr(amod,opy=opy)
+mysr <- as.sr(amod,ope=ope)
 confint(mysr,level.lo=0.05,level.hi=1.0)
 }
 \author{

@@ -4,7 +4,7 @@
 \title{Confidence Interval on Maximal Signal-Noise Ratio}
 \usage{
   sropt_confint(z.s,df1,df2,level=0.95,
-    opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
+    ope=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 
   \method{confint}{sropt} (z.s, parm, level = 0.95, ...)
 }
@@ -14,12 +14,13 @@
 
   \item{level}{the confidence level required.}
 
-  \item{opy}{the number of observations per 'year'.
-  \code{z.s}, and the confidence intervals are quoted in
-  'annualized' units, that is, per square root 'year', but
-  returns are observed possibly at a rate of \code{opy} per
-  'year.' default value is 1, meaning no deannualization is
-  performed.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
   \item{level.lo}{the lower bound for the confidence
   interval.}
@@ -60,9 +61,9 @@
 }
 \examples{
 # fix these!
-opy <- 253
+ope <- 253
 df1 <- 6
-df2 <- opy * 6
+df2 <- ope * 6
 rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
 sro <- as.sropt(rvs)
 aci <- confint(sro)

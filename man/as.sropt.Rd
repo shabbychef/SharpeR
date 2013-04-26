@@ -5,12 +5,12 @@
 \alias{sropt}
 \title{Compute the Sharpe ratio of the Markowitz portfolio.}
 \usage{
-  as.sropt(X,drag=0,opy=1,epoch="yr")
+  as.sropt(X,drag=0,ope=1,epoch="yr")
 
-  \method{as.sropt}{default} (X, drag = 0, opy = 1,
+  \method{as.sropt}{default} (X, drag = 0, ope = 1,
     epoch = "yr")
 
-  \method{as.sropt}{xts} (anxts, drag = 0, opy = 1,
+  \method{as.sropt}{xts} (anxts, drag = 0, ope = 1,
     epoch = "yr")
 }
 \arguments{
@@ -21,15 +21,18 @@
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,
   \emph{i.e.} has been multiplied by
-  \eqn{\sqrt{opy}}{sqrt(opy)}. This is in contrast to the
+  \eqn{\sqrt{ope}}{sqrt(ope)}. This is in contrast to the
   \code{c0} term given to \code{\link{sr}}.}
 
-  \item{opy}{the number of observations per 'year'. The
-  returns are observed at a rate of \code{opy} per 'year.'
-  default value is 1, meaning no annualization is
-  performed.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
-  \item{epoch}{the string representation of the 'year',
+  \item{epoch}{the string representation of the 'epoch',
   defaulting to 'yr'.}
 }
 \value{
@@ -40,7 +43,7 @@
   \item{df2}{the number of observed vectors.} \item{T2}{the
   Hotelling \eqn{T^2} statistic.} \item{sropt}{the maximal
   Sharpe statistic.} \item{drag}{the input \code{drag}
-  term.} \item{opy}{the input \code{opy} term.}
+  term.} \item{ope}{the input \code{ope} term.}
 }
 \description{
   Computes the Sharpe ratio of the Markowitz portfolio of
@@ -71,22 +74,22 @@
   The units of \eqn{z_*}{z*} are
   \eqn{\mbox{time}^{-1/2}}{per root time}. Typically the
   Sharpe ratio is \emph{annualized} by multiplying by
-  \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where
-  \eqn{\mbox{opy}}{opy} is the number of observations per
+  \eqn{\sqrt{\mbox{ope}}}{sqrt(ope)}, where
+  \eqn{\mbox{ope}}{ope} is the number of observations per
   year (or whatever the target annualization epoch.)
 }
 \examples{
 nfac <- 5
 nyr <- 10
-opy <- 253
+ope <- 253
 # simulations with no covariance structure.
 # under the null:
 set.seed(as.integer(charToRaw("determinstic")))
-Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
-asro <- as.sropt(Returns,drag=0,opy=opy)
+Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+asro <- as.sropt(Returns,drag=0,ope=ope)
 # under the alternative:
-Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
-asro <- as.sropt(Returns,drag=0,opy=opy)
+Returns <- matrix(rnorm(ope*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
+asro <- as.sropt(Returns,drag=0,ope=ope)
 # using real data.
 if (require(quantmod)) {
   getret <- function(sym,...) {

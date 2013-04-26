@@ -17,7 +17,7 @@
   To satisfy the minimum requirements of an S3 class.
 }
 \examples{
-rvs <- as.sr(rnorm(253*8),opy=253)
+rvs <- as.sr(rnorm(253*8),ope=253)
 is.sr(rvs)
 }
 \author{

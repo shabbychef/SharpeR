@@ -2,7 +2,7 @@
 \alias{sr}
 \title{Create an 'sr' object.}
 \usage{
-  sr(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr")
+  sr(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr")
 }
 \arguments{
   \item{sr}{a Sharpe ratio statistic.}
@@ -14,12 +14,17 @@
   this is assumed to be given in the same units as x,
   \emph{not} in 'annualized' terms.}
 
-  \item{opy}{the number of observations per 'year'. This is
-  used to 'annualize' the answer.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
   \item{rescal}{the rescaling parameter.}
 
-  \item{epoch}{the string representation of the 'year',
+  \item{epoch}{the string representation of the 'epoch',
   defaulting to 'yr'.}
 }
 \value{
@@ -34,13 +39,13 @@
   object: \itemize{ \item \code{sr} The Sharpe ratio
   statistic. \item \code{df} The d.f. of the equivalent
   t-statistic. \item \code{c0} The drag 'risk free rate'
-  used. \item \code{opy} The 'observations per year'. \item
-  \code{rescal} The rescaling parameter. \item \code{epoch}
-  The string name of the 'epoch'. }
+  used. \item \code{ope} The 'observations per epoch'.
+  \item \code{rescal} The rescaling parameter. \item
+  \code{epoch} The string name of the 'epoch'. }
 
   The stored Sharpe statistic, \code{sr} is equal to the
-  t-statistic times \eqn{rescal * sqrt{opy}}{rescal *
-  sqrt(opy)}.
+  t-statistic times \eqn{rescal * sqrt{ope}}{rescal *
+  sqrt(ope)}.
 
   For the most part, this constructor should \emph{not} be
   called directly, rather \code{\link{as.sr}} should be
@@ -51,14 +56,14 @@
 }
 \examples{
 # roll your own.
-opy <- 253
+ope <- 253
 zeta <- 1.0
-n <- 6 * opy
-rvs <- rsr(1,n,zeta,opy=opy)
-roll.own <- sr(sr=rvs,df=n-1,opy=opy,rescal=sqrt(1/n))
+n <- 6 * ope
+rvs <- rsr(1,n,zeta,ope=ope)
+roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
 # put a bunch in. naming becomes a problem.
-rvs <- rsr(5,n,zeta,opy=opy)
-roll.own <- sr(sr=rvs,df=n-1,opy=opy,rescal=sqrt(1/n))
+rvs <- rsr(5,n,zeta,ope=ope)
+roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

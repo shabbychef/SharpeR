@@ -48,17 +48,17 @@ test_that("psr/qsr monotonicity",{#FOLDUP
 	ps <- seq(0.1,0.9,length.out=9)
 	for (df in c(256,1024)) {
 		for (snr in c(0,1)) {
-			for (opy in c(1,52)) {
+			for (ope in c(1,52)) {
 				for (lp in c(TRUE,FALSE)) {
 					if (lp) { checkps <- log(ps) } else { checkps <- ps }
 					for (lt in c(TRUE,FALSE)) {
-						qs <- qsr(checkps, df, snr, opy, lower.tail=lt, log.p=lp)
+						qs <- qsr(checkps, df, snr, ope, lower.tail=lt, log.p=lp)
 						if (lt) { 
 							expect_true(is.sorted(qs,pragma="ascending"))
 						} else {
 							expect_true(is.sorted(qs,pragma="descending"))
 						}
-						pret <- psr(qs, df, snr, opy, lower.tail=lt, log.p=lp)
+						pret <- psr(qs, df, snr, ope, lower.tail=lt, log.p=lp)
 						expect_equal(checkps,pret)
 					}
 				}
@@ -101,18 +101,18 @@ test_that("psropt/qsropt monotonicity",{#FOLDUP
 	for (df1 in c(2,4,8)) {
 		for (df2 in c(256,1024)) {
 			for (snrstar in c(0,0.05)) {
-				for (opy in c(1,2)) {
+				for (ope in c(1,2)) {
 					for (drag in c(0,0.1)) {
 						for (lp in c(TRUE,FALSE)) {
 							if (lp) { checkps <- log(ps) } else { checkps <- ps }
 							for (lt in c(TRUE,FALSE)) {
-								qs <- qsropt(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								qs <- qsropt(checkps, df1, df2, snrstar, ope, drag, lower.tail=lt, log.p=lp)
 								if (lt) { 
 									expect_true(is.sorted(qs,pragma="ascending"))
 								} else {
 									expect_true(is.sorted(qs,pragma="descending"))
 								}
-								pret <- psropt(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								pret <- psropt(qs, df1, df2, snrstar, ope, drag, lower.tail=lt, log.p=lp)
 								expect_equal(checkps,pret)
 							}
 						}
@@ -158,14 +158,14 @@ test_that("pco_sropt/qco_sropt monotonicity",{#FOLDUP
 				for (lp in c(TRUE,FALSE)) {
 					if (lp) { checkps <- log(ps) } else { checkps <- ps }
 					for (lt in c(TRUE,FALSE)) {
-						qs <- qco_sropt(checkps, df1, df2, z.s=delta2, opy=1,
+						qs <- qco_sropt(checkps, df1, df2, z.s=delta2, ope=1,
 														lower.tail=lt, log.p=lp)
 						if (lt) { 
 							expect_true(is.sorted(qs,pragma="ascending"))
 						} else {
 							expect_true(is.sorted(qs,pragma="descending"))
 						}
-						pret <- pco_sropt(qs, df1, df2, z.s=delta2, opy=1,
+						pret <- pco_sropt(qs, df1, df2, z.s=delta2, ope=1,
 															lower.tail=lt, log.p=lp)
 						expect_true(ifelse(lp,all(pret <= 0),
 															 all(0 <= pret) && all(pret <= 1)))
@@ -185,26 +185,26 @@ test_that("psr/qsr parameter monotonicity",{#FOLDUP
 	snrs <- seq(-1,1,length.out=11)
 	ps <- 0.5
 	for (df in c(256,1024)) {
-		for (opy in c(1,12)) {
+		for (ope in c(1,12)) {
 			for (lp in c(TRUE,FALSE)) {
 				if (lp) { checkps <- log(ps) } else { checkps <- ps }
 				for (lt in c(TRUE,FALSE)) {
-					qs <- qsr(checkps, df, snrs, opy, lower.tail=lt, log.p=lp)
+					qs <- qsr(checkps, df, snrs, ope, lower.tail=lt, log.p=lp)
 					expect_true(is.sorted(qs,pragma="ascending"))
 				}
 			}
 		}
 	}
-	# opy
+	# ope
 	# in this case the nct ncp is decreasing so the bias is as well...
-	opy <- c(1,2,4,12,52,253)
+	ope <- c(1,2,4,12,52,253)
 	ps <- 0.5
 	for (df in c(256,1024)) {
 		for (snr in c(0,1)) {
 			for (lp in c(TRUE,FALSE)) {
 				if (lp) { checkps <- log(ps) } else { checkps <- ps }
 				for (lt in c(TRUE,FALSE)) {
-					qs <- qsr(checkps, df, snr, opy, lower.tail=lt, log.p=lp)
+					qs <- qsr(checkps, df, snr, ope, lower.tail=lt, log.p=lp)
 					expect_true(is.sorted(qs,pragma="descending"))
 				}
 			}
@@ -217,12 +217,12 @@ test_that("psr/qsr parameter monotonicity",{#FOLDUP
 	# Statistical Society. Series B (Methodological) (1973): 480-492.
 	df <- c(24,52,256,512,1024)
 	ps <- 0.5
-	for (opy in c(52,256)) {
+	for (ope in c(52,256)) {
 		for (snr in c(0,1)) {
 			for (lp in c(TRUE,FALSE)) {
 				if (lp) { checkps <- log(ps) } else { checkps <- ps }
 				for (lt in c(TRUE,FALSE)) {
-					qs <- qsr(checkps, df, snr, opy, lower.tail=lt, log.p=lp)
+					qs <- qsr(checkps, df, snr, ope, lower.tail=lt, log.p=lp)
 					expect_true(is.sorted(qs,pragma="descending"))
 				}
 			}
@@ -257,18 +257,18 @@ test_that("psr/qsr parameter monotonicity",{#FOLDUP
 	#for (df1 in c(2,4,8)) {
 		#for (df2 in c(256,1024)) {
 			#for (snrstar in c(0,0.05)) {
-				#for (opy in c(1,2)) {
+				#for (ope in c(1,2)) {
 					#for (drag in c(0,0.1)) {
 						#for (lp in c(TRUE,FALSE)) {
 							#if (lp) { checkps <- log(ps) } else { checkps <- ps }
 							#for (lt in c(TRUE,FALSE)) {
-								#qs <- qsropt(checkps, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								#qs <- qsropt(checkps, df1, df2, snrstar, ope, drag, lower.tail=lt, log.p=lp)
 								#if (lt) { 
 									#expect_true(!is.unsorted(qs))
 								#} else {
 									#expect_true(!is.unsorted(rev(qs)))
 								#}
-								#pret <- psropt(qs, df1, df2, snrstar, opy, drag, lower.tail=lt, log.p=lp)
+								#pret <- psropt(qs, df1, df2, snrstar, ope, drag, lower.tail=lt, log.p=lp)
 								#expect_equal(checkps,pret)
 							#}
 						#}

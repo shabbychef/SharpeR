@@ -142,7 +142,7 @@ rrt <- function(n, df, K, rho = 0) {
 #' The units of \eqn{z} is \eqn{\mbox{time}^{-1/2}}{per root time}.
 #' Typically the Sharpe ratio is \emph{annualized} by multiplying by
 #' \eqn{\sqrt{d}}{sqrt(d)}, where \eqn{d} is the number of observations
-#' per year (or whatever the target annualization epoch.)
+#' per epoch (typically a year).
 #'
 #' Letting \eqn{z = \sqrt{d}\frac{\bar{x}-c_0}{s}}{z = sqrt(d)(xbar - c0)/s},
 #' where the sample estimates are based on \eqn{n} observations, 
@@ -155,7 +155,7 @@ rrt <- function(n, df, K, rho = 0) {
 #' \itemize{
 #' \item \eqn{n} is denoted by \code{df}.
 #' \item \eqn{\zeta}{zeta} is denoted by \code{zeta}.
-#' \item \eqn{d} is denoted by \code{opy}. ('Observations Per Year')
+#' \item \eqn{d} is denoted by \code{ope}. ('Observations Per Year')
 #' }
 #' 
 #' If the returns violate the assumptions of normality, independence, etc
@@ -165,13 +165,13 @@ rrt <- function(n, df, K, rho = 0) {
 #'
 #' @usage
 #'
-#' dsr(x, df, zeta, opy, ...)
+#' dsr(x, df, zeta, ope, ...)
 #'
-#' psr(q, df, zeta, opy, ...)
+#' psr(q, df, zeta, ope, ...)
 #'
-#' qsr(p, df, zeta, opy, ...)
+#' qsr(p, df, zeta, ope, ...)
 #'
-#' rsr(n, df, zeta, opy)
+#' rsr(n, df, zeta, ope)
 #'
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
@@ -182,10 +182,7 @@ rrt <- function(n, df, K, rho = 0) {
 #'        when \code{df} is large.
 #' @param zeta the 'signal-to-noise' parameter, \eqn{\zeta}{zeta} defined as the population
 #'        mean divided by the population standard deviation, 'annualized'.
-#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{zeta} are quoted in 'annualized' units, that is, per square root 
-#'        'year', but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @template param-ope
 #' @param ... arguments passed on to the respective t-distribution functions, namely
 #' \code{lower.tail} with default \code{TRUE}, \code{log} with default \code{FALSE}, 
 #' and \code{log.p} with default \code{FALSE}.
@@ -217,8 +214,8 @@ rrt <- function(n, df, K, rho = 0) {
 #' pvs <- psr(rvs, 253*6, 1, 253)
 #' plot(ecdf(pvs))
 #'
-dsr <- function(x, df, zeta, opy = 1, ...) {
-	K <- sqrt(opy / df)
+dsr <- function(x, df, zeta, ope = 1, ...) {
+	K <- sqrt(ope / df)
 	if (missing(zeta)) {
 		retv <- drt(x, df-1, K, ...)
 	} else {
@@ -227,8 +224,8 @@ dsr <- function(x, df, zeta, opy = 1, ...) {
 	return(retv)	
 }
 #' @export 
-psr <- function(q, df, zeta, opy, ...) {
-	K <- sqrt(opy / df)
+psr <- function(q, df, zeta, ope, ...) {
+	K <- sqrt(ope / df)
 	if (missing(zeta)) {
 		retv <- prt(q, df-1, K, ...)
 	} else {
@@ -237,8 +234,8 @@ psr <- function(q, df, zeta, opy, ...) {
 	return(retv)	
 }
 #' @export 
-qsr <- function(p, df, zeta, opy, ...) {
-	K <- sqrt(opy / df)
+qsr <- function(p, df, zeta, ope, ...) {
+	K <- sqrt(ope / df)
 	if (missing(zeta)) {
 		retv <- qrt(p, df-1, K, ...)
 	} else {
@@ -247,8 +244,8 @@ qsr <- function(p, df, zeta, opy, ...) {
 	return(retv)
 }
 #' @export 
-rsr <- function(n, df, zeta, opy) {
-	K <- sqrt(opy / df)
+rsr <- function(n, df, zeta, ope) {
+	K <- sqrt(ope / df)
 	if (missing(zeta)) {
 		retv <- rrt(n, df-1, K)
 	} else {
@@ -443,19 +440,19 @@ rT2 <- function(n, df1, df2, delta2) {
 #' \item \eqn{q} is denoted by \code{df1}.
 #' \item \eqn{n} is denoted by \code{df2}.
 #' \item \eqn{\zeta_*}{zeta*} is denoted by \code{zeta.s}.
-#' \item \eqn{d} is denoted by \code{opy}.
+#' \item \eqn{d} is denoted by \code{ope}.
 #' \item \eqn{c_0/R} is denoted by \code{drag}.
 #' }
 #'
 #' @usage
 #'
-#' dsropt(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE)
+#' dsropt(x, df1, df2, zeta.s, ope, drag = 0, log = FALSE)
 #'
-#' psropt(q, df1, df2, zeta.s, opy, drag = 0, ...)
+#' psropt(q, df1, df2, zeta.s, ope, drag = 0, ...)
 #'
-#' qsropt(p, df1, df2, zeta.s, opy, drag = 0, ...)
+#' qsropt(p, df1, df2, zeta.s, ope, drag = 0, ...)
 #'
-#' rsropt(n, df1, df2, zeta.s, opy, drag = 0, ...)
+#' rsropt(n, df1, df2, zeta.s, ope, drag = 0, ...)
 #'
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
@@ -466,10 +463,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #'        \eqn{\zeta_* = \sqrt{\mu^{\top}\Sigma^{-1}\mu},}{zeta* = sqrt(mu' Sigma^-1 mu),}
 #'        for population parameters.
 #'        defaults to 0, \emph{i.e.} a central maximal Sharpe ratio distribution.
-#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{zeta.s} are quoted in 'annualized' units, that is, per 'year',
-#'        but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @template param-ope
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
 #'        that \code{drag} has been annualized, \emph{i.e.} is given in the
 #'        same units as \code{x} and \code{q}.
@@ -501,25 +495,25 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @examples 
 #' # generate some variates 
 #' ngen <- 2048
-#' opy <- 253
+#' ope <- 253
 #' df1 <- 8
-#' df2 <- opy * 10
+#' df2 <- ope * 10
 #' drag <- 0
 #' # sample
-#' rvs <- rsropt(ngen, df1, df2, drag, opy)
+#' rvs <- rsropt(ngen, df1, df2, drag, ope)
 #' hist(rvs)
 #' # these should be uniform:
-#' isp <- psropt(rvs, df1, df2, drag, opy)
+#' isp <- psropt(rvs, df1, df2, drag, ope)
 #' plot(ecdf(isp))
 #'
-dsropt <- function(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE) {
+dsropt <- function(x, df1, df2, zeta.s, ope, drag = 0, log = FALSE) {
 	if (!missing(drag) && (drag != 0)) {
 		x <- x + drag
 	}
-	if (!missing(opy)) {
-		x <- .deannualize(x, opy)
+	if (!missing(ope)) {
+		x <- .deannualize(x, ope)
 		if (!missing(zeta.s)) {
-			zeta.s <- .deannualize(zeta.s, opy)
+			zeta.s <- .deannualize(zeta.s, ope)
 		}
 	}
 	x.T2 <- .sropt_to_T2(x, df2)
@@ -537,14 +531,14 @@ dsropt <- function(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE) {
 	return(retv)
 }
 #' @export 
-psropt <- function(q, df1, df2, zeta.s, opy, drag = 0, ...) {
+psropt <- function(q, df1, df2, zeta.s, ope, drag = 0, ...) {
 	if (!missing(drag) && (drag != 0)) {
 		q <- q + drag
 	}
-	if (!missing(opy)) {
-		q <- .deannualize(q, opy)
+	if (!missing(ope)) {
+		q <- .deannualize(q, ope)
 		if (!missing(zeta.s)) {
-			zeta.s <- .deannualize(zeta.s, opy)
+			zeta.s <- .deannualize(zeta.s, ope)
 		}
 	}
 	q.T2 <- .sropt_to_T2(q, df2)
@@ -557,19 +551,19 @@ psropt <- function(q, df1, df2, zeta.s, opy, drag = 0, ...) {
 	return(retv)
 }
 #' @export 
-qsropt <- function(p, df1, df2, zeta.s, opy, drag = 0, ...) {
+qsropt <- function(p, df1, df2, zeta.s, ope, drag = 0, ...) {
 	if (missing(zeta.s)) {
 		delta2 = 0.0
 	} else {
-		if (!missing(opy)) {
-			zeta.s <- .deannualize(zeta.s, opy)
+		if (!missing(ope)) {
+			zeta.s <- .deannualize(zeta.s, ope)
 		}
 		delta2 <- .sropt_to_T2(zeta.s, df2)
 	}
 	q.T2 <- qT2(p, df1, df2, delta2, ...)
 	retv <- .T2_to_sropt(q.T2, df2)
-	if (!missing(opy)) {
-		retv <- .annualize(retv,opy)
+	if (!missing(ope)) {
+		retv <- .annualize(retv,ope)
 	}
 	if (!missing(drag) && (drag != 0)) {
 		retv <- retv - drag
@@ -577,19 +571,19 @@ qsropt <- function(p, df1, df2, zeta.s, opy, drag = 0, ...) {
 	return(retv)
 }
 #' @export 
-rsropt <- function(n, df1, df2, zeta.s, opy, drag = 0, ...) {
+rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 	if (missing(zeta.s)) {
 		delta2 = 0.0
 	} else {
-		if (!missing(opy)) {
-			zeta.s <- .deannualize(zeta.s, opy)
+		if (!missing(ope)) {
+			zeta.s <- .deannualize(zeta.s, ope)
 		}
 		delta2 <- .sropt_to_T2(zeta.s, df2)
 	}
 	r.T2 <- rT2(n, df1, df2, delta2, ...) 
 	retv <- .T2_to_sropt(r.T2, df2)
-	if (!missing(opy)) {
-		retv <- .annualize(retv,opy)
+	if (!missing(ope)) {
+		retv <- .annualize(retv,ope)
 	}
 	if (!missing(drag) && (drag != 0)) {
 		retv <- retv - drag
@@ -766,17 +760,14 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' @usage
 #'
-#' pco_sropt(q,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE) 
+#' pco_sropt(q,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE) 
 #'
-#' qco_sropt(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
+#' qco_sropt(p,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
 #'
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
 #' @param z.s an observed Sharpe ratio statistic, annualized.
-#' @param opy the number of observations per 'year'. \code{z.s}, \code{q}, and
-#'        \code{zeta.s} are quoted in 'annualized' units, that is, per 'year',
-#'        but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @template param-ope
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
@@ -808,34 +799,34 @@ qlambdap <- Vectorize(.qlambdap,
 #' @examples 
 #'
 #' zeta.s <- 2.0
-#' opy <- 253
+#' ope <- 253
 #' ntest <- 2000
 #' df1 <- 4
-#' df2 <- 6 * opy
+#' df2 <- 6 * ope
 #' rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
 #' qvs <- seq(0,10,length.out=101)
-#' pps <- pco_sropt(qvs,df1,df2,rvs[1],opy)
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope)
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
-#' pps <- pco_sropt(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
 #' 
 #' # 2FIX: shove these into the unit tests for monotonicity?
 #' svs <- seq(0,4,length.out=101)
-#' pps <- pco_sropt(2,df1,df2,svs,opy)
+#' pps <- pco_sropt(2,df1,df2,svs,ope)
 #' if (require(txtplot))
 #'  txtplot(svs,pps)
-#' pps <- pco_sropt(2,df1,df2,svs,opy,lower.tail=FALSE)
+#' pps <- pco_sropt(2,df1,df2,svs,ope,lower.tail=FALSE)
 #' if (require(txtplot))
 #'  txtplot(svs,pps)
 #' 
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
-#' pps <- pco_sropt(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
-#' pco_sropt(-1,df1,df2,rvs[1],opy)
+#' pco_sropt(-1,df1,df2,rvs[1],ope)
 #'
 #' qvs <- qco_sropt(0.05,df1=df1,df2=df2,z.s=rvs)
 #' mean(qvs > zeta.s)
@@ -849,12 +840,12 @@ qlambdap <- Vectorize(.qlambdap,
 #' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),df2,rvs)
 #' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 #'
-# 2FIX: add opy?
-pco_sropt <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
+# 2FIX: add ope?
+pco_sropt <- function(q,df1,df2,z.s,ope=1,lower.tail=TRUE,log.p=FALSE) {
 	# 2FIX: do the annualization just once for efficiency?
 	# this is just a silly wrapper on psropt
 	# delegate
-	retv <- psropt(q=z.s,df1=df1,df2=df2,zeta.s=q,opy=opy,
+	retv <- psropt(q=z.s,df1=df1,df2=df2,zeta.s=q,ope=ope,
 									lower.tail=!lower.tail,log.p=log.p)  # sic the tail reversal
 	return(retv)
 }
@@ -865,24 +856,24 @@ pco_sropt <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
 # pco_sropt only accepts non-negative q 
 #
 # here we try to find lb <= q < ub such that
-# pco_sropt(q,df1,df2,sropt,opy,lower.tail,log.p) = p
+# pco_sropt(q,df1,df2,sropt,ope,lower.tail,log.p) = p
 # however, there may be no such q, since we are limited to
 # the range [lp,up) where
-# lp = pco_sropt(lb,df1,df2,sropt,opy,lower.tail,log.p)
-# up = pco_sropt(ub,df1,df2,sropt,opy,lower.tail,log.p)
+# lp = pco_sropt(lb,df1,df2,sropt,ope,lower.tail,log.p)
+# up = pco_sropt(ub,df1,df2,sropt,ope,lower.tail,log.p)
 # if p < lp we return lb;
 # if q >= up, we return ub;
-.qco_sropt <- function(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,
+.qco_sropt <- function(p,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE,
 												lb=0,ub=Inf) {
 	if ((lb > ub) || (is.infinite(lb)) || (min(lb,ub) < 0))
 		stop("nonsensical lb and/or ub")
 
-	if (!missing(opy)) 
-		z.s <- .deannualize(z.s,opy)
+	if (!missing(ope)) 
+		z.s <- .deannualize(z.s,ope)
 
 	# create a function increasing in its argument that
 	# we wish to zero
-	# do *not* pass on opy b/c this function is a tight loop
+	# do *not* pass on ope b/c this function is a tight loop
 	if (lower.tail) {
 		zerf <- function(q) {
 			pco_sropt(q,df1=df1,df2=df2,z.s=z.s,lower.tail=lower.tail,log.p=log.p) - p
@@ -912,7 +903,7 @@ pco_sropt <- function(q,df1,df2,z.s,opy=1,lower.tail=TRUE,log.p=FALSE) {
 
 	ncp <- uniroot(zerf,interval=c(lb,ub),
 								 f.lower=flb,f.upper=fub)
-	retv <- ifelse(missing(opy),ncp$root,.annualize(ncp$root,opy))
+	retv <- ifelse(missing(ope),ncp$root,.annualize(ncp$root,ope))
 	return(retv)
 }
 #' @export 

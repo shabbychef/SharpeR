@@ -2,13 +2,13 @@
 \alias{reannualize}
 \title{Change the annualization of a Sharpe ratio.}
 \usage{
-  reannualize(x,opy,epoch)
+  reannualize(x,ope,epoch)
 }
 \arguments{
   \item{x}{an object of class \code{sr}.}
 
-  \item{opy}{the new observations per year (or epoch). If
-  none given, it is not updated.}
+  \item{ope}{the new observations per epoch. If none given,
+  it is not updated.}
 
   \item{epoch}{a string representation of the epoch. If
   none given, it is not updated.}
@@ -23,9 +23,9 @@
 }
 \examples{
 # compute a 'daily' Sharpe
-mysr <- as.sr(rnorm(253*8),opy=1)
+mysr <- as.sr(rnorm(253*8),ope=1,epoch="day")
 # turn into annual
-mysr2 <- reannualize(mysr,opy=253,epoch="yr")
+mysr2 <- reannualize(mysr,ope=253,epoch="yr")
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

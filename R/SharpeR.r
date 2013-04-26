@@ -70,7 +70,7 @@
 #' \item \code{df} stands for the degrees of freedom, typically \eqn{n-1}, but
 #' \eqn{n-J-1} in general.
 #' \item \eqn{\zeta}{zeta} is denoted by \code{zeta}.
-#' \item \eqn{d} is denoted by \code{opy}. ('Observations Per Year')
+#' \item \eqn{d} is denoted by \code{ope}. ('Observations Per Year')
 #' \item For the APT form of Sharpe, \code{K} stands for the
 #' rescaling parameter.
 #' }
@@ -114,7 +114,7 @@
 #' \item \eqn{q} is denoted by \code{df1}.
 #' \item \eqn{n} is denoted by \code{df2}.
 #' \item \eqn{\zeta_*}{zeta*} is denoted by \code{zeta.s}.
-#' \item \eqn{d} is denoted by \code{opy}.
+#' \item \eqn{d} is denoted by \code{ope}.
 #' \item \eqn{c_0/R} is denoted by \code{drag}.
 #' }
 #'

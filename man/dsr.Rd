@@ -5,13 +5,13 @@
 \alias{rsr}
 \title{The (non-central) Sharpe ratio.}
 \usage{
-  dsr(x, df, zeta, opy, ...)
+  dsr(x, df, zeta, ope, ...)
 
-  psr(q, df, zeta, opy, ...)
+  psr(q, df, zeta, ope, ...)
 
-  qsr(p, df, zeta, opy, ...)
+  qsr(p, df, zeta, ope, ...)
 
-  rsr(n, df, zeta, opy)
+  rsr(n, df, zeta, ope)
 }
 \arguments{
   \item{x,q}{vector of quantiles.}
@@ -29,12 +29,13 @@
   \eqn{\zeta}{zeta} defined as the population mean divided
   by the population standard deviation, 'annualized'.}
 
-  \item{opy}{the number of observations per 'year'.
-  \code{x}, \code{q}, and \code{zeta} are quoted in
-  'annualized' units, that is, per square root 'year', but
-  returns are observed possibly at a rate of \code{opy} per
-  'year.' default value is 1, meaning no deannualization is
-  performed.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
   \item{...}{arguments passed on to the respective
   t-distribution functions, namely \code{lower.tail} with
@@ -68,8 +69,7 @@
   The units of \eqn{z} is \eqn{\mbox{time}^{-1/2}}{per root
   time}. Typically the Sharpe ratio is \emph{annualized} by
   multiplying by \eqn{\sqrt{d}}{sqrt(d)}, where \eqn{d} is
-  the number of observations per year (or whatever the
-  target annualization epoch.)
+  the number of observations per epoch (typically a year).
 
   Letting \eqn{z = \sqrt{d}\frac{\bar{x}-c_0}{s}}{z =
   sqrt(d)(xbar - c0)/s}, where the sample estimates are
@@ -82,7 +82,7 @@
   The parameters are encoded as follows: \itemize{ \item
   \eqn{n} is denoted by \code{df}. \item \eqn{\zeta}{zeta}
   is denoted by \code{zeta}. \item \eqn{d} is denoted by
-  \code{opy}. ('Observations Per Year') }
+  \code{ope}. ('Observations Per Year') }
 
   If the returns violate the assumptions of normality,
   independence, etc (\emph{as they always should in the

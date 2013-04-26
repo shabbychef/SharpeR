@@ -5,13 +5,13 @@
 \alias{rsropt}
 \title{The (non-central) maximal Sharpe ratio distribution.}
 \usage{
-  dsropt(x, df1, df2, zeta.s, opy, drag = 0, log = FALSE)
+  dsropt(x, df1, df2, zeta.s, ope, drag = 0, log = FALSE)
 
-  psropt(q, df1, df2, zeta.s, opy, drag = 0, ...)
+  psropt(q, df1, df2, zeta.s, ope, drag = 0, ...)
 
-  qsropt(p, df1, df2, zeta.s, opy, drag = 0, ...)
+  qsropt(p, df1, df2, zeta.s, ope, drag = 0, ...)
 
-  rsropt(n, df1, df2, zeta.s, opy, drag = 0, ...)
+  rsropt(n, df1, df2, zeta.s, ope, drag = 0, ...)
 }
 \arguments{
   \item{x,q}{vector of quantiles.}
@@ -30,12 +30,13 @@
   defaults to 0, \emph{i.e.} a central maximal Sharpe ratio
   distribution.}
 
-  \item{opy}{the number of observations per 'year'.
-  \code{x}, \code{q}, and \code{zeta.s} are quoted in
-  'annualized' units, that is, per 'year', but returns are
-  observed possibly at a rate of \code{opy} per 'year.'
-  default value is 1, meaning no deannualization is
-  performed.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,
@@ -105,7 +106,7 @@
   \eqn{q} is denoted by \code{df1}. \item \eqn{n} is
   denoted by \code{df2}. \item \eqn{\zeta_*}{zeta*} is
   denoted by \code{zeta.s}. \item \eqn{d} is denoted by
-  \code{opy}. \item \eqn{c_0/R} is denoted by \code{drag}.
+  \code{ope}. \item \eqn{c_0/R} is denoted by \code{drag}.
   }
 }
 \note{
@@ -115,15 +116,15 @@
 \examples{
 # generate some variates
 ngen <- 2048
-opy <- 253
+ope <- 253
 df1 <- 8
-df2 <- opy * 10
+df2 <- ope * 10
 drag <- 0
 # sample
-rvs <- rsropt(ngen, df1, df2, drag, opy)
+rvs <- rsropt(ngen, df1, df2, drag, ope)
 hist(rvs)
 # these should be uniform:
-isp <- psropt(rvs, df1, df2, drag, opy)
+isp <- psropt(rvs, df1, df2, drag, ope)
 plot(ecdf(isp))
 }
 \author{

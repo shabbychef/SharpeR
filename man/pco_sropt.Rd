@@ -3,9 +3,9 @@
 \alias{qco_sropt}
 \title{The 'confidence distribution' for maximal Sharpe ratio.}
 \usage{
-  pco_sropt(q,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE)
+  pco_sropt(q,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE)
 
-  qco_sropt(p,df1,df2,z.s,opy,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf)
+  qco_sropt(p,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf)
 }
 \arguments{
   \item{q}{vector of quantiles.}
@@ -15,12 +15,13 @@
   \item{z.s}{an observed Sharpe ratio statistic,
   annualized.}
 
-  \item{opy}{the number of observations per 'year'.
-  \code{z.s}, \code{q}, and \code{zeta.s} are quoted in
-  'annualized' units, that is, per 'year', but returns are
-  observed possibly at a rate of \code{opy} per 'year.'
-  default value is 1, meaning no deannualization is
-  performed.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
   \item{log.p}{logical; if TRUE, probabilities p are given
   as \eqn{\mbox{log}(p)}{log(p)}.}
@@ -76,34 +77,34 @@
 }
 \examples{
 zeta.s <- 2.0
-opy <- 253
+ope <- 253
 ntest <- 2000
 df1 <- 4
-df2 <- 6 * opy
+df2 <- 6 * ope
 rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
 qvs <- seq(0,10,length.out=101)
-pps <- pco_sropt(qvs,df1,df2,rvs[1],opy)
+pps <- pco_sropt(qvs,df1,df2,rvs[1],ope)
 if (require(txtplot))
  txtplot(qvs,pps)
-pps <- pco_sropt(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
 if (require(txtplot))
  txtplot(qvs,pps)
 
 # 2FIX: shove these into the unit tests for monotonicity?
 svs <- seq(0,4,length.out=101)
-pps <- pco_sropt(2,df1,df2,svs,opy)
+pps <- pco_sropt(2,df1,df2,svs,ope)
 if (require(txtplot))
  txtplot(svs,pps)
-pps <- pco_sropt(2,df1,df2,svs,opy,lower.tail=FALSE)
+pps <- pco_sropt(2,df1,df2,svs,ope,lower.tail=FALSE)
 if (require(txtplot))
  txtplot(svs,pps)
 
 if (require(txtplot))
  txtplot(qvs,pps)
-pps <- pco_sropt(qvs,df1,df2,rvs[1],opy,lower.tail=FALSE)
+pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
 if (require(txtplot))
  txtplot(qvs,pps)
-pco_sropt(-1,df1,df2,rvs[1],opy)
+pco_sropt(-1,df1,df2,rvs[1],ope)
 
 qvs <- qco_sropt(0.05,df1=df1,df2=df2,z.s=rvs)
 mean(qvs > zeta.s)

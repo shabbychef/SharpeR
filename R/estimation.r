@@ -222,15 +222,15 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' @template sr
 #' @examples 
 #' # using "sr" class:
-#' opy <- 253
-#' df <- opy * 6
-#' xv <- rnorm(df, 1 / sqrt(opy))
-#' mysr <- as.sr(xv,opy=opy)
+#' ope <- 253
+#' df <- ope * 6
+#' xv <- rnorm(df, 1 / sqrt(ope))
+#' mysr <- as.sr(xv,ope=ope)
 #' confint(mysr,level=0.90)
 #' # using "lm" class
 #' yv <- xv + rnorm(length(xv))
 #' amod <- lm(yv ~ xv)
-#' mysr <- as.sr(amod,opy=opy)
+#' mysr <- as.sr(amod,ope=ope)
 #' confint(mysr,level.lo=0.05,level.hi=1.0)
 #'
 #' @rdname confint
@@ -264,7 +264,7 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #' @usage
 #'
 #' sropt_confint(z.s,df1,df2,level=0.95,
-#'                opy=1,level.lo=(1-level)/2,level.hi=1-level.lo)
+#'                ope=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
 #' @param z.s an observed Sharpe ratio statistic, annualized.
 #' @inheritParams qco_sropt
@@ -272,10 +272,7 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #' @inheritParams qsropt
 #' @inheritParams psropt
 #' @param level the confidence level required.
-#' @param opy the number of observations per 'year'. \code{z.s}, and the
-#'        confidence intervals are quoted in 'annualized' units, that is, per square root 
-#'        'year', but returns are observed possibly at a rate of \code{opy} per 
-#'        'year.' default value is 1, meaning no deannualization is performed.
+#' @template param-ope
 #' @param level.lo the lower bound for the confidence interval.
 #' @param level.hi the upper bound for the confidence interval.
 #' @keywords htest
@@ -289,23 +286,23 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #' @rdname sropt_confint
 #' @examples 
 #' # fix these!
-#' opy <- 253
+#' ope <- 253
 #' df1 <- 6
-#' df2 <- opy * 6
+#' df2 <- ope * 6
 #' rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
 #' sro <- as.sropt(rvs)
 #' aci <- confint(sro)
 #'
 #'@export
 sropt_confint <- function(z.s,df1,df2,level=0.95,
-											     opy=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
-	#2FIX: the order of arguments is really wonky. where does opy go?
-	#if (!missing(opy)) {
-		#z.s <- .deannualize(z.s,opy)
+											     ope=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
+	#2FIX: the order of arguments is really wonky. where does ope go?
+	#if (!missing(ope)) {
+		#z.s <- .deannualize(z.s,ope)
 	#}
 
-	ci.hi <- qco_sropt(level.hi,df1=df1,df2=df2,z.s=z.s,opy=opy,lower.tail=TRUE)
-	ci.lo <- qco_sropt(level.lo,df1=df1,df2=df2,z.s=z.s,opy=opy,lower.tail=TRUE,ub=ci.hi)
+	ci.hi <- qco_sropt(level.hi,df1=df1,df2=df2,z.s=z.s,ope=ope,lower.tail=TRUE)
+	ci.lo <- qco_sropt(level.lo,df1=df1,df2=df2,z.s=z.s,ope=ope,lower.tail=TRUE,ub=ci.hi)
 	ci <- c(ci.lo,ci.hi)
 
 	retval <- matrix(ci,nrow=1)
@@ -318,7 +315,7 @@ sropt_confint <- function(z.s,df1,df2,level=0.95,
 #' @method confint sropt
 #' @S3method confint sropt
 confint.sropt <- function(z.s,parm,level=0.95,...) {
-	retval <- sropt_confint(z.s$sropt,z.s$df1,z.s$df2,level=level,opy=z.s$opy,...)
+	retval <- sropt_confint(z.s$sropt,z.s$df1,z.s$df2,level=level,ope=z.s$ope,...)
 	return(retval)
 }
 
@@ -453,19 +450,19 @@ T2.inference <- function(T2,df1,df2,...) {
 #' # generate some sropts
 #' nfac <- 5
 #' nyr <- 10
-#' opy <- 253
+#' ope <- 253
 #' # simulations with no covariance structure.
 #' # under the null:
 #' set.seed(as.integer(charToRaw("determinstic")))
-#' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
-#' asro <- as.sropt(Returns,drag=0,opy=opy)
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
 #' est1 <- inference(asro,type='unbiased')  
 #' est2 <- inference(asro,type='KRS')  
 #' est3 <- inference(asro,type='MLE')
 #' 
 #' # under the alternative:
-#' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
-#' asro <- as.sropt(Returns,drag=0,opy=opy)
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
 #' est1 <- inference(asro,type='unbiased')  
 #' est2 <- inference(asro,type='KRS')  
 #' est3 <- inference(asro,type='MLE')
@@ -473,10 +470,10 @@ T2.inference <- function(T2,df1,df2,...) {
 #' # sample many under the alternative, look at the estimator.
 #' df1 <- 6
 #' df2 <- 2000
-#' opy <- 253
+#' ope <- 253
 #' zeta.s <- 1.25
-#' rvs <- rsropt(500, df1, df2, zeta.s, opy)
-#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
+#' rvs <- rsropt(500, df1, df2, zeta.s, ope)
+#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 #' est1 <- inference(roll.own,type='unbiased')  
 #' est2 <- inference(roll.own,type='KRS')  
 #' est3 <- inference(roll.own,type='MLE')

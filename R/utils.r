@@ -58,34 +58,34 @@
 #UNFOLD
 
 # class utils#FOLDUP
-.infer_opy_xts <- function(anxts) {
+.infer_ope_xts <- function(anxts) {
 	TEO <- time(anxts)
 	days.per.row <- as.double((TEO[length(TEO)] - TEO[1]) / (length(TEO) - 1))
-	opy <- 365.25 / days.per.row
-	return(opy)
+	ope <- 365.25 / days.per.row
+	return(ope)
 }
 #UNFOLD
 
 # annualize and deannualize a Sharpe Ratio#FOLDUP
 # ' @param sr the Sharpe Ratio, in per sqrt(epoch) units.
-# ' @param opy the number of observations per year. no default here.
-# ' @return the annualized Sharpe ratio, in per sqrt(year) units.
+# ' @param ope the number of observations per epoch. no default here.
+# ' @return the annualized Sharpe ratio, in per sqrt(epoch) units.
 # ' @aliases .deannualize
 # ' @export
-.annualize <- function(sr, opy) {
-  return(sr * sqrt(opy))  
+.annualize <- function(sr, ope) {
+  return(sr * sqrt(ope))  
 }
 # ' @export
-.deannualize <- function(sr.pa, opy) {
-  return(sr.pa / sqrt(opy))
+.deannualize <- function(sr.pa, ope) {
+  return(sr.pa / sqrt(ope))
 }
 
 # for T^2: 
-.annualize2 <- function(T2, opy) {
-  return(T2 * opy)  
+.annualize2 <- function(T2, ope) {
+  return(T2 * ope)  
 }
-.deannualize2 <- function(T2.pa, opy) {
-  return(T2.pa / opy)
+.deannualize2 <- function(T2.pa, ope) {
+  return(T2.pa / ope)
 }
 #UNFOLD
 

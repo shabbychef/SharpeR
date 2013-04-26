@@ -3,7 +3,7 @@
 \title{test for maximal Sharpe ratio}
 \usage{
   sropt.test(X,alternative=c("greater","two.sided","less"),
-    zeta.s=0,opy=1,conf.level=0.95)
+    zeta.s=0,ope=1,conf.level=0.95)
 }
 \arguments{
   \item{X}{a (non-empty) numeric matrix of data values,
@@ -17,12 +17,13 @@
   \item{zeta.s}{a number indicating the null hypothesis
   value.}
 
-  \item{opy}{the number of observations per 'year'.
-  \code{zeta.s} is quoted in 'annualized' units, that is,
-  per square root 'year', but returns are observed possibly
-  at a rate of \code{opy} per 'year.' default value is 1,
-  meaning no deannualization is performed.  This is only
-  used if \code{zeta.s} is nonzero.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
   \item{conf.level}{confidence level of the interval. (not
   used yet)}

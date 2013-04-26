@@ -7,7 +7,7 @@
   sr_test(x,...)
 
   sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
-    zeta=0,opy=1,paired=FALSE,conf.level=0.95)
+    zeta=0,ope=1,paired=FALSE,conf.level=0.95)
 
   sr_test(z,alternative=c("two.sided","less","greater"),
     zeta=0,conf.level=0.95)
@@ -29,11 +29,13 @@
   \item{zeta}{a number indicating the null hypothesis
   offset value, the \eqn{S} value.}
 
-  \item{opy}{the number of observations per 'year'.
-  \code{zeta} is quoted in 'annualized' units, that is, per
-  square root 'year', but returns are observed possibly at
-  a rate of \code{opy} per 'year.' default value is 1,
-  meaning no deannualization is performed.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
   \item{paired}{a logical indicating whether you want a
   paired test.}
@@ -89,17 +91,17 @@
 }
 \examples{
 # should reject null
-x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="greater")
-x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="two.sided")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,ope=1,alternative="greater")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,ope=1,alternative="two.sided")
 # should not reject null
-x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,opy=1,alternative="less")
+x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,ope=1,alternative="less")
 
 # test for uniformity
-pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),opy=253,alternative="two.sided")
+pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),ope=253,alternative="two.sided")
                         x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')
-asr <- as.sr(rnorm(1000,1 / sqrt(253)),opy=253)
+asr <- as.sr(rnorm(1000,1 / sqrt(253)),ope=253)
 checkit <- sr_test(asr,zeta=0)
 }
 \author{

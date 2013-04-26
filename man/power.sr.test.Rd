@@ -3,7 +3,7 @@
 \title{Power calculations for Sharpe ratio tests}
 \usage{
   power.sr.test(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
-    alternative=c("one.sided","two.sided"),opy=NULL)
+    alternative=c("one.sided","two.sided"),ope=NULL)
 }
 \arguments{
   \item{n}{Number of observations}
@@ -20,19 +20,20 @@
 
   \item{alternative}{One- or two-sided test.}
 
-  \item{opy}{the number of observations per 'year'.
-  \code{x}, \code{q}, and \code{zeta} are quoted in
-  'annualized' units, that is, per square root 'year', but
-  returns are observed possibly at a rate of \code{opy} per
-  'year.' default value is 1, meaning no deannualization is
-  performed.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 }
 \value{
   Object of class \code{power.htest}, a list of the
   arguments (including the computed one) augmented with
-  \code{method}, \code{note} and \code{n.yr} elements, the
-  latter is the number of years under the given
-  annualization (\code{opy}), \code{NA} if none given.
+  \code{method}, \code{note} and \code{n.epoch} elements,
+  the latter is the number of epochs under the given
+  annualization (\code{ope}), \code{NA} if none given.
 }
 \description{
   Compute power of test, or determine parameters to obtain
@@ -55,18 +56,20 @@
   NULL must be explicitly passed if you want to compute it.
 }
 \examples{
-anex <- power.sr.test(253,1,0.05,NULL,opy=253)
-anex <- power.sr.test(n=253,zeta=NULL,sig.level=0.05,power=0.5,opy=253)
-anex <- power.sr.test(n=NULL,zeta=0.6,sig.level=0.05,power=0.5,opy=253)
+anex <- power.sr.test(253,1,0.05,NULL,ope=253)
+anex <- power.sr.test(n=253,zeta=NULL,sig.level=0.05,power=0.5,ope=253)
+anex <- power.sr.test(n=NULL,zeta=0.6,sig.level=0.05,power=0.5,ope=253)
 # Lehr's Rule
 zetas <- seq(0.1,2.5,length.out=201)
 ssizes <- sapply(zetas,function(zed) {
-  x <- power.sr.test(n=NULL,zeta=zed,sig.level=0.05,power=0.8,opy=253)
+  x <- power.sr.test(n=NULL,zeta=zed,sig.level=0.05,power=0.8,
+       alternative="two.sided",ope=253)
   x$n / 253})
-plot(8 / (zetas*zetas),ssizes)
+# should be around 8.
+print(summary(ssizes * zetas * zetas))
 # e = n z^2 mnemonic approximate rule for 0.05 type I, 50\% power
 ssizes <- sapply(zetas,function(zed) {
-  x <- power.sr.test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,opy=253)
+  x <- power.sr.test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,ope=253)
   x$n / 253 })
 print(summary(ssizes * zetas * zetas - exp(1)))
 }

@@ -49,13 +49,13 @@
 #' \item \code{sr} The Sharpe ratio statistic.
 #' \item \code{df} The d.f. of the equivalent t-statistic.
 #' \item \code{c0} The drag 'risk free rate' used.
-#' \item \code{opy} The 'observations per year'.
+#' \item \code{ope} The 'observations per epoch'.
 #' \item \code{rescal} The rescaling parameter.
 #' \item \code{epoch} The string name of the 'epoch'.
 #' }
 #'
 #' The stored Sharpe statistic, \code{sr} is equal to the t-statistic 
-#' times \eqn{rescal * sqrt{opy}}{rescal * sqrt(opy)}.
+#' times \eqn{rescal * sqrt{ope}}{rescal * sqrt(ope)}.
 #'
 #' For the most part, this constructor should \emph{not} be called directly,
 #' rather \code{\link{as.sr}} should be called instead to compute the
@@ -63,17 +63,16 @@
 #'
 #' @usage
 #'
-#' sr(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") 
+#' sr(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") 
 #'
 #' @param sr a Sharpe ratio statistic.
 #' @param df the degrees of freedom of the equivalent t-statistic.
 #' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
 #'        assumed to be given in the same units as x, \emph{not}
 #'        in 'annualized' terms.
-#' @param opy the number of observations per 'year'. This is used to
-#'        'annualize' the answer.
+#' @template param-ope
 #' @param rescal the rescaling parameter.
-#' @param epoch the string representation of the 'year', defaulting
+#' @param epoch the string representation of the 'epoch', defaulting
 #'        to 'yr'.
 #' @keywords univar 
 #' @return a list cast to class \code{sr}.
@@ -88,26 +87,26 @@
 #'
 #' @examples 
 #' # roll your own.
-#' opy <- 253
+#' ope <- 253
 #' zeta <- 1.0
-#' n <- 6 * opy
-#' rvs <- rsr(1,n,zeta,opy=opy)
-#' roll.own <- sr(sr=rvs,df=n-1,opy=opy,rescal=sqrt(1/n))
+#' n <- 6 * ope
+#' rvs <- rsr(1,n,zeta,ope=ope)
+#' roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
 #' # put a bunch in. naming becomes a problem.
-#' rvs <- rsr(5,n,zeta,opy=opy)
-#' roll.own <- sr(sr=rvs,df=n-1,opy=opy,rescal=sqrt(1/n))
+#' rvs <- rsr(5,n,zeta,ope=ope)
+#' roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
 #'
-sr <- function(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") {
+sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 	retval <- list(sr = sr,df = df,c0 = c0,
-								 opy = opy,rescal = rescal,epoch = epoch)
+								 ope = ope,rescal = rescal,epoch = epoch)
 	class(retval) <- "sr"
 	return(retval)
 }
 # compute SR in only one place. I hope.
-.compute_sr <- function(mu,c0,sigma,opy) {
+.compute_sr <- function(mu,c0,sigma,ope) {
 	sr <- (mu - c0) / sigma
-	if (!missing(opy))
-		sr <- sr * sqrt(opy)
+	if (!missing(ope))
+		sr <- sr * sqrt(ope)
 	return(sr)
 }
 #' @title Compute the Sharpe ratio.
@@ -128,21 +127,20 @@ sr <- function(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' 
 #' The units of \eqn{z}{z} are \eqn{\mbox{time}^{-1/2}}{per root time}.
 #' Typically the Sharpe ratio is \emph{annualized} by multiplying by
-#' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
+#' \eqn{\sqrt{\mbox{ope}}}{sqrt(ope)}, where \eqn{\mbox{ope}}{ope} 
 #' is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
 #' @usage
 #'
-#' as.sr(x,...)
+#' as.sr(x,c0=0,ope=1,...) 
 #'
 #' @param x vector of returns.
 #' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
 #'        assumed to be given in the same units as x, \emph{not}
 #'        in 'annualized' terms.
-#' @param opy the number of observations per 'year'. This is used to
-#'        'annualize' the answer.
-#' @param epoch the string representation of the 'year', defaulting
+#' @template param-ope
+#' @param epoch the string representation of the 'epoch', defaulting
 #'        to 'yr'.
 #' @param ... further arguments to be passed to or from methods.
 #' @keywords univar 
@@ -150,7 +148,7 @@ sr <- function(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' \item{sr}{the annualized Sharpe ratio.}
 #' \item{df}{the t-stat degrees of freedom.}
 #' \item{c0}{the risk free term.}
-#' \item{opy}{the annualization factor.}
+#' \item{ope}{the annualization factor.}
 #' \item{rescal}{the rescaling factor.}
 #' \item{epoch}{the string epoch.}
 #' cast to class \code{sr}.
@@ -166,7 +164,7 @@ sr <- function(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #'
 #' @examples 
 #' # Sharpe's 'model': just given a bunch of returns.
-#' asr <- as.sr(rnorm(253*8),opy=253)
+#' asr <- as.sr(rnorm(253*8),ope=253)
 #' # or a matrix, with a name
 #' my.returns <- matrix(rnorm(253*10),ncol=1)
 #' colnames(my.returns) <- c("my strategy")
@@ -180,35 +178,35 @@ sr <- function(sr,df,c0=0,opy=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' # on a linear model, find the 'Sharpe' of the residual term
 #' nfac <- 5
 #' nyr <- 10
-#' opy <- 253
+#' ope <- 253
 #' set.seed(as.integer(charToRaw("determinstic")))
-#' Factors <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' Factors <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 #' Betas <- exp(0.1 * rnorm(dim(Factors)[2]))
 #' Returns <- (Factors %*% Betas) + rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 #' APT_mod <- lm(Returns ~ Factors)
-#' asr <- as.sr(APT_mod,opy=opy)
+#' asr <- as.sr(APT_mod,ope=ope)
 #' # try again, but make the Returns independent of the Factors.
 #' Returns <- rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 #' APT_mod <- lm(Returns ~ Factors)
-#' asr <- as.sr(APT_mod,opy=opy)
+#' asr <- as.sr(APT_mod,ope=ope)
 #'   
-as.sr <- function(x,c0=0,opy=1,...) {
+as.sr <- function(x,c0=0,ope=1,...) {
 	UseMethod("as.sr", x)
 }
 #' @param na.rm logical.  Should missing values be removed?
 #' @rdname as.sr
 #' @method as.sr default
 #' @S3method as.sr default
-as.sr.default <- function(x,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
+as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- mean(x,na.rm=na.rm)
 	sigma <- sd(x,na.rm=na.rm)
-	z <- .compute_sr(mu,c0,sigma,opy)
+	z <- .compute_sr(mu,c0,sigma,ope)
 	dim(z) <- c(1,1)
 	rownames(z) <- unlist(dimnames(x))
 	if (is.null(rownames(z)))
 		rownames(z) <- deparse(substitute(x))
 	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
-	retval <- sr(z,df=df-1,c0=c0,opy=opy,
+	retval <- sr(z,df=df-1,c0=c0,ope=ope,
 							 rescal=1/sqrt(df),epoch=epoch)
 	return(retval)
 }
@@ -216,15 +214,15 @@ as.sr.default <- function(x,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 #' @rdname as.sr
 #' @method as.sr lm 
 #' @S3method as.sr lm
-as.sr.lm <- function(modl,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
+as.sr.lm <- function(modl,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- modl$coefficients["(Intercept)"]
 	sigma <- sqrt(deviance(modl) / modl$df.residual)
-	z <- .compute_sr(mu,c0,sigma,opy)
+	z <- .compute_sr(mu,c0,sigma,ope)
 	dim(z) <- c(1,1)
 	rownames(z) <- deparse(substitute(modl))
 	XXinv <- vcov(modl) / sigma^2
 	rescal <- sqrt(XXinv["(Intercept)","(Intercept)"])
-	retval <- sr(z,df=modl$df.residual,c0=c0,opy=opy,
+	retval <- sr(z,df=modl$df.residual,c0=c0,ope=ope,
 							 rescal=rescal,epoch=epoch)
 	return(retval)
 }
@@ -232,11 +230,11 @@ as.sr.lm <- function(modl,c0=0,opy=1,na.rm=FALSE,epoch="yr") {
 #' @rdname as.sr
 #' @method as.sr xts 
 #' @S3method as.sr xts
-as.sr.xts <- function(anxts,c0=0,opy=1,...) {
-	if (missing(opy)) {
-		opy <- .infer_opy_xts(anxts)
+as.sr.xts <- function(anxts,c0=0,ope=1,...) {
+	if (missing(ope)) {
+		ope <- .infer_ope_xts(anxts)
 	}
-	retval <- as.sr.default(anxts,c0=c0,opy=opy,...)
+	retval <- as.sr.default(anxts,c0=c0,ope=ope,...)
 	return(retval)
 }
 #' @title Is this in the "sr" class?
@@ -261,7 +259,7 @@ as.sr.xts <- function(anxts,c0=0,opy=1,...) {
 #' @export
 #'
 #' @examples 
-#' rvs <- as.sr(rnorm(253*8),opy=253)
+#' rvs <- as.sr(rnorm(253*8),ope=253)
 #' is.sr(rvs)
 is.sr <- function(x) inherits(x,"sr")
 
@@ -293,20 +291,20 @@ print.sr <- function(x,...) {
 # SR methods#FOLDUP
 # get the t-stat associated with an SR object.
 .sr2t <- function(x) {
-	tval <- x$sr / (x$rescal * sqrt(x$opy))
+	tval <- x$sr / (x$rescal * sqrt(x$ope))
 	return(tval)
 }
 # and the reverse
 .t2sr <- function(x,tval) {
-	srval <- tval * (x$rescal * sqrt(x$opy))
+	srval <- tval * (x$rescal * sqrt(x$ope))
 	return(srval)
 }
 .psr <- function(q,zeta,...) {
-	retv <- prt(q$sr,df=q$df,K=(q$rescal * sqrt(q$opy)),rho=zeta,...)
+	retv <- prt(q$sr,df=q$df,K=(q$rescal * sqrt(q$ope)),rho=zeta,...)
 	return(retv)
 }
 .dsr <- function(q,zeta,...) {
-	retv <- drt(q$sr,df=q$df,K=(q$rescal * sqrt(q$opy)),rho=zeta,...)
+	retv <- drt(q$sr,df=q$df,K=(q$rescal * sqrt(q$ope)),rho=zeta,...)
 	return(retv)
 }
 
@@ -318,10 +316,10 @@ print.sr <- function(x,...) {
 #'
 #' @usage
 #'
-#' reannualize(x,opy,epoch)
+#' reannualize(x,ope,epoch)
 #'
 #' @param x an object of class \code{sr}.
-#' @param opy the new observations per year (or epoch). If none given, it is
+#' @param ope the new observations per epoch. If none given, it is
 #' not updated.
 #' @param epoch a string representation of the epoch. If none given, it is not
 #' updated.
@@ -333,14 +331,14 @@ print.sr <- function(x,...) {
 #'
 #' @examples 
 #' # compute a 'daily' Sharpe
-#' mysr <- as.sr(rnorm(253*8),opy=1)
+#' mysr <- as.sr(rnorm(253*8),ope=1,epoch="day")
 #' # turn into annual 
-#' mysr2 <- reannualize(mysr,opy=253,epoch="yr")
-reannualize <- function(x,opy,epoch) {
+#' mysr2 <- reannualize(mysr,ope=253,epoch="yr")
+reannualize <- function(x,ope,epoch) {
 	if (!is.sr(x)) stop("must give sr object")
-	if (!missing(opy)) {
-		x$sr <- x$sr * sqrt(opy / x$opy)
-		x$opy <- opy
+	if (!missing(ope)) {
+		x$sr <- x$sr * sqrt(ope / x$ope)
+		x$ope <- ope
 	}
 	if (!missing(epoch)) x$epoch <- epoch
 	return(x)
@@ -402,7 +400,7 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #' \item \code{df2} The number of observations.
 #' \item \code{drag} The drag term, which is the 'risk free rate' divided by
 #' the maximum risk.
-#' \item \code{opy} The 'observations per year'.
+#' \item \code{ope} The 'observations per epoch'.
 #' \item \code{epoch} The string name of the 'epoch'.
 #' }
 #'
@@ -412,18 +410,16 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #'
 #' @usage
 #'
-#' sropt(z.s,df1,df2,drag=0,opy=1,epoch="yr")
+#' sropt(z.s,df1,df2,drag=0,ope=1,epoch="yr")
 #'
 #' @param z.s an optimum Sharpe ratio statistic.
 #' @inheritParams dsropt
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
 #'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
-#'        by \eqn{\sqrt{opy}}{sqrt(opy)}. This is in contrast to the \code{c0}
+#'        by \eqn{\sqrt{ope}}{sqrt(ope)}. This is in contrast to the \code{c0}
 #'        term given to \code{\link{sr}}.
-#' @param opy the number of observations per 'year'. The returns are observed
-#'        at a rate of \code{opy} per 'year.' default value is 1, meaning no 
-#'        annualization is performed.
-#' @param epoch the string representation of the 'year', defaulting
+#' @template param-ope
+#' @param epoch the string representation of the 'epoch', defaulting
 #'        to 'yr'.
 #' @keywords univar 
 #' @return a list cast to class \code{sropt}.
@@ -438,19 +434,19 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #'
 #' @examples 
 #' # roll your own.
-#' opy <- 253
+#' ope <- 253
 #' zeta.s <- 1.0
 #' df1 <- 10
-#' df2 <- 6 * opy
-#' rvs <- rsropt(1,df1,df2,zeta.s,opy,drag=0)
-#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
+#' df2 <- 6 * ope
+#' rvs <- rsropt(1,df1,df2,zeta.s,ope,drag=0)
+#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 #' # put a bunch in. naming becomes a problem.
-#' rvs <- rsropt(5,df1,df2,zeta.s,opy,drag=0)
-#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
+#' rvs <- rsropt(5,df1,df2,zeta.s,ope,drag=0)
+#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 #'
-sropt <- function(z.s,df1,df2,drag=0,opy=1,epoch="yr") {
+sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr") {
 	retval <- list(sropt = z.s,df1 = df1,df2 = df2,
-								 drag = drag,opy = opy,epoch = epoch)
+								 drag = drag,ope = ope,epoch = epoch)
 	class(retval) <- "sropt"
 	return(retval)
 }
@@ -482,13 +478,13 @@ sropt <- function(z.s,df1,df2,drag=0,opy=1,epoch="yr") {
 #'
 #' The units of \eqn{z_*}{z*} are \eqn{\mbox{time}^{-1/2}}{per root time}.
 #' Typically the Sharpe ratio is \emph{annualized} by multiplying by
-#' \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where \eqn{\mbox{opy}}{opy} 
+#' \eqn{\sqrt{\mbox{ope}}}{sqrt(ope)}, where \eqn{\mbox{ope}}{ope} 
 #' is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
 #' @usage
 #'
-#' as.sropt(X,drag=0,opy=1,epoch="yr")
+#' as.sropt(X,drag=0,ope=1,epoch="yr")
 #'
 #' @param X matrix of returns.
 #' @inheritParams sropt 
@@ -502,7 +498,7 @@ sropt <- function(z.s,df1,df2,drag=0,opy=1,epoch="yr") {
 #' \item{T2}{the Hotelling \eqn{T^2} statistic.}
 #' \item{sropt}{the maximal Sharpe statistic.}
 #' \item{drag}{the input \code{drag} term.}
-#' \item{opy}{the input \code{opy} term.}
+#' \item{ope}{the input \code{ope} term.}
 #' @aliases sropt
 #' @seealso \code{\link{sr}}, sropt-distribution functions, 
 #' \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
@@ -513,15 +509,15 @@ sropt <- function(z.s,df1,df2,drag=0,opy=1,epoch="yr") {
 #' @examples 
 #' nfac <- 5
 #' nyr <- 10
-#' opy <- 253
+#' ope <- 253
 #' # simulations with no covariance structure.
 #' # under the null:
 #' set.seed(as.integer(charToRaw("determinstic")))
-#' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
-#' asro <- as.sropt(Returns,drag=0,opy=opy)
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
 #' # under the alternative:
-#' Returns <- matrix(rnorm(opy*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
-#' asro <- as.sropt(Returns,drag=0,opy=opy)
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
 #' # using real data.
 #' if (require(quantmod)) {
 #'   getret <- function(sym,...) {
@@ -532,25 +528,25 @@ sropt <- function(z.s,df1,df2,drag=0,opy=1,epoch="yr") {
 #'   some.rets <- getrets(c("IBM","AAPL","A","C","SPY","XOM"))
 #'   asro <- as.sropt(some.rets)
 #' }
-as.sropt <- function(X,drag=0,opy=1,epoch="yr") {
+as.sropt <- function(X,drag=0,ope=1,epoch="yr") {
 	UseMethod("as.sropt", X)
 }
 #' @rdname as.sropt
 #' @method as.sropt default
 #' @S3method as.sropt default
-as.sropt.default <- function(X,drag=0,opy=1,epoch="yr") {
+as.sropt.default <- function(X,drag=0,ope=1,epoch="yr") {
 	# somehow call sropt!
 	hotval <- .hotelling(X)
 	# what fucking bother.
 	quasi.sropt <- hotval[c("df2","T2")]
-	quasi.sropt$opy <- opy
+	quasi.sropt$ope <- ope
 	quasi.sropt$drag <- drag
 	z.s <- .T2sropt(quasi.sropt)
 	dim(z.s) <- c(1,1)
 
 	# this stinks
 	retv <- sropt(z.s=z.s,df1=hotval$df1,df2=hotval$df2,
-								drag=drag,opy=opy,epoch=epoch)
+								drag=drag,ope=ope,epoch=epoch)
 
 	# 2FIX: have to store T2 in here now. bleah.
 	retv$T2 <- hotval$T2
@@ -562,11 +558,11 @@ as.sropt.default <- function(X,drag=0,opy=1,epoch="yr") {
 #' @rdname as.sropt
 #' @method as.sropt xts
 #' @S3method as.sropt xts
-as.sropt.xts <- function(anxts,drag=0,opy=1,epoch="yr") {
-	if (missing(opy)) {
-		opy <- .infer_opy_xts(anxts)
+as.sropt.xts <- function(anxts,drag=0,ope=1,epoch="yr") {
+	if (missing(ope)) {
+		ope <- .infer_ope_xts(anxts)
 	}
-	retval <- as.sropt.default(anxts,drag=drag,opy=opy,epoch=epoch)
+	retval <- as.sropt.default(anxts,drag=drag,ope=ope,epoch=epoch)
 	return(retval)
 }
 #' @S3method print sropt
@@ -588,7 +584,7 @@ print.sropt <- function(x,...) {
 .sropt2T <- function(x) {
 	Tval <- x$T2
 	if (is.null(Tval)) {
-		tval <- .deannualize(x$sropt + x$drag,x$opy)
+		tval <- .deannualize(x$sropt + x$drag,x$ope)
 		Tval <- x$df2 * (tval^2)
 	}
 	return(Tval)
@@ -596,7 +592,7 @@ print.sropt <- function(x,...) {
 # and the reverse; with a sticky zero. ouch.
 .T2sropt <- function(x,Tval=x$T2) {
 	z.star <- sqrt(pmax(Tval,0) / x$df2)
-	z.star <- .annualize(z.star,x$opy)
+	z.star <- .annualize(z.star,x$ope)
 	z.star <- z.star - x$drag
 	return(z.star)
 }

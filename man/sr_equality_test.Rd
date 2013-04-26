@@ -60,11 +60,11 @@
 # under the null
 rv <- sr_equality_test(matrix(rnorm(500*5),ncol=5))
 # under the alternative (but with identity covariance)
-opy <- 253
+ope <- 253
 nyr <- 10
 nco <- 5
-rets <- 0.01 * sapply(seq(0,1.7/sqrt(opy),length.out=nco),
-  function(mu) { rnorm(opy*nyr,mean=mu,sd=1) })
+rets <- 0.01 * sapply(seq(0,1.7/sqrt(ope),length.out=nco),
+  function(mu) { rnorm(ope*nyr,mean=mu,sd=1) })
 rv <- sr_equality_test(rets)
 
 # using real data

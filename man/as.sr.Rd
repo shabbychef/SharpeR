@@ -5,15 +5,15 @@
 \alias{as.sr.xts}
 \title{Compute the Sharpe ratio.}
 \usage{
-  as.sr(x,...)
+  as.sr(x,c0=0,ope=1,...)
 
-  \method{as.sr}{default} (x, c0 = 0, opy = 1,
+  \method{as.sr}{default} (x, c0 = 0, ope = 1,
     na.rm = FALSE, epoch = "yr")
 
-  \method{as.sr}{lm} (modl, c0 = 0, opy = 1, na.rm = FALSE,
+  \method{as.sr}{lm} (modl, c0 = 0, ope = 1, na.rm = FALSE,
     epoch = "yr")
 
-  \method{as.sr}{xts} (anxts, c0 = 0, opy = 1, ...)
+  \method{as.sr}{xts} (anxts, c0 = 0, ope = 1, ...)
 }
 \arguments{
   \item{x}{vector of returns.}
@@ -22,10 +22,15 @@
   this is assumed to be given in the same units as x,
   \emph{not} in 'annualized' terms.}
 
-  \item{opy}{the number of observations per 'year'. This is
-  used to 'annualize' the answer.}
+  \item{ope}{the number of observations per 'epoch'. The
+  Sharpe ratio is typically quoted in 'annualized' units
+  for some epoch, that is, 'per square root epoch', though
+  returns are observed at a frequency of \code{ope} per
+  epoch. The default value is 1, meaning the observation
+  period is the epoch, and no annualization adjustments are
+  made.}
 
-  \item{epoch}{the string representation of the 'year',
+  \item{epoch}{the string representation of the 'epoch',
   defaulting to 'yr'.}
 
   \item{...}{further arguments to be passed to or from
@@ -40,7 +45,7 @@
 \value{
   a list containing the following components: \item{sr}{the
   annualized Sharpe ratio.} \item{df}{the t-stat degrees of
-  freedom.} \item{c0}{the risk free term.} \item{opy}{the
+  freedom.} \item{c0}{the risk free term.} \item{ope}{the
   annualization factor.} \item{rescal}{the rescaling
   factor.} \item{epoch}{the string epoch.} cast to class
   \code{sr}.
@@ -59,13 +64,13 @@
   The units of \eqn{z}{z} are \eqn{\mbox{time}^{-1/2}}{per
   root time}. Typically the Sharpe ratio is
   \emph{annualized} by multiplying by
-  \eqn{\sqrt{\mbox{opy}}}{sqrt(opy)}, where
-  \eqn{\mbox{opy}}{opy} is the number of observations per
+  \eqn{\sqrt{\mbox{ope}}}{sqrt(ope)}, where
+  \eqn{\mbox{ope}}{ope} is the number of observations per
   year (or whatever the target annualization epoch.)
 }
 \examples{
 # Sharpe's 'model': just given a bunch of returns.
-asr <- as.sr(rnorm(253*8),opy=253)
+asr <- as.sr(rnorm(253*8),ope=253)
 # or a matrix, with a name
 my.returns <- matrix(rnorm(253*10),ncol=1)
 colnames(my.returns) <- c("my strategy")
@@ -79,17 +84,17 @@ if (require(quantmod)) {
 # on a linear model, find the 'Sharpe' of the residual term
 nfac <- 5
 nyr <- 10
-opy <- 253
+ope <- 253
 set.seed(as.integer(charToRaw("determinstic")))
-Factors <- matrix(rnorm(opy*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+Factors <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 Betas <- exp(0.1 * rnorm(dim(Factors)[2]))
 Returns <- (Factors \%*\% Betas) + rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 APT_mod <- lm(Returns ~ Factors)
-asr <- as.sr(APT_mod,opy=opy)
+asr <- as.sr(APT_mod,ope=ope)
 # try again, but make the Returns independent of the Factors.
 Returns <- rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 APT_mod <- lm(Returns ~ Factors)
-asr <- as.sr(APT_mod,opy=opy)
+asr <- as.sr(APT_mod,ope=ope)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
