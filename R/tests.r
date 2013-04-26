@@ -467,7 +467,7 @@ sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 #' 
 #' @usage
 #'
-#' power.sr.test(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
+#' power.sr_test(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #'               alternative=c("one.sided","two.sided"),ope=NULL) 
 #'
 #' @param n Number of observations
@@ -496,25 +496,25 @@ sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 #' Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31.3-4.362}
 #'
 #' @examples 
-#' anex <- power.sr.test(253,1,0.05,NULL,ope=253) 
-#' anex <- power.sr.test(n=253,zeta=NULL,sig.level=0.05,power=0.5,ope=253) 
-#' anex <- power.sr.test(n=NULL,zeta=0.6,sig.level=0.05,power=0.5,ope=253) 
+#' anex <- power.sr_test(253,1,0.05,NULL,ope=253) 
+#' anex <- power.sr_test(n=253,zeta=NULL,sig.level=0.05,power=0.5,ope=253) 
+#' anex <- power.sr_test(n=NULL,zeta=0.6,sig.level=0.05,power=0.5,ope=253) 
 #' # Lehr's Rule 
 #' zetas <- seq(0.1,2.5,length.out=201)
 #' ssizes <- sapply(zetas,function(zed) { 
-#'   x <- power.sr.test(n=NULL,zeta=zed,sig.level=0.05,power=0.8,
+#'   x <- power.sr_test(n=NULL,zeta=zed,sig.level=0.05,power=0.8,
 #'        alternative="two.sided",ope=253)
 #'   x$n / 253})
 #' # should be around 8.
 #' print(summary(ssizes * zetas * zetas))
 #' # e = n z^2 mnemonic approximate rule for 0.05 type I, 50% power
 #' ssizes <- sapply(zetas,function(zed) { 
-#'   x <- power.sr.test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,ope=253)
+#'   x <- power.sr_test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,ope=253)
 #'   x$n / 253 })
 #' print(summary(ssizes * zetas * zetas - exp(1)))
 #' 
 #'@export
-power.sr.test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
+power.sr_test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 													alternative=c("one.sided","two.sided"),
 													ope=NULL) {
 	# stolen from power.t.test
@@ -547,8 +547,8 @@ power.sr.test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 }
 #UNFOLD
 
-# SRstar test#FOLDUP
-#' @title test for maximal Sharpe ratio
+# SROPT test#FOLDUP
+#' @title test for optimal Sharpe ratio
 #'
 #' @description 
 #'
@@ -570,7 +570,7 @@ power.sr.test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #' 
 #' @usage
 #'
-#' sropt.test(X,alternative=c("greater","two.sided","less"),
+#' sropt_test(X,alternative=c("greater","two.sided","less"),
 #'             zeta.s=0,ope=1,conf.level=0.95)
 #'
 #' @param X a (non-empty) numeric matrix of data values, each row independent,
@@ -587,8 +587,8 @@ power.sr.test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #' \item{parameter}{a list of the degrees of freedom for the statistic.}
 #' \item{p.value}{the p-value for the test.}
 #' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
-#' \item{estimate}{the estimated maximal Sharpe, annualized}
-#' \item{null.value}{the specified hypothesized value of the maximal Sharpe.}
+#' \item{estimate}{the estimated optimal Sharpe, annualized}
+#' \item{null.value}{the specified hypothesized value of the optimal Sharpe.}
 #' \item{alternative}{a character string describing the alternative hypothesis.}
 #' \item{method}{a character string indicating what type of test was performed.}
 #' \item{data.name}{a character string giving the name(s) of the data.}
@@ -599,14 +599,14 @@ power.sr.test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #' @examples 
 #'
 #' # test for uniformity
-#' pvs <- replicate(1000,{ x <- sropt.test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
+#' pvs <- replicate(1000,{ x <- sropt_test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
 #'                         x$p.value })
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
 #' 
 #'
 #'@export
-sropt.test <- function(X,alternative=c("greater","two.sided","less"),
+sropt_test <- function(X,alternative=c("greater","two.sided","less"),
 										zeta.s=0,ope=1,conf.level=0.95) {
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
@@ -681,6 +681,82 @@ power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) 
 	METHOD <- "Hotelling test"
 	retval <- structure(list(df1 = df1, df2 = df2, ncp = ncp, delta2 = df2 * ncp,
 								 sig.level = sig.level, power = power, 
+								 note = NOTE, method = METHOD), class = "power.htest")
+	return(retval)
+}
+#' @title Power calculations for optimal Sharpe ratio tests
+#'
+#' @description 
+#'
+#' Compute power of test, or determine parameters to obtain target power.
+#'
+#' @details 
+#'
+#' Suppose you perform a single-sample test for significance of the
+#' optimal Sharpe ratio based on the corresponding single-sample T^2-test. 
+#' Given any four of: the effect size (the population optimal SNR, 
+#' \eqn{\zeta_*}{zeta*}), the number of assets, the number of observations, 
+#' and the type I and type II rates, this function computes the fifth.
+#'
+#' Exactly one of the parameters \code{df1}, \code{df2}, 
+#' \code{zeta.s}, \code{power}, and 
+#' \code{sig.level} must be passed as NULL, and that parameter is determined 
+#' from the others.  Notice that \code{sig.level} has non-NULL default, so NULL 
+#' must be explicitly passed if you want to compute it.
+#' 
+#' @usage
+#'
+#' power.sropt_test(df1=NULL,df2=NULL,zeta.s=NULL,
+#'                  sig.level=0.05,power=NULL,ope=NULL) 
+#'
+#' @inheritParams dsropt
+#' @inheritParams qsropt
+#' @inheritParams psropt
+#' @param zeta.s the 'signal-to-noise' parameter, defined as ...
+#' @param sig.level Significance level (Type I error probability).
+#' @param power Power of test (1 minus Type II error probability).
+#' @template param-ope
+#' @keywords htest
+#' @return Object of class \code{power.htest}, a list of the arguments
+#' (including the computed one) augmented with \code{method}, \code{note}
+#' and \code{n.epoch} elements, the latter is the number of epochs 
+#' under the given annualization (\code{ope}), \code{NA} if none given.
+#' @seealso \code{\link{power.t.test}}, \code{\link{sropt_test}}
+#' @export 
+#' @template etc
+#' @template sropt
+#'
+#' @examples 
+#' anex <- power.sropt_test(8,4*253,1,0.05,NULL,ope=253) 
+#' 
+#' @export
+power.sropt_test <- function(df1=NULL,df2=NULL,zeta.s=NULL,
+														 sig.level=0.05,power=NULL,ope=1) {
+	# stolen from power.anova.test
+	if (sum(sapply(list(df1, df2, zeta.s, power, sig.level), is.null)) != 1) 
+		stop("exactly one of 'df1', 'df2', 'zeta.s', 'power', and 'sig.level' must be NULL")
+	if (!is.null(sig.level) && !is.numeric(sig.level) || any(0 > 
+		sig.level | sig.level > 1)) 
+		stop("'sig.level' must be numeric in [0, 1]")
+	p.body <- quote({
+		psropt(qsropt(sig.level, df1, df2, ope, lower.tail = FALSE),
+					 df1, df2, zeta.s, ope, lower.tail = FALSE)
+	})
+	if (is.null(power)) 
+		power <- eval(p.body)
+	else if (is.null(df1)) 
+		df1 <- uniroot(function(df1) eval(p.body) - power, c(1, 3e+03))$root
+	else if (is.null(df2)) 
+		df2 <- uniroot(function(df2) eval(p.body) - power, c(3, 1e+06))$root
+	else if (is.null(zeta.s))
+		zeta.s <- uniroot(function(zeta.s) eval(p.body) - power, c(0, 3e+01))$root
+	else if (is.null(sig.level)) 
+		sig.level <- uniroot(function(sig.level) eval(p.body) - power, c(1e-10, 1 - 1e-10))$root
+	else stop("internal error")
+	NOTE <- "one sided test"
+	METHOD <- "Hotelling test"
+	retval <- structure(list(df1 = df1, df2 = df2, zeta.s = zeta.s, 
+								 sig.level = sig.level, power = power, ope = ope, 
 								 note = NOTE, method = METHOD), class = "power.htest")
 	return(retval)
 }

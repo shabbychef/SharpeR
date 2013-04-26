@@ -144,8 +144,9 @@ plot(ecdf(isp))
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
   \code{\link{as.sropt.xts}}, \code{\link{confint.sropt}},
-  \code{\link{pco_sropt}}, \code{\link{sropt}},
-  \code{\link{sropt_confint}}, \code{\link{sropt.test}}
+  \code{\link{pco_sropt}}, \code{\link{power.sropt_test}},
+  \code{\link{sropt}}, \code{\link{sropt_confint}},
+  \code{\link{sropt_test}}
 }
 \keyword{distribution}
 

@@ -80,7 +80,7 @@ roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
   \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
   \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
   \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{plambdap}}, \code{\link{power.sr.test}},
+  \code{\link{plambdap}}, \code{\link{power.sr_test}},
   \code{\link{reannualize}}, \code{\link{se}},
   \code{\link{se.default}}, \code{\link{se.sr}},
   \code{\link{sr_equality_test}}, \code{\link{sr_test}},

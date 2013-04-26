@@ -74,7 +74,8 @@ roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
   \code{\link{as.sropt.default}},
   \code{\link{as.sropt.xts}}, \code{\link{confint.sropt}},
   \code{\link{dsropt}}, \code{\link{pco_sropt}},
-  \code{\link{sropt_confint}}, \code{\link{sropt.test}}
+  \code{\link{power.sropt_test}},
+  \code{\link{sropt_confint}}, \code{\link{sropt_test}}
 }
 \keyword{univar}
 

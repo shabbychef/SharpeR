@@ -78,8 +78,8 @@ aci <- confint(sro)
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
   \code{\link{as.sropt.xts}}, \code{\link{dsropt}},
-  \code{\link{pco_sropt}}, \code{\link{sropt}},
-  \code{\link{sropt.test}}
+  \code{\link{pco_sropt}}, \code{\link{power.sropt_test}},
+  \code{\link{sropt}}, \code{\link{sropt_test}}
 }
 \keyword{htest}
 

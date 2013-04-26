@@ -41,7 +41,7 @@
   mean return vector.} \item{Sigma}{the estimated
   covariance matrix.} \item{df1}{the number of assets.}
   \item{df2}{the number of observed vectors.} \item{T2}{the
-  Hotelling \eqn{T^2} statistic.} \item{sropt}{the maximal
+  Hotelling \eqn{T^2} statistic.} \item{sropt}{the optimal
   Sharpe statistic.} \item{drag}{the input \code{drag}
   term.} \item{ope}{the input \code{ope} term.}
 }
@@ -111,8 +111,8 @@ if (require(quantmod)) {
 
   Other sropt: \code{\link{confint.sropt}},
   \code{\link{dsropt}}, \code{\link{pco_sropt}},
-  \code{\link{sropt}}, \code{\link{sropt_confint}},
-  \code{\link{sropt.test}}
+  \code{\link{power.sropt_test}}, \code{\link{sropt}},
+  \code{\link{sropt_confint}}, \code{\link{sropt_test}}
 }
 \keyword{univar}
 

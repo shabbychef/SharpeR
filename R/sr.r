@@ -496,7 +496,7 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr") {
 #' \item{df1}{the number of assets.}
 #' \item{df2}{the number of observed vectors.}
 #' \item{T2}{the Hotelling \eqn{T^2} statistic.}
-#' \item{sropt}{the maximal Sharpe statistic.}
+#' \item{sropt}{the optimal Sharpe statistic.}
 #' \item{drag}{the input \code{drag} term.}
 #' \item{ope}{the input \code{ope} term.}
 #' @aliases sropt
