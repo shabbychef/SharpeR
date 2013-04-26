@@ -107,14 +107,15 @@
 #'
 #' @examples 
 #' # under the null 
-#' rv <- sr_equality_test(matrix(rnorm(500*5),nrow=5))
-#' # under the alternative (but with independent returns)
+#' rv <- sr_equality_test(matrix(rnorm(500*5),ncol=5))
+#' # under the alternative (but with identity covariance)
 #' opy <- 253
 #' nyr <- 10
 #' nco <- 5
 #' rets <- 0.01 * sapply(seq(0,1.7/sqrt(opy),length.out=nco),
 #'   function(mu) { rnorm(opy*nyr,mean=mu,sd=1) })
 #' rv <- sr_equality_test(rets)
+#' 
 #' # using real data
 #' if (require(quantmod)) {
 #'   getret <- function(sym,...) {
@@ -456,32 +457,30 @@ sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 #'
 #' Suppose you perform a single-sample test for significance of the
 #' Sharpe ratio based on the corresponding single-sample t-test. 
-#' Given any three of: the effect size (the population SNR), the
-#' number of observations, and the type I and type II rates,
-#' this computes the fourth.
+#' Given any three of: the effect size (the population SNR, \eqn{\zeta}{zeta}), 
+#' the number of observations, and the type I and type II rates,
+#' this function computes the fourth.
 #'
 #' This is a thin wrapper on \code{\link{power.t.test}}.
 #'
-#' Exactly one of the parameters \code{n}, \code{snr}, \code{power}, and 
+#' Exactly one of the parameters \code{n}, \code{zeta}, \code{power}, and 
 #' \code{sig.level} must be passed as NULL, and that parameter is determined 
 #' from the others.  Notice that \code{sig.level} has non-NULL default, so NULL 
 #' must be explicitly passed if you want to compute it.
 #' 
-#' 2FIX: change snr to zeta?
-#'
 #' @usage
 #'
-#' power.sr.test(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
-#'                           alternative=c("one.sided","two.sided"),opy=NULL) 
+#' power.sr.test(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
+#'               alternative=c("one.sided","two.sided"),opy=NULL) 
 #'
 #' @param n Number of observations
-#' @param snr the 'signal-to-noise' parameter, defined as the population
+#' @param zeta the 'signal-to-noise' parameter, defined as the population
 #'        mean divided by the population standard deviation, 'annualized'.
 #' @param sig.level Significance level (Type I error probability).
 #' @param power Power of test (1 minus Type II error probability).
 #' @param alternative One- or two-sided test.
 #' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#'        \code{zeta} are quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @keywords htest
@@ -493,41 +492,62 @@ sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 #' @export 
 #' @template etc
 #' @template sr
+#' @references 
+#'
+#' Lehr, R. "Sixteen S-squared over D-squared: A relation for crude 
+#' sample size estimates." Statist. Med., 11, no 8 (1992): 1099–1102. 
+#' doi: 10.1002/sim.4780110811
+#'
+#' Johnson, N. L., and Welch, B. L. "Applications of the non-central t-distribution."
+#' Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31.3-4.362}
+#'
 #' @examples 
 #' anex <- power.sr.test(253,1,0.05,NULL,opy=253) 
-#' anex <- power.sr.test(n=253,snr=NULL,sig.level=0.05,power=0.5,opy=253) 
-#' anex <- power.sr.test(n=NULL,snr=0.6,sig.level=0.05,power=0.5,opy=253) 
-#'
+#' anex <- power.sr.test(n=253,zeta=NULL,sig.level=0.05,power=0.5,opy=253) 
+#' anex <- power.sr.test(n=NULL,zeta=0.6,sig.level=0.05,power=0.5,opy=253) 
+#' # Lehr's Rule 
+#' zetas <- seq(0.1,2.5,length.out=201)
+#' ssizes <- sapply(zetas,function(zed) { 
+#'   x <- power.sr.test(n=NULL,zeta=zed,sig.level=0.05,power=0.8,
+#'        alternative="two.sided",opy=253)
+#'   x$n / 253})
+#' # should be around 8.
+#' print(summary(ssizes * zetas * zetas))
+#' # e = n z^2 mnemonic approximate rule for 0.05 type I, 50% power
+#' ssizes <- sapply(zetas,function(zed) { 
+#'   x <- power.sr.test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,opy=253)
+#'   x$n / 253 })
+#' print(summary(ssizes * zetas * zetas - exp(1)))
+#' 
 #'@export
-#2FIX: this is hosed. remake it.
-power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
+power.sr.test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 													alternative=c("one.sided","two.sided"),
 													opy=NULL) {
 	# stolen from power.t.test
-	if (sum(sapply(list(n, snr, power, sig.level), is.null)) != 1) 
-			stop("exactly one of 'n', 'snr', 'power', and 'sig.level' must be NULL")
+	if (sum(sapply(list(n, zeta, power, sig.level), is.null)) != 1) 
+			stop("exactly one of 'n', 'zeta', 'power', and 'sig.level' must be NULL")
 	if (!is.null(sig.level) && !is.numeric(sig.level) || any(0 > 
 			sig.level | sig.level > 1)) 
 			stop("'sig.level' must be numeric in [0, 1]")
 	type <- "one.sample"
 	alternative <- match.arg(alternative)
-	if (!missing(opy) && !is.null(opy) && !is.null(snr)) {
-		snr <- .deannualize(snr,opy)
-	}
+	if (!missing(opy) && !is.null(opy) && !is.null(zeta)) 
+		zeta <- .deannualize(zeta,opy)
 	# delegate
-	subval <- power.t.test(n=n,delta=snr,sd=1,sig.level=sig.level,
+	# 2FIX: what happens if zeta = 0 ? bleah.
+	subval <- power.t.test(n=n,delta=zeta,sd=1,sig.level=sig.level,
 												 power=power,type=type,alternative=alternative,
 												 strict=FALSE)
 	# interpret
-	subval$snr <- subval$delta
+	subval$zeta <- subval$delta
 	if (!missing(opy) && !is.null(opy)) {
-		subval$snr <- .annualize(subval$snr,opy)
+		subval$zeta <- .annualize(subval$zeta,opy)
 		subval$n.yr <- subval$n / opy
 	} else {
 		subval$n.yr <- NA
 	}
 	
-	retval <- subval[c("n","n.yr","snr","sig.level","power","alternative","note","method")]
+	retval <- subval[c("n","n.yr","zeta","sig.level","power","alternative","note","method")]
 	retval <- structure(retval,class=class(subval))
 	return(retval)
 }
@@ -557,19 +577,19 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #' @usage
 #'
 #' sropt.test(X,alternative=c("greater","two.sided","less"),
-#'             snrstar=0,opy=1,conf.level=0.95)
+#'             zeta.s=0,opy=1,conf.level=0.95)
 #'
 #' @param X a (non-empty) numeric matrix of data values, each row independent,
 #        each column representing an asset.
 #' @param alternative a character string specifying the alternative hypothesis,
 #'       must be one of \code{"two.sided"}, \code{"greater"} (default) or
 #'       \code{"less"}.  You can specify just the initial letter.
-#' @param snrstar a number indicating the null hypothesis value.
+#' @param zeta.s a number indicating the null hypothesis value.
 #' @param opy the number of observations per 'year'. 
-#'        \code{snrstar} is quoted in 'annualized' units, that is, per square root 
+#'        \code{zeta.s} is quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
-#'        This is only used if \code{snrstar} is nonzero.
+#'        This is only used if \code{zeta.s} is nonzero.
 #' @param conf.level confidence level of the interval. (not used yet)
 #' @keywords htest
 #' @return A list with class \code{"htest"} containing the following components:
@@ -597,11 +617,11 @@ power.sr.test <- function(n=NULL,snr=NULL,sig.level=0.05,power=NULL,
 #'
 #'@export
 sropt.test <- function(X,alternative=c("greater","two.sided","less"),
-										snrstar=0,opy=1,conf.level=0.95) {
+										zeta.s=0,opy=1,conf.level=0.95) {
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
-	if (!missing(snrstar) && (length(snrstar) != 1 || is.na(snrstar))) 
-		stop("'snrstar' must be a single number")
+	if (!missing(zeta.s) && (length(zeta.s) != 1 || is.na(zeta.s))) 
+		stop("'zeta.s' must be a single number")
 	if (!missing(conf.level) && (length(conf.level) != 1 || !is.finite(conf.level) || 
 		conf.level < 0 || conf.level > 1)) 
 		stop("'conf.level' must be a single number between 0 and 1")
@@ -620,13 +640,13 @@ sropt.test <- function(X,alternative=c("greater","two.sided","less"),
 
 	# 2FIX: add CIs here.
 	if (alternative == "less") {
-		pval <- psropt(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy)
+		pval <- psropt(estimate, df1=df1, df2=df2, zeta.s=zeta.s, opy=opy)
 	}
 	else if (alternative == "greater") {
-		pval <- psropt(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy, lower.tail = FALSE)
+		pval <- psropt(estimate, df1=df1, df2=df2, zeta.s=zeta.s, opy=opy, lower.tail = FALSE)
 	}
 	else {
-		pval <- .oneside2two(psropt(estimate, df1=df1, df2=df2, zeta.s=snrstar, opy=opy))
+		pval <- .oneside2two(psropt(estimate, df1=df1, df2=df2, zeta.s=zeta.s, opy=opy))
 	}
 
 	names(df1) <- "df1"
@@ -635,7 +655,7 @@ sropt.test <- function(X,alternative=c("greater","two.sided","less"),
 	#attr(cint, "conf.level") <- conf.level
 	retval <- list(statistic = statistic, parameter = df,
 								 estimate = estimate, p.value = pval, 
-								 alternative = alternative, null.value = snrstar,
+								 alternative = alternative, null.value = zeta.s,
 								 method = method, data.name = dname)
 	class(retval) <- "htest"
 	return(retval)

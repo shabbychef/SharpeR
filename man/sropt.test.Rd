@@ -3,7 +3,7 @@
 \title{test for maximal Sharpe ratio}
 \usage{
   sropt.test(X,alternative=c("greater","two.sided","less"),
-    snrstar=0,opy=1,conf.level=0.95)
+    zeta.s=0,opy=1,conf.level=0.95)
 }
 \arguments{
   \item{X}{a (non-empty) numeric matrix of data values,
@@ -14,15 +14,15 @@
   \code{"two.sided"}, \code{"greater"} (default) or
   \code{"less"}.  You can specify just the initial letter.}
 
-  \item{snrstar}{a number indicating the null hypothesis
+  \item{zeta.s}{a number indicating the null hypothesis
   value.}
 
   \item{opy}{the number of observations per 'year'.
-  \code{snrstar} is quoted in 'annualized' units, that is,
+  \code{zeta.s} is quoted in 'annualized' units, that is,
   per square root 'year', but returns are observed possibly
   at a rate of \code{opy} per 'year.' default value is 1,
   meaning no deannualization is performed.  This is only
-  used if \code{snrstar} is nonzero.}
+  used if \code{zeta.s} is nonzero.}
 
   \item{conf.level}{confidence level of the interval. (not
   used yet)}

@@ -593,9 +593,9 @@ print.sropt <- function(x,...) {
 	}
 	return(Tval)
 }
-# and the reverse
+# and the reverse; with a sticky zero. ouch.
 .T2sropt <- function(x,Tval=x$T2) {
-	z.star <- sqrt(Tval / x$df2)
+	z.star <- sqrt(pmax(Tval,0) / x$df2)
 	z.star <- .annualize(z.star,x$opy)
 	z.star <- z.star - x$drag
 	return(z.star)

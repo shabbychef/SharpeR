@@ -272,8 +272,8 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #' @inheritParams qsropt
 #' @inheritParams psropt
 #' @param level the confidence level required.
-#' @param opy the number of observations per 'year'. \code{x}, \code{q}, and 
-#'        \code{snr} are quoted in 'annualized' units, that is, per square root 
+#' @param opy the number of observations per 'year'. \code{z.s}, and the
+#'        confidence intervals are quoted in 'annualized' units, that is, per square root 
 #'        'year', but returns are observed possibly at a rate of \code{opy} per 
 #'        'year.' default value is 1, meaning no deannualization is performed.
 #' @param level.lo the lower bound for the confidence interval.
@@ -451,7 +451,6 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' @examples 
 #' # generate some sropts
-#' true.snrstar <- 1.25
 #' nfac <- 5
 #' nyr <- 10
 #' opy <- 253
@@ -471,6 +470,17 @@ T2.inference <- function(T2,df1,df2,...) {
 #' est2 <- inference(asro,type='KRS')  
 #' est3 <- inference(asro,type='MLE')
 #'
+#' # sample many under the alternative, look at the estimator.
+#' df1 <- 6
+#' df2 <- 2000
+#' opy <- 253
+#' zeta.s <- 1.25
+#' rvs <- rsropt(500, df1, df2, zeta.s, opy)
+#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
+#' est1 <- inference(roll.own,type='unbiased')  
+#' est2 <- inference(roll.own,type='KRS')  
+#' est3 <- inference(roll.own,type='MLE')
+#'
 inference <- function(z.s,type=c("KRS","MLE","unbiased")) {
 	# type defaults to "KRS":
 	type <- match.arg(type)
@@ -480,25 +490,11 @@ inference <- function(z.s,type=c("KRS","MLE","unbiased")) {
 	retval <- .T2sropt(z.s,retval)
 	return(retval)
 }
-# old documentation. sigh; would be nice to have this 'fast' form again.
-# df1 <- 6
-# df2 <- 2000
-# opy <- 253
-# rvs <- rsropt(500, df1, df2, true.snrstar, opy)
-# est1 <- inference(rvs,df1,df2,opy,type='unbiased')  
-# est2 <- inference(rvs,df1,df2,opy,type='KRS')  
-# est3 <- inference(rvs,df1,df2,opy,type='MLE')
 #UNFOLD
 
 # notes:
 # extract statistics (t-stat) from lm object:
 # https://stat.ethz.ch/pipermail/r-help/2009-February/190021.html
-#
-# also: 
-# see the code in summary.lm to see how sigma is calculated
-# or
-# sigma <- sqrt(deviance(fit) / df.residual(fit))
-# then base on confint? coef/vcov
 
 # to get a hotelling statistic from n x k matrix x:
 # myt <- summary(manova(lm(x ~ 1)),test="Hotelling-Lawley",intercept=TRUE)
@@ -510,7 +506,6 @@ inference <- function(z.s,type=c("KRS","MLE","unbiased")) {
 # myt <- summary(manova(lm(x ~ 1)),intercept=TRUE)
 # HLT <- sum(myt$Eigenvalues) #?
 # ...
-# 
 
 ## junkyard#FOLDUP
 

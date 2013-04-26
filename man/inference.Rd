@@ -41,7 +41,6 @@
 }
 \examples{
 # generate some sropts
-true.snrstar <- 1.25
 nfac <- 5
 nyr <- 10
 opy <- 253
@@ -60,6 +59,17 @@ asro <- as.sropt(Returns,drag=0,opy=opy)
 est1 <- inference(asro,type='unbiased')
 est2 <- inference(asro,type='KRS')
 est3 <- inference(asro,type='MLE')
+
+# sample many under the alternative, look at the estimator.
+df1 <- 6
+df2 <- 2000
+opy <- 253
+zeta.s <- 1.25
+rvs <- rsropt(500, df1, df2, zeta.s, opy)
+roll.own <- sropt(z.s=rvs,df1,df2,drag=0,opy=opy)
+est1 <- inference(roll.own,type='unbiased')
+est2 <- inference(roll.own,type='KRS')
+est3 <- inference(roll.own,type='MLE')
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

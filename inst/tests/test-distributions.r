@@ -67,31 +67,31 @@ test_that("psr/qsr monotonicity",{#FOLDUP
 	}
 })#UNFOLD
 
-test_that("pT2/qT2 monotonicity",{#FOLDUP
-	set.char.seed("f28b5cd4-dcdb-4e8e-9398-c79fb9038351")
+#test_that("pT2/qT2 monotonicity",{#FOLDUP
+	#set.char.seed("f28b5cd4-dcdb-4e8e-9398-c79fb9038351")
 	
-	# pT2
-	ps <- seq(0.1,0.9,length.out=9)
-	for (df1 in c(2,4,8)) {
-		for (df2 in c(256,1024)) {
-			for (delta2 in c(0,0.02)) {
-				for (lp in c(TRUE,FALSE)) {
-					if (lp) { checkps <- log(ps) } else { checkps <- ps }
-					for (lt in c(TRUE,FALSE)) {
-						qs <- qT2(checkps, df1, df2, delta2, lower.tail=lt, log.p=lp)
-						if (lt) { 
-							expect_true(is.sorted(qs,pragma="ascending"))
-						} else {
-							expect_true(is.sorted(qs,pragma="descending"))
-						}
-						pret <- pT2(qs, df1, df2, delta2, lower.tail=lt, log.p=lp)
-						expect_equal(checkps,pret)
-					}
-				}
-			}
-		}
-	}
-})#UNFOLD
+	## pT2
+	#ps <- seq(0.1,0.9,length.out=9)
+	#for (df1 in c(2,4,8)) {
+		#for (df2 in c(256,1024)) {
+			#for (delta2 in c(0,0.02)) {
+				#for (lp in c(TRUE,FALSE)) {
+					#if (lp) { checkps <- log(ps) } else { checkps <- ps }
+					#for (lt in c(TRUE,FALSE)) {
+						#qs <- qT2(checkps, df1, df2, delta2, lower.tail=lt, log.p=lp)
+						#if (lt) { 
+							#expect_true(is.sorted(qs,pragma="ascending"))
+						#} else {
+							#expect_true(is.sorted(qs,pragma="descending"))
+						#}
+						#pret <- pT2(qs, df1, df2, delta2, lower.tail=lt, log.p=lp)
+						#expect_equal(checkps,pret)
+					#}
+				#}
+			#}
+		#}
+	#}
+#})#UNFOLD
 
 test_that("psropt/qsropt monotonicity",{#FOLDUP
 	set.char.seed("22ad9afb-49c4-4f37-b32b-eab413b32750")

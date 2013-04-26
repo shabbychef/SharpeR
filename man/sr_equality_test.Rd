@@ -58,21 +58,23 @@
 }
 \examples{
 # under the null
-rv <- sr_equality_test(matrix(rnorm(500*5),nrow=5))
-# under the alternative (but with independent returns)
+rv <- sr_equality_test(matrix(rnorm(500*5),ncol=5))
+# under the alternative (but with identity covariance)
 opy <- 253
 nyr <- 10
 nco <- 5
 rets <- 0.01 * sapply(seq(0,1.7/sqrt(opy),length.out=nco),
   function(mu) { rnorm(opy*nyr,mean=mu,sd=1) })
 rv <- sr_equality_test(rets)
+
 # using real data
 if (require(quantmod)) {
-  getret <- function(sym) {
-    OHLCV <- getSymbols(sym,auto.assign=FALSE)
+  getret <- function(sym,...) {
+    OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
     lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
   }
-  some.rets <- do.call("cbind",lapply(c("IBM","AAPL","NFLX","SPY"),getret))
+  getrets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,getret,...)) }
+  some.rets <- getrets(c("IBM","AAPL","NFLX","SPY"))
   pvs <- sr_equality_test(some.rets)
 }
 # test for uniformity

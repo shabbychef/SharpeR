@@ -93,10 +93,8 @@ if (require(quantmod)) {
     OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
     lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
   }
-  getrets <- function(syms,...) {
-    some.rets <- do.call("cbind",lapply(syms,getret,...))
-  }
-  some.rets <- getrets(c("IBM","AAPL","NFLX","SPY"))
+  getrets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,getret,...)) }
+  some.rets <- getrets(c("IBM","AAPL","A","C","SPY","XOM"))
   asro <- as.sropt(some.rets)
 }
 }

@@ -15,7 +15,7 @@
   \item{level}{the confidence level required.}
 
   \item{opy}{the number of observations per 'year'.
-  \code{x}, \code{q}, and \code{snr} are quoted in
+  \code{z.s}, and the confidence intervals are quoted in
   'annualized' units, that is, per square root 'year', but
   returns are observed possibly at a rate of \code{opy} per
   'year.' default value is 1, meaning no deannualization is

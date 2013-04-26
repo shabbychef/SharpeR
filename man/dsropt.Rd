@@ -110,14 +110,20 @@
 }
 \note{
   This is a thin wrapper on the Hotelling T-squared
-  distribution, provided for convenience.
+  distribution, which is a wrapper on the F distribution.
 }
 \examples{
 # generate some variates
-rvs <- rsropt(2048, 8, 253*6, 0, 253)
+ngen <- 2048
+opy <- 253
+df1 <- 8
+df2 <- opy * 10
+drag <- 0
+# sample
+rvs <- rsropt(ngen, df1, df2, drag, opy)
 hist(rvs)
 # these should be uniform:
-isp <- psropt(rvs, 8, 253*6, 0, 253)
+isp <- psropt(rvs, df1, df2, drag, opy)
 plot(ecdf(isp))
 }
 \author{
@@ -130,8 +136,9 @@ plot(ecdf(isp))
   \url{http://mansci.journal.informs.org/cgi/doi/10.1287/mnsc.1070.0852}
 }
 \seealso{
-  Hotelling \eqn{T^2}-distribution functions,
-  \code{\link{dT2},\link{pT2},\link{qT2},\link{rT2}}
+  F-distribution functions, \code{\link{df}, \link{pf},
+  \link{qf}, \link{rf}}, Sharpe ratio distribution,
+  \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}.
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
