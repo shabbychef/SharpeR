@@ -268,8 +268,6 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #'
 #' @param z.s an observed Sharpe ratio statistic, annualized.
 #' @inheritParams dsropt
-#' @inheritParams qsropt
-#' @inheritParams psropt
 #' @param level the confidence level required.
 #' @template param-ope
 #' @param level.lo the lower bound for the confidence interval.
@@ -308,6 +306,7 @@ sropt_confint <- function(z.s,df1,df2,level=0.95,
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
 	return(retval)
 }
+#2FIX: this is orphaned. is not described anywhere. bleah.
 #' @export
 #' @param parm ignored here
 #' @rdname sropt_confint

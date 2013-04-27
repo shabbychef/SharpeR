@@ -710,8 +710,6 @@ power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) 
 #'                  sig.level=0.05,power=NULL,ope=NULL) 
 #'
 #' @inheritParams dsropt
-#' @inheritParams qsropt
-#' @inheritParams psropt
 #' @param zeta.s the 'signal-to-noise' parameter, defined as ...
 #' @param sig.level Significance level (Type I error probability).
 #' @param power Power of test (1 minus Type II error probability).

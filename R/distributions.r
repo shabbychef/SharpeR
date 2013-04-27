@@ -774,8 +774,6 @@ qlambdap <- Vectorize(.qlambdap,
 #  ' @param lb the lower bound for the output of \code{qco_sropt}.
 #  ' @param ub the upper bound for the output of \code{qco_sropt}.
 #  ' @inheritParams dsropt
-#  ' @inheritParams qsropt
-#  ' @inheritParams psropt
 #  ' @inheritParams qsr
 #  ' @inheritParams dsr
 #  ' @inheritParams psr

@@ -89,24 +89,7 @@
 }
 #UNFOLD
 
-# have this in too many places. ack.
-# converting t <-> sr#FOLDUP
-
-# conversion routines
-# Sharpe Ratio to t stat
-.sr_to_t <- function(sr, df) {
-  return(sr * sqrt(df))
-}
-# derivative of same
-.d_sr_to_t <- function(sr, df) {
-  return(sqrt(df))
-}
-# t stat to Sharpe Ratio
-.t_to_sr <- function(t, df) {
-  return(t / sqrt(df))
-}
-#UNFOLD
-
+# conversions
 # converting T2 <-> F#FOLDUP
 # convert hotelling T2 to F statistic
 .T2_to_F <- function(T2, p, n) {

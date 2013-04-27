@@ -270,9 +270,30 @@ format.sr <- function(x,...) {
 	retval <- capture.output(print(x,...))
 	return(retval)
 }
+#  ' @title Print values.
+#  '
+#  ' @description 
+#  '
+#  ' Displays an object, returning it \emph{invisibly}, 
+#  ' (via \code{invisible(x)}.)
+#  '
+#  ' @usage
+#  '
+#  ' print(x,...)
+#  '
+#  ' @param x an object
+#  ' @param ... passed on to 
+#  '
+#  ' @return the object, wrapped in \code{invisible}.
+#  ' @rdname print 
+#  ' @export
+print <- function(x,...) {
+	UseMethod("print", x)
+}
+#' @method print sr 
 #' @S3method print sr
 #' @export
-print.sr <- function(x,...) {
+print.sr <- function(x) {
 	tval <- .sr2t(x)
 	pval <- pt(tval,x$df,lower.tail=FALSE)
 	serr <- se(x,type="t")
@@ -284,6 +305,7 @@ print.sr <- function(x,...) {
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1,2),tst.ind=c(3),dig.tst=2)
+	invisible(x)
 }
 # @hadley's suggested form
 # print.sr <- function(x,...) cat(format(x,...), "\n")
@@ -565,9 +587,10 @@ as.sropt.xts <- function(anxts,drag=0,ope=1,epoch="yr") {
 	retval <- as.sropt.default(anxts,drag=drag,ope=ope,epoch=epoch)
 	return(retval)
 }
+#' @method print sropt
 #' @S3method print sropt
 #' @export
-print.sropt <- function(x,...) {
+print.sropt <- function(x) {
 	Tval <- x$T2
 	pval <- pT2(Tval,x$df1,x$df2,lower.tail=FALSE)
 	coefs <- cbind(x$sropt,Tval,pval)
