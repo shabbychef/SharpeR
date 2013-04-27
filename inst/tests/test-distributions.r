@@ -123,59 +123,59 @@ test_that("psropt/qsropt monotonicity",{#FOLDUP
 	}
 })#UNFOLD
 
-test_that("plambdap/qlambdap monotonicity",{#FOLDUP
-	set.char.seed("a5ae65f3-257a-47a3-af8e-46b34dfcebb0")
+#test_that("plambdap/qlambdap monotonicity",{#FOLDUP
+	#set.char.seed("a5ae65f3-257a-47a3-af8e-46b34dfcebb0")
 	
-	# plambdap
-	ps <- seq(0.1,0.9,length.out=9)
-	for (df in c(4,8,16)) {
-		for (tstat in c(-1,0,1)) {
-			for (lp in c(TRUE,FALSE)) {
-				if (lp) { checkps <- log(ps) } else { checkps <- ps }
-				for (lt in c(TRUE,FALSE)) {
-					qs <- qlambdap(checkps, df, tstat, lower.tail=lt, log.p=lp)
-					if (lt) { 
-						expect_true(is.sorted(qs,pragma="ascending"))
-					} else {
-						expect_true(is.sorted(qs,pragma="descending"))
-					}
-					pret <- plambdap(qs, df, tstat, lower.tail=lt, log.p=lp)
-					expect_equal(checkps,pret,tolerance=1e-4)
-				}
-			}
-		}
-	}
-})#UNFOLD
+	## plambdap
+	#ps <- seq(0.1,0.9,length.out=9)
+	#for (df in c(4,8,16)) {
+		#for (tstat in c(-1,0,1)) {
+			#for (lp in c(TRUE,FALSE)) {
+				#if (lp) { checkps <- log(ps) } else { checkps <- ps }
+				#for (lt in c(TRUE,FALSE)) {
+					#qs <- qlambdap(checkps, df, tstat, lower.tail=lt, log.p=lp)
+					#if (lt) { 
+						#expect_true(is.sorted(qs,pragma="ascending"))
+					#} else {
+						#expect_true(is.sorted(qs,pragma="descending"))
+					#}
+					#pret <- plambdap(qs, df, tstat, lower.tail=lt, log.p=lp)
+					#expect_equal(checkps,pret,tolerance=1e-4)
+				#}
+			#}
+		#}
+	#}
+#})#UNFOLD
 
-test_that("pco_sropt/qco_sropt monotonicity",{#FOLDUP
-	set.char.seed("161f0496-0229-4013-a65e-ff7c8b236f4a")
+#test_that("pco_sropt/qco_sropt monotonicity",{#FOLDUP
+	#set.char.seed("161f0496-0229-4013-a65e-ff7c8b236f4a")
 	
-	# co_sropt
-	ps <- seq(0.05,0.95,length.out=9)
-	for (df1 in c(2,4,8)) {
-		for (df2 in c(256,1024)) {
-			for (delta2 in c(0.72,1.2)) {  # this is the observed SR stat
-				for (lp in c(TRUE,FALSE)) {
-					if (lp) { checkps <- log(ps) } else { checkps <- ps }
-					for (lt in c(TRUE,FALSE)) {
-						qs <- qco_sropt(checkps, df1, df2, z.s=delta2, ope=1,
-														lower.tail=lt, log.p=lp)
-						if (lt) { 
-							expect_true(is.sorted(qs,pragma="ascending"))
-						} else {
-							expect_true(is.sorted(qs,pragma="descending"))
-						}
-						pret <- pco_sropt(qs, df1, df2, z.s=delta2, ope=1,
-															lower.tail=lt, log.p=lp)
-						expect_true(ifelse(lp,all(pret <= 0),
-															 all(0 <= pret) && all(pret <= 1)))
-						expect_equal(checkps,pret,tolerance=0.001)
-					}
-				}
-			}
-		}
-	}
-})#UNFOLD
+	## co_sropt
+	#ps <- seq(0.05,0.95,length.out=9)
+	#for (df1 in c(2,4,8)) {
+		#for (df2 in c(256,1024)) {
+			#for (delta2 in c(0.72,1.2)) {  # this is the observed SR stat
+				#for (lp in c(TRUE,FALSE)) {
+					#if (lp) { checkps <- log(ps) } else { checkps <- ps }
+					#for (lt in c(TRUE,FALSE)) {
+						#qs <- qco_sropt(checkps, df1, df2, z.s=delta2, ope=1,
+														#lower.tail=lt, log.p=lp)
+						#if (lt) { 
+							#expect_true(is.sorted(qs,pragma="ascending"))
+						#} else {
+							#expect_true(is.sorted(qs,pragma="descending"))
+						#}
+						#pret <- pco_sropt(qs, df1, df2, z.s=delta2, ope=1,
+															#lower.tail=lt, log.p=lp)
+						#expect_true(ifelse(lp,all(pret <= 0),
+															 #all(0 <= pret) && all(pret <= 1)))
+						#expect_equal(checkps,pret,tolerance=0.001)
+					#}
+				#}
+			#}
+		#}
+	#}
+#})#UNFOLD
 
 test_that("psr/qsr parameter monotonicity",{#FOLDUP
 	set.char.seed("adc578c1-381c-428a-baae-8d5607732176")
@@ -297,29 +297,29 @@ test_that("psr/qsr parameter monotonicity",{#FOLDUP
 		#}
 	#}
 
-test_that("qlambdap sensible",{#FOLDUP
-	set.char.seed("f54698f1-ec37-49a4-8463-d4209f25afbc")
+#test_that("qlambdap sensible",{#FOLDUP
+	#set.char.seed("f54698f1-ec37-49a4-8463-d4209f25afbc")
 	
-	df <- 128
-	true.ncp <- 3
-	tvals <- rt(4096,df,true.ncp)
+	#df <- 128
+	#true.ncp <- 3
+	#tvals <- rt(4096,df,true.ncp)
 
-	for (p in c(0.05,0.25,0.5,0.75,0.95)) {
-		tstat <- sapply(tvals,function(t) { return(qlambdap(p,df,t)) })
-		expect_equal(mean(tstat >= true.ncp),p,tolerance=0.05)
-	}
+	#for (p in c(0.05,0.25,0.5,0.75,0.95)) {
+		#tstat <- sapply(tvals,function(t) { return(qlambdap(p,df,t)) })
+		#expect_equal(mean(tstat >= true.ncp),p,tolerance=0.05)
+	#}
 
-	# edge cases
-	expect_true(Inf == qlambdap(1,df,1,lower.tail=TRUE))
-	expect_true(-Inf == qlambdap(1,df,1,lower.tail=FALSE))
-	expect_true(-Inf == qlambdap(0,df,1,lower.tail=TRUE))
-	expect_true(Inf == qlambdap(0,df,1,lower.tail=FALSE))
+	## edge cases
+	#expect_true(Inf == qlambdap(1,df,1,lower.tail=TRUE))
+	#expect_true(-Inf == qlambdap(1,df,1,lower.tail=FALSE))
+	#expect_true(-Inf == qlambdap(0,df,1,lower.tail=TRUE))
+	#expect_true(Inf == qlambdap(0,df,1,lower.tail=FALSE))
 
-	expect_true(1 == plambdap(Inf,df,1,lower.tail=TRUE))
-	expect_true(1 == plambdap(-Inf,df,1,lower.tail=FALSE))
-	expect_true(0 == plambdap(-Inf,df,1,lower.tail=TRUE))
-	expect_true(0 == plambdap(Inf,df,1,lower.tail=FALSE))
-})#UNFOLD
+	#expect_true(1 == plambdap(Inf,df,1,lower.tail=TRUE))
+	#expect_true(1 == plambdap(-Inf,df,1,lower.tail=FALSE))
+	#expect_true(0 == plambdap(-Inf,df,1,lower.tail=TRUE))
+	#expect_true(0 == plambdap(Inf,df,1,lower.tail=FALSE))
+#})#UNFOLD
 
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:

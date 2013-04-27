@@ -110,9 +110,9 @@ if (require(quantmod)) {
   \link{rsropt}}
 
   Other sropt: \code{\link{confint.sropt}},
-  \code{\link{dsropt}}, \code{\link{pco_sropt}},
-  \code{\link{power.sropt_test}}, \code{\link{sropt}},
-  \code{\link{sropt_confint}}, \code{\link{sropt_test}}
+  \code{\link{dsropt}}, \code{\link{power.sropt_test}},
+  \code{\link{sropt}}, \code{\link{sropt_confint}},
+  \code{\link{sropt_test}}
 }
 \keyword{univar}
 

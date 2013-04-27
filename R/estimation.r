@@ -216,7 +216,7 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{se}}, \code{\link{qlambdap}}
+#' @seealso \code{\link{confint}}, \code{\link{se}}
 #' @export 
 #' @template etc
 #' @template sr
@@ -267,7 +267,6 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #'                ope=1,level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
 #' @param z.s an observed Sharpe ratio statistic, annualized.
-#' @inheritParams qco_sropt
 #' @inheritParams dsropt
 #' @inheritParams qsropt
 #' @inheritParams psropt
@@ -279,7 +278,7 @@ confint.sr <- function(object,parm,level=0.95,...) {
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the SNR. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{qco_sropt}}, \code{\link{sropt.test}}
+#' @seealso \code{\link{confint}}, \code{\link{sropt.test}}
 #' @export 
 #' @template etc
 #' @template sropt
@@ -428,7 +427,6 @@ T2.inference <- function(T2,df1,df2,...) {
 #' inference(z.s,type=c("KRS","MLE","unbiased"))
 #'
 #' @param z.s an object of type \code{sropt}.
-#' @inheritParams qco_sropt
 #' @inheritParams dsropt
 #' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
 #' @keywords htest

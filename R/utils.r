@@ -89,6 +89,7 @@
 }
 #UNFOLD
 
+# have this in too many places. ack.
 # converting t <-> sr#FOLDUP
 
 # conversion routines
@@ -128,7 +129,6 @@
 #}
 #UNFOLD
 
-# SR^*, the SR of a Markowitz portfolio
 # converting T2 <-> sropt#FOLDUP
 # convert hotelling T2 to maximal SR statistic, SR^*
 .T2_to_sropt <- function(T2, n) {

@@ -83,10 +83,10 @@ anse2 <- se(asr,type="exact")
   \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
   \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
   \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{plambdap}}, \code{\link{power.sr_test}},
-  \code{\link{reannualize}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+  \code{\link{power.sr_test}}, \code{\link{reannualize}},
+  \code{\link{sr}}, \code{\link{sr_equality_test}},
+  \code{\link{sr_test}}, \code{\link{sr_test.default}},
+  \code{\link{sr_test.sr}}
 }
 \keyword{htest}
 
