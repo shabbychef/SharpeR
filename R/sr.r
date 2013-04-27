@@ -270,29 +270,28 @@ format.sr <- function(x,...) {
 	retval <- capture.output(print(x,...))
 	return(retval)
 }
-#  ' @title Print values.
-#  '
-#  ' @description 
-#  '
-#  ' Displays an object, returning it \emph{invisibly}, 
-#  ' (via \code{invisible(x)}.)
-#  '
-#  ' @usage
-#  '
-#  ' print(x,...)
-#  '
-#  ' @param x an object
-#  ' @param ... passed on to 
-#  '
-#  ' @return the object, wrapped in \code{invisible}.
-#  ' @rdname print 
-#  ' @export
-print <- function(x,...) {
-	UseMethod("print", x)
-}
-#' @method print sr 
+#' @title Print values.
+#'
+#' @description 
+#'
+#' Displays an object, returning it \emph{invisibly}, 
+#' (via \code{invisible(x)}.)
+#'
+#' @usage
+#'
+#' print(x,...)
+#'
+#' @param x an object of class \code{sr} or \code{sropt}.
+#' @param ... further arguments to be passed to or from methods.
+#'
+#' @return the object, wrapped in \code{invisible}.
+#' @rdname print-SharpeR
+
+
+
+#' @rdname print-SharpeR
+#' @method print sr
 #' @S3method print sr
-#' @export
 print.sr <- function(x) {
 	tval <- .sr2t(x)
 	pval <- pt(tval,x$df,lower.tail=FALSE)
@@ -587,9 +586,9 @@ as.sropt.xts <- function(anxts,drag=0,ope=1,epoch="yr") {
 	retval <- as.sropt.default(anxts,drag=drag,ope=ope,epoch=epoch)
 	return(retval)
 }
+#' @rdname print-SharpeR
 #' @method print sropt
 #' @S3method print sropt
-#' @export
 print.sropt <- function(x) {
 	Tval <- x$T2
 	pval <- pT2(Tval,x$df1,x$df2,lower.tail=FALSE)

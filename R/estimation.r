@@ -178,12 +178,43 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 	retval <- .t2sr(z,retval)
 	return(retval)
 }
+#' @title Confidence Intervals for Model Parameters
+#' 
+#' @description 
+#'
+#' Computes confidence intervals for the (optimal) signal
+#' to noise ratio in a fitted model. Works on objects of
+#' class \code{sr} and \code{sropt}.
+#'
+#' @usage
+#'
+#' confint(object,level=0.95,level.lo=(1-level)/2,level.hi=1-level.lo,...)
+#'
+#' @param object an object of class \code{sr} or \code{sropt}.
+#' @param level the confidence level required.
+#' @param level.lo the lower confidence level required.
+#' @param level.hi the upper confidence level required.
+#' @param ... additional argument(s) for methods.
+#'
+#' @keywords htest
+#' @return A matrix (or vector) with columns giving lower and upper
+#' confidence limits for the parameter. These will be labelled as
+#' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
+#' @seealso \code{\link{confint}}, \code{\link{se}}
+#' @rdname confint
+#' @template etc
+#' @export
+confint <- function(object,level=0.95,
+							 level.lo=(1-level)/2,level.hi=1-level.lo,...) {
+	UseMethod("confint", object)
+}
 
 #' @title Confidence Interval on Signal-Noise Ratio
 #'
 #' @description 
 #'
-#' Computes approximate confidence intervals on the Signal-Noise ratio given the Sharpe ratio.
+#' Computes approximate confidence intervals on the (optimal) Signal-Noise ratio 
+#' given the (optimal) Sharpe ratio.
 #'
 #' @details 
 #'
@@ -199,28 +230,28 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' \item A method based on an F statistic.
 #' }
 #'
-#' @usage
+#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+#' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
+#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). 
+#' Let 
+#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}}}{z* = sqrt(xbar' S^-1 xbar)}
+#' Given observations of \eqn{z_*}{z*}, compute confidence intervals on the
+#' population analogue, defined as
+#' \deqn{\zeta_* = \sqrt{\mu^{\top} \Sigma^{-1} \mu}}{zeta* = sqrt(mu' Sigma^-1 mu)}
 #'
-#' confint(object,parm,level=0.95,...)
-#'
-#' @param object an observed Sharpe ratio statistic, of class \code{sr}.
-#' @param parm ignored here
+#' @param object an observed Sharpe ratio statistic, of class \code{sr} or
+#' \code{sropt}.
 #' @param level the confidence level required.
-#' @param ... the following parameters are relevant:
-#' \itemize{
-#' \item \code{type} is oe of \code{c("exact","t","Z","F")}
-#' \item \code{level.lo}, and \code{level.hi} allow one to compute
-#' non-symmetric CI.
-#' }
-#' @keywords htest
-#' @return A matrix (or vector) with columns giving lower and upper
-#' confidence limits for the SNR. These will be labelled as
-#' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{se}}
+#' @param level.lo the lower confidence level required.
+#' @param level.hi the upper confidence level required.
+#' @param type which method to apply.
 #' @export 
 #' @template etc
 #' @template sr
+#' @template sropt
 #' @examples 
+#'
 #' # using "sr" class:
 #' ope <- 253
 #' df <- ope * 6
@@ -232,65 +263,30 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' amod <- lm(yv ~ xv)
 #' mysr <- as.sr(amod,ope=ope)
 #' confint(mysr,level.lo=0.05,level.hi=1.0)
-#'
-#' @rdname confint
-#' @method confint sr 
-#' @S3method confint sr 
-confint.sr <- function(object,parm,level=0.95,...) {
-	tstat <- .sr2t(object)
-	retval <- .t_confint(tstat,df=object$df,level=level,...)
-	retval <- .t2sr(object,retval)
-	return(retval)
-}
-											 
-#' @title Confidence Interval on Maximal Signal-Noise Ratio
-#'
-#' @description 
-#'
-#' Computes approximate confidence intervals on the Signal-Noise ratio given the Sharpe ratio.
-#'
-#' @details 
-#'
-#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
-#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
-#' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
-#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). 
-#' Let 
-#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}}}{z* = sqrt(xbar' S^-1 xbar)}
-#' Given observations of \eqn{z_*}{z*}, compute confidence intervals on the
-#' population analogue, defined as
-#' \deqn{\zeta_* = \sqrt{\mu^{\top} \Sigma^{-1} \mu}}{zeta* = sqrt(mu' Sigma^-1 mu)}
-#'
-#' @usage
-#'
-#' sropt_confint(z.s,df1,df2,level=0.95,
-#'                ope=1,level.lo=(1-level)/2,level.hi=1-level.lo)
-#'
-#' @param z.s an observed Sharpe ratio statistic, annualized.
-#' @inheritParams dsropt
-#' @param level the confidence level required.
-#' @template param-ope
-#' @param level.lo the lower bound for the confidence interval.
-#' @param level.hi the upper bound for the confidence interval.
-#' @keywords htest
-#' @return A matrix (or vector) with columns giving lower and upper
-#' confidence limits for the SNR. These will be labelled as
-#' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{sropt.test}}
-#' @export 
-#' @template etc
-#' @template sropt
-#' @rdname sropt_confint
-#' @examples 
-#' # fix these!
+#' # using "sropt" class
 #' ope <- 253
 #' df1 <- 6
 #' df2 <- ope * 6
 #' rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
-#' sro <- as.sropt(rvs)
+#' sro <- as.sropt(rvs,ope=ope)
 #' aci <- confint(sro)
 #'
-#'@export
+#' @aliases confint.sropt
+#' @aliases confint.sr
+#' @rdname confint-SharpeR
+#' @method confint sr 
+#' @S3method confint sr 
+confint.sr <- function(object,level=0.95,
+							 level.lo=(1-level)/2,level.hi=1-level.lo,
+							 type=c("exact","t","Z","F")) {
+	type <- match.arg(type)
+	tstat <- .sr2t(object)
+	retval <- .t_confint(tstat,df=object$df,level=level,
+											 level.lo=level.lo,level.hi=level.hi,
+											 type=type)
+	retval <- .t2sr(object,retval)
+	return(retval)
+}
 sropt_confint <- function(z.s,df1,df2,level=0.95,
 											     ope=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
 	#2FIX: the order of arguments is really wonky. where does ope go?
@@ -306,14 +302,15 @@ sropt_confint <- function(z.s,df1,df2,level=0.95,
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
 	return(retval)
 }
-#2FIX: this is orphaned. is not described anywhere. bleah.
 #' @export
-#' @param parm ignored here
-#' @rdname sropt_confint
+#' @rdname confint-SharpeR
 #' @method confint sropt
 #' @S3method confint sropt
-confint.sropt <- function(z.s,parm,level=0.95,...) {
-	retval <- sropt_confint(z.s$sropt,z.s$df1,z.s$df2,level=level,ope=z.s$ope,...)
+confint.sropt <- function(object,level=0.95,
+							 level.lo=(1-level)/2,level.hi=1-level.lo) {
+	retval <- sropt_confint(object$sropt,object$df1,object$df2,
+													level=level,ope=object$ope,
+													level.lo=level.lo,level.hi=level.hi)
 	return(retval)
 }
 

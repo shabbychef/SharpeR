@@ -29,11 +29,11 @@ is.sr(rvs)
   Other sr: \code{\link{as.sr}},
   \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
   \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
-  \code{\link{dsr}}, \code{\link{power.sr_test}},
-  \code{\link{reannualize}}, \code{\link{se}},
-  \code{\link{se.default}}, \code{\link{se.sr}},
-  \code{\link{sr}}, \code{\link{sr_equality_test}},
-  \code{\link{sr_test}}, \code{\link{sr_test.default}},
-  \code{\link{sr_test.sr}}
+  \code{\link{confint.sropt}}, \code{\link{dsr}},
+  \code{\link{power.sr_test}}, \code{\link{reannualize}},
+  \code{\link{se}}, \code{\link{se.default}},
+  \code{\link{se.sr}}, \code{\link{sr}},
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
 }
 

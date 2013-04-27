@@ -65,9 +65,9 @@ anex <- power.sropt_test(8,4*253,1,0.05,NULL,ope=253)
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.xts}}, \code{\link{confint.sropt}},
-  \code{\link{dsropt}}, \code{\link{sropt}},
-  \code{\link{sropt_confint}}, \code{\link{sropt_test}}
+  \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
+  \code{\link{confint.sropt}}, \code{\link{dsropt}},
+  \code{\link{sropt}}, \code{\link{sropt_test}}
 }
 \keyword{htest}
 

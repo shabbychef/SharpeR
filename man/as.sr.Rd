@@ -112,7 +112,8 @@ asr <- as.sr(APT_mod,ope=ope)
   sr-distribution functions, \code{\link{dsr}, \link{psr},
   \link{qsr}, \link{rsr}}
 
-  Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
+  Other sr: \code{\link{confint.sr}},
+  \code{\link{confint.sropt}}, \code{\link{dsr}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
   \code{\link{reannualize}}, \code{\link{se}},
   \code{\link{se.default}}, \code{\link{se.sr}},

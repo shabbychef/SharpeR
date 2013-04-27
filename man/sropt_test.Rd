@@ -78,9 +78,9 @@ abline(0,1,col='red')
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.xts}}, \code{\link{confint.sropt}},
-  \code{\link{dsropt}}, \code{\link{power.sropt_test}},
-  \code{\link{sropt}}, \code{\link{sropt_confint}}
+  \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
+  \code{\link{confint.sropt}}, \code{\link{dsropt}},
+  \code{\link{power.sropt_test}}, \code{\link{sropt}}
 }
 \keyword{htest}
 
