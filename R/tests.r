@@ -486,14 +486,12 @@ sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 #' @export 
 #' @template etc
 #' @template sr
+#' @template ref-JW
 #' @references 
 #'
 #' Lehr, R. "Sixteen S-squared over D-squared: A relation for crude 
 #' sample size estimates." Statist. Med., 11, no 8 (1992): 1099–1102. 
 #' doi: 10.1002/sim.4780110811
-#'
-#' Johnson, N. L., and Welch, B. L. "Applications of the non-central t-distribution."
-#' Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31.3-4.362}
 #'
 #' @examples 
 #' anex <- power.sr_test(253,1,0.05,NULL,ope=253) 

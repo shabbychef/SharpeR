@@ -1,6 +1,5 @@
 export(as.sr)
 export(as.sropt)
-export(confint)
 export(dsr)
 export(dsropt)
 export(format.sr)

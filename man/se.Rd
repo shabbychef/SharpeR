@@ -59,10 +59,6 @@ anse2 <- se(asr,type="exact")
   business (1966): 119-138.
   \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 
-  Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for
-  experimentalists." 1996.
-  \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
-
   Johnson, N. L., and Welch, B. L. "Applications of the
   non-central t-distribution." Biometrika 31, no. 3-4
   (1940): 362-389.
@@ -71,6 +67,10 @@ anse2 <- se(asr,type="exact")
   Lo, Andrew W. "The statistics of Sharpe ratios."
   Financial Analysts Journal 58, no. 4 (2002): 36-52.
   \url{http://ssrn.com/paper=377260}
+
+  Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for
+  experimentalists." 1996.
+  \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
 
   Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the
   p-values?" Journal of Asset Management 8, no. 5 (2006):

@@ -77,7 +77,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 # these are phony targets
 .PHONY: help tags all \
 	gitpull gitpush \
-	news doc build install testthat \
+	news docs build install testthat \
 	staging_d local_d \
 	clean realclean \
 	R

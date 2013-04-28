@@ -149,16 +149,12 @@ se.default <- function(z, ...) {
 #' @note
 #' Eventually this should include corrections for autocorrelation, skew,
 #' kurtosis.
+#' @template ref-JW
+#' @template ref-Lo
 #' @references 
 #'
 #' Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
 #' 1996. \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
-#'
-#' Johnson, N. L., and Welch, B. L. "Applications of the non-central t-distribution."
-#' Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31.3-4.362}
-#'
-#' Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
-#' (2002): 36-52. \url{http://ssrn.com/paper=377260}
 #'
 #' Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the p-values?" Journal of Asset
 #' Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}
@@ -178,43 +174,20 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 	retval <- .t2sr(z,retval)
 	return(retval)
 }
-#' @title Confidence Intervals for Model Parameters
-#' 
-#' @description 
-#'
-#' Computes confidence intervals for the (optimal) signal
-#' to noise ratio in a fitted model. Works on objects of
-#' class \code{sr} and \code{sropt}.
-#'
-#' @usage
-#'
-#' confint(object,level=0.95,level.lo=(1-level)/2,level.hi=1-level.lo,...)
-#'
-#' @param object an object of class \code{sr} or \code{sropt}.
-#' @param level the confidence level required.
-#' @param level.lo the lower confidence level required.
-#' @param level.hi the upper confidence level required.
-#' @param ... additional argument(s) for methods.
-#'
-#' @keywords htest
-#' @return A matrix (or vector) with columns giving lower and upper
-#' confidence limits for the parameter. These will be labelled as
-#' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{se}}
-#' @rdname confint
-#' @template etc
-#' @export
-confint <- function(object,level=0.95,
-							 level.lo=(1-level)/2,level.hi=1-level.lo,...) {
-	UseMethod("confint", object)
-}
-
-#' @title Confidence Interval on Signal-Noise Ratio
+#  ' @usage
+#  '
+#  ' confint(object,level=0.95,level.lo=(1-level)/2,level.hi=1-level.lo,...)
+#confint <- function(object,level=0.95,
+							 #level.lo=(1-level)/2,level.hi=1-level.lo,...) {
+	#UseMethod("confint", object)
+#}
+#' @title Confidence Interval on (optimal) Signal-Noise Ratio
 #'
 #' @description 
 #'
 #' Computes approximate confidence intervals on the (optimal) Signal-Noise ratio 
 #' given the (optimal) Sharpe ratio.
+#' Works on objects of class \code{sr} and \code{sropt}.
 #'
 #' @details 
 #'
@@ -240,16 +213,22 @@ confint <- function(object,level=0.95,
 #' population analogue, defined as
 #' \deqn{\zeta_* = \sqrt{\mu^{\top} \Sigma^{-1} \mu}}{zeta* = sqrt(mu' Sigma^-1 mu)}
 #'
+#'
 #' @param object an observed Sharpe ratio statistic, of class \code{sr} or
 #' \code{sropt}.
 #' @param level the confidence level required.
 #' @param level.lo the lower confidence level required.
 #' @param level.hi the upper confidence level required.
 #' @param type which method to apply.
-#' @export 
 #' @template etc
 #' @template sr
 #' @template sropt
+#' @rdname confint
+#' @keywords htest
+#' @return A matrix (or vector) with columns giving lower and upper
+#' confidence limits for the parameter. These will be labelled as
+#' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
+#' @seealso \code{\link{confint}}, \code{\link{se}}
 #' @examples 
 #'
 #' # using "sr" class:
@@ -270,12 +249,15 @@ confint <- function(object,level=0.95,
 #' rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
 #' sro <- as.sropt(rvs,ope=ope)
 #' aci <- confint(sro)
-#'
-#' @aliases confint.sropt
-#' @aliases confint.sr
-#' @rdname confint-SharpeR
+#' # on sropt, rolling your own.
+#' zeta.s <- 1.0
+#' rvs <- rsropt(500, df1, df2, zeta.s, ope)
+#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
+#' aci <- confint(roll.own,level=0.95)
+#' coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
 #' @method confint sr 
 #' @S3method confint sr 
+#' @export
 confint.sr <- function(object,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,
 							 type=c("exact","t","Z","F")) {
@@ -287,30 +269,20 @@ confint.sr <- function(object,level=0.95,
 	retval <- .t2sr(object,retval)
 	return(retval)
 }
-sropt_confint <- function(z.s,df1,df2,level=0.95,
-											     ope=1,level.lo=(1-level)/2,level.hi=1-level.lo) {
-	#2FIX: the order of arguments is really wonky. where does ope go?
-	#if (!missing(ope)) {
-		#z.s <- .deannualize(z.s,ope)
-	#}
-
-	ci.hi <- qco_sropt(level.hi,df1=df1,df2=df2,z.s=z.s,ope=ope,lower.tail=TRUE)
-	ci.lo <- qco_sropt(level.lo,df1=df1,df2=df2,z.s=z.s,ope=ope,lower.tail=TRUE,ub=ci.hi)
-	ci <- c(ci.lo,ci.hi)
-
-	retval <- matrix(ci,nrow=1)
-	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
-	return(retval)
-}
 #' @export
-#' @rdname confint-SharpeR
+#' @rdname confint
 #' @method confint sropt
 #' @S3method confint sropt
 confint.sropt <- function(object,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo) {
-	retval <- sropt_confint(object$sropt,object$df1,object$df2,
-													level=level,ope=object$ope,
-													level.lo=level.lo,level.hi=level.hi)
+	ci.hi <- qco_sropt(level.hi,df1=object$df1,df2=object$df2,
+										 z.s=object$sropt,ope=object$ope,lower.tail=TRUE)
+	ci.lo <- qco_sropt(level.lo,df1=object$df1,df2=object$df2,
+										 z.s=object$sropt,ope=object$ope,lower.tail=TRUE,ub=max(ci.hi))
+	ci <- cbind(ci.lo,ci.hi)
+
+	retval <- matrix(ci,length(object$sropt))
+	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
 	return(retval)
 }
 
@@ -388,12 +360,12 @@ T2.inference <- function(T2,df1,df2,...) {
 	retv <- retv
 	return(retv)
 }
-#' @title Inference on noncentrality parameter of F or F-like statistic 
+#' @title Inference on noncentrality parameter of F-like statistic 
 #'
 #' @description 
 #'
 #' Estimates the non-centrality parameter associated with an observed
-#' statistic following a (non-central) F, \eqn{T^2}, or sropt distribution. 
+#' statistic following an optimal Sharpe Ratio distribution.
 #'
 #' @details 
 #'

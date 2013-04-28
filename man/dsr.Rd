@@ -112,10 +112,6 @@ plot(ecdf(pvs))
   Sharpe, William F. "Mutual fund performance." Journal of
   business (1966): 119-138.
   \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
-
-  Lo, Andrew W. "The statistics of Sharpe ratios."
-  Financial Analysts Journal 58, no. 4 (2002): 36-52.
-  \url{http://ssrn.com/paper=377260}
 }
 \seealso{
   t-distribution functions, \code{\link{dt}, \link{pt},
