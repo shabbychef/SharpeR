@@ -1,6 +1,6 @@
 \name{inference}
 \alias{inference}
-\title{Inference on noncentrality parameter of F or F-like statistic}
+\title{Inference on noncentrality parameter of F-like statistic}
 \usage{
   inference(z.s,type=c("KRS","MLE","unbiased"))
 }
@@ -15,8 +15,8 @@
 }
 \description{
   Estimates the non-centrality parameter associated with an
-  observed statistic following a (non-central) F,
-  \eqn{T^2}, or sropt distribution.
+  observed statistic following an optimal Sharpe Ratio
+  distribution.
 }
 \details{
   Let \eqn{F}{F} be an observed statistic distributed as a

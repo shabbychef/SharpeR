@@ -70,6 +70,14 @@ yv <- xv + rnorm(length(xv))
 amod <- lm(yv ~ xv)
 mysr <- as.sr(amod,ope=ope)
 confint(mysr,level.lo=0.05,level.hi=1.0)
+# rolling your own.
+ope <- 253
+df <- ope * 6
+zeta <- 1.0
+rvs <- rsr(500, df, zeta, ope)
+roll.own <- sr(sr=rvs,df=df,c0=0,ope=ope)
+aci <- confint(roll.own,level=0.95)
+coverage <- 1 - mean((zeta < aci[,1]) | (aci[,2] < zeta))
 # using "sropt" class
 ope <- 253
 df1 <- 6
@@ -100,10 +108,9 @@ coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
   \code{\link{as.sr.xts}}, \code{\link{dsr}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
   \code{\link{reannualize}}, \code{\link{se}},
-  \code{\link{se.default}}, \code{\link{se.sr}},
-  \code{\link{sr}}, \code{\link{sr_equality_test}},
-  \code{\link{sr_test}}, \code{\link{sr_test.default}},
-  \code{\link{sr_test.sr}}
+  \code{\link{se.sr}}, \code{\link{sr}},
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},

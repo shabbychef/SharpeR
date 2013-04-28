@@ -67,9 +67,9 @@
 					 level.lo=(1-level)/2,level.hi=1-level.lo) {
 	type <- match.arg(type)
 	if  (type == "exact") {
-		ci.lo <- qlambdap(level.lo,df-1,tstat,lower.tail=TRUE)
-		ci.hi <- qlambdap(level.hi,df-1,tstat,lower.tail=TRUE)
-		ci <- c(ci.lo,ci.hi)
+		ci.lo <- qlambdap(level.lo,df,tstat,lower.tail=TRUE)
+		ci.hi <- qlambdap(level.hi,df,tstat,lower.tail=TRUE)
+		ci <- cbind(ci.lo,ci.hi)
 	} else if (type == "t") {
 		se <- .t_se(tstat,df,type=type)
 		midp <- tstat
@@ -89,7 +89,7 @@
 		ci <- midp + zalp * se
 	} else stop("internal error")
 
-	retval <- matrix(ci,nrow=1)
+	retval <- matrix(ci,nrow=length(tstat))
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
 	return(retval)
 }
@@ -97,20 +97,12 @@
 
 # confidence intervals on the Sharpe ratio#FOLDUP
 
-#' @title Standard error computation
 #' @rdname se
 #' @export
 se <- function(z, ...) {
 	UseMethod("se", z)
 }
-#'
-#' @rdname se
-#' @method se default
-#' @S3method se default
-se.default <- function(z, ...) {
-	stop("no generic standard error computation available")
-}
-#' @title Standard error of Sharpe ratio
+#' @title Standard error computation
 #'
 #' @description 
 #'
@@ -130,12 +122,6 @@ se.default <- function(z, ...) {
 #' There should be very little difference between these except for very small
 #' sample sizes.
 #'
-#' @usage
-#'
-#' se(z, ...)
-#'
-#' se(z, type=c("t","Lo","exact"))
-#'
 #' @param z an observed Sharpe ratio statistic, of class \code{sr}.
 #' @param type estimator type. one of \code{"t", "Lo", "exact"}
 #' @param ... further arguments to be passed to or from methods.
@@ -145,29 +131,26 @@ se.default <- function(z, ...) {
 #' @export 
 #' @template etc
 #' @template sr
-#' @rdname se
 #' @note
 #' Eventually this should include corrections for autocorrelation, skew,
 #' kurtosis.
 #' @template ref-JW
 #' @template ref-Lo
+#' @template ref-Opdyke
 #' @references 
 #'
 #' Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
 #' 1996. \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
-#'
-#' Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the p-values?" Journal of Asset
-#' Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}
 #'
 #' @examples 
 #' asr <- as.sr(rnorm(1000,0.2))
 #' anse <- se(asr,type="t")
 #' anse2 <- se(asr,type="exact")
 #'
-#' @export
-#'
 #' @method se sr
 #' @S3method se sr
+#' @rdname se
+#' @export
 se.sr <- function(z, type=c("t","Lo","exact")) {
 	tstat <- .sr2t(z)
 	retval <- .t_se(tstat,df=z$df,type=type)
@@ -242,6 +225,14 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' amod <- lm(yv ~ xv)
 #' mysr <- as.sr(amod,ope=ope)
 #' confint(mysr,level.lo=0.05,level.hi=1.0)
+#' # rolling your own.
+#' ope <- 253
+#' df <- ope * 6
+#' zeta <- 1.0
+#' rvs <- rsr(500, df, zeta, ope)
+#' roll.own <- sr(sr=rvs,df=df,c0=0,ope=ope)
+#' aci <- confint(roll.own,level=0.95)
+#' coverage <- 1 - mean((zeta < aci[,1]) | (aci[,2] < zeta))
 #' # using "sropt" class
 #' ope <- 253
 #' df1 <- 6

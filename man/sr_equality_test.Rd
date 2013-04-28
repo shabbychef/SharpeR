@@ -114,9 +114,9 @@ abline(0,1,col='red')
   \code{\link{confint.sropt}}, \code{\link{dsr}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
   \code{\link{reannualize}}, \code{\link{se}},
-  \code{\link{se.default}}, \code{\link{se.sr}},
-  \code{\link{sr}}, \code{\link{sr_test}},
-  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+  \code{\link{se.sr}}, \code{\link{sr}},
+  \code{\link{sr_test}}, \code{\link{sr_test.default}},
+  \code{\link{sr_test.sr}}
 }
 \keyword{htest}
 

@@ -105,7 +105,7 @@ asr <- as.sr(APT_mod,ope=ope)
   \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 
   Lo, Andrew W. "The statistics of Sharpe ratios."
-  Financial Analysts Journal (2002): 36-52.
+  Financial Analysts Journal 58, no. 4 (2002): 36-52.
   \url{http://ssrn.com/paper=377260}
 }
 \seealso{
@@ -116,10 +116,9 @@ asr <- as.sr(APT_mod,ope=ope)
   \code{\link{confint.sropt}}, \code{\link{dsr}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
   \code{\link{reannualize}}, \code{\link{se}},
-  \code{\link{se.default}}, \code{\link{se.sr}},
-  \code{\link{sr}}, \code{\link{sr_equality_test}},
-  \code{\link{sr_test}}, \code{\link{sr_test.default}},
-  \code{\link{sr_test.sr}}
+  \code{\link{se.sr}}, \code{\link{sr}},
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
 }
 \keyword{univar}
 

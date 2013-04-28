@@ -1,16 +1,11 @@
 \name{se}
 \alias{se}
-\alias{se.default}
 \alias{se.sr}
 \title{Standard error computation}
 \usage{
   se(z, ...)
 
-  \method{se}{default} (z, ...)
-
-  se(z, ...)
-
-  se(z, type=c("t","Lo","exact"))
+  \method{se}{sr} (z, type = c("t", "Lo", "exact"))
 }
 \arguments{
   \item{z}{an observed Sharpe ratio statistic, of class
@@ -26,8 +21,6 @@
   an estimate of standard error.
 }
 \description{
-  Standard error computation
-
   Estimates the standard error of the Sharpe ratio
   statistic.
 }
@@ -68,13 +61,13 @@ anse2 <- se(asr,type="exact")
   Financial Analysts Journal 58, no. 4 (2002): 36-52.
   \url{http://ssrn.com/paper=377260}
 
-  Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for
-  experimentalists." 1996.
-  \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
-
   Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the
   p-values?" Journal of Asset Management 8, no. 5 (2006):
   308-336. \url{http://ssrn.com/paper=886728}
+
+  Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for
+  experimentalists." 1996.
+  \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
 }
 \seealso{
   sr-distribution functions, \code{\link{dsr}}

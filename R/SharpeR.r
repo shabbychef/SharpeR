@@ -118,7 +118,7 @@
 #' \item \eqn{c_0/R} is denoted by \code{drag}.
 #' }
 #'
-#' @section Legal Mumbo Jumbo
+#' @section Legal Mumbo Jumbo:
 #'
 #' SharpeR is distributed in the hope that it will be useful,
 #' but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -129,11 +129,9 @@
 #' @template ref-Sharpe
 #' @template ref-JW
 #' @template ref-Lo
+#' @template ref-Opdyke
 #'
 #' @references
-#' 
-#' Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the p-values?" Journal of Asset
-#' Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}
 #'
 #' Kan, Raymond and Smith, Daniel R. "The Distribution of the Sample Minimum-Variance Frontier."
 #' Journal of Management Science 54, no. 7 (2008): 1364--1380.

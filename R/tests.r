@@ -705,7 +705,7 @@ power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) 
 #' @usage
 #'
 #' power.sropt_test(df1=NULL,df2=NULL,zeta.s=NULL,
-#'                  sig.level=0.05,power=NULL,ope=NULL) 
+#'                  sig.level=0.05,power=NULL,ope=1)
 #'
 #' @inheritParams dsropt
 #' @param zeta.s the 'signal-to-noise' parameter, defined as ...
