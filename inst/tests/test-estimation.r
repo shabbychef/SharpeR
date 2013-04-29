@@ -69,8 +69,8 @@ test_that("confint.sropt coverage",{#FOLDUP
 				for (nominal.coverage in c(0.90,0.95)) {
 					aci <- confint(roll.own,level=nominal.coverage)
 					coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
-					cat(sprintf('df1=%d,df2=%d,zeta.s=%g: nominal: %.2g%%; achieved: %.2g%%\n',df1,df2,zeta.s,
-											100*nominal.coverage,100*coverage))
+					#cat(sprintf('df1=%d,df2=%d,zeta.s=%g: nominal: %.2g%%; achieved: %.2g%%\n',df1,df2,zeta.s,
+											#100*nominal.coverage,100*coverage))
 					# this stinks! need more samples and tighter tolerance, but it runs
 					# too slowly.
 					expect_equal(coverage,nominal.coverage,tolerance=0.07,scale=1)

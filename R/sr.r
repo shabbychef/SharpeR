@@ -514,7 +514,6 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #' \item{sropt}{the optimal Sharpe statistic.}
 #' \item{drag}{the input \code{drag} term.}
 #' \item{ope}{the input \code{ope} term.}
-#' @aliases sropt
 #' @seealso \code{\link{sr}}, sropt-distribution functions, 
 #' \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
 #' @rdname as.sropt

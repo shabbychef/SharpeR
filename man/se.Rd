@@ -5,7 +5,7 @@
 \usage{
   se(z, ...)
 
-  \method{se}{sr} (z, type = c("t", "Lo", "exact"))
+  \method{se}{sr} (z, type = c("t", "Lo"))
 }
 \arguments{
   \item{z}{an observed Sharpe ratio statistic, of class
@@ -42,7 +42,7 @@
 \examples{
 asr <- as.sr(rnorm(1000,0.2))
 anse <- se(asr,type="t")
-anse2 <- se(asr,type="exact")
+anse <- se(asr,type="Lo")
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

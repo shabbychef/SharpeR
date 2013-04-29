@@ -139,13 +139,13 @@ se <- function(z, ...) {
 #' @examples 
 #' asr <- as.sr(rnorm(1000,0.2))
 #' anse <- se(asr,type="t")
-#' anse2 <- se(asr,type="exact")
+#' anse <- se(asr,type="Lo")
 #'
 #' @method se sr
 #' @S3method se sr
 #' @rdname se
 #' @export
-se.sr <- function(z, type=c("t","Lo","exact")) {
+se.sr <- function(z, type=c("t","Lo")) {
 	tstat <- .sr2t(z)
 	retval <- .t_se(tstat,df=z$df,type=type)
 	retval <- .t2sr(z,retval)
