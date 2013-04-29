@@ -289,7 +289,7 @@ print.sr <- function(x) {
 	#colnames(coefs) <- c("stat","t.stat","p.value")
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "Std. Error","t value","Pr(>t)")
-	rownames(coefs) <- if (is.null(rownames(x$sr))) c("Sharpe") else rownames(x$sr)
+	rownames(coefs) <- if (is.null(rownames(x$sr))) rep(c("Sharpe"),length(x$sr)) else rownames(x$sr)
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1,2),tst.ind=c(3),dig.tst=2)
@@ -420,7 +420,7 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #'
 #' @usage
 #'
-#' sropt(z.s,df1,df2,drag=0,ope=1,epoch="yr")
+#' sropt(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL)
 #'
 #' @param z.s an optimum Sharpe ratio statistic.
 #' @inheritParams dsropt
@@ -428,6 +428,8 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #'        that \code{drag} has been annualized, \emph{i.e.} has been multiplied
 #'        by \eqn{\sqrt{ope}}{sqrt(ope)}. This is in contrast to the \code{c0}
 #'        term given to \code{\link{sr}}.
+#' @param T2 the Hotelling \eqn{T^2}{T^2} statistic. If not given, it is
+#'        computed from the given information.
 #' @template param-ope
 #' @param epoch the string representation of the 'epoch', defaulting
 #'        to 'yr'.
@@ -454,9 +456,12 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #' rvs <- rsropt(5,df1,df2,zeta.s,ope,drag=0)
 #' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 #'
-sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr") {
+sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 	retval <- list(sropt = z.s,df1 = df1,df2 = df2,
 								 drag = drag,ope = ope,epoch = epoch)
+	if (is.null(T2)) 
+		T2 <- .sropt2T(retval)
+	retval$T2 <- T2
 	class(retval) <- "sropt"
 	return(retval)
 }
@@ -556,10 +561,8 @@ as.sropt.default <- function(X,drag=0,ope=1,epoch="yr") {
 
 	# this stinks
 	retv <- sropt(z.s=z.s,df1=hotval$df1,df2=hotval$df2,
-								drag=drag,ope=ope,epoch=epoch)
+								drag=drag,ope=ope,epoch=epoch,T2=hotval$T2)
 
-	# 2FIX: have to store T2 in here now. bleah.
-	retv$T2 <- hotval$T2
 	# 2FIX: merge markowitz in?
 
 	return(retv)
@@ -585,7 +588,7 @@ print.sropt <- function(x) {
 	coefs <- cbind(x$sropt,Tval,pval)
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "T^2 value","Pr(>T^2)")
-	rownames(coefs) <- if (is.null(rownames(x$sropt))) c("Sharpe") else rownames(x$sropt)
+	rownames(coefs) <- if (is.null(rownames(x$sropt))) rep(c("Sharpe"),length(x$sropt)) else rownames(x$sropt)
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)

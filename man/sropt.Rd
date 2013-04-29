@@ -2,7 +2,7 @@
 \alias{sropt}
 \title{Create an 'sropt' object.}
 \usage{
-  sropt(z.s,df1,df2,drag=0,ope=1,epoch="yr")
+  sropt(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL)
 }
 \arguments{
   \item{z.s}{an optimum Sharpe ratio statistic.}
@@ -12,6 +12,9 @@
   \emph{i.e.} has been multiplied by
   \eqn{\sqrt{ope}}{sqrt(ope)}. This is in contrast to the
   \code{c0} term given to \code{\link{sr}}.}
+
+  \item{T2}{the Hotelling \eqn{T^2}{T^2} statistic. If not
+  given, it is computed from the given information.}
 
   \item{ope}{the number of observations per 'epoch'. The
   Sharpe ratio is typically quoted in 'annualized' units

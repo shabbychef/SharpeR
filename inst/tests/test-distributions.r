@@ -27,7 +27,7 @@
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
-# helpers
+# helpers#FOLDUP
 is.sorted <- function(xs,pragma=c("ascending","descending")) {
 	pragma <- match.arg(pragma)
 	retv <- switch(pragma,
@@ -35,11 +35,19 @@ is.sorted <- function(xs,pragma=c("ascending","descending")) {
 								 descending = !is.unsorted(rev(xs)))
 	return(retv)
 }
+# are the data approximately U(0,1)?
+is.appx.uniform <- function(xs) {
+	q.check <- seq(0,1,length.out=21)
+	retv <- max(abs(quantile(ecdf(xs),q.check) - q.check)) < max(diff(q.check))
+	return(retv)
+}
+
 set.char.seed <- function(str) {
 	set.seed(as.integer(charToRaw(str)))
 }
+#UNFOLD
 
-context("distribution functions")
+context("distribution functions: basic monotonicity")#FOLDUP
 
 test_that("psr/qsr monotonicity",{#FOLDUP
 	set.char.seed("1ccb4a05-fd09-43f7-a692-80deebfd67f4")
@@ -67,31 +75,31 @@ test_that("psr/qsr monotonicity",{#FOLDUP
 	}
 })#UNFOLD
 
-#test_that("pT2/qT2 monotonicity",{#FOLDUP
-	#set.char.seed("f28b5cd4-dcdb-4e8e-9398-c79fb9038351")
+test_that("pT2/qT2 monotonicity",{#FOLDUP
+	set.char.seed("f28b5cd4-dcdb-4e8e-9398-c79fb9038351")
 	
-	## pT2
-	#ps <- seq(0.1,0.9,length.out=9)
-	#for (df1 in c(2,4,8)) {
-		#for (df2 in c(256,1024)) {
-			#for (delta2 in c(0,0.02)) {
-				#for (lp in c(TRUE,FALSE)) {
-					#if (lp) { checkps <- log(ps) } else { checkps <- ps }
-					#for (lt in c(TRUE,FALSE)) {
-						#qs <- qT2(checkps, df1, df2, delta2, lower.tail=lt, log.p=lp)
-						#if (lt) { 
-							#expect_true(is.sorted(qs,pragma="ascending"))
-						#} else {
-							#expect_true(is.sorted(qs,pragma="descending"))
-						#}
-						#pret <- pT2(qs, df1, df2, delta2, lower.tail=lt, log.p=lp)
-						#expect_equal(checkps,pret)
-					#}
-				#}
-			#}
-		#}
-	#}
-#})#UNFOLD
+	# pT2
+	ps <- seq(0.1,0.9,length.out=9)
+	for (df1 in c(2,4,8)) {
+		for (df2 in c(256,1024)) {
+			for (delta2 in c(0,0.02)) {
+				for (lp in c(TRUE,FALSE)) {
+					if (lp) { checkps <- log(ps) } else { checkps <- ps }
+					for (lt in c(TRUE,FALSE)) {
+						qs <- qT2(checkps, df1, df2, delta2, lower.tail=lt, log.p=lp)
+						if (lt) { 
+							expect_true(is.sorted(qs,pragma="ascending"))
+						} else {
+							expect_true(is.sorted(qs,pragma="descending"))
+						}
+						pret <- pT2(qs, df1, df2, delta2, lower.tail=lt, log.p=lp)
+						expect_equal(checkps,pret)
+					}
+				}
+			}
+		}
+	}
+})#UNFOLD
 
 test_that("psropt/qsropt monotonicity",{#FOLDUP
 	set.char.seed("22ad9afb-49c4-4f37-b32b-eab413b32750")
@@ -176,6 +184,9 @@ test_that("pco_sropt/qco_sropt monotonicity",{#FOLDUP
 		}
 	}
 })#UNFOLD
+#UNFOLD
+
+context("distribution functions: parameter monotonicity")#FOLDUP
 
 test_that("psr/qsr parameter monotonicity",{#FOLDUP
 	set.char.seed("adc578c1-381c-428a-baae-8d5607732176")
@@ -230,6 +241,7 @@ test_that("psr/qsr parameter monotonicity",{#FOLDUP
 	}
 	
 })#UNFOLD
+
 # 2FIX: other distributions monotonicity wrt parameters...
 	## pT2
 	#ps <- seq(0.1,0.9,length.out=9)
@@ -296,6 +308,9 @@ test_that("psr/qsr parameter monotonicity",{#FOLDUP
 			#}
 		#}
 	#}
+#UNFOLD
+
+context("distribution functions: sanity checks")#FOLDUP
 
 test_that("qlambdap sensible",{#FOLDUP
 	set.char.seed("f54698f1-ec37-49a4-8463-d4209f25afbc")
@@ -320,6 +335,61 @@ test_that("qlambdap sensible",{#FOLDUP
 	expect_true(0 == plambdap(-Inf,df,1,lower.tail=TRUE))
 	expect_true(0 == plambdap(Inf,df,1,lower.tail=FALSE))
 })#UNFOLD
+#UNFOLD
+
+context("distribution functions: random generation")#FOLDUP
+
+ngen <- 2048
+
+test_that("psr/rsr uniform generation",{#FOLDUP
+	set.char.seed("6728bbac-7b37-4b26-bd59-f7f074dc3bc3")
+	
+	# psr
+	for (df in c(256,1024)) {
+		for (snr in c(0,1)) {
+			for (ope in c(1,52)) {
+				rvs <- rsr(ngen, df, snr, ope)
+				aps <- psr(rvs,  df, snr, ope)
+				expect_true(is.appx.uniform(aps))
+			}
+		}
+	}
+})#UNFOLD
+
+test_that("pT2/qT2 uniform generation",{#FOLDUP
+	set.char.seed("66ff5482-e5e5-4443-881d-6a9e6fd6fc8d")
+	
+	# pT2
+	for (df1 in c(2,4,8)) {
+		for (df2 in c(256,1024)) {
+			for (delta2 in c(0,0.02)) {
+				rvs <- rT2(ngen, df1, df2, delta2)
+				aps <- pT2(rvs,  df1, df2, delta2)
+				expect_true(is.appx.uniform(aps))
+			}
+		}
+	}
+})#UNFOLD
+
+test_that("psropt/qsropt uniform generation",{#FOLDUP
+	set.char.seed("b7cd77c2-f197-411c-8d14-a37ab4694944")
+	
+	# psropt
+	for (df1 in c(2,4,8)) {
+		for (df2 in c(256,1024)) {
+			for (snrstar in c(0,0.05)) {
+				for (ope in c(1,2)) {
+					for (drag in c(0,0.1)) {
+						rvs <- rsropt(ngen, df1, df2, snrstar, ope, drag)
+						aps <- psropt(rvs,  df1, df2, snrstar, ope, drag)
+						expect_true(is.appx.uniform(aps))
+					}
+				}
+			}
+		}
+	}
+})#UNFOLD
+#UNFOLD
 
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:

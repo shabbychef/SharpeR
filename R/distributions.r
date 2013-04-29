@@ -354,6 +354,7 @@ dT2 <- function(x, df1, df2, delta2, log = FALSE) {
 #  ' @export
 pT2 <- function(q, df1, df2, delta2, ...) {
 	Fs <- .T2_to_F(q, df1, df2)
+	#cat(sprintf('pT2 F(%d,%d) stat: %g\n',df1,df2,Fs))
 	if (missing(delta2)) {
 		#retv <- pf(Fs, df1 = df1, df2 = df2 - df1, ncp = 0, ...)
 		retv <- pf(Fs, df1 = df1, df2 = df2 - df1, ...)
