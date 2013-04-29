@@ -37,29 +37,40 @@ test_that("confint.sr coverage",{#FOLDUP
 	set.char.seed("066dfa96-6dd7-4d14-ab74-49e81b3afd83")
 
 	ope <- 253
-	df <- ope * 6
-	zeta <- 1.0
-	rvs <- rsr(500, df, zeta, ope)
-	roll.own <- sr(sr=rvs,df=df,c0=0,ope=ope)
-	test.coverage <- 0.95
-	aci <- confint(roll.own,level=test.coverage)
-	coverage <- 1 - mean((zeta < aci[,1]) | (aci[,2] < zeta))
-	expect_equal(coverage,test.coverage,tolerance=0.05)
+	for (nyr in c(3,6,9)) {
+		df <- ceiling(ope * nyr)
+		for (type in c("exact","t","Z")) {
+			for (zeta in c(-1.0,0.0,1.0,2.0)) {
+				rvs <- rsr(500, df, zeta, ope)
+				roll.own <- sr(sr=rvs,df=df,c0=0,ope=ope)
+				for (nominal.coverage in c(0.90,0.95)) {
+					aci <- confint(roll.own,level=nominal.coverage,type=type)
+					coverage <- 1 - mean((zeta < aci[,1]) | (aci[,2] < zeta))
+					expect_equal(coverage,nominal.coverage,tolerance=0.05,scale=1)
+				}
+			}
+		}
+	}
 })#UNFOLD
 
 test_that("confint.sropt coverage",{#FOLDUP
 	set.char.seed("a5b0fb75-b50a-41a4-85d6-cd990ac0b9b2")
 
 	ope <- 253
-	df1 <- 6
-	df2 <- ope * 6
-	zeta.s <- 1.0
-	rvs <- rsropt(800, df1, df2, zeta.s, ope)
-	roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
-	test.coverage <- 0.95
-	aci <- confint(roll.own,level=test.coverage)
-	coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
-	expect_equal(coverage,test.coverage,tolerance=0.05)
+	for (df1 in c(2,4,8,16)) {
+		for (nyr in c(3,6,9)) {
+			df2 <- ceiling(ope * nyr)
+			for (zeta.s in c(0.0,1.0,3.0)) {
+				rvs <- rsropt(2000, df1, df2, zeta.s, ope)
+				roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
+				for (nominal.coverage in c(0.90,0.95)) {
+					aci <- confint(roll.own,level=nominal.coverage)
+					coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
+					expect_equal(coverage,nominal.coverage,tolerance=0.05,scale=1)
+				}
+			}
+		}
+	}
 })#UNFOLD
 
 #for vim modeline: (do not edit)

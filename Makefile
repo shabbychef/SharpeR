@@ -45,12 +45,13 @@ RSCRIPT   			 = $(RBIN)/Rscript
 # packages I need to test this one
 TEST_DEPS  			 = testthat roxygen2 knitr txtplot 
 INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
+PKG_TESTR 			 = tests/run-all.R
 
 #INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%,$(TEST_DEPS)) 
 
 # do not distribute these!
 NODIST_FILES		 = Makefile $(M4_FILES) rebuildTags.sh .gitignore .gitattributes .tags .R_tags
-NODIST_DIRS			 = .git
+NODIST_DIRS			 = .git man-roxygen
 
 RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
@@ -77,7 +78,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 # these are phony targets
 .PHONY: help tags all \
 	gitpull gitpush \
-	news docs build install testthat \
+	news docs build install testthat tests \
 	staging_d local_d \
 	clean realclean \
 	R
@@ -92,6 +93,7 @@ help:
 	@echo "  deps       Install dependencies for package development"
 	@echo "  docs       Invoke roxygen to generate Rd files in man/"
 	@echo "  testthat   Run unit tests."
+	@echo '  tests       "   "     "   '
 	@echo "  parallel   Create a staging version of this package."
 	@echo "  build      Invoke docs and then create a package."
 	@echo "  check      Invoke build and then check the package."
@@ -208,16 +210,23 @@ checksee : $(RCHECK_SENTINEL)
 # UNIT TESTING
 ################################
 
+#$(RLOCAL) --slave -e "if (require(testthat) && require($(PKG_NAME))) testthat::test_dir('./inst/tests')" | tee $@
+
 # 2FIX:
-unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION
+unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION $(PKG_TESTR)
 	$(call WARN_DEPS)
-	$(RLOCAL) --slave -e "if (require(testthat) && require($(PKG_NAME))) testthat::test_dir('./inst/tests')" | tee $@
+	R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save \
+				 --slave < $(PKG_TESTR) | tee $@
 
 testthat : unit_test.log
 
+tests    : unit_test.log
+
 # drop into R shell in the 'local context'
 R : deps $(LOCAL)/$(PKG_NAME)/INDEX
-	R_LIBS=$(LOCAL) R_PROFILE=load.R R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
+	R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
 
 ################################
 # CLEAN UP 

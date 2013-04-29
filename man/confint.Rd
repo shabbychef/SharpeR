@@ -5,7 +5,7 @@
 \usage{
   \method{confint}{sr} (object, level = 0.95,
     level.lo = (1 - level)/2, level.hi = 1 - level.lo,
-    type = c("exact", "t", "Z", "F"))
+    type = c("exact", "t", "Z"))
 
   \method{confint}{sropt} (object, level = 0.95,
     level.lo = (1 - level)/2, level.hi = 1 - level.lo)
@@ -43,8 +43,7 @@
   exact when returns are normal, based on inverting the
   non-central t distribution. \item A method based on the
   standard error of a non-central t distribution. \item A
-  method based on a normal approximation. \item A method
-  based on an F statistic. }
+  method based on a normal approximation. }
 
   Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of
   a \eqn{q}{q}-variate normal random variable with mean

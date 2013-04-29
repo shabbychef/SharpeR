@@ -40,11 +40,12 @@
 
 # standard error on the non-centrality parameter of a t-stat
 
+# this is for shit b/c it can be negative. ditch it.
 # See Walck, section 33.3
 .t_se_weird <- function(tstat,df) {
 	cn <- .tbias(df)
 	dn <- tstat / cn
-	se <- sqrt(((1+dn**2) * (df/df-2)) - tstat**2)
+	se <- sqrt(((1+(dn*dn)) * (df/df-2)) - (tstat*tstat))
 	return(se)
 }
 # See Walck, section 33.5
@@ -52,42 +53,35 @@
 	se <- sqrt(1 + (tstat**2) / (2*df))
 	return(se)
 }
-.t_se <- function(t,df,type=c("t","Lo","exact")) {
+.t_se <- function(t,df,type=c("t","Lo")) {
 	# 2FIX: add opdyke corrections for skew and kurtosis?
 	# 2FIX: add autocorrelation correction?
 	type <- match.arg(type)
 	se <- switch(type,
 							 t = .t_se_normal(t,df),
-							 Lo = .t_se_normal(t,df),
-							 exact = .t_se_weird(t,df))
+							 Lo = .t_se_normal(t,df))
+							 #exact = .t_se_weird(t,df))
 	return(se)
 }
 # confidence intervals on the non-centrality parameter of a t-stat
-.t_confint <- function(tstat,df,level=0.95,type=c("exact","t","Z","F"),
+.t_confint <- function(tstat,df,level=0.95,type=c("exact","t","Z"),
 					 level.lo=(1-level)/2,level.hi=1-level.lo) {
 	type <- match.arg(type)
-	if  (type == "exact") {
+	if (type == "exact") {
 		ci.lo <- qlambdap(level.lo,df,tstat,lower.tail=TRUE)
 		ci.hi <- qlambdap(level.hi,df,tstat,lower.tail=TRUE)
 		ci <- cbind(ci.lo,ci.hi)
-	} else if (type == "t") {
-		se <- .t_se(tstat,df,type=type)
-		midp <- tstat
+	} else {
+		if (type == "t") {
+			se <- .t_se(tstat,df,type=type)
+			midp <- tstat
+		} else if (type == "Z") {
+			se <- .t_se(tstat,df,type="t")
+			midp <- tstat * (1 - 1 / (4 * df))
+		} else stop("internal error")
 		zalp <- qnorm(c(level.lo,level.hi))
-		ci <- midp + zalp * se
-	} else if (type == "Z") {
-		se <- .t_se(tstat,df,type="t")
-		midp <- tstat * (1 - 1 / (4 * df))
-		zalp <- qnorm(c(level.lo,level.hi))
-		ci <- midp + zalp * se
-	} else if (type == "F") {
-		# this is silly.
-		se <- .t_se(tstat,df,type="exact")
-		cn <- .tbias(df)
-		midp <- z / cn
-		zalp <- qnorm(c(level.lo,level.hi))
-		ci <- midp + zalp * se
-	} else stop("internal error")
+		ci <- cbind(midp + zalp[1] * se,midp + zalp[2] * se)
+	} 
 
 	retval <- matrix(ci,nrow=length(tstat))
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
@@ -183,7 +177,6 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' distribution.
 #' \item A method based on the standard error of a non-central t distribution.
 #' \item A method based on a normal approximation.
-#' \item A method based on an F statistic.
 #' }
 #'
 #' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
@@ -251,7 +244,7 @@ se.sr <- function(z, type=c("t","Lo","exact")) {
 #' @export
 confint.sr <- function(object,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,
-							 type=c("exact","t","Z","F")) {
+							 type=c("exact","t","Z")) {
 	type <- match.arg(type)
 	tstat <- .sr2t(object)
 	retval <- .t_confint(tstat,df=object$df,level=level,
