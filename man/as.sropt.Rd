@@ -2,7 +2,6 @@
 \alias{as.sropt}
 \alias{as.sropt.default}
 \alias{as.sropt.xts}
-\alias{sropt}
 \title{Compute the Sharpe ratio of the Markowitz portfolio.}
 \usage{
   as.sropt(X,drag=0,ope=1,epoch="yr")
@@ -24,13 +23,14 @@
   \eqn{\sqrt{ope}}{sqrt(ope)}. This is in contrast to the
   \code{c0} term given to \code{\link{sr}}.}
 
-  \item{ope}{the number of observations per 'epoch'. The
-  Sharpe ratio is typically quoted in 'annualized' units
-  for some epoch, that is, 'per square root epoch', though
-  returns are observed at a frequency of \code{ope} per
-  epoch. The default value is 1, meaning the observation
-  period is the epoch, and no annualization adjustments are
-  made.}
+  \item{ope}{the number of observations per 'epoch'. For
+  convenience of interpretation, The Sharpe ratio is
+  typically quoted in 'annualized' units for some epoch,
+  that is, 'per square root epoch', though returns are
+  observed at a frequency of \code{ope} per epoch.  The
+  default value is 1, meaning the code will not attempt to
+  guess, what the observation frequency is, and no
+  annualization adjustments will be made.}
 
   \item{epoch}{the string representation of the 'epoch',
   defaulting to 'yr'.}
@@ -77,6 +77,10 @@
   \eqn{\sqrt{\mbox{ope}}}{sqrt(ope)}, where
   \eqn{\mbox{ope}}{ope} is the number of observations per
   year (or whatever the target annualization epoch.)
+
+  Note that if \code{ope} is not given, the converter from
+  \code{xts} attempts to infer the observations per year,
+  without regard to the name of the \code{epoch} given.
 }
 \examples{
 nfac <- 5
@@ -84,7 +88,7 @@ nyr <- 10
 ope <- 253
 # simulations with no covariance structure.
 # under the null:
-set.seed(as.integer(charToRaw("determinstic")))
+set.seed(as.integer(charToRaw("be determinstic")))
 Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 asro <- as.sropt(Returns,drag=0,ope=ope)
 # under the alternative:
@@ -111,7 +115,9 @@ if (require(quantmod)) {
 
   Other sropt: \code{\link{confint.sr}},
   \code{\link{confint.sropt}}, \code{\link{dsropt}},
-  \code{\link{power.sropt_test}}, \code{\link{sropt}},
+  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{sropt}},
   \code{\link{sropt_test}}
 }
 \keyword{univar}

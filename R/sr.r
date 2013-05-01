@@ -131,6 +131,10 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
+#' Note that if \code{ope} is not given, the converter from \code{xts}
+#' attempts to infer the observations per year, without regard to 
+#' the name of the \code{epoch} given.
+#'
 #' @usage
 #'
 #' as.sr(x,c0=0,ope=1,...) 
@@ -281,6 +285,33 @@ format.sr <- function(x,...) {
 #' @method print sr
 #' @S3method print sr
 #' @export
+#' @template etc
+#' @template sr
+#' @examples 
+#' # compute a 'daily' Sharpe
+#' mysr <- as.sr(rnorm(253*8),ope=1,epoch="day")
+#' print(mysr)
+#' # roll your own.
+#' ope <- 253
+#' zeta <- 1.0
+#' n <- 6 * ope
+#' rvs <- rsr(1,n,zeta,ope=ope)
+#' roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
+#' print(roll.own)
+#' # put a bunch in. naming becomes a problem.
+#' rvs <- rsr(5,n,zeta,ope=ope)
+#' roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
+#' print(roll.own)
+#' # for sropt objects:
+#' nfac <- 5
+#' nyr <- 10
+#' ope <- 253
+#' # simulations with no covariance structure.
+#' # under the null:
+#' set.seed(as.integer(charToRaw("be determinstic")))
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
+#' print(asro)
 print.sr <- function(x) {
 	tval <- .sr2t(x)
 	pval <- pt(tval,x$df,lower.tail=FALSE)
@@ -299,6 +330,7 @@ print.sr <- function(x) {
 # print.sr <- function(x,...) cat(format(x,...), "\n")
 
 # SR methods#FOLDUP
+# 2FIX: make the x$rescal * sqrt(x$ope) occur in one place only ... 
 # get the t-stat associated with an SR object.
 .sr2t <- function(x) {
 	tval <- x$sr / (x$rescal * sqrt(x$ope))
@@ -322,36 +354,68 @@ print.sr <- function(x) {
 #'
 #' @description 
 #'
-#' Changes the annualization factor of a Sharpe ratio statistic.
+#' Changes the annualization factor of a Sharpe ratio statistic, or the rate at
+#' which observations are made.
 #'
-#' @usage
-#'
-#' reannualize(x,ope,epoch)
-#'
-#' @param x an object of class \code{sr}.
-#' @param ope the new observations per epoch. If none given, it is
+#' @param object an object of class \code{sr} or \code{sropt}.
+#' @param new.ope the new observations per epoch. If none given, it is
 #' not updated.
-#' @param epoch a string representation of the epoch. If none given, it is not
+#' @param new.epoch a string representation of the epoch. If none given, it is not
 #' updated.
-#' @return an object of class \code{sr} with the annualization or epoch updated.
+#' @return the input object with the annualization and/or epoch updated.
 #' @seealso sr
-#' @template etc
 #' @family sr
+#' @seealso sropt
+#' @family sropt
+#' @template etc
 #' @export
+#' @rdname reannualize
 #'
 #' @examples 
 #' # compute a 'daily' Sharpe
 #' mysr <- as.sr(rnorm(253*8),ope=1,epoch="day")
 #' # turn into annual 
-#' mysr2 <- reannualize(mysr,ope=253,epoch="yr")
-reannualize <- function(x,ope,epoch) {
-	if (!is.sr(x)) stop("must give sr object")
-	if (!missing(ope)) {
-		x$sr <- x$sr * sqrt(ope / x$ope)
-		x$ope <- ope
+#' mysr2 <- reannualize(mysr,new.ope=253,new.epoch="yr")
+#'
+#' # for sropt
+#' ope <- 253
+#' zeta.s <- 1.0  
+#' df1 <- 10
+#' df2 <- 6 * ope
+#' rvs <- rsropt(1,df1,df2,zeta.s,ope,drag=0)
+#' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope,epoch="yr")
+#' # make 'monthly'
+#' roll.monthly <- reannualize(roll.own,new.ope=21,new.epoch="mo.")
+#' # make 'daily'
+#' roll.daily <- reannualize(roll.own,new.ope=1,new.epoch="day")
+reannualize <- function(object,new.ope=NULL,new.epoch=NULL) {
+	UseMethod("reannualize", object)
+}
+#' @rdname reannualize
+#' @method reannualize sr
+#' @S3method reannualize sr
+#' @export
+reannualize.sr <- function(object,new.ope=NULL,new.epoch=NULL) {
+	if (!is.sr(object)) stop("must give sr object")
+	if (!missing(new.ope)) {
+		object$sr <- object$sr * sqrt(new.ope / object$ope)
+		object$ope <- new.ope
 	}
-	if (!missing(epoch)) x$epoch <- epoch
-	return(x)
+	if (!missing(new.epoch)) object$epoch <- new.epoch
+	return(object)
+}
+#' @rdname reannualize
+#' @method reannualize sropt
+#' @S3method reannualize sropt
+#' @export
+reannualize.sropt <- function(object,new.ope=NULL,new.epoch=NULL) {
+	if (!is.sropt(object)) stop("must give sropt object")
+	if (!missing(new.ope)) {
+		object$sropt <- object$sropt * sqrt(new.ope / object$ope)
+		object$ope <- new.ope
+	}
+	if (!missing(new.epoch)) object$epoch <- new.epoch
+	return(object)
 }
 #UNFOLD
 #UNFOLD
@@ -452,9 +516,11 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL) {
 #' df2 <- 6 * ope
 #' rvs <- rsropt(1,df1,df2,zeta.s,ope,drag=0)
 #' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
+#' print(roll.own)
 #' # put a bunch in. naming becomes a problem.
 #' rvs <- rsropt(5,df1,df2,zeta.s,ope,drag=0)
 #' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
+#' print(roll.own)
 #'
 sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 	retval <- list(sropt = z.s,df1 = df1,df2 = df2,
@@ -497,6 +563,10 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #' is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
+#' Note that if \code{ope} is not given, the converter from \code{xts}
+#' attempts to infer the observations per year, without regard to 
+#' the name of the \code{epoch} given.
+#'
 #' @usage
 #'
 #' as.sropt(X,drag=0,ope=1,epoch="yr")
@@ -526,7 +596,7 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #' ope <- 253
 #' # simulations with no covariance structure.
 #' # under the null:
-#' set.seed(as.integer(charToRaw("determinstic")))
+#' set.seed(as.integer(charToRaw("be determinstic")))
 #' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 #' asro <- as.sropt(Returns,drag=0,ope=ope)
 #' # under the alternative:
@@ -577,6 +647,39 @@ as.sropt.xts <- function(anxts,drag=0,ope=1,epoch="yr") {
 	retval <- as.sropt.default(anxts,drag=drag,ope=ope,epoch=epoch)
 	return(retval)
 }
+#' @title Is this in the "sropt" class?
+#'
+#' @description 
+#'
+#' Checks if an object is in the class \code{'sropt'}
+#'
+#' @details
+#'
+#' To satisfy the minimum requirements of an S3 class.
+#'
+#' @usage
+#'
+#' is.sropt(x)
+#'
+#' @param x an object of some kind.
+#' @return a boolean.
+#' @seealso sropt
+#' @template etc
+#' @family sropt
+#' @export
+#'
+#' @examples 
+#' nfac <- 5
+#' nyr <- 10
+#' ope <- 253
+#' # simulations with no covariance structure.
+#' # under the null:
+#' set.seed(as.integer(charToRaw("be determinstic")))
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
+#' is.sropt(asro)
+is.sropt <- function(x) inherits(x,"sropt")
+
 #' @rdname print
 #' @method print sropt
 #' @S3method print sropt

@@ -16,13 +16,14 @@
   \item{T2}{the Hotelling \eqn{T^2}{T^2} statistic. If not
   given, it is computed from the given information.}
 
-  \item{ope}{the number of observations per 'epoch'. The
-  Sharpe ratio is typically quoted in 'annualized' units
-  for some epoch, that is, 'per square root epoch', though
-  returns are observed at a frequency of \code{ope} per
-  epoch. The default value is 1, meaning the observation
-  period is the epoch, and no annualization adjustments are
-  made.}
+  \item{ope}{the number of observations per 'epoch'. For
+  convenience of interpretation, The Sharpe ratio is
+  typically quoted in 'annualized' units for some epoch,
+  that is, 'per square root epoch', though returns are
+  observed at a frequency of \code{ope} per epoch.  The
+  default value is 1, meaning the code will not attempt to
+  guess, what the observation frequency is, and no
+  annualization adjustments will be made.}
 
   \item{epoch}{the string representation of the 'epoch',
   defaulting to 'yr'.}
@@ -63,21 +64,27 @@ df1 <- 10
 df2 <- 6 * ope
 rvs <- rsropt(1,df1,df2,zeta.s,ope,drag=0)
 roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
+print(roll.own)
 # put a bunch in. naming becomes a problem.
 rvs <- rsropt(5,df1,df2,zeta.s,ope,drag=0)
 roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
+print(roll.own)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
+  \code{\link{reannualize}}
+
   \code{\link{as.sropt}}
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
   \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
   \code{\link{confint.sropt}}, \code{\link{dsropt}},
-  \code{\link{power.sropt_test}}, \code{\link{sropt_test}}
+  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{sropt_test}}
 }
 \keyword{univar}
 

@@ -22,13 +22,14 @@
   this is assumed to be given in the same units as x,
   \emph{not} in 'annualized' terms.}
 
-  \item{ope}{the number of observations per 'epoch'. The
-  Sharpe ratio is typically quoted in 'annualized' units
-  for some epoch, that is, 'per square root epoch', though
-  returns are observed at a frequency of \code{ope} per
-  epoch. The default value is 1, meaning the observation
-  period is the epoch, and no annualization adjustments are
-  made.}
+  \item{ope}{the number of observations per 'epoch'. For
+  convenience of interpretation, The Sharpe ratio is
+  typically quoted in 'annualized' units for some epoch,
+  that is, 'per square root epoch', though returns are
+  observed at a frequency of \code{ope} per epoch.  The
+  default value is 1, meaning the code will not attempt to
+  guess, what the observation frequency is, and no
+  annualization adjustments will be made.}
 
   \item{epoch}{the string representation of the 'epoch',
   defaulting to 'yr'.}
@@ -67,6 +68,10 @@
   \eqn{\sqrt{\mbox{ope}}}{sqrt(ope)}, where
   \eqn{\mbox{ope}}{ope} is the number of observations per
   year (or whatever the target annualization epoch.)
+
+  Note that if \code{ope} is not given, the converter from
+  \code{xts} attempts to infer the observations per year,
+  without regard to the name of the \code{epoch} given.
 }
 \examples{
 # Sharpe's 'model': just given a bunch of returns.
@@ -109,13 +114,17 @@ asr <- as.sr(APT_mod,ope=ope)
   \url{http://ssrn.com/paper=377260}
 }
 \seealso{
+  \code{\link{reannualize}}
+
   sr-distribution functions, \code{\link{dsr}, \link{psr},
   \link{qsr}, \link{rsr}}
 
   Other sr: \code{\link{confint.sr}},
   \code{\link{confint.sropt}}, \code{\link{dsr}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
-  \code{\link{reannualize}}, \code{\link{se}},
+  \code{\link{print.sr}}, \code{\link{print.sropt}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr_equality_test}}, \code{\link{sr_test}},
   \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}

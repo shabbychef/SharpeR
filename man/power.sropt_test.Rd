@@ -15,13 +15,14 @@
   \item{power}{Power of test (1 minus Type II error
   probability).}
 
-  \item{ope}{the number of observations per 'epoch'. The
-  Sharpe ratio is typically quoted in 'annualized' units
-  for some epoch, that is, 'per square root epoch', though
-  returns are observed at a frequency of \code{ope} per
-  epoch. The default value is 1, meaning the observation
-  period is the epoch, and no annualization adjustments are
-  made.}
+  \item{ope}{the number of observations per 'epoch'. For
+  convenience of interpretation, The Sharpe ratio is
+  typically quoted in 'annualized' units for some epoch,
+  that is, 'per square root epoch', though returns are
+  observed at a frequency of \code{ope} per epoch.  The
+  default value is 1, meaning the code will not attempt to
+  guess, what the observation frequency is, and no
+  annualization adjustments will be made.}
 
   \item{df1}{the number of assets in the portfolio.}
 
@@ -61,13 +62,18 @@ anex <- power.sropt_test(8,4*253,1,0.05,NULL,ope=253)
   Steven E. Pav \email{shabbychef@gmail.com}
 }
 \seealso{
+  \code{\link{reannualize}}
+
   \code{\link{power.t.test}}, \code{\link{sropt_test}}
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
   \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
   \code{\link{confint.sropt}}, \code{\link{dsropt}},
-  \code{\link{sropt}}, \code{\link{sropt_test}}
+  \code{\link{is.sropt}}, \code{\link{reannualize}},
+  \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{sropt}},
+  \code{\link{sropt_test}}
 }
 \keyword{htest}
 

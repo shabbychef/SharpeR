@@ -106,7 +106,9 @@ coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
   \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
   \code{\link{as.sr.xts}}, \code{\link{dsr}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
-  \code{\link{reannualize}}, \code{\link{se}},
+  \code{\link{print.sr}}, \code{\link{print.sropt}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr_equality_test}}, \code{\link{sr_test}},
   \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
@@ -114,7 +116,9 @@ coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
   \code{\link{as.sropt.xts}}, \code{\link{dsropt}},
-  \code{\link{power.sropt_test}}, \code{\link{sropt}},
+  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{sropt}},
   \code{\link{sropt_test}}
 }
 \keyword{htest}

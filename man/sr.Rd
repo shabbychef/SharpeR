@@ -14,13 +14,14 @@
   this is assumed to be given in the same units as x,
   \emph{not} in 'annualized' terms.}
 
-  \item{ope}{the number of observations per 'epoch'. The
-  Sharpe ratio is typically quoted in 'annualized' units
-  for some epoch, that is, 'per square root epoch', though
-  returns are observed at a frequency of \code{ope} per
-  epoch. The default value is 1, meaning the observation
-  period is the epoch, and no annualization adjustments are
-  made.}
+  \item{ope}{the number of observations per 'epoch'. For
+  convenience of interpretation, The Sharpe ratio is
+  typically quoted in 'annualized' units for some epoch,
+  that is, 'per square root epoch', though returns are
+  observed at a frequency of \code{ope} per epoch.  The
+  default value is 1, meaning the code will not attempt to
+  guess, what the observation frequency is, and no
+  annualization adjustments will be made.}
 
   \item{rescal}{the rescaling parameter.}
 
@@ -74,6 +75,8 @@ roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
   \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 }
 \seealso{
+  \code{\link{reannualize}}
+
   \code{\link{as.sr}}
 
   Other sr: \code{\link{as.sr}},
@@ -81,7 +84,9 @@ roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
   \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
   \code{\link{confint.sropt}}, \code{\link{dsr}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
-  \code{\link{reannualize}}, \code{\link{se}},
+  \code{\link{print.sr}}, \code{\link{print.sropt}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr_equality_test}},
   \code{\link{sr_test}}, \code{\link{sr_test.default}},
   \code{\link{sr_test.sr}}

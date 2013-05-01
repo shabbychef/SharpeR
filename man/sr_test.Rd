@@ -29,13 +29,14 @@
   \item{zeta}{a number indicating the null hypothesis
   offset value, the \eqn{S} value.}
 
-  \item{ope}{the number of observations per 'epoch'. The
-  Sharpe ratio is typically quoted in 'annualized' units
-  for some epoch, that is, 'per square root epoch', though
-  returns are observed at a frequency of \code{ope} per
-  epoch. The default value is 1, meaning the observation
-  period is the epoch, and no annualization adjustments are
-  made.}
+  \item{ope}{the number of observations per 'epoch'. For
+  convenience of interpretation, The Sharpe ratio is
+  typically quoted in 'annualized' units for some epoch,
+  that is, 'per square root epoch', though returns are
+  observed at a frequency of \code{ope} per epoch.  The
+  default value is 1, meaning the code will not attempt to
+  guess, what the observation frequency is, and no
+  annualization adjustments will be made.}
 
   \item{paired}{a logical indicating whether you want a
   paired test.}
@@ -120,12 +121,16 @@ checkit <- sr_test(asr,zeta=0)
 \seealso{
   \code{\link{sr_equality_test}}, \code{\link{t.test}}.
 
+  \code{\link{reannualize}}
+
   Other sr: \code{\link{as.sr}},
   \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
   \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
   \code{\link{confint.sropt}}, \code{\link{dsr}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
-  \code{\link{reannualize}}, \code{\link{se}},
+  \code{\link{print.sr}}, \code{\link{print.sropt}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr_equality_test}}
 }

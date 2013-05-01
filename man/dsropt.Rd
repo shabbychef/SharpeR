@@ -30,13 +30,14 @@
   defaults to 0, \emph{i.e.} a central maximal Sharpe ratio
   distribution.}
 
-  \item{ope}{the number of observations per 'epoch'. The
-  Sharpe ratio is typically quoted in 'annualized' units
-  for some epoch, that is, 'per square root epoch', though
-  returns are observed at a frequency of \code{ope} per
-  epoch. The default value is 1, meaning the observation
-  period is the epoch, and no annualization adjustments are
-  made.}
+  \item{ope}{the number of observations per 'epoch'. For
+  convenience of interpretation, The Sharpe ratio is
+  typically quoted in 'annualized' units for some epoch,
+  that is, 'per square root epoch', though returns are
+  observed at a frequency of \code{ope} per epoch.  The
+  default value is 1, meaning the code will not attempt to
+  guess, what the observation frequency is, and no
+  annualization adjustments will be made.}
 
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,
@@ -137,6 +138,8 @@ plot(ecdf(isp))
   \url{http://mansci.journal.informs.org/cgi/doi/10.1287/mnsc.1070.0852}
 }
 \seealso{
+  \code{\link{reannualize}}
+
   F-distribution functions, \code{\link{df}, \link{pf},
   \link{qf}, \link{rf}}, Sharpe ratio distribution,
   \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}.
@@ -144,8 +147,10 @@ plot(ecdf(isp))
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
   \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
-  \code{\link{confint.sropt}},
-  \code{\link{power.sropt_test}}, \code{\link{sropt}},
+  \code{\link{confint.sropt}}, \code{\link{is.sropt}},
+  \code{\link{power.sropt_test}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{sropt}},
   \code{\link{sropt_test}}
 }
 \keyword{distribution}
