@@ -602,6 +602,22 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #' # under the alternative:
 #' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
 #' asro <- as.sropt(Returns,drag=0,ope=ope)
+#' # generating correlated multivariate normal data in a more sane way
+#' if (require(MASS)) {
+#'   nstok <- 10
+#'   nfac <- 3
+#'   nyr <- 10
+#'   ope <- 253
+#'   X.like <- 0.01 * matrix(rnorm(500*nfac),ncol=nfac) %*% 
+#'     matrix(runif(nfac*nstok),ncol=nstok)
+#'   Sigma <- cov(X.like) + diag(0.003,nstok)
+#'   # under the null:
+#'   Returns <- mvrnorm(ceiling(ope*nyr),mu=matrix(0,ncol=nstok),Sigma=Sigma)
+#'   asro <- as.sropt(Returns,ope=ope)
+#'   # under the alternative
+#'   Returns <- mvrnorm(ceiling(ope*nyr),mu=matrix(0.001,ncol=nstok),Sigma=Sigma)
+#'   asro <- as.sropt(Returns,ope=ope)
+#' }
 #' # using real data.
 #' if (require(quantmod)) {
 #'   getret <- function(sym,...) {

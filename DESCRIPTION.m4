@@ -20,6 +20,8 @@ Description: a collection of tools for analyzing significance of trading
 Depends: 
     R (>= 2.4.0)
 Suggests: 
+    quantmod,
+    MASS,
     testthat, 
     txtplot, 
     knitr

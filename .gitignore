@@ -21,3 +21,8 @@ unit_test.log
 #DESCRIPTION
 #man/
 
+# generated as part of the 'local' vignette build
+SharpeR.tex
+SharpeR.log
+SharpeR.pdf
+*.aux

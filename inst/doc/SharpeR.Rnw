@@ -20,8 +20,14 @@
 
 \maketitle
 
+\begin{abstract}
+The SharpeR package provides basic functionality for testing significance of
+the Sharpe ratio of a series of returns, and of the Markowitz portfolio on a 
+number of possibly correlated assets.\cite{Sharpe:1966} 
+\end{abstract}
+
+
 blah blah blah.
-\cite{Sharpe:1966}
 
 <<show-off>>=
 rnorm(5)

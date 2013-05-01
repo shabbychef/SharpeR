@@ -81,6 +81,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 	news docs build install testthat tests \
 	staging_d local_d \
 	clean realclean \
+	vignette staged_vignette \
 	R
 
 help:
@@ -99,6 +100,8 @@ help:
 	@echo "  check      Invoke build and then check the package."
 	@echo "  install    Invoke build and then install the result."
 	@echo "  R          Invoke R in a local context with the package."
+	@echo "  vignette   Insures the vignette gets built."
+	@echo "  staged_vignette   faster vignette build."
 	@echo "  clean      Do some cleanup."
 	@echo "  realclean  Do lots of cleanup."
 	@echo ""
@@ -206,6 +209,10 @@ check: $(RCHECK_SENTINEL)
 checksee : $(RCHECK_SENTINEL)
 	okular $(RCHECK)/$(PKG_NAME)-manual.pdf
 
+$(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf : inst/doc/$(PKG_NAME).Rnw $(RCHECK_SENTINEL)
+
+vignette : $(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
+
 ################################
 # UNIT TESTING
 ################################
@@ -228,6 +235,13 @@ R : deps $(LOCAL)/$(PKG_NAME)/INDEX
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
 				 R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
 
+$(PKG_NAME).pdf: inst/doc/$(PKG_NAME).Rnw deps $(LOCAL)/$(PKG_NAME)/INDEX 
+	R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,knitr,$(PKG_NAME)" \
+				 R -q --no-save --slave -e "knitr::knit2pdf('$<');"
+
+staged_vignette: $(PKG_NAME).pdf
+
 ################################
 # CLEAN UP 
 ################################
@@ -237,6 +251,10 @@ clean :
 	-rm -rf man/*.Rd
 	-rm -rf $(STAGED_PKG)
 	-rm -rf $(RCHECK)
+	-rm -rf $(PKG_NAME).tex
+	-rm -rf $(PKG_NAME).log
+	-rm -rf $(PKG_NAME).aux
+	-rm -rf $(PKG_NAME).pdf
 
 realclean : clean
 	-rm -rf $(LOCAL)
