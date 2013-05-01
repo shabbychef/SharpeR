@@ -1,0 +1,66 @@
+\name{print.sr}
+\alias{print.sr}
+\alias{print.sropt}
+\title{Print values.}
+\usage{
+  \method{print}{sr} (x)
+
+  \method{print}{sropt} (x)
+}
+\arguments{
+  \item{x}{an object of class \code{sr} or \code{sropt}.}
+}
+\value{
+  the object, wrapped in \code{invisible}.
+}
+\description{
+  Displays an object, returning it \emph{invisibly}, (via
+  \code{invisible(x)}.)
+}
+\examples{
+# compute a 'daily' Sharpe
+mysr <- as.sr(rnorm(253*8),ope=1,epoch="day")
+print(mysr)
+# roll your own.
+ope <- 253
+zeta <- 1.0
+n <- 6 * ope
+rvs <- rsr(1,n,zeta,ope=ope)
+roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
+print(roll.own)
+# put a bunch in. naming becomes a problem.
+rvs <- rsr(5,n,zeta,ope=ope)
+roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
+print(roll.own)
+# for sropt objects:
+nfac <- 5
+nyr <- 10
+ope <- 253
+# simulations with no covariance structure.
+# under the null:
+set.seed(as.integer(charToRaw("be determinstic")))
+Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+asro <- as.sropt(Returns,drag=0,ope=ope)
+print(asro)
+}
+\author{
+  Steven E. Pav \email{shabbychef@gmail.com}
+}
+\references{
+  Sharpe, William F. "Mutual fund performance." Journal of
+  business (1966): 119-138.
+  \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+}
+\seealso{
+  Other sr: \code{\link{as.sr}},
+  \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
+  \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
+  \code{\link{confint.sropt}}, \code{\link{dsr}},
+  \code{\link{is.sr}}, \code{\link{power.sr_test}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{se}},
+  \code{\link{se.sr}}, \code{\link{sr}},
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+}
+
