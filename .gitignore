@@ -26,3 +26,5 @@ SharpeR.tex
 SharpeR.log
 SharpeR.pdf
 *.aux
+*.bbl
+*.blg

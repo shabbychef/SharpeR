@@ -19,7 +19,7 @@ R_FILES 				+= $(wildcard ./tests/*.R)
 
 M4_FILES				?= $(wildcard *.m4)
 
-VERSION 				 = 0.1304
+VERSION 				 = 0.1305
 TODAY 					:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 				:= SharpeR
@@ -56,6 +56,14 @@ NODIST_DIRS			 = .git man-roxygen
 RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
 SUPPORT_FILES 	 = ./DESCRIPTION ./NAMESPACE $(RD_DUMMY)
+
+# latex bother. bleah.
+#TEXINPADD    = .:$(HOME)/sys/etc/tex:$(HOME)/sys/etc/tex/SEPtex:$(HOME)/work/math/TEX
+TEXINPADD    = .:./inst/doc
+PRETEX       = TEXINPUTS=$(TEXINPADD):$$TEXINPUTS
+PREBIB       = BSTINPUTS=$(TEXINPADD):$$BSTINPUTS \
+               BIBINPUTS=$(TEXINPADD):$$BIBINPUTS 
+BIBTEX      := $(shell which bibtex)
 
 #########################################################################
 # MACROS
@@ -239,6 +247,9 @@ $(PKG_NAME).pdf: inst/doc/$(PKG_NAME).Rnw deps $(LOCAL)/$(PKG_NAME)/INDEX
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
 				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,knitr,$(PKG_NAME)" \
 				 R -q --no-save --slave -e "knitr::knit2pdf('$<');"
+	if grep Citation $(PKG_NAME).log > /dev/null; then $(PREBIB) $(BIBTEX) $(PKG_NAME); \
+		"$(R)" CMD pdflatex $(PKG_NAME).tex; fi
+	if grep Rerun $(PKG_NAME).log > /dev/null; then "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 
 staged_vignette: $(PKG_NAME).pdf
 

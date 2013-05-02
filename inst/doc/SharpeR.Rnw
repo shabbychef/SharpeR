@@ -30,12 +30,15 @@ number of possibly correlated assets.\cite{Sharpe:1966}
 blah blah blah.
 
 <<show-off>>=
-rnorm(5)
-df=data.frame(y=rnorm(100), x=1:100)
-summary(lm(y~x, data=df))
+library(SharpeR)
+set.seed(as.integer(charToRaw("set the seed")))
+# Sharpe's 'model': just given a bunch of returns.
+returns <- rnorm(253*8,mean=3e-4,sd=1e-2)
+asr <- as.sr(returns,ope=253,epoch="yr")
+print(asr)
 @
 
-%\bibliographystyle{jss}
+\bibliographystyle{jss}
 \bibliography{SharpeR}
 
 \end{document}
