@@ -5,7 +5,7 @@
 \documentclass{article}
 
 \usepackage{url}
-\usepackage[authoryear]{natbib}
+%\usepackage[authoryear]{natbib}
 
 \makeatletter
 
@@ -38,7 +38,8 @@ asr <- as.sr(returns,ope=253,epoch="yr")
 print(asr)
 @
 
-\bibliographystyle{jss}
+%\bibliographystyle{jss}
+\bibliographystyle{acm}
 \bibliography{SharpeR}
 
 \end{document}

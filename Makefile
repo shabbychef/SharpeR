@@ -89,7 +89,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 	news docs build install testthat tests \
 	staging_d local_d \
 	clean realclean \
-	vignette staged_vignette \
+	vignette fast_vignette fast_v \
 	R
 
 help:
@@ -108,8 +108,8 @@ help:
 	@echo "  check      Invoke build and then check the package."
 	@echo "  install    Invoke build and then install the result."
 	@echo "  R          Invoke R in a local context with the package."
-	@echo "  vignette   Insures the vignette gets built."
-	@echo "  staged_vignette   faster vignette build."
+	@echo "  vignette   Ensures the vignette gets built."
+	@echo "  fast_vignette   faster vignette build."
 	@echo "  clean      Do some cleanup."
 	@echo "  realclean  Do lots of cleanup."
 	@echo ""
@@ -251,7 +251,8 @@ $(PKG_NAME).pdf: inst/doc/$(PKG_NAME).Rnw deps $(LOCAL)/$(PKG_NAME)/INDEX
 		"$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 	if grep Rerun $(PKG_NAME).log > /dev/null; then "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 
-staged_vignette: $(PKG_NAME).pdf
+fast_vignette: $(PKG_NAME).pdf
+fast_v: $(PKG_NAME).pdf
 
 ################################
 # CLEAN UP 
@@ -266,6 +267,8 @@ clean :
 	-rm -rf $(PKG_NAME).log
 	-rm -rf $(PKG_NAME).aux
 	-rm -rf $(PKG_NAME).pdf
+	-rm -rf $(PKG_NAME).bbl
+	-rm -rf $(PKG_NAME).blg
 
 realclean : clean
 	-rm -rf $(LOCAL)
