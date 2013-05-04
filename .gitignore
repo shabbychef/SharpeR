@@ -28,3 +28,4 @@ SharpeR.pdf
 *.aux
 *.bbl
 *.blg
+cache/

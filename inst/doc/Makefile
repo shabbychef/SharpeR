@@ -19,6 +19,7 @@ clean:
 	rm -rf *.tex *.bbl *.blg *.aux *.out *.log *.spl *tikzDictionary *.md figure/
 
 %.pdf: %.Rnw
+	@-echo "fuck all this!"
 	$(R_HOME)/bin/Rscript -e "if (getRversion() < '3.0.0') knitr::knit2pdf('$*.Rnw') else tools::texi2pdf('$*.tex')"
 	if grep Citation $*.log > /dev/null; then $(BIBTEX) $*; \
 		"$(R_HOME)/bin/R" CMD pdflatex $*.tex; fi

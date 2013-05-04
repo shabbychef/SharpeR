@@ -43,7 +43,7 @@ R         			 = $(RBIN)/R
 RSCRIPT   			 = $(RBIN)/Rscript
 
 # packages I need to test this one
-TEST_DEPS  			 = testthat roxygen2 knitr txtplot 
+TEST_DEPS  			 = testthat roxygen2 knitr txtplot quantmod
 INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
 PKG_TESTR 			 = tests/run-all.R
 
@@ -189,8 +189,11 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 
 parallel : $(STAGED_PKG)/DESCRIPTION
 
-#PACKAGING_FLAGS   = --no-vignettes
-PACKAGING_FLAGS   = 
+# ack. cannot build the vignette when calling
+# make package
+# something about 'pb' missing?
+PACKAGING_FLAGS   = --no-vignettes
+#PACKAGING_FLAGS   = 
 
 # make the 'package', which is a tar.gz
 $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS)
@@ -202,7 +205,7 @@ package : $(PKG_TGZ)
 $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ) 
 	$(call WARN_DEPS)
 	$(call MKDIR,$(LOCAL))
-	$(RLOCAL) CMD INSTALL --no-multiarch --library=$(LOCAL) $<
+	$(RLOCAL) CMD INSTALL --preclean --no-multiarch --library=$(LOCAL) $<
 	touch $@
 
 install: $(LOCAL)/$(PKG_NAME)/INDEX
@@ -244,12 +247,12 @@ R : deps $(LOCAL)/$(PKG_NAME)/INDEX
 				 R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
 
 $(PKG_NAME).pdf: inst/doc/$(PKG_NAME).Rnw deps $(LOCAL)/$(PKG_NAME)/INDEX 
-	R_LIBS=$(LOCAL) R_PROFILE=load.R \
+	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
 				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,knitr,$(PKG_NAME)" \
 				 R -q --no-save --slave -e "knitr::knit2pdf('$<');"
 	if grep Citation $(PKG_NAME).log > /dev/null; then $(PREBIB) $(BIBTEX) $(PKG_NAME); \
-		"$(R)" CMD pdflatex $(PKG_NAME).tex; fi
-	if grep Rerun $(PKG_NAME).log > /dev/null; then "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
+		$(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
+	if grep Rerun $(PKG_NAME).log > /dev/null; then $(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 
 fast_vignette: $(PKG_NAME).pdf
 fast_v: $(PKG_NAME).pdf
@@ -272,6 +275,7 @@ clean :
 
 realclean : clean
 	-rm -rf $(LOCAL)
+	-rm -rf ./cache
 
 ################################
 # git FOO 
