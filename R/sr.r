@@ -211,6 +211,23 @@ as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 							 rescal=1/sqrt(df),epoch=epoch)
 	return(retval)
 }
+#' @param adframe a \code{data.frame} object.
+#' @rdname as.sr
+#' @method as.sr data.frame
+#' @S3method as.sr data.frame
+as.sr.data.frame <- function(adframe,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+	mu <- apply(adframe,2,mean,na.rm=na.rm)
+	sigma <- apply(adframe,2,sd,na.rm=na.rm)
+	z <- .compute_sr(mu,c0,sigma,ope)
+	dim(z) <- c(length(mu),1)
+	rownames(z) <- unlist(colnames(adframe))
+	if (is.null(rownames(z)))
+		rownames(z) <- deparse(substitute(adframe))
+	df <- ifelse(na.rm,apply(!is.na(adframe),2,sum),dim(adframe)[1])
+	retval <- sr(z,df=df-1,c0=c0,ope=ope,
+							 rescal=1/sqrt(df),epoch=epoch)
+	return(retval)
+}
 #' @param modl a fit model of class \code{lm}.
 #' @rdname as.sr
 #' @method as.sr lm 
@@ -227,7 +244,7 @@ as.sr.lm <- function(modl,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 							 rescal=rescal,epoch=epoch)
 	return(retval)
 }
-#' @param anxts an xts object.
+#' @param anxts an \code{xts} object.
 #' @rdname as.sr
 #' @method as.sr xts 
 #' @S3method as.sr xts
@@ -235,7 +252,7 @@ as.sr.xts <- function(anxts,c0=0,ope=1,...) {
 	if (missing(ope)) {
 		ope <- .infer_ope_xts(anxts)
 	}
-	retval <- as.sr.default(anxts,c0=c0,ope=ope,...)
+	retval <- as.sr.data.frame(as.data.frame(anxts),c0=c0,ope=ope,...)
 	return(retval)
 }
 #' @title Is this in the "sr" class?
@@ -652,7 +669,7 @@ as.sropt.default <- function(X,drag=0,ope=1,epoch="yr") {
 
 	return(retv)
 }
-#' @param anxts an xts object.
+#' @param anxts an \code{xts} object.
 #' @rdname as.sropt
 #' @method as.sropt xts
 #' @S3method as.sropt xts

@@ -141,7 +141,8 @@ On the other hand, arithmetic returns are indeed additive
 several stocks, and \sportw is the dollar proportional allocation into those
 stocks at the start of the period, then \trAB{\vreti}{\sportw} is the
 arithmetic return of the portfolio over that period. This holds even when the
-portfolio holds some stocks `short.' (Often this ... 
+portfolio holds some stocks `short.'  Often this portfolio accounting is
+misapplied to geometric returns without even an appeal to Taylor's theorem.
 
 %UNFOLD
 
@@ -149,7 +150,17 @@ portfolio holds some stocks `short.' (Often this ...
 
 An \rcode{sr} object encapsulates one or more \txtSR statistics, along with the
 degrees of freedom, the rescaling to a \tstat statistic, and the annualization
-and units information.
+and units information. One can simply stuff this information into an \rcode{sr} 
+object, but this is perhaps `advanced usage.' 
+
+<<'babysteps'>>=
+library(SharpeR)
+# suppose you computed the Sharpe of your strategy to
+# be 1.3 / sqrt(yr), based on 1200 daily observations.
+# store them as follows:
+my.sr <- sr(sr=1.3,df=1200-1,ope=252,epoch="yr")
+print(my.sr)
+@
 
 <<'showoff'>>=
 library(SharpeR)
@@ -173,13 +184,13 @@ get.ret <- function(sym,...) {
 }
 get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
 some.rets <- get.rets(c("BRK.B","SPY"),from="1996-05-09")
-# compute Sharpe ignoring the benchmark
-bare.sr <- as.sr(some.rets[,"BRK.B.Adjusted"],na.rm=TRUE)
-print(bare.sr)
-print(confint(bare.sr))
+# first look at both of these:
+both.sr <- as.sr(some.rets)
+print(both.sr)
+print(confint(both.sr))
 # compute Sharpe of idiosyncratic term under CAPM
 linmod <- lm(BRK.B.Adjusted ~ SPY.Adjusted,data=some.rets)
-CAPM.sr <- as.sr(linmod,ope=bare.sr$ope,epoch="yr")
+CAPM.sr <- as.sr(linmod,ope=both.sr$ope,epoch="yr")
 print(summary(linmod))
 print(CAPM.sr)
 print(confint(linmod,'(Intercept)'))

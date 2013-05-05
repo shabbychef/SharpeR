@@ -1,5 +1,6 @@
 \name{as.sr}
 \alias{as.sr}
+\alias{as.sr.data.frame}
 \alias{as.sr.default}
 \alias{as.sr.lm}
 \alias{as.sr.xts}
@@ -8,6 +9,9 @@
   as.sr(x,c0=0,ope=1,...)
 
   \method{as.sr}{default} (x, c0 = 0, ope = 1,
+    na.rm = FALSE, epoch = "yr")
+
+  \method{as.sr}{data.frame} (adframe, c0 = 0, ope = 1,
     na.rm = FALSE, epoch = "yr")
 
   \method{as.sr}{lm} (modl, c0 = 0, ope = 1, na.rm = FALSE,
@@ -39,9 +43,11 @@
 
   \item{na.rm}{logical.  Should missing values be removed?}
 
+  \item{adframe}{a \code{data.frame} object.}
+
   \item{modl}{a fit model of class \code{lm}.}
 
-  \item{anxts}{an xts object.}
+  \item{anxts}{an \code{xts} object.}
 }
 \value{
   a list containing the following components: \item{sr}{the

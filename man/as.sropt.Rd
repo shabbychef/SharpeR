@@ -15,7 +15,7 @@
 \arguments{
   \item{X}{matrix of returns.}
 
-  \item{anxts}{an xts object.}
+  \item{anxts}{an \code{xts} object.}
 
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,

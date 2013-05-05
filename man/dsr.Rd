@@ -121,6 +121,7 @@ plot(ecdf(pvs))
   \link{qt}, \link{rt}}
 
   Other sr: \code{\link{as.sr}},
+  \code{\link{as.sr.data.frame}},
   \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
   \code{\link{as.sr.xts}}, \code{\link{confint.sr}},
   \code{\link{confint.sropt}}, \code{\link{is.sr}},
