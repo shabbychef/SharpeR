@@ -13,13 +13,14 @@
 \makeatother
 
 \input{sharpe_shortcuts.tex}
-<<'preamble',echo=FALSE,warning=FALSE,message=FALSE>>=
-require(knitr)
+<<'preamble', include=FALSE, warning=FALSE, message=FALSE>>=
+library(knitr)
 
 # set the knitr options ... for everyone!
-opts_knit$set(progress=TRUE)
+# if you unset this, then vignette build bonks. oh, joy.
+#opts_knit$set(progress=TRUE)
 
-#opts_chunk$set(echo=FALSE,warning=FALSE,message=FALSE)
+opts_chunk$set(echo=FALSE,warning=FALSE,message=FALSE)
 opts_chunk$set(warning=FALSE,message=FALSE)
 #opts_chunk$set(results="asis")
 opts_chunk$set(cache=TRUE,cache.path="cache/")
@@ -33,7 +34,7 @@ compile.time <- Sys.time()
 # not used yet
 LONG.FORM <- FALSE
 
-require(quantmod)
+library(quantmod)
 options("getSymbols.warning4.0"=FALSE)
 @
 

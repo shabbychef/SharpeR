@@ -16,16 +16,18 @@ all: $(TARGETS)
 R_HOME    ?= /usr
 
 clean:
+	echo "clean is called" >> /tmp/vig.log
 	rm -rf *.tex *.bbl *.blg *.aux *.out *.log *.spl *tikzDictionary *.md figure/
 
 %.pdf: %.Rnw
-	@-echo "fuck all this!"
+	echo "pdf build called" >> /tmp/vig.log
 	$(R_HOME)/bin/Rscript -e "if (getRversion() < '3.0.0') knitr::knit2pdf('$*.Rnw') else tools::texi2pdf('$*.tex')"
 	if grep Citation $*.log > /dev/null; then $(BIBTEX) $*; \
 		"$(R_HOME)/bin/R" CMD pdflatex $*.tex; fi
 	if grep Rerun $*.log > /dev/null; then "$(R_HOME)/bin/R" CMD pdflatex $*.tex; fi
 
 %.html: %.Rmd
+	echo "html build called" >> /tmp/vig.log
 	$(R_HOME)/bin/Rscript -e "if (getRversion() < '3.0.0') knitr::knit2html('$*.Rmd')"
 
 

@@ -50,12 +50,12 @@ PKG_TESTR 			 = tests/run-all.R
 #INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%,$(TEST_DEPS)) 
 
 # do not distribute these!
-NODIST_FILES		 = Makefile $(M4_FILES) rebuildTags.sh .gitignore .gitattributes .tags .R_tags
+NODIST_FILES		 = ./Makefile $(M4_FILES) rebuildTags.sh .gitignore .gitattributes .tags .R_tags
 NODIST_DIRS			 = .git man-roxygen
 
 RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
-SUPPORT_FILES 	 = ./DESCRIPTION ./NAMESPACE $(RD_DUMMY)
+SUPPORT_FILES 	 = ./DESCRIPTION ./NAMESPACE $(RD_DUMMY) ./inst/doc/$(PKG_NAME).Rnw
 
 # latex bother. bleah.
 #TEXINPADD    = .:$(HOME)/sys/etc/tex:$(HOME)/sys/etc/tex/SEPtex:$(HOME)/work/math/TEX
@@ -89,7 +89,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 	news docs build install testthat tests \
 	staging_d local_d \
 	clean realclean \
-	vignette fast_vignette fast_v \
+	vignette \
 	R
 
 help:
@@ -108,8 +108,7 @@ help:
 	@echo "  check      Invoke build and then check the package."
 	@echo "  install    Invoke build and then install the result."
 	@echo "  R          Invoke R in a local context with the package."
-	@echo "  vignette   Ensures the vignette gets built."
-	@echo "  fast_vignette   faster vignette build."
+	@echo "  vignette   Build the vignette in the local context."
 	@echo "  clean      Do some cleanup."
 	@echo "  realclean  Do lots of cleanup."
 	@echo ""
@@ -192,14 +191,16 @@ parallel : $(STAGED_PKG)/DESCRIPTION
 # ack. cannot build the vignette when calling
 # make package
 # something about 'pb' missing?
-PACKAGING_FLAGS   = --no-vignettes
-#PACKAGING_FLAGS   = 
+#PACKAGING_FLAGS   = --no-vignettes
+PACKAGING_FLAGS   = 
 
 # make the 'package', which is a tar.gz
 $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS)
 	$(RLOCAL) CMD build $(PACKAGING_FLAGS) $(<D)
 
-package : $(PKG_TGZ)
+#package : $(PKG_TGZ)
+
+build : $(PKG_TGZ)
 
 # an 'install'
 $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ) 
@@ -222,7 +223,7 @@ checksee : $(RCHECK_SENTINEL)
 
 $(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf : inst/doc/$(PKG_NAME).Rnw $(RCHECK_SENTINEL)
 
-vignette : $(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
+slow_vignette : $(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
 
 ################################
 # UNIT TESTING
@@ -254,8 +255,7 @@ $(PKG_NAME).pdf: inst/doc/$(PKG_NAME).Rnw deps $(LOCAL)/$(PKG_NAME)/INDEX
 		$(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 	if grep Rerun $(PKG_NAME).log > /dev/null; then $(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 
-fast_vignette: $(PKG_NAME).pdf
-fast_v: $(PKG_NAME).pdf
+vignette: $(PKG_NAME).pdf
 
 ################################
 # CLEAN UP 
