@@ -13,6 +13,7 @@
 \makeatother
 
 \input{sharpe_shortcuts.tex}
+\providecommand{\rcode}[1]{\texttt{#1}}
 <<'preamble', include=FALSE, warning=FALSE, message=FALSE>>=
 library(knitr)
 
@@ -20,7 +21,8 @@ library(knitr)
 # if you unset this, then vignette build bonks. oh, joy.
 #opts_knit$set(progress=TRUE)
 
-opts_chunk$set(echo=FALSE,warning=FALSE,message=FALSE)
+# for a package vignette, you do want to echo.
+# opts_chunk$set(echo=FALSE,warning=FALSE,message=FALSE)
 opts_chunk$set(warning=FALSE,message=FALSE)
 #opts_chunk$set(results="asis")
 opts_chunk$set(cache=TRUE,cache.path="cache/")
@@ -47,14 +49,15 @@ options("getSymbols.warning4.0"=FALSE)
 
 \maketitle
 
-\begin{abstract}
+\begin{abstract}%FOLDUP
 The SharpeR package provides basic functionality for testing significance of
 the \txtSR of a series of returns, and of the Markowitz portfolio on a 
 number of possibly correlated assets.\cite{Sharpe:1966} The goal of the package
 is to make it simple to estimate profitability (in terms of risk-adjusted
 returns) of strategies or asset streams.
-\end{abstract}
+\end{abstract}%UNFOLD
 
+\section{The \txtSR}%FOLDUP
 Sharpe defined the 'reward to variability ratio', now known as the 
 '\txtSR', as the sample statistic
 $$
@@ -109,8 +112,44 @@ In particular, they are distributed as rescaled non-central \tlaw{} and \flaw{}
 distributions. Under these assumptions on the generating processes, we can
 perform inference on the population analogues using the sample statistics.
 
-\section{Basic Usage}
+The importance of each of these assumptions (\viz homoskedasticity,
+independence, normality, \etc) can and should be checked. It should be noted
+that this package is distributed without any warranty
+of any kind, and in no way should any analysis performed with this package be
+interpreted as implicit investment advice by the author(s).
 
+The units of \smu are `returns per time,' while those of \ssig are `returns per
+square root time.' Consequently, the units of \ssr are `per square root time.'
+Typically the \txtSR is quoted in `annualized' terms, \ie \yrto{-1/2}, but the
+units are omitted. I believe that units should be included as it avoids
+ambiguity, and simplifies conversions.
+
+There is no clear standard whether arithmetic or geometric returns should be
+used in the computation of the \txtSR. Since arithmetic returns are always
+greater than the equivalent geometric returns, one would suspect that
+arithmetic returns are \emph{always} used when advertising products. However, I
+suspect that geometric returns are more frequently used in the analysis of
+strategies. Geometric returns have the attractive property of being `additive',
+meaning that the geometric return of a period is the sum of those of
+subperiods, and thus the sign of the arithmetic mean of some geometric returns
+indicates whether the final value of a strategy is greater than the initial
+value. Oddly, the arithmetic mean of arithmetic returns does not share this
+property. 
+
+On the other hand, arithmetic returns are indeed additive 
+\emph{contemporaneously}: if \vreti is the vector of arithmetic returns of
+several stocks, and \sportw is the dollar proportional allocation into those
+stocks at the start of the period, then \trAB{\vreti}{\sportw} is the
+arithmetic return of the portfolio over that period. This holds even when the
+portfolio holds some stocks `short.' (Often this ... 
+
+%UNFOLD
+
+\section{Basic Usage}%FOLDUP
+
+An \rcode{sr} object encapsulates one or more \txtSR statistics, along with the
+degrees of freedom, the rescaling to a \tstat statistic, and the annualization
+and units information.
 
 <<'showoff'>>=
 library(SharpeR)
@@ -120,6 +159,8 @@ returns <- rnorm(253*8,mean=3e-4,sd=1e-2)
 asr <- as.sr(returns,ope=253,epoch="yr")
 print(asr)
 @
+
+\subsection{Attribution Models}
 
 <<'BRKB'>>=
 library(quantmod)
@@ -135,14 +176,21 @@ some.rets <- get.rets(c("BRK.B","SPY"),from="1996-05-09")
 # compute Sharpe ignoring the benchmark
 bare.sr <- as.sr(some.rets[,"BRK.B.Adjusted"],na.rm=TRUE)
 print(bare.sr)
+print(confint(bare.sr))
 # compute Sharpe of idiosyncratic term under CAPM
 linmod <- lm(BRK.B.Adjusted ~ SPY.Adjusted,data=some.rets)
 CAPM.sr <- as.sr(linmod,ope=bare.sr$ope,epoch="yr")
+print(summary(linmod))
 print(CAPM.sr)
+print(confint(linmod,'(Intercept)'))
+print(confint(CAPM.sr))
 @
+%UNFOLD
 
 %\bibliographystyle{jss}
 \bibliographystyle{acm}
 \bibliography{SharpeR}
 
 \end{document}
+%for vim modeline: (do not edit)
+% vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=%%s:syn=rnoweb:ft=rnoweb
