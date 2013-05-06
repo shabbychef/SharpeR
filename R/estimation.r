@@ -251,7 +251,7 @@ confint.sr <- function(object,level=0.95,
 											 level.lo=level.lo,level.hi=level.hi,
 											 type=type)
 	retval <- .t2sr(object,retval)
-	rownames(retval) <- if (is.null(rownames(object$sr))) rep(c("Sharpe"),length(object$sr)) else rownames(object$sr)
+	rownames(retval) <- .get_strat_names(object$sr)
 	return(retval)
 }
 #' @export

@@ -17,7 +17,8 @@
   \method{as.sr}{lm} (modl, c0 = 0, ope = 1, na.rm = FALSE,
     epoch = "yr")
 
-  \method{as.sr}{xts} (anxts, c0 = 0, ope = 1, ...)
+  \method{as.sr}{xts} (anxts, c0 = 0, ope = 1,
+    epoch = "yr")
 }
 \arguments{
   \item{x}{vector of returns.}

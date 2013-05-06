@@ -78,9 +78,9 @@
   \eqn{\mbox{ope}}{ope} is the number of observations per
   year (or whatever the target annualization epoch.)
 
-  Note that if \code{ope} is not given, the converter from
-  \code{xts} attempts to infer the observations per year,
-  without regard to the name of the \code{epoch} given.
+  Note that if \code{ope} and \code{epoch} are not given,
+  the converter from \code{xts} attempts to infer the
+  observations per epoch, assuming yearly epoch.
 }
 \examples{
 nfac <- 5

@@ -151,7 +151,8 @@ misapplied to geometric returns without even an appeal to Taylor's theorem.
 An \rcode{sr} object encapsulates one or more \txtSR statistics, along with the
 degrees of freedom, the rescaling to a \tstat statistic, and the annualization
 and units information. One can simply stuff this information into an \rcode{sr} 
-object, but this is perhaps `advanced usage.' 
+object, but it is more straightforward to allow \rcode{as.sr} to compute the
+\txtSR for you. 
 
 <<'babysteps'>>=
 library(SharpeR)
@@ -160,20 +161,49 @@ library(SharpeR)
 # store them as follows:
 my.sr <- sr(sr=1.3,df=1200-1,ope=252,epoch="yr")
 print(my.sr)
+# multiple strategies can be tracked as well.
+# one can attach names to them.
+srstats <- c(0.5,1.2,0.6)
+dim(srstats) <- c(3,1)
+rownames(srstats) <- c("strat. A","strat. B","benchmark")
+my.sr <- sr(srstats,df=1200-1,ope=252,epoch="yr")
+print(my.sr)
 @
 
+Throughout, \rcode{ope} stands for `Observations Per Epoch', and is the
+(average) number of returns observed per the annualizatin period, called
+the \rcode{epoch}.  At the moment there is not much hand holding regarding
+these parameters: no checking is performed for sane values.
+
+The \rcode{as.sr} method will compute the \txtSR for you, from numeric,
+\rcode{data.frame}, \rcode{xts} or \rcode{lm} objects. In the latter case, it
+is assumed one is performing an attribution model, and the statistic of
+interest is the fit of the \rcode{(Intercept)} term divided by the residual
+standard deviation. Here are some examples:
+
 <<'showoff'>>=
-library(SharpeR)
 set.seed(as.integer(charToRaw("set the seed")))
 # Sharpe's 'model': just given a bunch of returns.
 returns <- rnorm(253*8,mean=3e-4,sd=1e-2)
 asr <- as.sr(returns,ope=253,epoch="yr")
 print(asr)
+# a data frame with a single strategy
+asr <- as.sr(data.frame(my.strategy=returns),ope=253,epoch="yr")
+print(asr)
 @
 
-\subsection{Attribution Models}
+When a \rcode{data.frame} with multiple columns is given, the \txtSR of each is
+computed, and they are all stored:
+<<'more_data_frame'>>=
+# a data frame with multiple strategies
+asr <- as.sr(data.frame(strat1=rnorm(253*8),strat2=rnorm(253*8,mean=4e-4,sd=1e-2)),
+	ope=253,epoch="yr")
+print(asr)
+@
 
-<<'BRKB'>>=
+Here is an example using \rcode{xts} objects. In this case, if the \rcode{ope}
+is not given, it is inferred from the time marks of the input object.
+<<'some_stocks'>>=
 library(quantmod)
 get.ret <- function(sym,...) {
 	OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
@@ -183,13 +213,50 @@ get.ret <- function(sym,...) {
 	lrets[-1,]
 }
 get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+some.rets <- get.rets(c("AAPL","IBM","A","C"),from="2001-01-01")
+print(as.sr(some.rets))
+@
+
+The annualization of an \rcode{sr} object can be changed with the
+\rcode{reannualize} method. The name of the epoch and the observation rate can
+both be changed.
+
+<<'reannualize'>>=
+some.rets <- get.rets(c("XOM"),from="2001-01-01")
+yearly <- as.sr(some.rets)
+monthly <- reannualize(yearly,new.ope=21,new.epoch="mo.")
+print(yearly)
+print(monthly)
+@
+
+%UNFOLD
+\subsection{Attribution Models}%FOLDUP
+
+When an object of class \rcode{lm} is given to \rcode{as.sr}, the 
+fit \rcode{(Intercept)} term is divided by the residual volatility to compute
+something like the \txtSR. In terms of Null Hypothesis Significance Testing,
+nothing is gained by summarizing the \rcode{sr} object instead of the
+\rcode{lm} object. However, confidence intervals on the \txtSR are quoted in
+the more natural units of reward to variability, and in annualized terms (or
+whatever the epoch is.)
+
+As an example, here I perform
+
+<<'BRKB'>>=
 some.rets <- get.rets(c("BRK.B","SPY"),from="1996-05-09")
+# make them monthly.
+mo.rets <- do.call(cbind,lapply(exp(cumsum(some.rets)),function(x) {
+	retv <- monthlyReturn(x)
+	colnames(retv) <- colnames(x)
+	return(retv)
+}))
 # first look at both of these:
 both.sr <- as.sr(some.rets)
+both.sr <- as.sr(mo.rets)
 print(both.sr)
 print(confint(both.sr))
 # compute Sharpe of idiosyncratic term under CAPM
-linmod <- lm(BRK.B.Adjusted ~ SPY.Adjusted,data=some.rets)
+linmod <- lm(BRK.B.Adjusted ~ SPY.Adjusted,data=mo.rets)
 CAPM.sr <- as.sr(linmod,ope=both.sr$ope,epoch="yr")
 print(summary(linmod))
 print(CAPM.sr)
@@ -197,6 +264,17 @@ print(confint(linmod,'(Intercept)'))
 print(confint(CAPM.sr))
 @
 %UNFOLD
+
+\subsection{Attribution Models}
+
+\subsection{Distribution Functions}
+
+There are \rcode{dpqr} functions for the \txtSR distribution, as well as the
+`optimal \txtSR' distribution. These are merely rescaled non-central 
+\tstat and \Fstat distributions, provided for convenience, and for testing
+purposes.
+
+\nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940}
 
 %\bibliographystyle{jss}
 \bibliographystyle{acm}

@@ -109,6 +109,10 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 		sr <- sr * sqrt(ope)
 	return(sr)
 }
+.get_strat_names <- function(xstat) {
+	retval <- if (is.null(rownames(xstat))) rep(c("Sharpe"),length(xstat)) else rownames(xstat)
+	return(retval)
+}
 #' @title Compute the Sharpe ratio.
 #'
 #' @description 
@@ -248,11 +252,12 @@ as.sr.lm <- function(modl,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 #' @rdname as.sr
 #' @method as.sr xts 
 #' @S3method as.sr xts
-as.sr.xts <- function(anxts,c0=0,ope=1,...) {
-	if (missing(ope)) {
+as.sr.xts <- function(anxts,c0=0,ope=1,epoch="yr") {
+	if (missing(ope) && missing(epoch)) {
 		ope <- .infer_ope_xts(anxts)
+		epoch <- "yr"
 	}
-	retval <- as.sr.data.frame(as.data.frame(anxts),c0=c0,ope=ope,...)
+	retval <- as.sr.data.frame(as.data.frame(anxts),c0=c0,ope=ope,epoch=epoch)
 	return(retval)
 }
 #' @title Is this in the "sr" class?
@@ -337,7 +342,7 @@ print.sr <- function(x) {
 	#colnames(coefs) <- c("stat","t.stat","p.value")
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "Std. Error","t value","Pr(>t)")
-	rownames(coefs) <- if (is.null(rownames(x$sr))) rep(c("Sharpe"),length(x$sr)) else rownames(x$sr)
+	rownames(coefs) <- .get_strat_names(x$sr)
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1,2),tst.ind=c(3),dig.tst=2)
@@ -580,9 +585,9 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #' is the number of observations
 #' per year (or whatever the target annualization epoch.)
 #'
-#' Note that if \code{ope} is not given, the converter from \code{xts}
-#' attempts to infer the observations per year, without regard to 
-#' the name of the \code{epoch} given.
+#' Note that if \code{ope} and \code{epoch} are not given, the 
+#' converter from \code{xts} attempts to infer the observations per epoch,
+#' assuming yearly epoch.
 #'
 #' @usage
 #'
@@ -723,7 +728,7 @@ print.sropt <- function(x) {
 	coefs <- cbind(x$sropt,Tval,pval)
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "T^2 value","Pr(>T^2)")
-	rownames(coefs) <- if (is.null(rownames(x$sropt))) rep(c("Sharpe"),length(x$sropt)) else rownames(x$sropt)
+	rownames(coefs) <- .get_strat_names(x$sropt)
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)
