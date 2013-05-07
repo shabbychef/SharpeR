@@ -69,12 +69,13 @@ rv <- sr_equality_test(rets)
 
 # using real data
 if (require(quantmod)) {
-  getret <- function(sym,...) {
+  get.ret <- function(sym,...) {
     OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
     lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
+    lrets[-1,]
   }
-  getrets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,getret,...)) }
-  some.rets <- getrets(c("IBM","AAPL","NFLX","SPY"))
+  get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+  some.rets <- get.rets(c("IBM","AAPL","NFLX","SPY"))
   pvs <- sr_equality_test(some.rets)
 }
 # test for uniformity

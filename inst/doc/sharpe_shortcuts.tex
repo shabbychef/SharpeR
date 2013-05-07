@@ -7,6 +7,11 @@
 \RequirePackage{ifthen}
 \RequirePackage{xspace}
 
+% ack.
+%\providecommand{\figref}[1]{Figure~\ref{fig:#1}}
+\providecommand{\figref}[1]{Figure\nobreakspace\ref{fig:#1}}
+\providecommand{\eqnref}[1]{Equation\nobreakspace\ref{eqn:#1}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % meta meta commands
 % emptyP if 1 is empty give 2 else give 3
@@ -49,6 +54,8 @@
 \providecommand{\SEPbbb}[1]{\mathbb{#1}}
 \providecommand{\reals}[1]{\ensuremath{\SEPbbb{R}^{#1}}}
 
+\providecommand{\oneby}[1]{\MATHIT{\frac{1}{#1}}}
+
 % yes, I am lazy.
 \providecommand{\txtSR}{Sharpe ratio\xspace}
 
@@ -58,6 +65,7 @@
 \providecommand{\iid}{\emph{i.i.d.}\xspace}
 \providecommand{\viz}{\emph{viz.}\xspace}
 \providecommand{\etc}{\emph{etc.}\xspace}
+\providecommand{\etal}{\emph{et al.}\xspace}
 \providecommand{\cf}{\emph{cf.}\xspace}
 
 \providecommand{\setwo}[2]{\ensuremath{\left\{ #1 \left|\; {#2} \right.\right\}}\xspace}
@@ -286,8 +294,12 @@
 % risk free
 \providecommand{\rfr}[1][0]{\mathSUB{r}{#1}}
 
+% the symbol for SNR/SR
+%\providecommand{\prvSNR}[0]{\psi}
+\providecommand{\prvSNR}[0]{\zeta}
+
 % sample sharpe ratio
-\providecommand{\ssrUL}[2]{\mathUL{\hat{\psi}}{#1}{#2}}
+\providecommand{\ssrUL}[2]{\mathUL{\hat{\prvSNR}}{#1}{#2}}
 %\providecommand{\ssrUL}[2]{\mathUL{r}{#1}{#2}}
 \providecommand{\ssr}[1][]{\ssrUL{}{#1}}
 \providecommand{\ssrsq}[1][]{\ssrUL{2}{#1}}
@@ -303,7 +315,7 @@
 \providecommand{\sfse}{\kappa}
 
 %unbiased estimator of Sharpe ratio
-\providecommand{\susr}[1][]{\MATHIT{\tilde{\psi}_{#1}}}
+\providecommand{\susr}[1][]{\MATHIT{\tilde{\prvSNR}_{#1}}}
 \providecommand{\sgossz}[1][]{\mathSUB{z}{#1}}
 %UNFOLD
 %population parameters%FOLDUP
@@ -311,7 +323,7 @@
 \providecommand{\psig}[1][]{\mathSUB{\sigma}{#1}}
 \providecommand{\psigsq}[1][]{\mathUL{\sigma}{2}{#1}}
 
-\providecommand{\psrUL}[2]{\mathUL{\psi}{#1}{#2}}
+\providecommand{\psrUL}[2]{\mathUL{\prvSNR}{#1}{#2}}
 
 \providecommand{\psr}[1][]{\psrUL{}{#1}}
 \providecommand{\psnr}[1][]{\psrUL{}{#1}}

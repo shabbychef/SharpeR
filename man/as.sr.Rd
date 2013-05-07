@@ -18,7 +18,7 @@
     epoch = "yr")
 
   \method{as.sr}{xts} (anxts, c0 = 0, ope = 1,
-    epoch = "yr")
+    na.rm = FALSE, epoch = "yr")
 }
 \arguments{
   \item{x}{vector of returns.}

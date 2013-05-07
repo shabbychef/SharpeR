@@ -4,16 +4,20 @@
 %\VignettePackage{SharpeR}
 \documentclass[10pt,a4paper,english]{article}
 
+% front matter%FOLDUP
 \usepackage{url}
 \usepackage{amsmath}
 %\usepackage[authoryear]{natbib}
 
 \makeatletter
-
 \makeatother
 
 \input{sharpe_shortcuts.tex}
+%\providecommand{\rcode}[1]{\texttt{\verb{#1}}}
 \providecommand{\rcode}[1]{\texttt{#1}}
+
+% knitr setup%FOLDUP
+
 <<'preamble', include=FALSE, warning=FALSE, message=FALSE>>=
 library(knitr)
 
@@ -27,7 +31,15 @@ opts_chunk$set(warning=FALSE,message=FALSE)
 #opts_chunk$set(results="asis")
 opts_chunk$set(cache=TRUE,cache.path="cache/")
 opts_chunk$set(fig.path="figure/",dev=c("pdf","cairo_ps"))
+# for figures? this is sweave-specific?
 #opts_knit$set(eps=TRUE)
+
+# this would be for figures:
+#opts_chunk$set(out.width='.8\\textwidth')
+# for text wrapping:
+options(width=64,digits=2)
+opts_chunk$set(size="small")
+opts_chunk$set(tidy=TRUE,tidy.opts=list(width.cutoff=50,keep.blank.line=TRUE))
 
 compile.time <- Sys.time()
 
@@ -39,15 +51,17 @@ LONG.FORM <- FALSE
 library(quantmod)
 options("getSymbols.warning4.0"=FALSE)
 @
+%UNFOLD
+%UNFOLD
 
+% document incantations%FOLDUP
 \begin{document}
 
 \title{SharpeR}
-
-
 \author{Steven E. Pav}
 
 \maketitle
+%UNFOLD
 
 \begin{abstract}%FOLDUP
 The SharpeR package provides basic functionality for testing significance of
@@ -80,10 +94,11 @@ been extensively studied.  Many of the interesting properties of the
 Also little appreciated is that the multivariate analogue of the \tstat-statistic,
 Hotelling's \Tstat, is related to the Markowitz portfolio. Consider the
 following portfolio optimization problem:
-$$
+\begin{equation}
 \max_{\sportw : \qform{\svsig}{\sportw} \le R^2} 
 \frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
-$$
+\label{eqn:port_prob}
+\end{equation}
 where \svmu, \svsig are the sample mean vector and covariance matrix, \rfr is
 the risk-free rate, and $R$ is a cap on portfolio 'risk' as estimated by
 \svsig. (Note this differs from the traditional definition of the problem which
@@ -113,8 +128,8 @@ distributions. Under these assumptions on the generating processes, we can
 perform inference on the population analogues using the sample statistics.
 
 The importance of each of these assumptions (\viz homoskedasticity,
-independence, normality, \etc) can and should be checked. It should be noted
-that this package is distributed without any warranty
+independence, normality, \etc) can and should be checked. 
+\cite{Lumley:2002,Opdyke2007} The reader must be warned that this package is distributed without any warranty
 of any kind, and in no way should any analysis performed with this package be
 interpreted as implicit investment advice by the author(s).
 
@@ -187,7 +202,7 @@ set.seed(as.integer(charToRaw("set the seed")))
 returns <- rnorm(253*8,mean=3e-4,sd=1e-2)
 asr <- as.sr(returns,ope=253,epoch="yr")
 print(asr)
-# a data frame with a single strategy
+# a data.frame with a single strategy
 asr <- as.sr(data.frame(my.strategy=returns),ope=253,epoch="yr")
 print(asr)
 @
@@ -195,7 +210,7 @@ print(asr)
 When a \rcode{data.frame} with multiple columns is given, the \txtSR of each is
 computed, and they are all stored:
 <<'more_data_frame'>>=
-# a data frame with multiple strategies
+# a data.frame with multiple strategies
 asr <- as.sr(data.frame(strat1=rnorm(253*8),strat2=rnorm(253*8,mean=4e-4,sd=1e-2)),
 	ope=253,epoch="yr")
 print(asr)
@@ -213,23 +228,36 @@ get.ret <- function(sym,...) {
 	lrets[-1,]
 }
 get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+# quantmod::periodReturn does not deal properly with multiple
+# columns, and the straightforward apply(mtms,2,periodReturn) barfs
+my.periodReturn <- function(mtms,...) {
+	per.rets <- do.call(cbind,lapply(mtms,
+		function(x) {
+			retv <- periodReturn(x,...)
+			colnames(retv) <- colnames(x)
+			return(retv) 
+		}))
+}
 some.rets <- get.rets(c("AAPL","IBM","A","C"),from="2001-01-01")
 print(as.sr(some.rets))
 @
 
 The annualization of an \rcode{sr} object can be changed with the
 \rcode{reannualize} method. The name of the epoch and the observation rate can
-both be changed.
+both be changed. Changing the annualization will not change statistical
+significance, it merely changes the units.
 
 <<'reannualize'>>=
 some.rets <- get.rets(c("XOM"),from="2001-01-01")
 yearly <- as.sr(some.rets)
 monthly <- reannualize(yearly,new.ope=21,new.epoch="mo.")
 print(yearly)
+# significance should be the same, but units changed.
 print(monthly)
 @
 
 %UNFOLD
+
 \subsection{Attribution Models}%FOLDUP
 
 When an object of class \rcode{lm} is given to \rcode{as.sr}, the 
@@ -240,45 +268,283 @@ nothing is gained by summarizing the \rcode{sr} object instead of the
 the more natural units of reward to variability, and in annualized terms (or
 whatever the epoch is.)
 
-As an example, here I perform
+As an example, here I perform a CAPM attribution to the monthly returns of
+\texttt{BRK.B}
 
 <<'BRKB'>>=
+# get the returns (see above for the function)
 some.rets <- get.rets(c("BRK.B","SPY"),from="1996-05-09")
-# make them monthly.
-mo.rets <- do.call(cbind,lapply(exp(cumsum(some.rets)),function(x) {
-	retv <- monthlyReturn(x)
-	colnames(retv) <- colnames(x)
-	return(retv)
-}))
-# first look at both of these:
-both.sr <- as.sr(some.rets)
+# make them monthly:
+mo.rets <- my.periodReturn(exp(cumsum(some.rets)),period='monthly',type='arithmetic')
+# look at both of them together:
 both.sr <- as.sr(mo.rets)
 print(both.sr)
+# confindence intervals on the Sharpe:
 print(confint(both.sr))
-# compute Sharpe of idiosyncratic term under CAPM
+# perform a CAPM attribution, using SPY as 'the market'
 linmod <- lm(BRK.B.Adjusted ~ SPY.Adjusted,data=mo.rets)
+# convert attribution model to Sharpe
 CAPM.sr <- as.sr(linmod,ope=both.sr$ope,epoch="yr")
+# statistical significance does not change (though note the sr summary
+# prints a 1-sided p-value)
 print(summary(linmod))
 print(CAPM.sr)
+# the confidence intervals tell the same story, but in different units:
 print(confint(linmod,'(Intercept)'))
 print(confint(CAPM.sr))
 @
 %UNFOLD
 
-\subsection{Attribution Models}
+\subsection{Testing Sharpe and Power}%FOLDUP
 
-\subsection{Distribution Functions}
+The function \rcode{sr\_test} performs one- and two-sample tests for
+significance of \txtSR. Paired tests for equality of \txtSR can be
+performed via the \rcode{sr\_equality\_test}, which applies the tests of Leung \etal or
+of Wright \etal \cite{Leung2008,Wright2012}
+
+<<'SPDRcheck'>>=
+# get the sector 'spiders'
+some.rets <- get.rets(c("XLY","XLE","XLP","XLF","XLV","XLI","XLB","XLK","XLU"),from="1999-01-01")
+# make them monthly:
+mo.rets <- my.periodReturn(exp(cumsum(some.rets)),period='monthly',type='arithmetic')
+# one-sample test on utilities:
+XLU.monthly <- mo.rets[,"XLU.Adjusted"]
+print(sr_test(XLU.monthly),alternative="two.sided")
+
+# test for equality of Sharpe among the different spiders
+print(sr_equality_test(some.rets))
+# perform a paired two-sample test via sr_test:
+XLF.monthly <- mo.rets[,"XLF.Adjusted"]
+print(sr_test(x=XLU.monthly,y=XLF.monthly,ope=12,paired=TRUE))
+@
+
+The \emph{power} of the one-sample test for \txtSR follows a form first
+published by Johnson and Welch:\cite{Johnson:1940}
+$$
+\ssiz = \frac{c}{\psnrsq},
+$$
+where the constant $c$ depends on the type I and type II rates and whether one
+is performing a one- or two-sided test. A handy mnemonic instantiation of this
+rule, similar to `Lehr's rule,' \cite{vanBelle2002_STRUTs,Lehr16} is 
+$e \approx \ssiz \psnrsq$, where \psnr is the population signal-to-noise
+ratio, $e$ is Euler's number, and \ssiz is the sample size, in the \emph{same
+units} as \psnr. That is, if one measures SNR in annualized units, then \ssiz is
+the number of \emph{years}.  The relative error in this approximation for
+determining the sample size is shown in \figref{power_thing}, as a function of
+\psnr; the error is smaller than one percent in the tested range.  Note that the
+$e$ appearing here is merely a coincidence.
+
+<<'power_thing',fig.cap="The percent error of the power mnemonic $e\\approx\\ssiz \\psnrsq$ is plotted versus \\psnr.">>=
+ope <- 253
+ zetas <- seq(0.1,2.5,length.out=201)
+ssizes <- sapply(zetas,function(zed) { 
+ x <- power.sr_test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,ope=ope)
+ x$n / ope 
+})
+plot(zetas,100 * ((exp(1) / zetas^2) - ssizes)/ssizes, ylab="error in mnemonic rule (as %)")
+@
+
+<<'sobering',include=FALSE>>=
+foo.power <- power.sr_test(n=253,zeta=NULL,sig.level=0.05,power=0.5,ope=253)
+@
+
+The power rules are sobering indeed. Suppose you were a hedge fund manager
+whose investors threatened to perform a one-sided \tstat-test after one year.
+If your strategy's signal-to-noise ratio is less than
+\Sexpr{foo.power$zeta}\yrto{-1/2} (a value which should be considered ``very good''), 
+your chances of `passing' the \tstat-test are less than fifty percent.
+%UNFOLD
+
+\subsection{Optimal Sharpe}%FOLDUP
+
+The class \rcode{sropt} stores the `optimal' \txtSR, which is that of the
+optimal (`Markowitz') portfolio, as defined in \eqnref{port_prob}, as well as
+the relevant degrees of freedom, and the annualization parameters. Again, the
+constructor can be used directly, but the helper function is preferred:
+
+<<'sropt_basics'>>=
+# from a matrix object:
+ope <- 253
+n.stok <- 7
+n.yr <- 8
+# somewhat unrealistic: the returns are independent.
+some.rets <- matrix(rnorm(n.yr * ope * n.stok),ncol=n.stok)
+asro <- as.sropt(some.rets,ope=ope)
+print(asro)
+# from an xts object
+some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"),from="2001-01-01")
+asro <- as.sropt(some.rets)
+print(asro)
+@
+
+One can compute confidence intervals for the population parameter
+$\psnropt \defeq \sqrt{\qform{\minv{\pvsig}}{\pvmu}}$, called the `optimal
+signal-noise ratio', based on inverting the non-central \flaw{}-distribution. 
+Estimates of \psnropt can also be computed, via Maximum Likelihood
+Estimation, or a `shrinkage' estimate.  \cite{kubokawa1993estimation,MC1986216}
+
+<<'sropt_estim'>>=
+# confidence intervals:
+print(confint(asro,level.lo=0.05,level.hi=1))
+# estimation
+print(inference(asro,type="KRS"))
+print(inference(asro,type="MLE"))
+@
+
+A nice rule of thumb is that, to a first order approximation, the MLE of
+\psnropt is zero exactly when $\ssrsqopt \le \nlatf/\ssiz,$ where
+\nlatf is the number of assets. Inspection of this inequality confirms that
+\ssropt and \ssiz can be expressed `in the same units', meaning that if \ssropt
+is in \yrto{-1/2}, then \ssiz should be the number of \emph{years}.  For
+example, if the Markowitz portfolio on 8 assets over 7 years has a 
+\txtSR of 1\yrto{-1/2}, the MLE will be zero. This can be confirmed empirically
+as below.
+
+<<'MLE_rule'>>=
+ope <- 253
+zeta.s <- 0.8
+n.check <- 1000
+df1 <- 10
+df2 <- 6 * ope
+rvs <- rsropt(n.check,df1,df2,zeta.s,ope,drag=0)
+roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope,epoch="yr")
+MLEs <- inference(roll.own,type="MLE")
+zerMLE <- MLEs <= 0
+crit.value <- 0.5 * (max(rvs[zerMLE])^2 + min(rvs[!zerMLE])^2)
+aspect.ratio <- df1 / (df2 / ope)
+cat(sprintf("empirical cutoff for zero MLE is %2.2f yr^{-1}\n", crit.value))
+cat(sprintf("the aspect ratio is %2.2f yr^{-1}\n",aspect.ratio))
+@
+
+\subsubsection{The Haircut}
+
+Care must be taken interpreting the confidence intervals and the estimated
+optimal SNR. This is because \psnropt is the \emph{maximal} population SNR achieved 
+by any portfolio; it is at least equal to, and potentially much larger than, 
+the SNR achieved by the portfolio based on sample statistics, \sportwopt. There
+is a gap or `haircut' due to mis-estimation of the optimal portfolio. One would
+suspect that this gap is worse when the true effect size (\ie \psnropt) is
+smaller, when there are fewer observations (\ssiz), and when there are more
+assets (\nlatf).
+
+I define the haircut as the gap
+\begin{equation}
+\hcut \defeq 1 - \frac{\trAB{\sportwopt}{\pvmu}}{\psnropt\sqrt{\qform{\pvsig}{\sportwopt}}}
+= 1 - \wrapParens{\frac{\trAB{\sportwopt}{\pvmu}}{\trAB{\pportwopt}{\pvmu}}}
+\wrapParens{\frac{\sqrt{\qform{\pvsig}{\pportwopt}}}{\sqrt{\qform{\pvsig}{\sportwopt}}}},
+\label{eqn:hcut_def}
+\end{equation}
+where \pportwopt is the population optimal portfolio, positively proportional
+to $\minv{\pvsig}{\pvmu}.$ Modeling the haircut is an not straightforward
+because it is a random quantity which is not observed. That is, it mixes the
+unknown population parameters \pvsig and \pvmu with the sample quantity
+\sportwopt, which is random.  
+
+At the moment the best I can provide is an unconditional estimate of the 
+distribution of \hcut based on the unobserved population parameters.
+When $\ssiz/\nlatf$ is large, the following is a reasonable approximation,
+where \nctlaw{x,y} is a non-central \tstat-distribution with non-centrality
+parameter $x$ and $y$ degrees of freedom:
+\begin{equation}  
+\sqrt{\nlatf - 1} \ftan{\farcsin{1-\hcut}} \approx \nctlaw{\sqrt{\ssiz}\psnropt,\nlatf-1}.
+\label{eqn:hcut_apx}
+\end{equation}
+This approximation can be found by ignoring all variability in the sample
+estimate of the covariance matrix, that is by assuming that the sample optimal
+portfolio was computed with the \emph{population} covariance:
+$\sportwopt \propto \minv{\pvsig}{\svmu}$.
+
+Numerical experiments suggest that the following is a decent approximation to
+the median value of the haircut distribution:
+$$
+1 - \fsin{\farctan{\frac{\sqrt{\ssiz}\psnropt}{\sqrt{\nlatf-1}}}}.
+$$
+
+Let's see this in practice:
+<<'haircutting'>>=
+require(MASS)
+
+simple.marko <- function(rets) {
+	mu.hat <- as.vector(apply(rets,MARGIN=2,mean,na.rm=TRUE))
+	Sig.hat <- cov(rets)
+	w.opt <- solve(Sig.hat,mu.hat)
+	retval <- list('mu'=mu.hat,'sig'=Sig.hat,'w'=w.opt)
+	return(retval)
+}
+
+gen.pop <- function(n,p,zeta.s=0) {
+	true.mu <- matrix(rnorm(p),ncol=p)
+	#generate an SPD population covariance. a hack.
+	xser <- matrix(rnorm(p*(p + 100)),ncol=p)
+	true.Sig <- t(xser) %*% xser
+	pre.sr <- sqrt(true.mu %*% solve(true.Sig,t(true.mu)))
+	#scale down the sample mean to match the zeta.s
+	true.mu <- (zeta.s/pre.sr[1]) * true.mu 
+  X <- mvrnorm(n=n,mu=true.mu,Sigma=true.Sig)
+	retval = list('X'=X,'mu'=true.mu,'sig'=true.Sig,'SNR'=zeta.s)
+	return(retval)
+}
+
+sample.haircut <- function(n,p,...) {
+	popX <- gen.pop(n,p,...)
+	smeas <- simple.marko(popX$X)
+	# I have got to figure out how to deal with vectors...
+	ssnr <- (t(smeas$w) %*% t(popX$mu)) / sqrt(t(smeas$w) %*% popX$sig %*% smeas$w)
+	hcut <- 1 - (ssnr / popX$SNR)
+	return(hcut)
+}
+
+set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
+ope <- 253
+n.sim <- 1024
+n.stok <- 8
+n.yr <- 5
+n.obs <- ceiling(ope * n.yr)
+# annualized optimal SNR
+zeta.s <- 1.20 / sqrt(ope)
+
+hcuts <- replicate(n.sim,sample.haircut(n.obs,n.stok,zeta.s))
+print(summary(hcuts))
+medv.apx <- 1 - sin(atan(sqrt((n.obs * zeta.s^2) / (n.stok - 1))))
+cat(sprintf("modeled median is %2.2f\n",medv.apx))
+@
+<<'hcut_med',include=FALSE>>=
+medv.true <- median(hcuts)
+med.snr.true <- zeta.s * (1 - medv.true)
+@
+
+In this case, where we optimize over \Sexpr{n.stok} assets given \Sexpr{n.yr} 
+years of daily observations, and a population SNR of 
+\Sexpr{zeta.s * sqrt(ope)} \yrto{-1/2}, the median value of the haircut is on the 
+order of \Sexpr{signif(100 * medv.true,2)}\%, meaning that the median
+population SNR of the sample portfolios is around \Sexpr{med.snr.true *
+sqrt(ope)}\yrto{-1/2}.  The maximum value of the haircut over the
+\Sexpr{n.sim} simulations, however is \Sexpr{max(hcuts)}, which is larger than
+one; this happens if and only if the sample portfolio has negative expected
+return: $\trAB{\sportwopt}{\pvmu} < 0$. In this case the Markowitz portfolio
+is actually destroying value because of estimation error.
+
+Again, it is not clear how to estimate the haircut given the observed
+statistics \svmu and \svsig, other than lamely `plugging in' the sample
+estimate in place of \psnropt.
+%UNFOLD
+
+\subsection{Distribution Functions}%FOLDUP
 
 There are \rcode{dpqr} functions for the \txtSR distribution, as well as the
 `optimal \txtSR' distribution. These are merely rescaled non-central 
 \tstat and \Fstat distributions, provided for convenience, and for testing
-purposes.
+purposes. See the help for \rcode{dsr} and \rcode{dsropt} for more details.
 
+%UNFOLD
+
+% bibliography%FOLDUP
 \nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940}
 
 %\bibliographystyle{jss}
 \bibliographystyle{acm}
 \bibliography{SharpeR}
+%UNFOLD
 
 \end{document}
 %for vim modeline: (do not edit)

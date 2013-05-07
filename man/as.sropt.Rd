@@ -112,12 +112,14 @@ if (require(MASS)) {
 }
 # using real data.
 if (require(quantmod)) {
-  getret <- function(sym,...) {
+  get.ret <- function(sym,...) {
     OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
     lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
+    # chomp first NA!
+    lrets[-1,]
   }
-  getrets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,getret,...)) }
-  some.rets <- getrets(c("IBM","AAPL","A","C","SPY","XOM"))
+  get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+  some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
   asro <- as.sropt(some.rets)
 }
 }

@@ -118,12 +118,13 @@
 #' 
 #' # using real data
 #' if (require(quantmod)) {
-#'   getret <- function(sym,...) {
+#'   get.ret <- function(sym,...) {
 #'     OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
 #'     lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
+#'     lrets[-1,]
 #'   }
-#'   getrets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,getret,...)) }
-#'   some.rets <- getrets(c("IBM","AAPL","NFLX","SPY"))
+#'   get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+#'   some.rets <- get.rets(c("IBM","AAPL","NFLX","SPY"))
 #'   pvs <- sr_equality_test(some.rets)
 #' }
 #' # test for uniformity
@@ -136,6 +137,8 @@
 sr_equality_test <- function(X,type=c("chisq","F","t"),
 														 alternative=c("two.sided","less","greater"),
 														 contrasts=NULL) {
+	# all this stolen from t.test.default:
+	alternative <- match.arg(alternative)
 	dname <- deparse(substitute(X))
 	X <- na.omit(X)
 	type <- match.arg(type)
@@ -185,6 +188,10 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 									 chisq = pchisq(T2,df=k,ncp=0,lower.tail=FALSE),
 									 F = pf((n-k) * T2/((n-1) * k),df1=k,df2=n-k,lower.tail=FALSE))
 		statistic <- T2
+		if (alternative != "two.sided") {
+			warning("cannot perform directional tests on T^2")
+			alternative <- "two.sided"
+		}
 	}
 
 	# attach names
@@ -192,9 +199,13 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 	method <- paste(c("test for equality of Sharpe ratio, via",type,"test"),collapse=" ")
 	names(SR) <- sapply(1:p,function(x) { paste(c("strat",x),collapse="_") })
 
+	cozeta <- 0
+	names(cozeta) <- "sum squared contrasts of SNR"
+
 	retval <- list(statistic = statistic, parameter = k,
 							 df1 = p, df2 = n, p.value = pval, 
-							 SR = SR,
+							 SR = SR, null.value = cozeta,
+							 alternative = alternative,
 							 method = method, data.name = dname)
 	class(retval) <- "htest"
 	return(retval)
@@ -323,12 +334,13 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 		subsr <- as.sr(x,c0=0,ope=ope,na.rm=TRUE)
 		retv <- sr_test(subsr,alternative=alternative,zeta=zeta,conf.level=conf.level)
 		retv$data.name <- dname
-		names(retv$estimate) <- paste(c("Sharpe ratio of",dname),sep=" ",collapse="")
+		names(retv$estimate) <- paste(c("Sharpe ratio of ",dname),sep=" ",collapse="")
 		return(retv)
 	} #UNFOLD
 	else {#FOLDUP
 		ny <- length(y)
 		if (paired) {#FOLDUP
+			nx <- length(x)
 			if (zeta != 0)
 				stop("cannot test 'zeta' != 0 for paired test")
 			if (nx != ny)
@@ -381,6 +393,7 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 	}#UNFOLD
 
 	names(df) <- "df"
+	names(zeta) <- "difference in signal-noise ratios"
 	#attr(cint, "conf.level") <- conf.level
 	retval <- list(statistic = statistic, parameter = df,
 								 estimate = estimate, p.value = pval, 
@@ -436,6 +449,7 @@ sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 	}
 
 	names(df) <- "df"
+	names(zeta) <- "signal-noise ratio"
 	#attr(cint, "conf.level") <- conf.level
 	retval <- list(statistic = statistic, parameter = df,
 								 estimate = estimate, p.value = pval, 

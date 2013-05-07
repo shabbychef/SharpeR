@@ -43,7 +43,7 @@ R         			 = $(RBIN)/R
 RSCRIPT   			 = $(RBIN)/Rscript
 
 # packages I need to test this one
-TEST_DEPS  			 = testthat roxygen2 knitr txtplot quantmod
+TEST_DEPS  			 = testthat roxygen2 knitr txtplot quantmod MASS
 INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
 PKG_TESTR 			 = tests/run-all.R
 

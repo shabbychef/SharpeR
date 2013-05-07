@@ -862,6 +862,15 @@ pco_sropt <- function(q,df1,df2,z.s,ope=1,lower.tail=TRUE,log.p=FALSE) {
 	if ((lb > ub) || (is.infinite(lb)) || (min(lb,ub) < 0))
 		stop("nonsensical lb and/or ub")
 
+	eqv.p <- if (log.p) exp(p) else p
+
+	if (eqv.p == 1)
+		return(ifelse(lower.tail,Inf,0))
+	if (eqv.p == 0)
+		return(ifelse(lower.tail,0,Inf))
+	if ((eqv.p < 0) || (eqv.p > 1))
+		return (NaN)
+
 	if (!missing(ope)) 
 		z.s <- .deannualize(z.s,ope)
 

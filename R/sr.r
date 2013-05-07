@@ -252,12 +252,12 @@ as.sr.lm <- function(modl,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 #' @rdname as.sr
 #' @method as.sr xts 
 #' @S3method as.sr xts
-as.sr.xts <- function(anxts,c0=0,ope=1,epoch="yr") {
+as.sr.xts <- function(anxts,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	if (missing(ope) && missing(epoch)) {
 		ope <- .infer_ope_xts(anxts)
 		epoch <- "yr"
 	}
-	retval <- as.sr.data.frame(as.data.frame(anxts),c0=c0,ope=ope,epoch=epoch)
+	retval <- as.sr.data.frame(as.data.frame(anxts),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
 	return(retval)
 }
 #' @title Is this in the "sr" class?
@@ -642,12 +642,14 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #' }
 #' # using real data.
 #' if (require(quantmod)) {
-#'   getret <- function(sym,...) {
+#'   get.ret <- function(sym,...) {
 #'     OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
 #'     lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
+#'     # chomp first NA!
+#'     lrets[-1,]
 #'   }
-#'   getrets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,getret,...)) }
-#'   some.rets <- getrets(c("IBM","AAPL","A","C","SPY","XOM"))
+#'   get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+#'   some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
 #'   asro <- as.sropt(some.rets)
 #' }
 as.sropt <- function(X,drag=0,ope=1,epoch="yr") {
