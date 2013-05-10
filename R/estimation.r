@@ -93,7 +93,7 @@
 
 #' @rdname se
 #' @export
-se <- function(z, ...) {
+se <- function(z, type) {
 	UseMethod("se", z)
 }
 #' @title Standard error computation
@@ -118,7 +118,7 @@ se <- function(z, ...) {
 #'
 #' @param z an observed Sharpe ratio statistic, of class \code{sr}.
 #' @param type estimator type. one of \code{"t", "Lo", "exact"}
-#' @param ... further arguments to be passed to or from methods.
+#' @template param-ellipsis
 #' @keywords htest
 #' @return an estimate of standard error.
 #' @seealso sr-distribution functions, \code{\link{dsr}}
@@ -192,6 +192,7 @@ se.sr <- function(z, type=c("t","Lo")) {
 #'
 #' @param object an observed Sharpe ratio statistic, of class \code{sr} or
 #' \code{sropt}.
+#' @param parm ignored here, but required for the general method.
 #' @param level the confidence level required.
 #' @param level.lo the lower confidence level required.
 #' @param level.hi the upper confidence level required.
@@ -242,7 +243,7 @@ se.sr <- function(z, type=c("t","Lo")) {
 #' @method confint sr 
 #' @S3method confint sr 
 #' @export
-confint.sr <- function(object,level=0.95,
+confint.sr <- function(object,parm,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,
 							 type=c("exact","t","Z")) {
 	type <- match.arg(type)
@@ -258,7 +259,7 @@ confint.sr <- function(object,level=0.95,
 #' @rdname confint
 #' @method confint sropt
 #' @S3method confint sropt
-confint.sropt <- function(object,level=0.95,
+confint.sropt <- function(object,parm,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo) {
 	ci.hi <- qco_sropt(level.hi,df1=object$df1,df2=object$df2,
 										 z.s=object$sropt,ope=object$ope,lower.tail=TRUE)

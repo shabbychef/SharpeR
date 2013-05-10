@@ -141,16 +141,17 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #'
 #' @usage
 #'
-#' as.sr(x,c0=0,ope=1,...) 
+#' as.sr(x,c0=0,ope=1,na.rm=FALSE,epoch="yr")
 #'
-#' @param x vector of returns.
+#' @param x vector of returns, or object of class \code{data.frame}, \code{xts},
+#'        or \code{lm}.
 #' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
 #'        assumed to be given in the same units as x, \emph{not}
 #'        in 'annualized' terms.
 #' @template param-ope
+#' @param na.rm logical.  Should missing values be removed?
 #' @param epoch the string representation of the 'epoch', defaulting
 #'        to 'yr'.
-#' @param ... further arguments to be passed to or from methods.
 #' @keywords univar 
 #' @return a list containing the following components:
 #' \item{sr}{the annualized Sharpe ratio.}
@@ -195,10 +196,9 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' APT_mod <- lm(Returns ~ Factors)
 #' asr <- as.sr(APT_mod,ope=ope)
 #'   
-as.sr <- function(x,c0=0,ope=1,...) {
+as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	UseMethod("as.sr", x)
 }
-#' @param na.rm logical.  Should missing values be removed?
 #' @rdname as.sr
 #' @method as.sr default
 #' @S3method as.sr default
@@ -215,49 +215,46 @@ as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 							 rescal=1/sqrt(df),epoch=epoch)
 	return(retval)
 }
-#' @param adframe a \code{data.frame} object.
 #' @rdname as.sr
 #' @method as.sr data.frame
 #' @S3method as.sr data.frame
-as.sr.data.frame <- function(adframe,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
-	mu <- apply(adframe,2,mean,na.rm=na.rm)
-	sigma <- apply(adframe,2,sd,na.rm=na.rm)
+as.sr.data.frame <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+	mu <- apply(x,2,mean,na.rm=na.rm)
+	sigma <- apply(x,2,sd,na.rm=na.rm)
 	z <- .compute_sr(mu,c0,sigma,ope)
 	dim(z) <- c(length(mu),1)
-	rownames(z) <- unlist(colnames(adframe))
+	rownames(z) <- unlist(colnames(x))
 	if (is.null(rownames(z)))
-		rownames(z) <- deparse(substitute(adframe))
-	df <- ifelse(na.rm,apply(!is.na(adframe),2,sum),dim(adframe)[1])
+		rownames(z) <- deparse(substitute(x))
+	df <- ifelse(na.rm,apply(!is.na(x),2,sum),dim(x)[1])
 	retval <- sr(z,df=df-1,c0=c0,ope=ope,
 							 rescal=1/sqrt(df),epoch=epoch)
 	return(retval)
 }
-#' @param modl a fit model of class \code{lm}.
 #' @rdname as.sr
 #' @method as.sr lm 
 #' @S3method as.sr lm
-as.sr.lm <- function(modl,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
-	mu <- modl$coefficients["(Intercept)"]
-	sigma <- sqrt(deviance(modl) / modl$df.residual)
+as.sr.lm <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+	mu <- x$coefficients["(Intercept)"]
+	sigma <- sqrt(deviance(x) / x$df.residual)
 	z <- .compute_sr(mu,c0,sigma,ope)
 	dim(z) <- c(1,1)
-	rownames(z) <- deparse(substitute(modl))
-	XXinv <- vcov(modl) / sigma^2
+	rownames(z) <- deparse(substitute(x))
+	XXinv <- vcov(x) / sigma^2
 	rescal <- sqrt(XXinv["(Intercept)","(Intercept)"])
-	retval <- sr(z,df=modl$df.residual,c0=c0,ope=ope,
+	retval <- sr(z,df=x$df.residual,c0=c0,ope=ope,
 							 rescal=rescal,epoch=epoch)
 	return(retval)
 }
-#' @param anxts an \code{xts} object.
 #' @rdname as.sr
 #' @method as.sr xts 
 #' @S3method as.sr xts
-as.sr.xts <- function(anxts,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+as.sr.xts <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	if (missing(ope) && missing(epoch)) {
-		ope <- .infer_ope_xts(anxts)
+		ope <- .infer_ope_xts(x)
 		epoch <- "yr"
 	}
-	retval <- as.sr.data.frame(as.data.frame(anxts),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
+	retval <- as.sr.data.frame(as.data.frame(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
 	return(retval)
 }
 #' @title Is this in the "sr" class?
@@ -286,8 +283,8 @@ as.sr.xts <- function(anxts,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 #' is.sr(rvs)
 is.sr <- function(x) inherits(x,"sr")
 
-#' @S3method format sr
-#' @export
+# ' @S3method format sr
+# ' @export
 format.sr <- function(x,...) {
 	# oh! ugly! ugly!
 	retval <- capture.output(print.sr(x,...))
@@ -301,6 +298,7 @@ format.sr <- function(x,...) {
 #' (via \code{invisible(x)}.)
 #'
 #' @param x an object of class \code{sr} or \code{sropt}.
+#' @template param-ellipsis
 #'
 #' @return the object, wrapped in \code{invisible}.
 #' @rdname print
@@ -334,7 +332,7 @@ format.sr <- function(x,...) {
 #' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 #' asro <- as.sropt(Returns,drag=0,ope=ope)
 #' print(asro)
-print.sr <- function(x) {
+print.sr <- function(x,...) {
 	tval <- .sr2t(x)
 	pval <- pt(tval,x$df,lower.tail=FALSE)
 	serr <- se(x,type="t")
@@ -593,7 +591,7 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #'
 #' as.sropt(X,drag=0,ope=1,epoch="yr")
 #'
-#' @param X matrix of returns.
+#' @param X matrix of returns, or \code{xts} object.
 #' @inheritParams sropt 
 #' @keywords univar 
 #' @return A list with containing the following components:
@@ -676,15 +674,14 @@ as.sropt.default <- function(X,drag=0,ope=1,epoch="yr") {
 
 	return(retv)
 }
-#' @param anxts an \code{xts} object.
 #' @rdname as.sropt
 #' @method as.sropt xts
 #' @S3method as.sropt xts
-as.sropt.xts <- function(anxts,drag=0,ope=1,epoch="yr") {
+as.sropt.xts <- function(X,drag=0,ope=1,epoch="yr") {
 	if (missing(ope)) {
-		ope <- .infer_ope_xts(anxts)
+		ope <- .infer_ope_xts(X)
 	}
-	retval <- as.sropt.default(anxts,drag=drag,ope=ope,epoch=epoch)
+	retval <- as.sropt.default(X,drag=drag,ope=ope,epoch=epoch)
 	return(retval)
 }
 #' @title Is this in the "sropt" class?
@@ -724,7 +721,7 @@ is.sropt <- function(x) inherits(x,"sropt")
 #' @method print sropt
 #' @S3method print sropt
 #' @export
-print.sropt <- function(x) {
+print.sropt <- function(x,...) {
 	Tval <- x$T2
 	pval <- pT2(Tval,x$df1,x$df2,lower.tail=FALSE)
 	coefs <- cbind(x$sropt,Tval,pval)

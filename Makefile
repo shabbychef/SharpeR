@@ -188,9 +188,6 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 
 parallel : $(STAGED_PKG)/DESCRIPTION
 
-# ack. cannot build the vignette when calling
-# make package
-# something about 'pb' missing?
 #PACKAGING_FLAGS   = --no-vignettes
 PACKAGING_FLAGS   = 
 

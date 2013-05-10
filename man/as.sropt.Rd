@@ -9,13 +9,11 @@
   \method{as.sropt}{default} (X, drag = 0, ope = 1,
     epoch = "yr")
 
-  \method{as.sropt}{xts} (anxts, drag = 0, ope = 1,
+  \method{as.sropt}{xts} (X, drag = 0, ope = 1,
     epoch = "yr")
 }
 \arguments{
-  \item{X}{matrix of returns.}
-
-  \item{anxts}{an \code{xts} object.}
+  \item{X}{matrix of returns, or \code{xts} object.}
 
   \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
   to 0. It is assumed that \code{drag} has been annualized,

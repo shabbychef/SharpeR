@@ -89,7 +89,7 @@ print(summary(ssizes * zetas * zetas - exp(1)))
 
   Lehr, R. "Sixteen S-squared over D-squared: A relation
   for crude sample size estimates." Statist. Med., 11, no 8
-  (1992): 1099–1102. doi: 10.1002/sim.4780110811
+  (1992): 1099--1102. doi: 10.1002/sim.4780110811
 }
 \seealso{
   \code{\link{reannualize}}
@@ -106,8 +106,7 @@ print(summary(ssizes * zetas * zetas - exp(1)))
   \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}}
 }
 \keyword{htest}
 

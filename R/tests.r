@@ -241,10 +241,22 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' 
 #' @usage
 #'
-#' sr_test(x,...)
+#' sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
+#'         zeta=0,ope=1,paired=FALSE,conf.level=0.95)
 #'
-#' @param x a (non-empty) numeric vector of data values.
-#' @param ... further arguments to be passed to or from methods.
+#' @param x a (non-empty) numeric vector of data values, or an
+#'    object of class \code{sr}, in which case we perform
+#'    single-sample tests.
+#' @param y an optional (non-empty) numeric vector of data values.
+#' @param alternative a character string specifying the alternative hypothesis,
+#'       must be one of \code{"two.sided"} (default), \code{"greater"} or
+#'       \code{"less"}.  You can specify just the initial letter.
+#' @param zeta a number indicating the null hypothesis offset value, the
+#' \eqn{S} value.
+#' @template param-ope
+#' @param paired a logical indicating whether you want a paired test.
+#' @param conf.level confidence level of the interval. 
+#' @template param-ellipsis
 #' @keywords htest
 #' @return A list with class \code{"htest"} containing the following components:
 #' \item{statistic}{the value of the t- or Z-statistic.}
@@ -279,34 +291,20 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #'                         x$p.value })
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
+#' # testing an object of class sr
+#' asr <- as.sr(rnorm(1000,1 / sqrt(253)),ope=253)
+#' checkit <- sr_test(asr,zeta=0)
 #'
 #' @export
-sr_test <- function(x,...) {
-	UseMethod("sr_test", x)
-}
-#' @rdname sr_test
-#' @method sr_test default
-#' @S3method sr_test default
-#'
-#' @usage
-#'
-#' sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
-#'         zeta=0,ope=1,paired=FALSE,conf.level=0.95)
-#'
-#'
-#' @param y an optional (non-empty) numeric vector of data values.
-#' @param alternative a character string specifying the alternative hypothesis,
-#'       must be one of \code{"two.sided"} (default), \code{"greater"} or
-#'       \code{"less"}.  You can specify just the initial letter.
-#' @param zeta a number indicating the null hypothesis offset value, the
-#' \eqn{S} value.
-#' @template param-ope
-#' @param paired a logical indicating whether you want a paired test.
-#' @param conf.level confidence level of the interval. 
-sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
+sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 										zeta=0,ope=1,paired=FALSE,conf.level=0.95) {
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
+	if (is.sr(x)) {
+		retv <- .sr_test_on_sr(z=x,alternative=alternative,
+													 zeta=zeta,conf.level=conf.level)
+		return(retv)
+	}
 	if (!missing(zeta) && (length(zeta) != 1 || is.na(zeta))) 
 		stop("'zeta' must be a single number")
 	if (!missing(conf.level) && (length(conf.level) != 1 || !is.finite(conf.level) || 
@@ -332,7 +330,7 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 	if (is.null(y)) {#FOLDUP
 		# delegate
 		subsr <- as.sr(x,c0=0,ope=ope,na.rm=TRUE)
-		retv <- sr_test(subsr,alternative=alternative,zeta=zeta,conf.level=conf.level)
+		retv <- .sr_test_on_sr(subsr,alternative=alternative,zeta=zeta,conf.level=conf.level)
 		retv$data.name <- dname
 		names(retv$estimate) <- paste(c("Sharpe ratio of ",dname),sep=" ",collapse="")
 		return(retv)
@@ -359,6 +357,7 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 			pval <- subtest$p.value
 		} #UNFOLD
 		else {#FOLDUP
+			# via Z-approximation. sigh.
 			srx <- as.sr(x,c0=0)
 			sry <- as.sr(y,c0=0)
 
@@ -367,8 +366,8 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 			nx <- srx$df
 			ny <- sry$df
 
-			se.x <- sr.se(sx,nx,type="t")
-			se.y <- sr.se(sy,ny,type="t")
+			se.x <- se(srx,type="t")
+			se.y <- se(sry,type="t")
 			se.z <- sqrt(se.x^2 + se.y^2)
 			estimate <- sx - sy
 			zeta <- .deannualize(zeta,ope)
@@ -402,20 +401,9 @@ sr_test.default <- function(x,y=NULL,alternative=c("two.sided","less","greater")
 	class(retval) <- "htest"
 	return(retval)
 }
-#' @rdname sr_test
-#' @method sr_test sr
-#' @S3method sr_test sr
-#'
-#' @usage
-#'
-#' sr_test(z,alternative=c("two.sided","less","greater"),
-#'         zeta=0,conf.level=0.95)
-#'
-#' @param z an object of class \code{sr}.
-#' @examples 
-#' asr <- as.sr(rnorm(1000,1 / sqrt(253)),ope=253)
-#' checkit <- sr_test(asr,zeta=0)
-sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
+# fuck it, this used to be sr_test.sr, but tired of fighting with roxygen
+# and R CMD check --as-cran warnings.
+.sr_test_on_sr <- function(z,alternative=c("two.sided","less","greater"),
 											 zeta=0,conf.level=0.95) {
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
@@ -504,7 +492,7 @@ sr_test.sr <- function(z,alternative=c("two.sided","less","greater"),
 #' @references 
 #'
 #' Lehr, R. "Sixteen S-squared over D-squared: A relation for crude 
-#' sample size estimates." Statist. Med., 11, no 8 (1992): 1099–1102. 
+#' sample size estimates." Statist. Med., 11, no 8 (1992): 1099--1102. 
 #' doi: 10.1002/sim.4780110811
 #'
 #' @examples 

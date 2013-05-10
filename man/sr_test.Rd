@@ -1,22 +1,14 @@
 \name{sr_test}
 \alias{sr_test}
-\alias{sr_test.default}
-\alias{sr_test.sr}
 \title{test for Sharpe ratio}
 \usage{
-  sr_test(x,...)
-
   sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
     zeta=0,ope=1,paired=FALSE,conf.level=0.95)
-
-  sr_test(z,alternative=c("two.sided","less","greater"),
-    zeta=0,conf.level=0.95)
 }
 \arguments{
-  \item{x}{a (non-empty) numeric vector of data values.}
-
-  \item{...}{further arguments to be passed to or from
-  methods.}
+  \item{x}{a (non-empty) numeric vector of data values, or
+  an object of class \code{sr}, in which case we perform
+  single-sample tests.}
 
   \item{y}{an optional (non-empty) numeric vector of data
   values.}
@@ -43,7 +35,8 @@
 
   \item{conf.level}{confidence level of the interval.}
 
-  \item{z}{an object of class \code{sr}.}
+  \item{...}{further arguments to be passed to or from
+  methods.}
 }
 \value{
   A list with class \code{"htest"} containing the following
@@ -102,6 +95,7 @@ pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),ope=253,alternative="two.sided"
                         x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')
+# testing an object of class sr
 asr <- as.sr(rnorm(1000,1 / sqrt(253)),ope=253)
 checkit <- sr_test(asr,zeta=0)
 }
@@ -119,9 +113,9 @@ checkit <- sr_test(asr,zeta=0)
   \url{http://www.jstor.org/stable/2285841}
 }
 \seealso{
-  \code{\link{sr_equality_test}}, \code{\link{t.test}}.
-
   \code{\link{reannualize}}
+
+  \code{\link{sr_equality_test}}, \code{\link{t.test}}.
 
   Other sr: \code{\link{as.sr}},
   \code{\link{as.sr.data.frame}},

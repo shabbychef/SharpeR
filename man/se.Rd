@@ -3,7 +3,7 @@
 \alias{se.sr}
 \title{Standard error computation}
 \usage{
-  se(z, ...)
+  se(z, type)
 
   \method{se}{sr} (z, type = c("t", "Lo"))
 }
@@ -81,8 +81,7 @@ anse <- se(asr,type="Lo")
   \code{\link{print.sr}}, \code{\link{print.sropt}},
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}}
 }
 \keyword{htest}
 

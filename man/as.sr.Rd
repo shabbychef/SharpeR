@@ -6,22 +6,23 @@
 \alias{as.sr.xts}
 \title{Compute the Sharpe ratio.}
 \usage{
-  as.sr(x,c0=0,ope=1,...)
+  as.sr(x,c0=0,ope=1,na.rm=FALSE,epoch="yr")
 
   \method{as.sr}{default} (x, c0 = 0, ope = 1,
     na.rm = FALSE, epoch = "yr")
 
-  \method{as.sr}{data.frame} (adframe, c0 = 0, ope = 1,
+  \method{as.sr}{data.frame} (x, c0 = 0, ope = 1,
     na.rm = FALSE, epoch = "yr")
 
-  \method{as.sr}{lm} (modl, c0 = 0, ope = 1, na.rm = FALSE,
+  \method{as.sr}{lm} (x, c0 = 0, ope = 1, na.rm = FALSE,
     epoch = "yr")
 
-  \method{as.sr}{xts} (anxts, c0 = 0, ope = 1,
-    na.rm = FALSE, epoch = "yr")
+  \method{as.sr}{xts} (x, c0 = 0, ope = 1, na.rm = FALSE,
+    epoch = "yr")
 }
 \arguments{
-  \item{x}{vector of returns.}
+  \item{x}{vector of returns, or object of class
+  \code{data.frame}, \code{xts}, or \code{lm}.}
 
   \item{c0}{the 'risk-free' or 'disastrous' rate of return.
   this is assumed to be given in the same units as x,
@@ -36,19 +37,10 @@
   guess, what the observation frequency is, and no
   annualization adjustments will be made.}
 
-  \item{epoch}{the string representation of the 'epoch',
-  defaulting to 'yr'.}
-
-  \item{...}{further arguments to be passed to or from
-  methods.}
-
   \item{na.rm}{logical.  Should missing values be removed?}
 
-  \item{adframe}{a \code{data.frame} object.}
-
-  \item{modl}{a fit model of class \code{lm}.}
-
-  \item{anxts}{an \code{xts} object.}
+  \item{epoch}{the string representation of the 'epoch',
+  defaulting to 'yr'.}
 }
 \value{
   a list containing the following components: \item{sr}{the
@@ -133,8 +125,7 @@ asr <- as.sr(APT_mod,ope=ope)
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}}
 }
 \keyword{univar}
 

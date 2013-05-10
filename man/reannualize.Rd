@@ -64,8 +64,7 @@ roll.daily <- reannualize(roll.own,new.ope=1,new.epoch="day")
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
   \code{\link{print.sr}}, \code{\link{print.sropt}},
   \code{\link{se}}, \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}}
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},

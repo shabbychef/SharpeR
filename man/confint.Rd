@@ -3,16 +3,19 @@
 \alias{confint.sropt}
 \title{Confidence Interval on (optimal) Signal-Noise Ratio}
 \usage{
-  \method{confint}{sr} (object, level = 0.95,
+  \method{confint}{sr} (object, parm, level = 0.95,
     level.lo = (1 - level)/2, level.hi = 1 - level.lo,
     type = c("exact", "t", "Z"))
 
-  \method{confint}{sropt} (object, level = 0.95,
+  \method{confint}{sropt} (object, parm, level = 0.95,
     level.lo = (1 - level)/2, level.hi = 1 - level.lo)
 }
 \arguments{
   \item{object}{an observed Sharpe ratio statistic, of
   class \code{sr} or \code{sropt}.}
+
+  \item{parm}{ignored here, but required for the general
+  method.}
 
   \item{level}{the confidence level required.}
 
@@ -111,8 +114,7 @@ coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}}
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},

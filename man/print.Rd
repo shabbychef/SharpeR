@@ -3,12 +3,15 @@
 \alias{print.sropt}
 \title{Print values.}
 \usage{
-  \method{print}{sr} (x)
+  \method{print}{sr} (x, ...)
 
-  \method{print}{sropt} (x)
+  \method{print}{sropt} (x, ...)
 }
 \arguments{
   \item{x}{an object of class \code{sr} or \code{sropt}.}
+
+  \item{...}{further arguments to be passed to or from
+  methods.}
 }
 \value{
   the object, wrapped in \code{invisible}.
@@ -61,7 +64,6 @@ print(asro)
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_test.default}}, \code{\link{sr_test.sr}}
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}}
 }
 
