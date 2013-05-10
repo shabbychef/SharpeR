@@ -22,8 +22,8 @@ Depends:
 Suggests: 
     quantmod,
     MASS,
+		TTR,
     testthat, 
-    txtplot, 
     knitr
 URL: http://www.r-project.org, https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
