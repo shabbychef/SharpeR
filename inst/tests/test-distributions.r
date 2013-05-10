@@ -36,15 +36,16 @@ is.sorted <- function(xs,pragma=c("ascending","descending")) {
 	return(retv)
 }
 # are the data approximately U(0,1)?
-is.appx.uniform <- function(xs) {
+is.appx.uniform <- function(xs,slop=1.0) {
 	q.check <- seq(0,1,length.out=21)
-	retv <- max(abs(quantile(ecdf(xs),q.check) - q.check)) < max(diff(q.check))
+	retv <- max(abs(quantile(ecdf(xs),q.check) - q.check)) < slop * max(diff(q.check))
 	return(retv)
 }
 
 set.char.seed <- function(str) {
 	set.seed(as.integer(charToRaw(str)))
 }
+THOROUGHNESS <- 1.0
 #UNFOLD
 
 context("distribution functions: basic monotonicity")#FOLDUP
@@ -317,7 +318,8 @@ test_that("qlambdap sensible",{#FOLDUP
 	
 	df <- 128
 	true.ncp <- 3
-	tvals <- rt(4096,df,true.ncp)
+	ngen <- ceiling(THOROUGHNESS * 1024)
+	tvals <- rt(ngen,df,true.ncp)
 
 	for (p in c(0.05,0.25,0.5,0.75,0.95)) {
 		tstat <- sapply(tvals,function(t) { return(qlambdap(p,df,t)) })
@@ -339,7 +341,7 @@ test_that("qlambdap sensible",{#FOLDUP
 
 context("distribution functions: random generation")#FOLDUP
 
-ngen <- 2048
+ngen <- ceiling(THOROUGHNESS * 1024)
 
 test_that("psr/rsr uniform generation",{#FOLDUP
 	set.char.seed("6728bbac-7b37-4b26-bd59-f7f074dc3bc3")
@@ -350,7 +352,7 @@ test_that("psr/rsr uniform generation",{#FOLDUP
 			for (ope in c(1,52)) {
 				rvs <- rsr(ngen, df, snr, ope)
 				aps <- psr(rvs,  df, snr, ope)
-				expect_true(is.appx.uniform(aps))
+				expect_true(is.appx.uniform(aps,slop=1.5))
 			}
 		}
 	}
@@ -365,7 +367,7 @@ test_that("pT2/qT2 uniform generation",{#FOLDUP
 			for (delta2 in c(0,0.02)) {
 				rvs <- rT2(ngen, df1, df2, delta2)
 				aps <- pT2(rvs,  df1, df2, delta2)
-				expect_true(is.appx.uniform(aps))
+				expect_true(is.appx.uniform(aps,slop=1.5))
 			}
 		}
 	}
@@ -382,7 +384,7 @@ test_that("psropt/qsropt uniform generation",{#FOLDUP
 					for (drag in c(0,0.1)) {
 						rvs <- rsropt(ngen, df1, df2, snrstar, ope, drag)
 						aps <- psropt(rvs,  df1, df2, snrstar, ope, drag)
-						expect_true(is.appx.uniform(aps))
+						expect_true(is.appx.uniform(aps,slop=1.5))
 					}
 				}
 			}

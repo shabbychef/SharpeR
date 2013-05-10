@@ -57,6 +57,10 @@ RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
 SUPPORT_FILES 	 = ./DESCRIPTION ./NAMESPACE $(RD_DUMMY) ./inst/doc/$(PKG_NAME).Rnw
 
+# for R CMD build
+#BUILD_FLAGS 		?= --no-vignettes
+BUILD_FLAGS 		?= 
+
 # latex bother. bleah.
 #TEXINPADD    = .:$(HOME)/sys/etc/tex:$(HOME)/sys/etc/tex/SEPtex:$(HOME)/work/math/TEX
 TEXINPADD    = .:./inst/doc
@@ -64,6 +68,8 @@ PRETEX       = TEXINPUTS=$(TEXINPADD):$$TEXINPUTS
 PREBIB       = BSTINPUTS=$(TEXINPADD):$$BSTINPUTS \
                BIBINPUTS=$(TEXINPADD):$$BIBINPUTS 
 BIBTEX      := $(shell which bibtex)
+
+#FAST_
 
 #########################################################################
 # MACROS
@@ -188,12 +194,9 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 
 parallel : $(STAGED_PKG)/DESCRIPTION
 
-#PACKAGING_FLAGS   = --no-vignettes
-PACKAGING_FLAGS   = 
-
 # make the 'package', which is a tar.gz
 $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS)
-	$(RLOCAL) CMD build $(PACKAGING_FLAGS) $(<D)
+	$(RLOCAL) CMD build $(BUILD_FLAGS) $(<D)
 
 #package : $(PKG_TGZ)
 

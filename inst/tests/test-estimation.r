@@ -27,17 +27,19 @@
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
+
 # helpers#FOLDUP
 set.char.seed <- function(str) {
 	set.seed(as.integer(charToRaw(str)))
 }
+THOROUGHNESS <- 1.0
 #UNFOLD
 
 context("estimation functions: confint coverage")#FOLDUP
 test_that("confint.sr coverage",{#FOLDUP
 	set.char.seed("066dfa96-6dd7-4d14-ab74-49e81b3afd83")
 
-	ngen <- 1024
+	ngen <- ceiling(THOROUGHNESS * 256)
 	ope <- 253
 	for (nyr in c(3,6,9)) {
 		df <- ceiling(ope * nyr)
@@ -48,7 +50,7 @@ test_that("confint.sr coverage",{#FOLDUP
 				for (nominal.coverage in c(0.90,0.95)) {
 					aci <- confint(roll.own,level=nominal.coverage,type=type)
 					coverage <- 1 - mean((zeta < aci[,1]) | (aci[,2] < zeta))
-					expect_equal(coverage,nominal.coverage,tolerance=0.05,scale=1)
+					expect_equal(coverage,nominal.coverage,tolerance=0.09,scale=1)
 				}
 			}
 		}
@@ -58,7 +60,7 @@ test_that("confint.sr coverage",{#FOLDUP
 test_that("confint.sropt coverage",{#FOLDUP
 	set.char.seed("50c7aa74-9cec-4fef-980e-c25bfede8260")
 
-	ngen <- 2000
+	ngen <- ceiling(THOROUGHNESS * 512)
 	ope <- 253
 	for (df1 in c(2,4,8,16)) {
 		for (nyr in c(3,6,9)) {
