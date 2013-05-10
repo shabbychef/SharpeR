@@ -770,8 +770,14 @@ Here is an example using \Robject{xts} objects. In this case, if the \Rcode{ope}
 is not given, it is inferred from the time marks of the input object.
 <<'some_stocks'>>=
 library(quantmod)
-get.ret <- function(sym,...) {
-	OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
+get.ret <- function(sym,warnings=FALSE,...) {
+	# getSymbols.yahoo will barf sometimes; do a trycatch
+	ntry <- 3
+  trynum <- 0
+	while (!exists("OHCLV") && (trynum < ntry)) {
+		trynum <- trynum + 1
+		try(OHLCV <- getSymbols(sym,auto.assign=FALSE,warnings=warnings,...),silent=TRUE)
+  }
 	adj.names <- paste(c(sym,"Adjusted"),collapse=".",sep="")
 	lrets <- diff(log(OHLCV[,adj.names]))
 	#chop first
