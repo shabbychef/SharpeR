@@ -288,7 +288,7 @@ gitpull :
 	git pull origin master
 
 tag :
-	echo "git tag -a v$(VERSION) -m 'version $(VERSION)'"
+	echo "git tag -a r$(VERSION) -m 'release $(VERSION)'"
 	echo "git push --tags"
 
 ################################
