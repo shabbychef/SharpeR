@@ -43,7 +43,7 @@ R         			 = $(RBIN)/R
 RSCRIPT   			 = $(RBIN)/Rscript
 
 # packages I need to test this one
-TEST_DEPS  			 = testthat roxygen2 knitr txtplot quantmod MASS
+TEST_DEPS  			 = testthat roxygen2 knitr TTR txtplot quantmod MASS
 INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
 PKG_TESTR 			 = tests/run-all.R
 
@@ -235,7 +235,7 @@ slow_vignette : $(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
 unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION $(PKG_TESTR)
 	$(call WARN_DEPS)
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
-				 R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save \
+				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,$(PKG_NAME)" R -q --no-save \
 				 --slave < $(PKG_TESTR) | tee $@
 
 testthat : unit_test.log
@@ -245,11 +245,11 @@ tests    : unit_test.log
 # drop into R shell in the 'local context'
 R : deps $(LOCAL)/$(PKG_NAME)/INDEX
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
-				 R_DEFAULT_PACKAGES="utils,graphics,stats,$(PKG_NAME)" R -q --no-save
+				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,$(PKG_NAME)" R -q --no-save
 
 $(PKG_NAME).pdf: inst/doc/$(PKG_NAME).Rnw deps $(LOCAL)/$(PKG_NAME)/INDEX 
 	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
-				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,knitr,$(PKG_NAME)" \
+				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,knitr,TTR,$(PKG_NAME)" \
 				 R -q --no-save --slave -e "knitr::knit2pdf('$<');"
 	if grep Citation $(PKG_NAME).log > /dev/null; then $(PREBIB) $(BIBTEX) $(PKG_NAME); \
 		$(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi

@@ -7,14 +7,564 @@
 % front matter%FOLDUP
 \usepackage{url}
 \usepackage{amsmath}
+\usepackage{amsfonts}
 %\usepackage[authoryear]{natbib}
 
 \makeatletter
 \makeatother
 
-\input{sharpe_shortcuts.tex}
+%\input{sharpe_shortcuts.tex}
+\typeout{-- sharpe_shortcuts.tex}%FOLDUP
+
+%\usepackage[environments,commands,meshstuff,shortcuts]{sepmath}
+%\usepackage[environments,commands,shortcuts]{sepmath}
+
+\RequirePackage{ifthen}
+\RequirePackage{xspace}
+
+% ack.
+%\providecommand{\figref}[1]{Figure~\ref{fig:#1}}
+\providecommand{\figref}[1]{Figure\nobreakspace\ref{fig:#1}}
+\providecommand{\eqnref}[1]{Equation\nobreakspace\ref{eqn:#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% meta meta commands
+% emptyP if 1 is empty give 2 else give 3
+%\providecommand{\mtP}[3]{\ifx\@empty#1\@empty#2\else#3\fi}
+%\def\mtP#1#2#3{\ifx\@empty#1\@empty#2\else#3\fi}
+%\def\mtP#1#2#3{\ifx\@empty\detokenize{#1}\@empty#2\else#3\fi}
+\def\mtP#1#2#3{\if\relax\detokenize{#1}\relax#2\else#3\fi}
+% listmore if 1 is empty give 1 else give `,1'
+%\def\lMr#1{\ifx\@empty#1\@empty\relax\else{,#1}\fi}
+\def\lMr#1{\ifx\@empty\detokenize{#1}\@empty\relax\else{,#1}\fi}
+
+\providecommand{\MATHIT}[1]{\ensuremath{#1}\xspace}
+\providecommand{\neUL}[3]{\mtP{#2}{\mtP{#3}{#1}{{#1}_{#3}}}{\mtP{#3}{{#1}^{#2}}{{#1}^{#2}_{#3}}}}
+\providecommand{\neSUP}[2]{\mtP{#2}{#1}{{{#1}^{#2}}}}
+\providecommand{\mathSUB}[2]{\MATHIT{\neSUB{#1}{#2}}}
+
+\providecommand{\wrapParens}[1]{\left(#1\right)}
+\providecommand{\wrapBraces}[1]{\left\{#1\right\}}
+\providecommand{\wrapBracks}[1]{\left[#1\right]}
+
+%\providecommand{\wrapNeParens}[1]{\if\relax\detokenize{#1}\relax\else\wrapParens{#1}\fi}
+
+\providecommand{\wrapNeParens}[1]{\mtP{#1}{}{\wrapParens{#1}}}
+\providecommand{\wrapNeBraces}[1]{\mtP{#1}{}{\wrapBraces{#1}}}
+\providecommand{\wrapNeBracks}[1]{\mtP{#1}{}{\wrapBracks{#1}}}
+\providecommand{\neSUB}[2]{\mtP{#2}{#1}{{{#1}_{#2}}}}
+
+\providecommand{\abs}[1]{\ensuremath{\left| #1 \right|}}
+\providecommand{\mathSUB}[2]{\MATHIT{\neSUB{#1}{#2}}}
+\renewcommand{\Pr}[1]{\ensuremath{\operatorname{Pr}\left\{#1\right\}}}
+\providecommand{\vect}[1]{\MATHIT{\boldsymbol{#1}}}
+\providecommand{\eye}{\ensuremath{I}}
+\providecommand{\Mtx}[1]{\MATHIT{\mathsf{#1}}}
+\providecommand{\MtxUL}[3]{\mathUL{\Mtx{#1}}{#2}{#3}}
+\providecommand{\nePAIR}[2]{#1\lMr{#2}}
+\providecommand{\VAR}[1]{\ensuremath{\operatorname{var}\wrapNeParens{#1}}}
+\providecommand{\mathUL}[3]{\MATHIT{\neUL{#1}{#2}{#3}}}
+\providecommand{\mathSUP}[2]{\MATHIT{\neSUP{#1}{#2}}}
+\providecommand{\vectUL}[3]{\mathUL{\vect{#1}}{#2}{#3}}
+\providecommand{\SEPbbb}[1]{\mathbb{#1}}
+\providecommand{\reals}[1]{\ensuremath{\SEPbbb{R}^{#1}}}
+
+\providecommand{\oneby}[1]{\MATHIT{\frac{1}{#1}}}
+
+% yes, I am lazy.
+\providecommand{\txtSR}{Sharpe ratio\xspace}
+
+\providecommand{\eg}{\emph{e.g.},\xspace}
+\providecommand{\ie}{\emph{i.e.},\xspace}
+\providecommand{\nb}{\emph{n.b.},\xspace}
+\providecommand{\iid}{\emph{i.i.d.}\xspace}
+\providecommand{\viz}{\emph{viz.}\xspace}
+\providecommand{\etc}{\emph{etc.}\xspace}
+\providecommand{\etal}{\emph{et al.}\xspace}
+\providecommand{\cf}{\emph{cf.}\xspace}
+
+\providecommand{\setwo}[2]{\ensuremath{\left\{ #1 \left|\; {#2} \right.\right\}}\xspace}
+
+\providecommand{\defeq}{=_{\mbox{df}}}
+
+
+% utilities%FOLDUP
+% convert something into a function
+\providecommand{\funcit}[2]{\MATHIT{#1\wrapNeParens{#2}}}
+%compact fraction;
+\providecommand{\fracc}[2]{\MATHIT{#1 / #2}}
+% with paren wrap
+\providecommand{\fraccp}[2]{\MATHIT{\wrapNeParens{#1}/\wrapNeParens{#2}}}
+%small 'mbox'
+%http://stackoverflow.com/questions/1239786/latex-math-mode-and-mbox-mode
+\providecommand{\smbox}[1]{\mbox{\scriptsize #1}}
+
+%\providecommand{\argmax}{\MATHIT{\mbox{argmax}}}
+\providecommand{\argmax}{\MATHIT{\mathop{\mathrm{argmax}}}}
+
+
+%UNFOLD
+
+% all commands%FOLDUP
+% vector operator
+\providecommand{\vecop}[1]{\funcit{\mbox{vec}}{#1}}
+\providecommand{\trace}[1]{\funcit{\mbox{tr}}{#1}}
+% is this replicated elsewhere?
+\providecommand{\det}[1]{\abs{#1}}
+% idealized and conditional SNR functions
+\providecommand{\pSNRfoo}[2]{\funcit{\mathSUB{\mbox{SNR}}{#1}}{#2}}
+\providecommand{\sSNRfoo}[2]{\funcit{\mathSUB{\hat{\mbox{SNR}}}{#1}}{#2}}
+
+\providecommand{\pSNR}[1]{\pSNRfoo{}{#1}}
+\providecommand{\sSNR}[1]{\sSNRfoo{}{#1}}
+
+\providecommand{\SNRfunc}[1]{\pSNRfoo{}{#1}}
+\providecommand{\SNRfunci}[1]{\pSNRfoo{i}{#1}}
+\providecommand{\SNRfuncu}[1]{\pSNRfoo{u}{#1}}
+\providecommand{\SNRfuncc}[1]{\pSNRfoo{c}{#1}}
+
+
+
+% transpose and inverse
+\providecommand{\tr}[1]{\mathSUP{#1}{\top}}
+\providecommand{\minv}[1]{\mathSUP{#1}{-1}}
+\providecommand{\trminv}[1]{\mathSUP{#1}{-\top}}
+
+% these are private to this file%FOLDUP
+\providecommand{\prvsymi}{x}
+\providecommand{\prvsymj}{y}
+\providecommand{\prvsymk}{f}
+\providecommand{\prvsyml}{z}
+\providecommand{\prvsyme}{v}
+\providecommand{\prvsymf}{f}
+\providecommand{\prvsymv}{v}
+\providecommand{\prvsymu}{u}
+% prices:
+\providecommand{\prvsymp}{p}
+% arithmetic and geometric:
+\providecommand{\prvsyma}{r}
+\providecommand{\prvsymg}{l}
+
+\providecommand{\prvsymPortfolio}{w}
+\providecommand{\prvsymPASSTHROUGH}{W}
+
+\providecommand{\prvsymWilk}{U}
+\providecommand{\prvsymHLT}{T}
+\providecommand{\prvsymPBT}{P}
+\providecommand{\prvsymRLR}{R}
+%UNFOLD
+
+% prices/mtm
+%\providecommand{\pryt}[1][t]{\mathSUB{p}{#1}}
+\providecommand{\pryp}[1][]{\mathSUB{\prvsymp}{#1}}
+%\providecommand{\grett}[1][t]{\mathSUB{l}{#1}}
+%\providecommand{\arett}[1][t]{\mathSUB{r}{#1}}
+
+\renewcommand{\exp}[1]{\ensuremath{e^{#1}}}
+\providecommand{\longexp}[1]{\ensuremath{\operatorname{exp}\wrapNeParens{#1}}}
+
+%scalar returns:
+\providecommand{\reti}[1][]{\mathSUB{\prvsymi}{#1}}
+\providecommand{\retj}[1][]{\mathSUB{\prvsymj}{#1}}
+\providecommand{\retk}[1][]{\mathSUB{\prvsymk}{#1}}
+\providecommand{\retl}[1][]{\mathSUB{\prvsyml}{#1}}
+\providecommand{\retf}[1][]{\mathSUB{\prvsymf}{#1}}
+\providecommand{\retv}[1][]{\mathSUB{\prvsymv}{#1}}
+\providecommand{\reta}[1][]{\mathSUB{\prvsyma}{#1}}
+\providecommand{\retg}[1][]{\mathSUB{\prvsymg}{#1}}
+
+%vector returns:
+\providecommand{\vreti}[1][]{\vectUL{\prvsymi}{}{#1}}
+\providecommand{\vretj}[1][]{\vectUL{\prvsymj}{}{#1}}
+\providecommand{\vretk}[1][]{\vectUL{\prvsymk}{}{#1}}
+\providecommand{\vretl}[1][]{\vectUL{\prvsyml}{}{#1}}
+\providecommand{\vretf}[1][]{\vectUL{\prvsymf}{}{#1}}
+\providecommand{\vretv}[1][]{\vectUL{\prvsymv}{}{#1}}
+\providecommand{\vreta}[1][]{\vectUL{\prvsyma}{}{#1}}
+\providecommand{\vretg}[1][]{\vectUL{\prvsymg}{}{#1}}
+
+% transpose of same
+\providecommand{\trvreti}[1][]{\vectUL{\prvsymi}{\top}{#1}}
+\providecommand{\trvretj}[1][]{\vectUL{\prvsymj}{\top}{#1}}
+\providecommand{\trvretk}[1][]{\vectUL{\prvsymk}{\top}{#1}}
+\providecommand{\trvretl}[1][]{\vectUL{\prvsyml}{\top}{#1}}
+\providecommand{\trvretf}[1][]{\vectUL{\prvsymf}{\top}{#1}}
+\providecommand{\trvretv}[1][]{\vectUL{\prvsymv}{\top}{#1}}
+\providecommand{\trvreta}[1][]{\vectUL{\prvsyma}{\top}{#1}}
+\providecommand{\trvretg}[1][]{\vectUL{\prvsymg}{\top}{#1}}
+
+%matrix returns:
+\providecommand{\mreti}[1][]{\MtxUL{\MakeUppercase{\prvsymi}}{}{#1}}
+\providecommand{\mretj}[1][]{\MtxUL{\MakeUppercase{\prvsymj}}{}{#1}}
+\providecommand{\mretk}[1][]{\MtxUL{\MakeUppercase{\prvsymk}}{}{#1}}
+\providecommand{\mretl}[1][]{\MtxUL{\MakeUppercase{\prvsyml}}{}{#1}}
+\providecommand{\mretf}[1][]{\MtxUL{\MakeUppercase{\prvsymf}}{}{#1}}
+\providecommand{\mretv}[1][]{\MtxUL{\MakeUppercase{\prvsymv}}{}{#1}}
+\providecommand{\mreta}[1][]{\MtxUL{\MakeUppercase{\prvsyma}}{}{#1}}
+\providecommand{\mretg}[1][]{\MtxUL{\MakeUppercase{\prvsymg}}{}{#1}}
+
+% the factor or signal
+\providecommand{\sfact}[1][t]{\mathSUB{\prvsymf}{#1}}
+\providecommand{\vfact}[1][t]{\vectUL{\prvsymf}{}{#1}}
+\providecommand{\trvfact}[1][t]{\vectUL{\prvsymf}{\top}{#1}}
+\providecommand{\mfact}[1][]{\MtxUL{\MakeUppercase{\prvsymf}}{}{#1}}
+
+% distribution of factor
+\providecommand{\pfacmu}{\vectUL{\mu}{}{f}}
+\providecommand{\trpfacmu}{\vectUL{\mu}{\top}{f}}
+\providecommand{\pfacsig}{\MtxUL{\Gamma}{}{f}}
+\providecommand{\pfacgram}[1][]{\MATHIT{\pfacsig + #1\pfacmu\trpfacmu}}
+
+\providecommand{\sfacmu}{\vectUL{\hat{\mu}}{}{f}}
+\providecommand{\trsfacmu}{\vectUL{\hat{\mu}}{\top}{f}}
+\providecommand{\sfacsig}{\MtxUL{\hat{\Gamma}}{}{f}}
+
+% the error or residual
+\providecommand{\serrt}[1][t]{\mathSUB{\prvsymu}{#1}}
+\providecommand{\verrt}[1][t]{\vect{\mathSUB{\prvsymu}{#1}}}
+\providecommand{\merrt}[1][]{\MtxUL{\MakeUppercase{\prvsymu}}{}{#1}}
+
+% population and sample versions
+\providecommand{\pserrt}[1][t]{\mathSUB{\epsilon}{#1}}
+\providecommand{\pverrt}[1][t]{\vect{\mathSUB{\epsilon}{#1}}}
+\providecommand{\pmerrt}[1][]{\MtxUL{E}{}{#1}}
+\providecommand{\sserrt}[1][t]{\mathSUB{\hat{\epsilon}}{#1}}
+\providecommand{\sverrt}[1][t]{\vect{\mathSUB{\hat{\epsilon}}{#1}}}
+\providecommand{\smerrt}[1][]{\MtxUL{\hat{E}}{}{#1}}
+
+% population and sample (conditional) markowitz weights and passthrough
+\providecommand{\pmarkow}[1][]{\mathSUB{w}{#1}}
+\providecommand{\smarkow}[1][]{\mathSUB{\hat{w}}{#1}}
+\providecommand{\ppasthru}[1][]{\mathSUB{\prvsymPASSTHROUGH}{#1}}
+\providecommand{\spasthru}[1][]{\mathSUB{\hat{\prvsymPASSTHROUGH}}{#1}}
+\providecommand{\trppasthru}[1][]{\mathUL{\prvsymPASSTHROUGH}{\top}{#1}}
+\providecommand{\trspasthru}[1][]{\mathUL{\hat{\prvsymPASSTHROUGH}}{\top}{#1}}
+
+\providecommand{\apasthru}[1][a]{\ppasthru[#1]}
+\providecommand{\trapasthru}[1][a]{\trppasthru[#1]}
+
+\providecommand{\ppasopt}[1][]{\ppasthru[\nePAIR{*}{#1}]}
+\providecommand{\spasopt}[1][]{\spasthru[\nePAIR{*}{#1}]}
+
+% HE eigenvalues
+\providecommand{\pheeig}[1][]{\mathUL{\lambda}{}{#1}}
+\providecommand{\sheeig}[1][]{\mathUL{\hat{\lambda}}{}{#1}}
+
+% MGLH
+\providecommand{\pWILK}[1][]{\mathUL{\prvsymWilk}{}{#1}}
+\providecommand{\pHLT}[1][]{\mathUL{\prvsymHLT}{}{#1}}
+\providecommand{\pPBT}[1][]{\mathUL{\prvsymPBT}{}{#1}}
+\providecommand{\pRLR}[1][]{\mathUL{\prvsymRLR}{}{#1}}
+\providecommand{\sWILK}[1][]{\mathUL{\hat{\prvsymWilk}}{}{#1}}
+\providecommand{\sHLT}[1][]{\mathUL{\hat{\prvsymHLT}}{}{#1}}
+\providecommand{\sPBT}[1][]{\mathUL{\hat{\prvsymPBT}}{}{#1}}
+\providecommand{\sRLR}[1][]{\mathUL{\hat{\prvsymRLR}}{}{#1}}
+
+
+
+%vector of all ones, zeros
+\providecommand{\vone}[1][]{\vect{1_{#1}}}
+\providecommand{\vzero}{\vect{0}}
+
+% a vector
+\providecommand{\avect}{\vect{v}}
+
+%leverage variable;
+\providecommand{\levi}[1][]{\mathSUB{l}{#1}}
+
+%generic combination of matrices
+\providecommand{\ABA}[2]{#1 #2 #1}
+\providecommand{\ABCBA}[3]{#1 #2 #3 #2 #1}
+\providecommand{\trAB}[2]{\tr{#1}#2}
+
+%gram matrix
+\providecommand{\gram}[1]{\trAB{#1}{#1}}
+%outer gram
+\providecommand{\ogram}[1]{#1 \tr{#1}}
+%quadratic form
+\providecommand{\qform}[2]{\tr{#2} #1 #2}
+%quadratic outer form
+\providecommand{\qoform}[2]{#2 #1 \tr{#2}}
+\providecommand{\crossp}[1]{\gram{\wrapNeParens{#1}}}
+
+% a conditional on b
+%\providecommand{\acondb}[2]{\MATHIT{#1\,\left|\,#2\right.}}
+\providecommand{\acondb}[2]{\MATHIT{#1\left|\,#2\right.}}
+
+% sample statistics%FOLDUP
+\providecommand{\smean}[1]{\MATHIT{\bar{#1}}}
+\providecommand{\sstd}[1]{\mathSUB{s}{#1}}
+
+%\providecommand{\svmean}[1]{\smean{\vect{#1}}}
+%\providecommand{\svstd}[1]{\MtxUL{S}{}{#1}}
+
+%sample statistics.
+%\providecommand{\smu}[1][]{\smean{\reti[#1]}}
+%\providecommand{\ssig}[1][]{\MATHIT{s_{#1}}}
+%\providecommand{\smu}[1][]{\smean{\reti[#1]}}
+\providecommand{\smu}[1][]{\mathSUB{\hat{\mu}}{#1}}
+\providecommand{\ssig}[1][]{\mathSUB{\hat{\sigma}}{#1}}
+\providecommand{\ssds}[1][]{\MATHIT{{s_N}_{#1}}}
+
+% risk free
+\providecommand{\rfr}[1][0]{\mathSUB{r}{#1}}
+
+% the symbol for SNR/SR
+%\providecommand{\prvSNR}[0]{\psi}
+\providecommand{\prvSNR}[0]{\zeta}
+
+% sample sharpe ratio
+\providecommand{\ssrUL}[2]{\mathUL{\hat{\prvSNR}}{#1}{#2}}
+%\providecommand{\ssrUL}[2]{\mathUL{r}{#1}{#2}}
+\providecommand{\ssr}[1][]{\ssrUL{}{#1}}
+\providecommand{\ssrsq}[1][]{\ssrUL{2}{#1}}
+\providecommand{\ssropt}{\ssr[*]}
+\providecommand{\ssrsqopt}{\ssrsq[*]}
+
+%\providecommand{\svmu}[1][]{\smean{\vreti[#1]}}
+%\providecommand{\svsig}[1][]{\MATHIT{S_{#1}}}
+\providecommand{\svmu}[1][]{\vectUL{\hat{\mu}}{}{#1}}
+\providecommand{\svsig}[1][]{\MtxUL{\hat{\Sigma}}{}{#1}}
+
+\providecommand{\sfvmu}[1][]{\smean{\vreti[#1]^{*}}}
+\providecommand{\sfse}{\kappa}
+
+%unbiased estimator of Sharpe ratio
+\providecommand{\susr}[1][]{\MATHIT{\tilde{\prvSNR}_{#1}}}
+\providecommand{\sgossz}[1][]{\mathSUB{z}{#1}}
+%UNFOLD
+%population parameters%FOLDUP
+\providecommand{\pmu}[1][]{\mathSUB{\mu}{#1}}
+\providecommand{\psig}[1][]{\mathSUB{\sigma}{#1}}
+\providecommand{\psigsq}[1][]{\mathUL{\sigma}{2}{#1}}
+
+\providecommand{\psrUL}[2]{\mathUL{\prvSNR}{#1}{#2}}
+
+\providecommand{\psr}[1][]{\psrUL{}{#1}}
+\providecommand{\psnr}[1][]{\psrUL{}{#1}}
+\providecommand{\psrsq}[1][]{\psrUL{2}{#1}}
+\providecommand{\psnrsq}[1][]{\psrUL{2}{#1}}
+
+% optimum SNR in the population
+\providecommand{\psnropt}{\psnr[*]}
+\providecommand{\psnrpopt}{\psnr[*]}
+\providecommand{\psnrsqopt}{\psnrsq[*]}
+\providecommand{\psnrsqpopt}{\psnrsq[*]}
+
+% population SNR of the *sample optimal* portfolio. bleah
+\providecommand{\psnrsopt}{\psnr[s,*]}
+
+%population vector mean and covariance
+\providecommand{\pvmu}[1][]{\vectUL{\mu}{}{#1}}
+\providecommand{\pvsig}[1][]{\MtxUL{\Sigma}{}{#1}}
+\providecommand{\pvschol}[1][]{\MtxUL{C}{}{#1}}
+
+%UNFOLD
+
+% haircut
+\providecommand{\hcut}[1][]{\mathSUB{h}{#1}}
+\providecommand{\Pmat}{\Mtx{P}}
+
+\providecommand{\smahalo}[1][]{\mathSUB{\hat{d}}{#1}}
+
+
+% positively proportional to
+\providecommand{\ppropto}{\mathSUB{\propto}{+}}
+
+% MGLH
+\providecommand{\MGLHA}[1][]{\MtxUL{A}{}{#1}}
+\providecommand{\MGLHC}[1][]{\MtxUL{C}{}{#1}}
+\providecommand{\MGLHT}[1][]{\MtxUL{\Theta}{}{#1}}
+\providecommand{\MGLHrank}{\MATHIT{r}}
+\providecommand{\MGLHa}{\MATHIT{a}}
+\providecommand{\MGLHc}{\MATHIT{c}}
+
+\providecommand{\MGLHH}[1][]{\MtxUL{H}{}{#1}}
+\providecommand{\MGLHE}[1][]{\MtxUL{E}{}{#1}}
+\providecommand{\pMGLHH}[1][]{\MtxUL{H}{}{#1}}
+\providecommand{\pMGLHE}[1][]{\MtxUL{E}{}{#1}}
+\providecommand{\sMGLHH}[1][]{\MtxUL{\hat{H}}{}{#1}}
+\providecommand{\sMGLHE}[1][]{\MtxUL{\hat{E}}{}{#1}}
+
+\providecommand{\eye}[1][]{\MtxUL{I}{}{#1}}
+
+
+%CDF and quantile%FOLDUP
+
+% make a letter into a distribution 'law'
+\providecommand{\makelaw}[2]{\MATHIT{#1\wrapNeParens{#2}}}
+\providecommand{\FOOcdf}[3]{\funcit{\mathSUB{F}{#1}}{#2;#3}}
+\providecommand{\FOOqnt}[3]{\funcit{\mathSUB{#1}{#2}}{#3}}
+
+
+%t
+\providecommand{\tcdf}[2]{\FOOcdf{t}{#1}{#2}}
+\providecommand{\tqnt}[2]{\FOOqnt{t}{#1}{#2}}
+\providecommand{\tlaw}[1]{\makelaw{t}{#1}}
+
+\providecommand{\nctcdf}[2]{\FOOcdf{t}{#1}{#2}}
+\providecommand{\nctqnt}[2]{\FOOqnt{t}{#1}{#2}}
+\providecommand{\nctlaw}[1]{\makelaw{t}{#1}}
+\providecommand{\nctvar}[1][]{\mathSUB{t}{#1}}
+
+%f
+\providecommand{\fcdf}[2]{\FOOcdf{f}{#1}{#2}}
+\providecommand{\ncfcdf}[2]{\FOOcdf{f}{#1}{#2}}
+\providecommand{\fqnt}[2]{\FOOqnt{f}{#1}{#2}}
+\providecommand{\ncfqnt}[2]{\FOOqnt{f}{#1}{#2}}
+\providecommand{\flaw}[1]{\makelaw{F}{#1}}
+\providecommand{\ncflaw}[1]{\makelaw{F}{#1}}
+
+%chisq
+\providecommand{\prvchisq}{\chi^2}
+\providecommand{\chisqcdf}[2]{\FOOcdf{\prvchisq}{#1}{#2}}
+\providecommand{\chisqqnt}[2]{\FOOqnt{\prvchisq}{#1}{#2}}
+\providecommand{\chisqlaw}[1]{\makelaw{\prvchisq}{#1}}
+
+\providecommand{\gausslaw}[1]{\makelaw{\mathcal{N}}{#1}}
+
+%beta
+\providecommand{\betacdf}[2]{\MATHIT{F_{\beta}\wrapNeParens{#1;#2}}}
+\providecommand{\betaqnt}[2]{\MATHIT{\beta_{#1}\wrapNeParens{#2}}}
+\providecommand{\betalaw}[1]{\makelaw{\mathcal{B}}{#1}}
+
+% instantiations of laws with default parameters filled in?
+% overkill?
+\providecommand{\normdist}[1][0,1]{\gausslaw{#1}}
+\providecommand{\tdist}[1][n]{\MATHIT{\mathcal{t}\wrapNeParens{#1}}}
+\providecommand{\hotdist}[1][n,p]{\MATHIT{\mathcal{T^2}\wrapNeParens{#1}}}
+
+%density, distribution, quantile of normal distribution
+\providecommand{\dnorm}[1][x]{\funcit{\phi}{#1}}
+\providecommand{\pnorm}[1][x]{\funcit{\Phi}{#1}}
+\providecommand{\qnorm}[1]{\mathSUB{z}{#1}}
+%UNFOLD
+
+%statistical whatsits%FOLDUP
+\providecommand{\typeI}{\MATHIT{\alpha}}
+\providecommand{\typeII}{\MATHIT{\beta}}
+\providecommand{\powr}{\MATHIT{1 - \typeII}}
+\providecommand{\irate}{\MATHIT{c_0}}
+%UNFOLD
+
+% time commands; change the default!?
+\providecommand{\yrto}[1]{\mathSUP{\mbox{yr}}{#1}}
+\providecommand{\moto}[1]{\mathSUP{\mbox{mo.}}{#1}}
+\providecommand{\qto}[1]{\mathSUP{\mbox{Q}}{#1}}
+\providecommand{\dayto}[1]{\mathSUP{\mbox{day}}{#1}}
+
+%linear regression: population and sample%FOLDUP
+\providecommand{\pregco}[1][]{\mathSUB{\beta}{#1}}
+\providecommand{\pregvec}{\vect{\beta}}
+\providecommand{\perr}[1][]{\mathSUB{\epsilon}{#1}}
+\providecommand{\sregco}[1][]{\mathSUB{\hat{\beta}}{#1}}
+\providecommand{\sregvec}{\vect{\hat{\beta}}}
+\providecommand{\serr}[1][]{\mathSUB{\hat{\epsilon}}{#1}}
+
+% multivariate regression;
+\providecommand{\pRegco}[1][]{\mathSUB{B}{#1}}
+\providecommand{\pErr}[1][]{\mathSUB{E}{#1}}
+\providecommand{\pErrt}[1][t]{\pErr[#1]}
+\providecommand{\sRegco}[1][]{\mathSUB{\hat{B}}{#1}}
+\providecommand{\sErr}[1][]{\mathSUB{\hat{E}}{#1}}
+
+%UNFOLD
+%
+%'contrast' vector and target
+\providecommand{\convec}[1][]{\vect{\mathSUB{v}{#1}}}
+\providecommand{\contar}[1][]{\MATHIT{c}}
+
+%noncentrality parameters
+\providecommand{\nctp}[1][]{\mathSUB{\delta}{#1}}
+\providecommand{\ncfp}[1][]{\mathSUB{\delta}{#1}}
+
+\providecommand{\tstat}[1][]{\mathSUB{t}{#1}}
+\providecommand{\fstat}[1][]{\mathSUB{f}{#1}}
+\providecommand{\Fstat}[1][]{\mathSUB{F}{#1}}
+\providecommand{\Tstat}[1][]{\mathUL{T}{2}{#1}}
+%\providecommand{\tbias}[1][\ssiz]{\MATHIT{\eta_{#1}}}
+\providecommand{\tbias}[1][\ssiz]{\mathSUB{c}{#1}}
+
+% delta hotelling
+\providecommand{\DTstat}[1][]{\MATHIT{\Delta\Tstat[#1]}}
+
+
+\providecommand{\median}[1]{\funcit{\mbox{median}}{#1}}
+\providecommand{\Pr}[1]{\funcit{\mbox{\large P}}{#1}}
+\providecommand{\E}[1]{\MATHIT{\mbox{\large E}\wrapNeBracks{#1}}}
+%\providecommand{\E}[1]{\ensuremath{\operatorname{E}\left[#1\right]}}
+\providecommand{\VAR}[1]{\funcit{\mbox{Var}}{#1}}
+\providecommand{\GAM}[1]{\MATHIT{\Gamma\wrapNeParens{#1}}}
+\providecommand{\skewness}[1]{\funcit{\mbox{skew}}{#1}}
+\providecommand{\exkurt}[1]{\funcit{\mbox{ex\,kurtosis}}{#1}}
+
+\providecommand{\sacor}[1][]{\mathSUB{\hat{\nu}}{#1}}
+\providecommand{\pacor}[1][]{\mathSUB{\nu}{#1}}
+\providecommand{\corcor}{\MATHIT{d}}
+
+% sample size, # of strategies, number of 'latent factors', addon factors?
+% bleah. the semantics of this are hosed.
+
+% sample size; for scalar case
+\providecommand{\ssiz}[1][]{\mathSUB{n}{#1}}
+% number of 'strategies'; or returns. assets.
+\providecommand{\nstrat}[1][]{\mathSUB{k}{#1}}
+
+% number of observations. uhoh.
+\providecommand{\nobs}[1][]{\mathSUB{n}{#1}}
+% number of 'signals'. let's stick with that.
+\providecommand{\nfac}[1][]{\mathSUB{f}{#1}}
+
+% this should probably change to \nstrat.
+\providecommand{\nlatf}[1][]{\mathSUB{p}{#1}}
+\providecommand{\nlatfmo}[1][]{\mathSUB{q}{#1}}
+\providecommand{\nlatftot}{\MATHIT{\nlatf+\nlatfmo}}
+
+% # of attribution factors
+% this should probably change to \nfac.
+\providecommand{\nattf}[1][]{\mathSUB{l}{#1}}
+
+\providecommand{\df}[1][]{\mathSUB{v}{#1}}
+
+%t-power law numerator constant.
+%2FIX: this is a throwaway constant.
+\providecommand{\tpowc}[1][]{\mathSUB{k}{#1}}
+
+%aspect ratio
+\providecommand{\arat}[1][]{\mathSUB{c}{#1}}
+
+\providecommand{\portw}[1][{}]{\vectUL{w}{}{#1}}
+\providecommand{\pportw}[1][{}]{\vectUL{\nu}{}{#1}}
+\providecommand{\sportw}[1][{}]{\vectUL{\hat{w}}{}{#1}}
+\providecommand{\sportwopt}{\sportw[*]}
+\providecommand{\pportwopt}{\pportw[*]}
+
+
+% basis vectors
+\providecommand{\basev}[1][]{\vectUL{e}{}{#1}}
+
+% functions
+\providecommand{\farcsin}[1]{\funcit{\arcsin}{#1}}
+\providecommand{\fsin}[1]{\funcit{\sin}{#1}}
+\providecommand{\farctan}[1]{\funcit{\arctan}{#1}}
+\providecommand{\ftan}[1]{\funcit{\tan}{#1}}
+
+
+%UNFOLD
+%UNFOLD
+
+\providecommand{\stratrc}[1][]{\mathSUB{\theta}{#1}}
+
 %\providecommand{\rcode}[1]{\texttt{\verb{#1}}}
-\providecommand{\rcode}[1]{\texttt{#1}}
+\providecommand{\Rcode}[1]{{\texttt{#1}}}
+% stolen from synapter vignette:
+\providecommand{\Rfunction}[1]{{\texttt{#1}}}
+\providecommand{\Robject}[1]{{\texttt{#1}}}
+\providecommand{\Rpackage}[1]{{\mbox{\normalfont\textsf{#1}}}}
+\providecommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
+
+\providecommand{\StockTicker}[1]{{\texttt{#1}}}
+
 
 % knitr setup%FOLDUP
 
@@ -24,7 +574,7 @@ library(knitr)
 # set the knitr options ... for everyone!
 # if you unset this, then vignette build bonks. oh, joy.
 #opts_knit$set(progress=TRUE)
-
+opts_knit$set(eval.after='fig.cap')
 # for a package vignette, you do want to echo.
 # opts_chunk$set(echo=FALSE,warning=FALSE,message=FALSE)
 opts_chunk$set(warning=FALSE,message=FALSE)
@@ -46,7 +596,7 @@ compile.time <- Sys.time()
 # compiler flags!
 
 # not used yet
-LONG.FORM <- FALSE
+LONG.FORM <- TRUE
 
 library(quantmod)
 options("getSymbols.warning4.0"=FALSE)
@@ -71,15 +621,15 @@ is to make it simple to estimate profitability (in terms of risk-adjusted
 returns) of strategies or asset streams.
 \end{abstract}%UNFOLD
 
-\section{The \txtSR}%FOLDUP
-Sharpe defined the 'reward to variability ratio', now known as the 
-'\txtSR', as the sample statistic
+\section{The \txtSR and Optimal \txtSR}%FOLDUP
+Sharpe defined the `reward to variability ratio', now known as the 
+`\txtSR', as the sample statistic
 $$
 \ssr = \frac{\smu}{\ssig},
 $$
 where \smu is the sample mean, and \ssig is the sample standard deviation.
 \cite{Sharpe:1966} The
-\txtSR was later redefined to include a 'risk-free' or 'disastrous rate
+\txtSR was later redefined to include a `risk-free' or `disastrous rate
 of return': $\ssr = \wrapParens{\smu - \rfr}/\ssig.$ 
 
 It is little appreciated in quantitative finance that the \txtSR is identical 
@@ -100,9 +650,9 @@ following portfolio optimization problem:
 \label{eqn:port_prob}
 \end{equation}
 where \svmu, \svsig are the sample mean vector and covariance matrix, \rfr is
-the risk-free rate, and $R$ is a cap on portfolio 'risk' as estimated by
+the risk-free rate, and $R$ is a cap on portfolio `risk' as estimated by
 \svsig. (Note this differs from the traditional definition of the problem which
-imposes a 'self-financing constraint' which does not actually bound portfolio
+imposes a `self-financing constraint' which does not actually bound portfolio
 weights.)  The solution to this problem is
 $$
 \sportwopt = \frac{R}{\sqrt{\qform{\minv{\svsig}}{\svmu}}} \minv{\svsig}\svmu.
@@ -161,12 +711,12 @@ misapplied to geometric returns without even an appeal to Taylor's theorem.
 
 %UNFOLD
 
-\section{Basic Usage}%FOLDUP
+\section{Using the \Robject{sr} Class}%FOLDUP
 
-An \rcode{sr} object encapsulates one or more \txtSR statistics, along with the
+An \Robject{sr} object encapsulates one or more \txtSR statistics, along with the
 degrees of freedom, the rescaling to a \tstat statistic, and the annualization
-and units information. One can simply stuff this information into an \rcode{sr} 
-object, but it is more straightforward to allow \rcode{as.sr} to compute the
+and units information. One can simply stuff this information into an \Robject{sr} 
+object, but it is more straightforward to allow \Rfunction{as.sr} to compute the
 \txtSR for you. 
 
 <<'babysteps'>>=
@@ -185,15 +735,15 @@ my.sr <- sr(srstats,df=1200-1,ope=252,epoch="yr")
 print(my.sr)
 @
 
-Throughout, \rcode{ope} stands for `Observations Per Epoch', and is the
+Throughout, \Rcode{ope} stands for `Observations Per Epoch', and is the
 (average) number of returns observed per the annualizatin period, called
-the \rcode{epoch}.  At the moment there is not much hand holding regarding
+the \Rcode{epoch}.  At the moment there is not much hand holding regarding
 these parameters: no checking is performed for sane values.
 
-The \rcode{as.sr} method will compute the \txtSR for you, from numeric,
-\rcode{data.frame}, \rcode{xts} or \rcode{lm} objects. In the latter case, it
+The \Rfunction{as.sr} method will compute the \txtSR for you, from numeric,
+\Robject{data.frame}, \Robject{xts} or \Robject{lm} objects. In the latter case, it
 is assumed one is performing an attribution model, and the statistic of
-interest is the fit of the \rcode{(Intercept)} term divided by the residual
+interest is the fit of the \Rcode{(Intercept)} term divided by the residual
 standard deviation. Here are some examples:
 
 <<'showoff'>>=
@@ -207,7 +757,7 @@ asr <- as.sr(data.frame(my.strategy=returns),ope=253,epoch="yr")
 print(asr)
 @
 
-When a \rcode{data.frame} with multiple columns is given, the \txtSR of each is
+When a \Robject{data.frame} with multiple columns is given, the \txtSR of each is
 computed, and they are all stored:
 <<'more_data_frame'>>=
 # a data.frame with multiple strategies
@@ -216,7 +766,7 @@ asr <- as.sr(data.frame(strat1=rnorm(253*8),strat2=rnorm(253*8,mean=4e-4,sd=1e-2
 print(asr)
 @
 
-Here is an example using \rcode{xts} objects. In this case, if the \rcode{ope}
+Here is an example using \Robject{xts} objects. In this case, if the \Rcode{ope}
 is not given, it is inferred from the time marks of the input object.
 <<'some_stocks'>>=
 library(quantmod)
@@ -242,8 +792,8 @@ some.rets <- get.rets(c("AAPL","IBM","A","C"),from="2001-01-01")
 print(as.sr(some.rets))
 @
 
-The annualization of an \rcode{sr} object can be changed with the
-\rcode{reannualize} method. The name of the epoch and the observation rate can
+The annualization of an \Robject{sr} object can be changed with the
+\Rfunction{reannualize} method. The name of the epoch and the observation rate can
 both be changed. Changing the annualization will not change statistical
 significance, it merely changes the units.
 
@@ -256,20 +806,19 @@ print(yearly)
 print(monthly)
 @
 
-%UNFOLD
-
 \subsection{Attribution Models}%FOLDUP
 
-When an object of class \rcode{lm} is given to \rcode{as.sr}, the 
-fit \rcode{(Intercept)} term is divided by the residual volatility to compute
+When an object of class \Robject{lm} is given to \Rfunction{as.sr}, the 
+fit \Rcode{(Intercept)} term is divided by the residual volatility to compute
 something like the \txtSR. In terms of Null Hypothesis Significance Testing,
-nothing is gained by summarizing the \rcode{sr} object instead of the
-\rcode{lm} object. However, confidence intervals on the \txtSR are quoted in
+nothing is gained by summarizing the \Robject{sr} object instead of the
+\Robject{lm} object. However, confidence intervals on the \txtSR are quoted in
 the more natural units of reward to variability, and in annualized terms (or
 whatever the epoch is.)
 
 As an example, here I perform a CAPM attribution to the monthly returns of
-\texttt{BRK.B}
+\StockTicker{BRK.B}. Note that the statistical significance here is certainly
+tainted by selection bias, a topic beyond the scope of this note.
 
 <<'BRKB'>>=
 # get the returns (see above for the function)
@@ -297,9 +846,9 @@ print(confint(CAPM.sr))
 
 \subsection{Testing Sharpe and Power}%FOLDUP
 
-The function \rcode{sr\_test} performs one- and two-sample tests for
+The function \Rfunction{sr\_test} performs one- and two-sample tests for
 significance of \txtSR. Paired tests for equality of \txtSR can be
-performed via the \rcode{sr\_equality\_test}, which applies the tests of Leung \etal or
+performed via the \Rfunction{sr\_equality\_test}, which applies the tests of Leung \etal or
 of Wright \etal \cite{Leung2008,Wright2012}
 
 <<'SPDRcheck'>>=
@@ -331,12 +880,13 @@ ratio, $e$ is Euler's number, and \ssiz is the sample size, in the \emph{same
 units} as \psnr. That is, if one measures SNR in annualized units, then \ssiz is
 the number of \emph{years}.  The relative error in this approximation for
 determining the sample size is shown in \figref{power_thing}, as a function of
-\psnr; the error is smaller than one percent in the tested range.  Note that the
-$e$ appearing here is merely a coincidence.
+\psnr; the error is smaller than one percent in the tested range.  Note that
+Euler's number appears here coincidentally, as it is nearly equal to
+$\wrapBracks{\funcit{\minv{\Phi}}{0.95}}^2$.
 
 <<'power_thing',fig.cap="The percent error of the power mnemonic $e\\approx\\ssiz \\psnrsq$ is plotted versus \\psnr.">>=
 ope <- 253
- zetas <- seq(0.1,2.5,length.out=201)
+ zetas <- seq(0.1,2.5,length.out=101)
 ssizes <- sapply(zetas,function(zed) { 
  x <- power.sr_test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,ope=ope)
  x$n / ope 
@@ -354,10 +904,11 @@ If your strategy's signal-to-noise ratio is less than
 \Sexpr{foo.power$zeta}\yrto{-1/2} (a value which should be considered ``very good''), 
 your chances of `passing' the \tstat-test are less than fifty percent.
 %UNFOLD
+%UNFOLD
 
-\subsection{Optimal Sharpe}%FOLDUP
+\section{Using the \Robject{sropt} Class}%FOLDUP
 
-The class \rcode{sropt} stores the `optimal' \txtSR, which is that of the
+The class \Robject{sropt} stores the `optimal' \txtSR, which is that of the
 optimal (`Markowitz') portfolio, as defined in \eqnref{port_prob}, as well as
 the relevant degrees of freedom, and the annualization parameters. Again, the
 constructor can be used directly, but the helper function is preferred:
@@ -393,7 +944,8 @@ print(inference(asro,type="MLE"))
 
 A nice rule of thumb is that, to a first order approximation, the MLE of
 \psnropt is zero exactly when $\ssrsqopt \le \nlatf/\ssiz,$ where
-\nlatf is the number of assets. Inspection of this inequality confirms that
+\nlatf is the number of assets. \cite{kubokawa1993estimation,MC1986216}
+Inspection of this inequality confirms that
 \ssropt and \ssiz can be expressed `in the same units', meaning that if \ssropt
 is in \yrto{-1/2}, then \ssiz should be the number of \emph{years}.  For
 example, if the Markowitz portfolio on 8 assets over 7 years has a 
@@ -416,7 +968,7 @@ cat(sprintf("empirical cutoff for zero MLE is %2.2f yr^{-1}\n", crit.value))
 cat(sprintf("the aspect ratio is %2.2f yr^{-1}\n",aspect.ratio))
 @
 
-\subsubsection{The Haircut}
+\subsection{The Haircut}%FOLDUP
 
 Care must be taken interpreting the confidence intervals and the estimated
 optimal SNR. This is because \psnropt is the \emph{maximal} population SNR achieved 
@@ -427,7 +979,7 @@ suspect that this gap is worse when the true effect size (\ie \psnropt) is
 smaller, when there are fewer observations (\ssiz), and when there are more
 assets (\nlatf).
 
-I define the haircut as the gap
+I define the haircut as the quantity
 \begin{equation}
 \hcut \defeq 1 - \frac{\trAB{\sportwopt}{\pvmu}}{\psnropt\sqrt{\qform{\pvsig}{\sportwopt}}}
 = 1 - \wrapParens{\frac{\trAB{\sportwopt}{\pvmu}}{\trAB{\pportwopt}{\pvmu}}}
@@ -435,35 +987,42 @@ I define the haircut as the gap
 \label{eqn:hcut_def}
 \end{equation}
 where \pportwopt is the population optimal portfolio, positively proportional
-to $\minv{\pvsig}{\pvmu}.$ Modeling the haircut is an not straightforward
+to $\minv{\pvsig}{\pvmu}.$ Modeling the haircut is not straightforward
 because it is a random quantity which is not observed. That is, it mixes the
 unknown population parameters \pvsig and \pvmu with the sample quantity
-\sportwopt, which is random.  
+\sportwopt, which is random. 
 
-At the moment the best I can provide is an unconditional estimate of the 
-distribution of \hcut based on the unobserved population parameters.
-When $\ssiz/\nlatf$ is large, the following is a reasonable approximation,
-where \nctlaw{x,y} is a non-central \tstat-distribution with non-centrality
-parameter $x$ and $y$ degrees of freedom:
+When $\ssiz/\nlatf$ is large, the following is a reasonable approximation to
+the distribution of \hcut:
 \begin{equation}  
-\sqrt{\nlatf - 1} \ftan{\farcsin{1-\hcut}} \approx \nctlaw{\sqrt{\ssiz}\psnropt,\nlatf-1}.
+\sqrt{\nlatf - 1} \ftan{\farcsin{1-\hcut}} \approx
+\nctlaw{\sqrt{\ssiz}\psnropt,\nlatf-1},
 \label{eqn:hcut_apx}
 \end{equation}
+where \nctlaw{x,y} is a non-central \tstat-distribution with non-centrality
+parameter $x$ and $y$ degrees of freedom.
 This approximation can be found by ignoring all variability in the sample
 estimate of the covariance matrix, that is by assuming that the sample optimal
 portfolio was computed with the \emph{population} covariance:
-$\sportwopt \propto \minv{\pvsig}{\svmu}$.
+$\sportwopt \propto \minv{\pvsig}{\svmu}$. Because mis-estimation of the
+covariance matrix should contribute some error, I expect that this
+approximation is a `stochastic lower bound' on the true haircut. Numerical
+simulations, however, suggest it is a fairly tight bound for large $\ssiz/\nlatf$.
+(I would be willing to guess that the true distribution involves a non-central
+\flaw{}-distribution, but the proof is beyond me at the moment.)
 
-Numerical experiments suggest that the following is a decent approximation to
-the median value of the haircut distribution:
-$$
-1 - \fsin{\farctan{\frac{\sqrt{\ssiz}\psnropt}{\sqrt{\nlatf-1}}}}.
-$$
+%Numerical experiments support the following as an approximation to
+%the median value of the haircut distribution:
+%$$
+%1 - \fsin{\farctan{\frac{\sqrt{\ssiz}\psnropt}{\sqrt{\nlatf-1}}}}.
+%$$
 
-Let's see this in practice:
-<<'haircutting'>>=
+Here I look at the haircut via Monte Carlo simulations:
+
+<<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
 require(MASS)
 
+# simple markowitz.
 simple.marko <- function(rets) {
 	mu.hat <- as.vector(apply(rets,MARGIN=2,mean,na.rm=TRUE))
 	Sig.hat <- cov(rets)
@@ -471,7 +1030,7 @@ simple.marko <- function(rets) {
 	retval <- list('mu'=mu.hat,'sig'=Sig.hat,'w'=w.opt)
 	return(retval)
 }
-
+# make multivariate pop. & sample w/ given zeta.star
 gen.pop <- function(n,p,zeta.s=0) {
 	true.mu <- matrix(rnorm(p),ncol=p)
 	#generate an SPD population covariance. a hack.
@@ -484,57 +1043,269 @@ gen.pop <- function(n,p,zeta.s=0) {
 	retval = list('X'=X,'mu'=true.mu,'sig'=true.Sig,'SNR'=zeta.s)
 	return(retval)
 }
-
+# a single simulation
 sample.haircut <- function(n,p,...) {
 	popX <- gen.pop(n,p,...)
 	smeas <- simple.marko(popX$X)
 	# I have got to figure out how to deal with vectors...
 	ssnr <- (t(smeas$w) %*% t(popX$mu)) / sqrt(t(smeas$w) %*% popX$sig %*% smeas$w)
 	hcut <- 1 - (ssnr / popX$SNR)
-	return(hcut)
+	# to compute the plugin estimator, estimate zeta.star
+	asro <- sropt(z.s=sqrt(t(smeas$w) %*% smeas$mu),df1=p,df2=n)
+	zeta.hat.s <- inference(asro,type="KRS")  # or 'MLE', 'unbiased'
+	return(c(hcut,zeta.hat.s))
 }
 
+# set everything up
 set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
 ope <- 253
-n.sim <- 1024
+n.sim <- if (LONG.FORM) 4096 else 512
 n.stok <- 8
-n.yr <- 5
+n.yr <- 4
 n.obs <- ceiling(ope * n.yr)
-# annualized optimal SNR
-zeta.s <- 1.20 / sqrt(ope)
+zeta.s <- 1.20 / sqrt(ope)   # optimal SNR, in daily units
 
-hcuts <- replicate(n.sim,sample.haircut(n.obs,n.stok,zeta.s))
+# run some experiments
+system.time(experiments <- replicate(n.sim,sample.haircut(n.obs,n.stok,zeta.s)))
+hcuts <- experiments[1,]
 print(summary(hcuts))
-medv.apx <- 1 - sin(atan(sqrt((n.obs * zeta.s^2) / (n.stok - 1))))
-cat(sprintf("modeled median is %2.2f\n",medv.apx))
+# haircut approximation in the equation above
+qhcut <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
+	1 - sin(atan((1/sqrt(df1-1)) * qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail)))
+}
+# if you wanted to look at how bad the plug-in estimator is, then
+# uncomment the following (you are warned):
+# zeta.hat.s <- experiments[2,];                                   
+# qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.hat.s),hcuts,
+# 			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles");
+# qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.hat.s) },
+# 			 col=2)
+
+# qqplot;
+qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
+			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles")
+qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.s) },
+			 col=2)
 @
 <<'hcut_med',include=FALSE>>=
 medv.true <- median(hcuts)
 med.snr.true <- zeta.s * (1 - medv.true)
 @
 
-In this case, where we optimize over \Sexpr{n.stok} assets given \Sexpr{n.yr} 
-years of daily observations, and a population SNR of 
-\Sexpr{zeta.s * sqrt(ope)} \yrto{-1/2}, the median value of the haircut is on the 
+I check the quality of the approximation given in \eqnref{hcut_apx} by a Q-Q 
+plot in \figref{haircutting}.  For the case where
+$\ssiz=\Sexpr{n.obs}$ (\Sexpr{n.yr} years of daily observations), 
+$\nlatf=\Sexpr{n.stok}$ and $\psnropt=\Sexpr{zeta.s * sqrt(ope)}\yrto{-1/2}$, 
+the t-approximation is very good indeed. 
+%Note that computing prediction
+%intervals for this unobserved, random quantity using this equation is not
+%feasible because it relies on the unobserved \psnropt.  Using a plugin
+%estimate, based on debiasing \ssropt, or the MLE, \etc, do not give satisfactory
+%results either.
+%, as illustrated in \figref{hcut_plugin}.
+%<<'hcut_plugin',fig.cap="Empirical p-values using \\eqnref{hcut_apx} and a (feasible) plug-in estimate of \\psnropt are shown. The plug-in approach does not give good estimates, and is not suggested.">>=
+%# and the plugin approximation:
+%plot(ecdf(plugin.p))
+%abline(a=0,b=1,col=2)
+%@
+%Let's look at the range of haircuts and the approximate median value:
+%<<'hcut_continued'>>=
+%# now check the median approximation
+%print(summary(hcuts))
+%medv.apx <- 1 - sin(atan(sqrt((n.obs * zeta.s^2) / (n.stok - 1))))
+%cat(sprintf("modeled median is %2.2f\n",medv.apx))
+%@
+
+%Continuing, 
+%In this case, where we optimize over \Sexpr{n.stok} assets given \Sexpr{n.yr} 
+%years of daily observations, and a population SNR of 
+%\Sexpr{zeta.s * sqrt(ope)} \yrto{-1/2}, 
+The median value of the haircut is on the 
 order of \Sexpr{signif(100 * medv.true,2)}\%, meaning that the median
 population SNR of the sample portfolios is around \Sexpr{med.snr.true *
 sqrt(ope)}\yrto{-1/2}.  The maximum value of the haircut over the
 \Sexpr{n.sim} simulations, however is \Sexpr{max(hcuts)}, which is larger than
 one; this happens if and only if the sample portfolio has negative expected
 return: $\trAB{\sportwopt}{\pvmu} < 0$. In this case the Markowitz portfolio
-is actually destroying value because of estimation error.
+is actually \emph{destroying value} because of modeling error: the mean return
+of the selected portfolio is negative, even though positive mean is achievable.
 
-Again, it is not clear how to estimate the haircut given the observed
-statistics \svmu and \svsig, other than lamely `plugging in' the sample
-estimate in place of \psnropt.
+%Again, it is not clear how to estimate the haircut given the observed
+%statistics \svmu and \svsig, other than lamely `plugging in' the sample
+%estimate in place of \psnropt.
+
+The approximation in \eqnref{hcut_apx} involves the unknown population
+parameters \pvmu and \pvsig, but does not make use of the observed quantities
+\svmu and \svsig. It seems mostly of theoretical interest, perhaps for
+producing prediction intervals on \hcut when planning a trading strategy 
+(\ie balancing \ssiz and \nlatf). A more practical problem is that of 
+estimating confidence intervals on 
+$\trAB{\sportw}{\pvmu} / \sqrt{\qform{\minv{\pvsig}}{\sportw}}$ having 
+observed \svmu and \svsig. In this case one \emph{cannot} simply 
+plug-in some estimate of \psnropt computed from \ssropt (via MLE, KRS, \etc)
+into \eqnref{hcut_apx}. The reason is that the error in the approximation of
+\psnropt is not independent of the modeling error that causes the haircut.
+
 %UNFOLD
 
-\subsection{Distribution Functions}%FOLDUP
+\subsection{Approximating Overfit}
 
-There are \rcode{dpqr} functions for the \txtSR distribution, as well as the
+A high-level sketch of quant work is as follows: 
+construct a trading system with some free parameters, \stratrc, backtest the strategy for
+$\stratrc[1],\stratrc[2],\ldots,\stratrc[m]$, then pick the \stratrc[i] that
+maximizes the \txtSR in backtesting. `Overfit bias' (variously known as `datamining
+bias,' `garbatrage,' `backtest arb,' \etc) is the upward bias in one's estimate
+of the true signal-to-noise of the strategy parametrized by \stratrc[i^*] due
+to one using the same data to select the strategy and estimate it's
+performance. \cite{Aronson2007}[Chapter 6]
+
+As an example, consider a basic Moving Average Crossover strategy. Here
+\stratrc is a vector of 2 window lengths. One longs the market exactly when one
+moving average exceeds the other, and shorts otherwise. One performs
+a brute force search of all allowable window sizes. Before deciding to deploy
+money into the MAC strategy parametrized by \stratrc[i^*], one has to estimate
+its profitability.
+
+There is a way to roughly estimate overfit bias by viewing the problem as a
+portfolio problem, and performing inference on the optimal \txtSR.  To do
+this, suppose that \vreti[i] is the \ssiz-vector of backtested returns
+associated with \stratrc[i]. (I will assume that all the backtests are over the
+same period of time.)  Then approximately embed the backtested returns vectors
+in the subset of a \nlatf-dimensional subspace. That is, by a process like PCA,
+make the approximation:
+%A(?): Make PCA-like linear approximation of returns vectors:
+%$$\wrapNeBraces{\vreti[1],\ldots,\vreti[m]} \approx \mathcal{L} \subset \setwo{\sum_{1\le j \le \nlatf} k_j \vretj[j]}{k_j \in \reals}$$
+$$\wrapNeBraces{\vreti[1],\ldots,\vreti[m]} \approx \mathcal{K} \subset \mathcal{L} \defeq \setwo{\mretj \sportw}{\sportw \in \reals{\nlatf}}$$
+Abusing notation, let $\funcit{\ssr}{\stratrc}$ be the sample \txtSR
+associated with parameters \stratrc, and also let $\funcit{\ssr}{\vreti}$ be the \txtSR
+associated with the vector of returns \vreti.  Then make the approximation
+$$
+\funcit{\ssr}{\stratrc[*]} \defeq \max_{\stratrc[1],\ldots,\stratrc[m]}
+\funcit{\ssr}{\stratrc[i]} 
+\approx \max_{\vreti \in \mathcal{K}} \funcit{\ssr}{\vreti}
+\le \max_{\vreti \in \mathcal{L}} \funcit{\ssr}{\vreti} = \ssropt.
+$$
+This is a conservative approximation: the true maximum over $\mathcal{L}$ is
+presumably much larger than \funcit{\ssr}{\stratrc[*]}. One can then use 
+\funcit{\ssr}{\stratrc[*]} as \ssropt over a set of \nlatf assets, perform
+inference on \psnropt, which, by a series of approximations as above, is an
+approximate upper bound on \funcit{\psnr}{\stratrc[*]}.
+
+This approximate attack on overfitting will work better when one has a good
+estimate of \nlatf, when $m$ is relatively large and \nlatf relatively small,
+and when the linear approximation to the set of backtested returns is good.
+Moreover, the definition of $\mathcal{L}$ explicitly allows shorting, whereas
+the backtested returns vectors $\vreti[i]$ may lack the symmetry about zero 
+to make this a good approximation. By way of illustration, consider the case
+where the trading system is set up such that different \stratrc produce 
+minor variants on a clearly losing strategy: in this case we might have
+$\funcit{\ssr}{\stratrc[*]} < 0$, which cannot hold for \ssropt. 
+
+One can estimate \nlatf via Monte Carlo simulations, by actually performing
+PCA, or via the `SWAG' method. Surprisingly, often one's intuitive estimate 
+of the true `degrees of freedom' in a trading system is reasonably good.
+
+<<'estimate_overfit',fig.cap=paste("Q-Q plot of",n.sim,"achieved optimal \\txtSR values from brute force search over both windows of a Moving Average Crossover under the null of driftless log returns with zero autocorrelation versus the approximation by a 2-parameter optimal \\txtSR distribution is shown.")>>=
+require(TTR)
+# brute force search two window MAC
+brute.force <- function(lrets,rrets=exp(lrets)-1,win1,win2=win1) {
+	mtms <- c(1,exp(cumsum(lrets)))  # prepend a 1.
+  # do all the SMAs;
+  SMA1 <- sapply(win1,function(n) { SMA(mtms,n=n) }) 
+  symmetric <- missing(win2)
+  if (!symmetric)
+  	SMA2 <- sapply(win2,function(n) { SMA(mtms,n=n) }) 
+
+  mwin <- max(c(win1,win2))
+  zeds <- matrix(NaN,nrow=length(win1),ncol=length(win2))
+	# 2FIX: vectorize this!
+	for (iidx in 1:length(win1)) {
+		SM1 <- SMA1[,iidx]
+		for (jidx in 1:length(win2)) {
+			SM2 <- if (symmetric) SMA1[,jidx] else SMA2[,jidx]
+			trades <- sign(SM1 - SM2)
+			dum.bt <- trades[mwin:(length(trades)-1)] * rrets[mwin:length(rrets)]  # braindead backtest.
+			mysr <- as.sr(dum.bt)
+			zeds[iidx,jidx] <- mysr$sr
+		}
+	}
+	retv <- max(zeds,na.rm=TRUE) 
+	return(retv)
+}
+# simulate one.
+sim.one <- function(nbt,win1,...) {
+	lrets <- rnorm(nbt+max(win1),sd=0.01)
+	retv <- brute.force(lrets,win1=win1,...)
+	return(retv)
+}
+# set everything up
+set.seed(as.integer(charToRaw("e23769f4-94f8-4c36-bca1-28c48c49b4fb")))
+ope <- 253
+n.yr <- 4
+n.obs <- ceiling(ope * n.yr)
+n.sim <- if (LONG.FORM) 4096 else 512
+win1 <- c(2,4,8,16,32,64,128,256)
+
+# run them
+system.time(max.zeds <- replicate(n.sim,sim.one(n.obs,win1)))
+# qqplot;
+qqplot(qsropt(ppoints(length(max.zeds)),df1=2,df2=n.obs),max.zeds,
+			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles")
+qqline(max.zeds,datax=FALSE,distribution = function(p) { qsropt(p,df1=2,df2=n.obs) },
+			 col=2)
+@
+
+Here I illustrate the quality of the approximation for the two-window 
+simple MAC strategy. I generate log returns which are homoskedastic, driftless,
+and have zero autocorrelation. In this case, \emph{every} MAC strategy has zero
+expected return (ignoring trading costs). In spite of this deficiency in the
+market, I find the best combination of window sizes by looking at \Sexpr{n.yr} 
+years of daily data. By selecting the combination of windows with the highest
+\txtSR, then using that maximal value as an estimate of the selected model's
+true signal-noise-ratio, I have subjected myself to overfit bias. I repeat this
+experiment \Sexpr{n.sim} times, then Q-Q plot the maximal \txtSR values over
+those experiments versus an optimal \txtSR distribution assuming $\nlatf=2$ in
+\figref{estimate_overfit}.  The fit is reasonable except in the case where the
+maximal in-sample \txtSR is very low (recall that it can be negative for this
+brute-force search, whereas the optimal \txtSR distribution does not produce
+negative values). This case is unlikely to lead to a trading catastrophe,
+however.
+
+It behooves me to replicate the above experiment `under the alternative,' \eg
+when the market has autocorrelated returns, to see if the approximation holds
+up when $\psnropt > 0$. I leave this for future iterations.
+Instead, I apply the $\nlatf=2$ approximation to the brute-force MAC overfit on
+\StockTicker{SPY}. 
+
+<<'now_on_spy'>>=
+# is MAC on SPY significant?
+SPY.lret <- get.ret('SPY',from="1995-01-01")
+mysr <- as.sr(SPY.lret)  # just to get the ope
+print(mysr)
+# try a whole lot of windows:
+win1 <- seq(4,204,by=10)
+zeds <- brute.force(SPY.lret,win1=win1)
+asro <- sropt(z.s=zeds,df1=2,df2=length(SPY.lret) - max(win1),ope=mysr$ope)
+print(asro)
+print(inference(asro,type="KRS"))
+@
+
+The \txtSR for \StockTicker{SPY} over this period is \Sexpr{mysr$sr}\yrto{-1/2}. The
+optimal \txtSR for the tested MAC strategies is \Sexpr{asro$sropt}\yrto{-1/2}. 
+The KRS estimate (using the $\nlatf=2$ approximation) for the upper bound on 
+signal-to-noise of the optimal MAC strategy is 
+only \Sexpr{inference(asro,type="KRS")}\yrto{-1/2}. \cite{kubokawa1993estimation}
+This leaves little room for excitement about MAC strategies on
+\StockTicker{SPY}.
+
+%UNFOLD
+
+\section{Distribution Functions}%FOLDUP
+
+There are \Rcode{dpqr} functions for the \txtSR distribution, as well as the
 `optimal \txtSR' distribution. These are merely rescaled non-central 
 \tstat and \Fstat distributions, provided for convenience, and for testing
-purposes. See the help for \rcode{dsr} and \rcode{dsropt} for more details.
+purposes. See the help for \Rfunction{dsr} and \Rfunction{dsropt} for more details.
 
 %UNFOLD
 
