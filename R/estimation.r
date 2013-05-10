@@ -200,6 +200,7 @@ se.sr <- function(z, type=c("t","Lo")) {
 #' @template etc
 #' @template sr
 #' @template sropt
+#' @template param-ellipsis
 #' @rdname confint
 #' @keywords htest
 #' @return A matrix (or vector) with columns giving lower and upper
@@ -245,7 +246,7 @@ se.sr <- function(z, type=c("t","Lo")) {
 #' @export
 confint.sr <- function(object,parm,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,
-							 type=c("exact","t","Z")) {
+							 type=c("exact","t","Z"),...) {
 	type <- match.arg(type)
 	tstat <- .sr2t(object)
 	retval <- .t_confint(tstat,df=object$df,level=level,
@@ -260,7 +261,7 @@ confint.sr <- function(object,parm,level=0.95,
 #' @method confint sropt
 #' @S3method confint sropt
 confint.sropt <- function(object,parm,level=0.95,
-							 level.lo=(1-level)/2,level.hi=1-level.lo) {
+							 level.lo=(1-level)/2,level.hi=1-level.lo,...) {
 	ci.hi <- qco_sropt(level.hi,df1=object$df1,df2=object$df2,
 										 z.s=object$sropt,ope=object$ope,lower.tail=TRUE)
 	ci.lo <- qco_sropt(level.lo,df1=object$df1,df2=object$df2,

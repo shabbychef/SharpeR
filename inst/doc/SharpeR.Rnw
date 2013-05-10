@@ -1059,7 +1059,7 @@ sample.haircut <- function(n,p,...) {
 # set everything up
 set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
 ope <- 253
-n.sim <- if (LONG.FORM) 4096 else 512
+n.sim <- if (LONG.FORM) 2048 else 512
 n.stok <- 8
 n.yr <- 4
 n.obs <- ceiling(ope * n.yr)
@@ -1218,15 +1218,18 @@ brute.force <- function(lrets,rrets=exp(lrets)-1,win1,win2=win1) {
 
   mwin <- max(c(win1,win2))
   zeds <- matrix(NaN,nrow=length(win1),ncol=length(win2))
+	upb <- if (symmetric) length(win1) - 1 else length(win1)
 	# 2FIX: vectorize this!
-	for (iidx in 1:length(win1)) {
+	for (iidx in 1:upb) {
 		SM1 <- SMA1[,iidx]
-		for (jidx in 1:length(win2)) {
+		lob <- if (symmetric) iidx + 1 else 1
+		for (jidx in lob:length(win2)) {
 			SM2 <- if (symmetric) SMA1[,jidx] else SMA2[,jidx]
 			trades <- sign(SM1 - SM2)
 			dum.bt <- trades[mwin:(length(trades)-1)] * rrets[mwin:length(rrets)]  # braindead backtest.
 			mysr <- as.sr(dum.bt)
 			zeds[iidx,jidx] <- mysr$sr
+			if (symmetric) zeds[jidx,iidx] <- - zeds[iidx,jidx]  # abuse symmetry of arithmetic returns
 		}
 	}
 	retv <- max(zeds,na.rm=TRUE) 
@@ -1243,7 +1246,7 @@ set.seed(as.integer(charToRaw("e23769f4-94f8-4c36-bca1-28c48c49b4fb")))
 ope <- 253
 n.yr <- 4
 n.obs <- ceiling(ope * n.yr)
-n.sim <- if (LONG.FORM) 4096 else 512
+n.sim <- if (LONG.FORM) 2048 else 512
 win1 <- c(2,4,8,16,32,64,128,256)
 
 # run them

@@ -5,10 +5,10 @@
 \usage{
   \method{confint}{sr} (object, parm, level = 0.95,
     level.lo = (1 - level)/2, level.hi = 1 - level.lo,
-    type = c("exact", "t", "Z"))
+    type = c("exact", "t", "Z"), ...)
 
   \method{confint}{sropt} (object, parm, level = 0.95,
-    level.lo = (1 - level)/2, level.hi = 1 - level.lo)
+    level.lo = (1 - level)/2, level.hi = 1 - level.lo, ...)
 }
 \arguments{
   \item{object}{an observed Sharpe ratio statistic, of
@@ -24,6 +24,9 @@
   \item{level.hi}{the upper confidence level required.}
 
   \item{type}{which method to apply.}
+
+  \item{...}{further arguments to be passed to or from
+  methods.}
 }
 \value{
   A matrix (or vector) with columns giving lower and upper
