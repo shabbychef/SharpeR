@@ -6,7 +6,7 @@ Author: Steven E. Pav
 Authors@R: c(person("Steven", "Pav", role=c("aut","cre"), 
     email="shabbychef@gmail.com"))
 Version: 0.1305
-Date: 2013-05-10
+Date: 2013-05-11
 License: LGPL-3
 Title: Statistical significance of Sharpe ratio
 Description: a collection of tools for analyzing significance of trading 

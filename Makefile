@@ -50,7 +50,8 @@ PKG_TESTR 			 = tests/run-all.R
 #INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%,$(TEST_DEPS)) 
 
 # do not distribute these!
-NODIST_FILES		 = ./Makefile $(M4_FILES) rebuildTags.sh .gitignore .gitattributes .tags .R_tags
+NODIST_FILES		 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
+NODIST_FILES		+= rebuildTags.sh .tags .R_tags
 NODIST_DIRS			 = .git man-roxygen
 
 RD_DUMMY 				 = man/$(PKG_NAME).Rd
@@ -96,6 +97,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 	staging_d local_d \
 	clean realclean \
 	vignette \
+	static_vignette \
 	R
 
 help:
@@ -202,6 +204,7 @@ $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS)
 
 build : $(PKG_TGZ)
 
+
 # an 'install'
 $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ) 
 	$(call WARN_DEPS)
@@ -210,6 +213,21 @@ $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ)
 	touch $@
 
 install: $(LOCAL)/$(PKG_NAME)/INDEX
+
+# fucking shit.
+# * Sat May 11 2013 09:48:00 PM Steven E. Pav <steven@cerebellumcapital.com>
+# static vignettes? CRAN having problems with quantmod.
+./inst/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
+	cp $< $@
+
+./inst/doc/index.html : $(LOCAL)/$(PKG_NAME)/doc/index.html
+	cp $< $@
+
+static_vignette : ./inst/doc/$(PKG_NAME).pdf ./inst/doc/index.html 
+
+# rely on the 'install' target above.
+$(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
+
 
 # check and install
 $(RCHECK_SENTINEL) : $(PKG_TGZ)
