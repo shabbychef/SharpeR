@@ -17,7 +17,7 @@ R_FILES 				+= $(wildcard ./inst/tests/*.r)
 R_FILES 				+= $(wildcard ./man-roxygen/*.R)
 R_FILES 				+= $(wildcard ./tests/*.R)
 
-M4_FILES				?= $(wildcard *.m4)
+M4_FILES				?= $(wildcard m4/*.m4)
 
 VERSION 				 = 0.1305
 TODAY 					:= $(shell date +%Y-%m-%d)
@@ -52,7 +52,7 @@ PKG_TESTR 			 = tests/run-all.R
 # do not distribute these!
 NODIST_FILES		 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
 NODIST_FILES		+= rebuildTags.sh .tags .R_tags
-NODIST_DIRS			 = .git man-roxygen
+NODIST_DIRS			 = .git man-roxygen m4
 
 RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
@@ -144,8 +144,8 @@ tags: .R_tags
 TAGS: 
 	$(R) --slave CMD rtags
 
-DESCRIPTION : DESCRIPTION.m4 Makefile
-	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
+% : m4/%.m4 Makefile
+	m4 -I ./m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
 
 # macro for local R
 RLOCAL = R_LIBS=$(LOCAL) $(R) --vanilla 
@@ -174,7 +174,7 @@ man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
 	$(RLOCAL) --slave -e "require(roxygen2); roxygenize('.', '.', overwrite=TRUE, unlink.target=TRUE)"
 	touch $@
 
-docs: DESCRIPTION man/$(PKG_NAME).Rd 
+docs: README.md DESCRIPTION man/$(PKG_NAME).Rd 
 
 #RSYNC_FLAGS     = -av
 #RSYNC_FLAGS     = -vrlpgoD --delete
