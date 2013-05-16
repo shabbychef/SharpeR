@@ -58,9 +58,20 @@ RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
 SUPPORT_FILES 	 = ./DESCRIPTION ./NAMESPACE $(RD_DUMMY) ./inst/doc/$(PKG_NAME).Rnw
 
+# 'static' means that we will build the pdf and index.html and distribute
+# those but not the sources.
+# 'dynamic' means we distribute the sources and not the pdf and index.html
+VIGNETTE_PRAGMA ?= static
+
 # for R CMD build
-#BUILD_FLAGS 		?= --no-vignettes
-BUILD_FLAGS 		?= 
+ifeq ($(VIGNETTE_PRAGMA),static)
+	BUILD_FLAGS 		?= 
+else ifeq($(VIGNETTE_PRAGMA),dynamic)
+	BUILD_FLAGS 		?= 
+else
+	$(error unknown VIGNETTE_PRAGMA $(VIGNETTE_PRAGMA))
+	#BUILD_FLAGS 		?= --no-vignettes
+endif
 
 # latex bother. bleah.
 #TEXINPADD    = .:$(HOME)/sys/etc/tex:$(HOME)/sys/etc/tex/SEPtex:$(HOME)/work/math/TEX
@@ -112,16 +123,16 @@ help:
 	@echo "  testthat   Run unit tests."
 	@echo '  tests       "   "     "   '
 	@echo "  parallel   Create a staging version of this package."
-	@echo "  build      Invoke docs and then create a package."
-	@echo "  check      Invoke build and then check the package."
-	@echo "  install    Invoke build and then install the result."
-	@echo "  R          Invoke R in a local context with the package."
+	@echo "  build      Make docs and then R CMD build the package.tgz"
+	@echo "  install    Make build and then install the result."
+	@echo "  R          Make install, then invoke R in the local context w/ the package."
 	@echo "  vignette   Build the vignette in the local context."
 	@echo "  clean      Do some cleanup."
 	@echo "  realclean  Do lots of cleanup."
 	@echo ""
 	@echo "Packaging Tasks"
 	@echo "---------------"
+	@echo "  check      Make build, then R CMD check the package."
 	@echo "  gitpush    Yes, I am lazy"
 	@echo ""
 	@echo "Using R in: $(RBIN)"
