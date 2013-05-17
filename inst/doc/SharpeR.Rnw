@@ -1024,8 +1024,7 @@ simulations, however, suggest it is a fairly tight bound for large $\ssiz/\nlatf
 
 Here I look at the haircut via Monte Carlo simulations:
 
-% <<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
-<<'haircutting',fig.cap="Q-Q plot of 1024 simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.">>=
+<<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
 require(MASS)
 
 # simple markowitz.
@@ -1211,8 +1210,7 @@ One can estimate \nlatf via Monte Carlo simulations, by actually performing
 PCA, or via the `SWAG' method. Surprisingly, often one's intuitive estimate 
 of the true `degrees of freedom' in a trading system is reasonably good.
 
-%  <<'estimate_overfit',fig.cap=paste("Q-Q plot of",n.sim,"achieved optimal \\txtSR values from brute force search over both windows of a Moving Average Crossover under the null of driftless log returns with zero autocorrelation versus the approximation by a 2-parameter optimal \\txtSR distribution is shown.")>>=
-<<'estimate_overfit',fig.cap="Q-Q plot of 1024 achieved optimal \\txtSR values from brute force search over both windows of a Moving Average Crossover under the null of driftless log returns with zero autocorrelation versus the approximation by a 2-parameter optimal \\txtSR distribution is shown.">>=
+<<'estimate_overfit',fig.cap=paste("Q-Q plot of",n.sim,"achieved optimal \\txtSR values from brute force search over both windows of a Moving Average Crossover under the null of driftless log returns with zero autocorrelation versus the approximation by a 2-parameter optimal \\txtSR distribution is shown.")>>=
 require(TTR)
 # brute force search two window MAC
 brute.force <- function(lrets,rrets=exp(lrets)-1,win1,win2=win1) {

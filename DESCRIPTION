@@ -20,9 +20,9 @@ Suggests:
 URL: http://www.r-project.org, https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
 Collate:
-    'SharpeR.r'
     'utils.r'
     'distributions.r'
     'sr.r'
     'estimation.r'
+    'SharpeR.r'
     'tests.r'
