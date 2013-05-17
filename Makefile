@@ -17,7 +17,7 @@ R_FILES 				+= $(wildcard ./inst/tests/*.r)
 R_FILES 				+= $(wildcard ./man-roxygen/*.R)
 R_FILES 				+= $(wildcard ./tests/*.R)
 
-M4_FILES				?= $(wildcard *.m4)
+M4_FILES				?= $(wildcard m4/*.m4)
 
 VERSION 				 = 0.1305
 TODAY 					:= $(shell date +%Y-%m-%d)
@@ -51,16 +51,28 @@ PKG_TESTR 			 = tests/run-all.R
 #INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%,$(TEST_DEPS)) 
 
 # do not distribute these!
-NODIST_FILES		 = ./Makefile $(M4_FILES) rebuildTags.sh .gitignore .gitattributes .tags .R_tags
-NODIST_DIRS			 = .git man-roxygen
+NODIST_FILES		 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
+NODIST_FILES		+= rebuildTags.sh .tags .R_tags
+NODIST_DIRS			 = .git man-roxygen m4
 
 RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
 SUPPORT_FILES 	 = ./DESCRIPTION ./NAMESPACE $(RD_DUMMY) ./inst/doc/$(PKG_NAME).Rnw
 
+# 'static' means that we will build the pdf and index.html and distribute
+# those but not the sources.
+# 'dynamic' means we distribute the sources and not the pdf and index.html
+VIGNETTE_PRAGMA ?= static
+
 # for R CMD build
-#BUILD_FLAGS 		?= --no-vignettes
-BUILD_FLAGS 		?= 
+ifeq ($(VIGNETTE_PRAGMA),static)
+	BUILD_FLAGS 		?= 
+else ifeq($(VIGNETTE_PRAGMA),dynamic)
+	BUILD_FLAGS 		?= 
+else
+	$(error unknown VIGNETTE_PRAGMA $(VIGNETTE_PRAGMA))
+	#BUILD_FLAGS 		?= --no-vignettes
+endif
 
 # latex bother. bleah.
 #TEXINPADD    = .:$(HOME)/sys/etc/tex:$(HOME)/sys/etc/tex/SEPtex:$(HOME)/work/math/TEX
@@ -99,6 +111,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 	staging_d local_d \
 	clean realclean \
 	vignette \
+	static_vignette \
 	R
 
 help:
@@ -113,16 +126,16 @@ help:
 	@echo "  testthat   Run unit tests."
 	@echo '  tests       "   "     "   '
 	@echo "  parallel   Create a staging version of this package."
-	@echo "  build      Invoke docs and then create a package."
-	@echo "  check      Invoke build and then check the package."
-	@echo "  install    Invoke build and then install the result."
-	@echo "  R          Invoke R in a local context with the package."
+	@echo "  build      Make docs and then R CMD build the package.tgz"
+	@echo "  install    Make build and then install the result."
+	@echo "  R          Make install, then invoke R in the local context w/ the package."
 	@echo "  vignette   Build the vignette in the local context."
 	@echo "  clean      Do some cleanup."
 	@echo "  realclean  Do lots of cleanup."
 	@echo ""
 	@echo "Packaging Tasks"
 	@echo "---------------"
+	@echo "  check      Make build, then R CMD check the package."
 	@echo "  gitpush    Yes, I am lazy"
 	@echo ""
 	@echo "Using R in: $(RBIN)"
@@ -145,8 +158,8 @@ tags: .R_tags
 TAGS: 
 	$(R) --slave CMD rtags
 
-DESCRIPTION : DESCRIPTION.m4 Makefile
-	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
+% : m4/%.m4 Makefile
+	m4 -I ./m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
 
 # macro for local R
 RLOCAL = R_LIBS=$(LOCAL) $(R) $(R_FLAGS)
@@ -175,7 +188,7 @@ man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
 	$(RLOCAL) --slave -e "require(roxygen2); roxygenize('.', '.', overwrite=TRUE, unlink.target=TRUE)"
 	touch $@
 
-docs: DESCRIPTION man/$(PKG_NAME).Rd 
+docs: README.md DESCRIPTION man/$(PKG_NAME).Rd 
 
 #RSYNC_FLAGS     = -av
 #RSYNC_FLAGS     = -vrlpgoD --delete
@@ -205,6 +218,7 @@ $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS)
 
 build : $(PKG_TGZ)
 
+
 # an 'install'
 $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ) 
 	$(call WARN_DEPS)
@@ -213,6 +227,21 @@ $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ)
 	touch $@
 
 install: $(LOCAL)/$(PKG_NAME)/INDEX
+
+# fucking shit.
+# * Sat May 11 2013 09:48:00 PM Steven E. Pav <steven@cerebellumcapital.com>
+# static vignettes? CRAN having problems with quantmod.
+./inst/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
+	cp $< $@
+
+./inst/doc/index.html : $(LOCAL)/$(PKG_NAME)/doc/index.html
+	cp $< $@
+
+static_vignette : ./inst/doc/$(PKG_NAME).pdf ./inst/doc/index.html 
+
+# rely on the 'install' target above.
+$(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
+
 
 # check and install
 $(RCHECK_SENTINEL) : $(PKG_TGZ)
