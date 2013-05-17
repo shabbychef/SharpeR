@@ -41,6 +41,7 @@ RCHECK_SENTINEL  = $(RCHECK)/$(PKG_NAME)/DESCRIPTION
 RBIN 						?= $(shell dirname "`which R`")
 R         			 = $(RBIN)/R
 RSCRIPT   			 = $(RBIN)/Rscript
+R_FLAGS 				?= --vanilla --verbose -q
 
 # packages I need to test this one
 TEST_DEPS  			 = testthat roxygen2 knitr TTR quantmod MASS
@@ -68,6 +69,8 @@ PRETEX       = TEXINPUTS=$(TEXINPADD):$$TEXINPUTS
 PREBIB       = BSTINPUTS=$(TEXINPADD):$$BSTINPUTS \
                BIBINPUTS=$(TEXINPADD):$$BIBINPUTS 
 BIBTEX      := $(shell which bibtex)
+
+BASE_DEF_PACKAGES   = "utils,graphics,grDevices,methods,stats,$(PKG_NAME)"
 
 #FAST_
 
@@ -146,7 +149,7 @@ DESCRIPTION : DESCRIPTION.m4 Makefile
 	m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
 
 # macro for local R
-RLOCAL = R_LIBS=$(LOCAL) $(R) --vanilla 
+RLOCAL = R_LIBS=$(LOCAL) $(R) $(R_FLAGS)
 
 # make directories
 local_d :
@@ -235,7 +238,7 @@ slow_vignette : $(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
 unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION $(PKG_TESTR)
 	$(call WARN_DEPS)
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
-				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,$(PKG_NAME)" R -q --no-save \
+				 R_DEFAULT_PACKAGES=$(BASE_DEF_PACKAGES) $(R) $(R_FLAGS) \
 				 --slave < $(PKG_TESTR) | tee $@
 
 testthat : unit_test.log
@@ -245,12 +248,12 @@ tests    : unit_test.log
 # drop into R shell in the 'local context'
 R : deps $(LOCAL)/$(PKG_NAME)/INDEX
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
-				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,$(PKG_NAME)" R -q --no-save
+				 R_DEFAULT_PACKAGES=$(BASE_DEF_PACKAGES) $(R) -q --no-save
 
 $(PKG_NAME).pdf: inst/doc/$(PKG_NAME).Rnw deps $(LOCAL)/$(PKG_NAME)/INDEX 
 	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
-				 R_DEFAULT_PACKAGES="utils,graphics,grDevices,methods,stats,knitr,TTR,$(PKG_NAME)" \
-				 R -q --no-save --slave -e "knitr::knit2pdf('$<');"
+				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,TTR" \
+				 $(R) $(R_FLAGS) --slave -e "knitr::knit2pdf('$<');"
 	if grep Citation $(PKG_NAME).log > /dev/null; then $(PREBIB) $(BIBTEX) $(PKG_NAME); \
 		$(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 	if grep Rerun $(PKG_NAME).log > /dev/null; then $(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
