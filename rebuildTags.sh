@@ -12,7 +12,12 @@
 # SVN: $Id: rebuildTags.sh 31471 2012-11-06 18:28:48Z steven $
 
 #CTAGS=exuberant-ctags
-CTAGS=ctags
+if [ "$LINUX_DISTRO" == "CRAPINTOSH" ]; then
+	CTAGS=/opt/local/bin/ctags
+else
+	CTAGS=ctags
+fi
+echo $CTAGS
 CTAGFLAGS='--verbose=no --recurse'
 NICE_LEVEL=18
 NICE_FLAGS="-n $NICE_LEVEL"
@@ -26,7 +31,7 @@ if [ -s $TMP_TAG ];
 then
 	mv $TMP_TAG .R_tags;
 else
-	echo "empty R tags?" > 2
+	echo "empty R tags?" 1>&2 
 fi
 
 ln -sf .R_tags .tags

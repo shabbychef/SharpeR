@@ -822,12 +822,12 @@ the more natural units of reward to variability, and in annualized terms (or
 whatever the epoch is.)
 
 As an example, here I perform a CAPM attribution to the monthly returns of
-\StockTicker{BRK.B}. Note that the statistical significance here is certainly
+\StockTicker{BRK-B}. Note that the statistical significance here is certainly
 tainted by selection bias, a topic beyond the scope of this note.
 
 <<'BRKB'>>=
 # get the returns (see above for the function)
-some.rets <- get.rets(c("BRK.B","SPY"),from="1996-05-09")
+some.rets <- get.rets(c("BRK-B","SPY"),from="1996-05-09")
 # make them monthly:
 mo.rets <- my.periodReturn(exp(cumsum(some.rets)),period='monthly',type='arithmetic')
 # look at both of them together:
@@ -1024,7 +1024,8 @@ simulations, however, suggest it is a fairly tight bound for large $\ssiz/\nlatf
 
 Here I look at the haircut via Monte Carlo simulations:
 
-<<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
+% <<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
+<<'haircutting',fig.cap="Q-Q plot of 1024 simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.">>=
 require(MASS)
 
 # simple markowitz.
@@ -1210,7 +1211,8 @@ One can estimate \nlatf via Monte Carlo simulations, by actually performing
 PCA, or via the `SWAG' method. Surprisingly, often one's intuitive estimate 
 of the true `degrees of freedom' in a trading system is reasonably good.
 
-<<'estimate_overfit',fig.cap=paste("Q-Q plot of",n.sim,"achieved optimal \\txtSR values from brute force search over both windows of a Moving Average Crossover under the null of driftless log returns with zero autocorrelation versus the approximation by a 2-parameter optimal \\txtSR distribution is shown.")>>=
+%  <<'estimate_overfit',fig.cap=paste("Q-Q plot of",n.sim,"achieved optimal \\txtSR values from brute force search over both windows of a Moving Average Crossover under the null of driftless log returns with zero autocorrelation versus the approximation by a 2-parameter optimal \\txtSR distribution is shown.")>>=
+<<'estimate_overfit',fig.cap="Q-Q plot of 1024 achieved optimal \\txtSR values from brute force search over both windows of a Moving Average Crossover under the null of driftless log returns with zero autocorrelation versus the approximation by a 2-parameter optimal \\txtSR distribution is shown.">>=
 require(TTR)
 # brute force search two window MAC
 brute.force <- function(lrets,rrets=exp(lrets)-1,win1,win2=win1) {

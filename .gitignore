@@ -15,6 +15,9 @@
 # unit testing
 unit_test.log
 
+# build static/dynamic
+convoluted_build.sh
+
 # automagically generated?
 # ah, but these are needed for install_github:
 #NAMESPACE
@@ -24,7 +27,7 @@ unit_test.log
 # generated as part of the 'local' vignette build
 SharpeR.tex
 SharpeR.log
-SharpeR.pdf
+./SharpeR.pdf
 *.aux
 *.bbl
 *.blg
