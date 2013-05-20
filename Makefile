@@ -19,7 +19,7 @@ R_FILES 				+= $(wildcard ./tests/*.R)
 
 M4_FILES				?= $(wildcard m4/*.m4)
 
-VERSION 				 = 0.1305
+VERSION 				 = 0.1306
 TODAY 					:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 				:= SharpeR
@@ -84,6 +84,24 @@ else
 	$(error unknown VIGNETTE_PRAGMA $(VIGNETTE_PRAGMA))
 	#BUILD_FLAGS 		?= --no-vignettes
 endif
+
+TEST_PRAGMA     ?= release
+
+# for R CMD build
+ifeq ($(TEST_PRAGMA),thorough)
+	# noop
+else 
+	SLOW_TESTS 			 = $(wildcard inst/tests/test-slow*.r)
+	NODIST_FILES 		+= $(SLOW_TESTS)
+endif
+
+define \n
+
+
+endef
+
+fooz :
+	echo $(patsubst %,%\${\n},$(NODIST_FILES))
 
 STAGING 				?= .staging/$(VIGNETTE_PRAGMA)
 STAGED_PKG 			 = $(STAGING)/$(PKG_NAME)
@@ -222,9 +240,8 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 		--include=man/ --include=man/* \
 		--include=NAMESPACE --include=DESCRIPTION \
 		--exclude-from=.gitignore \
-		$(patsubst %,--exclude=%,$(NODIST_FILES)) \
-		$(patsubst %,--exclude=%,$(NODIST_DIRS)) \
-		--exclude=$(LOCAL) --exclude=$(STAGING) --exclude=$(RCHECK) \
+		$(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_FILES))) $(patsubst %,--exclude=%,$(NODIST_DIRS)) \
+		--exclude=$(LOCAL) --exclude=$(basename $(STAGING)) --exclude=$(RCHECK) \
 		. $(@D)
 	touch $@
 
@@ -266,7 +283,7 @@ $(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
 # check and install
 $(RCHECK_SENTINEL) : $(PKG_TGZ)
 	$(call WARN_DEPS)
-	$(RLOCAL) CMD check --as-cran --outdir=$@ $^ 
+	$(RLOCAL) CMD check --as-cran --outdir=$(RCHECK) $^ 
 	
 check: $(RCHECK_SENTINEL)
 
@@ -363,6 +380,15 @@ convoluted_build.sh :
 	@-echo 'make inst/doc/SharpeR.pdf inst/doc/index.html' >> $@
 	@-echo 'VIGNETTE_PRAGMA=static make build' >> $@
 	@-echo 'VIGNETTE_PRAGMA=static make check' >> $@
+
+fake2 : 
+	$(MAKE) deps
+	$(MAKE) docs
+	VIGNETTE_PRAGMA=dynamic $(MAKE) install
+	$(MAKE) inst/doc/SharpeR.pdf inst/doc/index.html
+	VIGNETTE_PRAGMA=static $(MAKE) build
+	VIGNETTE_PRAGMA=static $(MAKE) check
+
 
 # FTP junk
 ~/.netrc :

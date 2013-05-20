@@ -137,7 +137,7 @@ se <- function(z, type) {
 #' 1996. \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
 #'
 #' @examples 
-#' asr <- as.sr(rnorm(1000,0.2))
+#' asr <- as.sr(rnorm(128,0.2))
 #' anse <- se(asr,type="t")
 #' anse <- se(asr,type="Lo")
 #'
@@ -224,20 +224,20 @@ se.sr <- function(z, type=c("t","Lo")) {
 #' ope <- 253
 #' df <- ope * 6
 #' zeta <- 1.0
-#' rvs <- rsr(500, df, zeta, ope)
+#' rvs <- rsr(128, df, zeta, ope)
 #' roll.own <- sr(sr=rvs,df=df,c0=0,ope=ope)
 #' aci <- confint(roll.own,level=0.95)
 #' coverage <- 1 - mean((zeta < aci[,1]) | (aci[,2] < zeta))
 #' # using "sropt" class
 #' ope <- 253
-#' df1 <- 6
-#' df2 <- ope * 6
+#' df1 <- 4
+#' df2 <- ope * 3
 #' rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
 #' sro <- as.sropt(rvs,ope=ope)
 #' aci <- confint(sro)
 #' # on sropt, rolling your own.
 #' zeta.s <- 1.0
-#' rvs <- rsropt(500, df1, df2, zeta.s, ope)
+#' rvs <- rsropt(128, df1, df2, zeta.s, ope)
 #' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 #' aci <- confint(roll.own,level=0.95)
 #' coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
@@ -401,8 +401,8 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' @examples 
 #' # generate some sropts
-#' nfac <- 5
-#' nyr <- 10
+#' nfac <- 3
+#' nyr <- 5
 #' ope <- 253
 #' # simulations with no covariance structure.
 #' # under the null:
@@ -421,11 +421,11 @@ T2.inference <- function(T2,df1,df2,...) {
 #' est3 <- inference(asro,type='MLE')
 #'
 #' # sample many under the alternative, look at the estimator.
-#' df1 <- 6
-#' df2 <- 2000
+#' df1 <- 3
+#' df2 <- 512
 #' ope <- 253
 #' zeta.s <- 1.25
-#' rvs <- rsropt(500, df1, df2, zeta.s, ope)
+#' rvs <- rsropt(128, df1, df2, zeta.s, ope)
 #' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 #' est1 <- inference(roll.own,type='unbiased')  
 #' est2 <- inference(roll.own,type='KRS')  

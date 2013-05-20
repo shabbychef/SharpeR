@@ -74,16 +74,18 @@
 }
 \examples{
 # Sharpe's 'model': just given a bunch of returns.
-asr <- as.sr(rnorm(253*8),ope=253)
+asr <- as.sr(rnorm(253*3),ope=253)
 # or a matrix, with a name
-my.returns <- matrix(rnorm(253*10),ncol=1)
+my.returns <- matrix(rnorm(253*3),ncol=1)
 colnames(my.returns) <- c("my strategy")
 asr <- as.sr(my.returns)
 # given an xts object:
+\dontrun{
 if (require(quantmod)) {
   IBM <- getSymbols('IBM',auto.assign=FALSE)
   lrets <- diff(log(IBM[,"IBM.Adjusted"]))
   asr <- as.sr(lrets,na.rm=TRUE)
+}
 }
 # on a linear model, find the 'Sharpe' of the residual term
 nfac <- 5

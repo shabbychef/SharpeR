@@ -40,7 +40,7 @@
   autocorrelation, skew, kurtosis.
 }
 \examples{
-asr <- as.sr(rnorm(1000,0.2))
+asr <- as.sr(rnorm(128,0.2))
 anse <- se(asr,type="t")
 anse <- se(asr,type="Lo")
 }

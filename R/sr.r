@@ -89,7 +89,7 @@
 #' # roll your own.
 #' ope <- 253
 #' zeta <- 1.0
-#' n <- 6 * ope
+#' n <- 3 * ope
 #' rvs <- rsr(1,n,zeta,ope=ope)
 #' roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
 #' # put a bunch in. naming becomes a problem.
@@ -170,16 +170,18 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #'
 #' @examples 
 #' # Sharpe's 'model': just given a bunch of returns.
-#' asr <- as.sr(rnorm(253*8),ope=253)
+#' asr <- as.sr(rnorm(253*3),ope=253)
 #' # or a matrix, with a name
-#' my.returns <- matrix(rnorm(253*10),ncol=1)
+#' my.returns <- matrix(rnorm(253*3),ncol=1)
 #' colnames(my.returns) <- c("my strategy")
 #' asr <- as.sr(my.returns)
 #' # given an xts object:
+#' \dontrun{
 #' if (require(quantmod)) {
 #'   IBM <- getSymbols('IBM',auto.assign=FALSE)
 #'   lrets <- diff(log(IBM[,"IBM.Adjusted"]))
 #'   asr <- as.sr(lrets,na.rm=TRUE)
+#' }
 #' }
 #' # on a linear model, find the 'Sharpe' of the residual term
 #' nfac <- 5
@@ -638,6 +640,7 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #'   Returns <- mvrnorm(ceiling(ope*nyr),mu=matrix(0.001,ncol=nstok),Sigma=Sigma)
 #'   asro <- as.sropt(Returns,ope=ope)
 #' }
+#' \dontrun{
 #' # using real data.
 #' if (require(quantmod)) {
 #'   get.ret <- function(sym,...) {
@@ -649,6 +652,7 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #'   get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
 #'   some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
 #'   asro <- as.sropt(some.rets)
+#' }
 #' }
 as.sropt <- function(X,drag=0,ope=1,epoch="yr") {
 	UseMethod("as.sropt", X)

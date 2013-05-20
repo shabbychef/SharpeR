@@ -202,12 +202,14 @@ rrt <- function(n, df, K, rho = 0) {
 #' @template etc
 #' @template sr
 #' @examples 
-#' rvs <- rsr(2048, 253*6, 0, 253)
+#' rvs <- rsr(128, 253*6, 0, 253)
 #' dvs <- dsr(rvs, 253*6, 0, 253)
-#' pvs <- psr(rvs, 253*6, 0, 253)
-#' plot(ecdf(pvs))
-#' pvs <- psr(rvs, 253*6, 1, 253)
-#' plot(ecdf(pvs))
+#' pvs.H0 <- psr(rvs, 253*6, 0, 253)
+#' pvs.HA <- psr(rvs, 253*6, 1, 253)
+#' \dontrun{
+#' plot(ecdf(pvs.H0))
+#' plot(ecdf(pvs.HA))
+#' }
 #'
 dsr <- function(x, df, zeta, ope = 1, ...) {
 	K <- sqrt(ope / df)
@@ -329,7 +331,7 @@ rsr <- function(n, df, zeta, ope) {
 #  ' Statistics 2, no. 3 (1931): 360--378. \url{http://projecteuclid.org/euclid.aoms/1177732979}
 #  '
 #  ' @examples 
-#  ' rvs <- rT2(2048, 4, 253*6, 0)
+#  ' rvs <- rT2(128, 4, 253*6, 0)
 #  ' dvs <- dT2(rvs, 4, 253*6, 0)
 #  ' pvs <- pT2(rvs, 4, 253*6, 0)
 #  ' plot(ecdf(pvs))
@@ -490,7 +492,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #'
 #' @examples 
 #' # generate some variates 
-#' ngen <- 2048
+#' ngen <- 128
 #' ope <- 253
 #' df1 <- 8
 #' df2 <- ope * 10
@@ -660,7 +662,7 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 #  ' and decreasing in \code{tstat}. \code{qlambdap} should be increasing
 #  ' in \code{p}
 #  ' @examples 
-#  ' rvs <- rnorm(2048)
+#  ' rvs <- rnorm(128)
 #  ' pvs <- plambdap(rvs, 253*6, 0.5)
 #  ' plot(ecdf(pvs))
 #  ' pvs <- plambdap(rvs, 253*6, 1)

@@ -99,12 +99,14 @@
   made here for large \code{zeta}.
 }
 \examples{
-rvs <- rsr(2048, 253*6, 0, 253)
+rvs <- rsr(128, 253*6, 0, 253)
 dvs <- dsr(rvs, 253*6, 0, 253)
-pvs <- psr(rvs, 253*6, 0, 253)
-plot(ecdf(pvs))
-pvs <- psr(rvs, 253*6, 1, 253)
-plot(ecdf(pvs))
+pvs.H0 <- psr(rvs, 253*6, 0, 253)
+pvs.HA <- psr(rvs, 253*6, 1, 253)
+\dontrun{
+plot(ecdf(pvs.H0))
+plot(ecdf(pvs.HA))
+}
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

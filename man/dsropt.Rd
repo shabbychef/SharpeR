@@ -116,7 +116,7 @@
 }
 \examples{
 # generate some variates
-ngen <- 2048
+ngen <- 128
 ope <- 253
 df1 <- 8
 df2 <- ope * 10

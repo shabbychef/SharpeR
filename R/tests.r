@@ -116,6 +116,7 @@
 #'   function(mu) { rnorm(ope*nyr,mean=mu,sd=1) })
 #' rv <- sr_equality_test(rets)
 #' 
+#' \dontrun{
 #' # using real data
 #' if (require(quantmod)) {
 #'   get.ret <- function(sym,...) {
@@ -128,10 +129,11 @@
 #'   pvs <- sr_equality_test(some.rets)
 #' }
 #' # test for uniformity
-#' pvs <- replicate(500,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
+#' pvs <- replicate(1024,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
 #'                        x$p.value })
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
+#' }
 #'
 #'@export
 sr_equality_test <- function(X,type=c("chisq","F","t"),
@@ -287,7 +289,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,ope=1,alternative="less")
 #'
 #' # test for uniformity
-#' pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),ope=253,alternative="two.sided")
+#' pvs <- replicate(128,{ x <- sr_test(rnorm(1000),ope=253,alternative="two.sided")
 #'                         x$p.value })
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
@@ -500,7 +502,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' anex <- power.sr_test(n=253,zeta=NULL,sig.level=0.05,power=0.5,ope=253) 
 #' anex <- power.sr_test(n=NULL,zeta=0.6,sig.level=0.05,power=0.5,ope=253) 
 #' # Lehr's Rule 
-#' zetas <- seq(0.1,2.5,length.out=201)
+#' zetas <- seq(0.1,2.5,length.out=51)
 #' ssizes <- sapply(zetas,function(zed) { 
 #'   x <- power.sr_test(n=NULL,zeta=zed,sig.level=0.05,power=0.8,
 #'        alternative="two.sided",ope=253)
@@ -599,7 +601,7 @@ power.sr_test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #' @examples 
 #'
 #' # test for uniformity
-#' pvs <- replicate(1000,{ x <- sropt_test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
+#' pvs <- replicate(128,{ x <- sropt_test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
 #'                         x$p.value })
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 

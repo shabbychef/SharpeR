@@ -66,7 +66,7 @@
 }
 \examples{
 # test for uniformity
-pvs <- replicate(1000,{ x <- sropt_test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
+pvs <- replicate(128,{ x <- sropt_test(matrix(rnorm(1000*4),ncol=4),alternative="two.sided")
                         x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')

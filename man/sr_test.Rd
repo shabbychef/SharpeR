@@ -91,7 +91,7 @@ x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,ope=1,alternative="two.sided")
 x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,ope=1,alternative="less")
 
 # test for uniformity
-pvs <- replicate(1000,{ x <- sr_test(rnorm(1000),ope=253,alternative="two.sided")
+pvs <- replicate(128,{ x <- sr_test(rnorm(1000),ope=253,alternative="two.sided")
                         x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')

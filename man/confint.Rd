@@ -79,20 +79,20 @@ confint(mysr,level.lo=0.05,level.hi=1.0)
 ope <- 253
 df <- ope * 6
 zeta <- 1.0
-rvs <- rsr(500, df, zeta, ope)
+rvs <- rsr(128, df, zeta, ope)
 roll.own <- sr(sr=rvs,df=df,c0=0,ope=ope)
 aci <- confint(roll.own,level=0.95)
 coverage <- 1 - mean((zeta < aci[,1]) | (aci[,2] < zeta))
 # using "sropt" class
 ope <- 253
-df1 <- 6
-df2 <- ope * 6
+df1 <- 4
+df2 <- ope * 3
 rvs <- as.matrix(rnorm(df1*df2),ncol=df1)
 sro <- as.sropt(rvs,ope=ope)
 aci <- confint(sro)
 # on sropt, rolling your own.
 zeta.s <- 1.0
-rvs <- rsropt(500, df1, df2, zeta.s, ope)
+rvs <- rsropt(128, df1, df2, zeta.s, ope)
 roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 aci <- confint(roll.own,level=0.95)
 coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))

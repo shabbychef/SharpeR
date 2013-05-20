@@ -41,8 +41,8 @@
 }
 \examples{
 # generate some sropts
-nfac <- 5
-nyr <- 10
+nfac <- 3
+nyr <- 5
 ope <- 253
 # simulations with no covariance structure.
 # under the null:
@@ -61,11 +61,11 @@ est2 <- inference(asro,type='KRS')
 est3 <- inference(asro,type='MLE')
 
 # sample many under the alternative, look at the estimator.
-df1 <- 6
-df2 <- 2000
+df1 <- 3
+df2 <- 512
 ope <- 253
 zeta.s <- 1.25
-rvs <- rsropt(500, df1, df2, zeta.s, ope)
+rvs <- rsropt(128, df1, df2, zeta.s, ope)
 roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 est1 <- inference(roll.own,type='unbiased')
 est2 <- inference(roll.own,type='KRS')

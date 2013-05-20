@@ -67,6 +67,7 @@ rets <- 0.01 * sapply(seq(0,1.7/sqrt(ope),length.out=nco),
   function(mu) { rnorm(ope*nyr,mean=mu,sd=1) })
 rv <- sr_equality_test(rets)
 
+\dontrun{
 # using real data
 if (require(quantmod)) {
   get.ret <- function(sym,...) {
@@ -79,10 +80,11 @@ if (require(quantmod)) {
   pvs <- sr_equality_test(some.rets)
 }
 # test for uniformity
-pvs <- replicate(500,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
+pvs <- replicate(1024,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
                        x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red')
+}
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

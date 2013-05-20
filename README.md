@@ -16,6 +16,6 @@ if (require(devtools))
 	install_github(repo='SharpeR',username='shabbychef',ref='master')
 # last release:
 if (require(devtools))
-	install_github(repo='SharpeR',username='shabbychef',ref='r0.1305')
+	install_github(repo='SharpeR',username='shabbychef',ref='r0.1306')
 ```
 

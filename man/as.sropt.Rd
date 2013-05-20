@@ -108,6 +108,7 @@ if (require(MASS)) {
   Returns <- mvrnorm(ceiling(ope*nyr),mu=matrix(0.001,ncol=nstok),Sigma=Sigma)
   asro <- as.sropt(Returns,ope=ope)
 }
+\dontrun{
 # using real data.
 if (require(quantmod)) {
   get.ret <- function(sym,...) {
@@ -119,6 +120,7 @@ if (require(quantmod)) {
   get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
   some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
   asro <- as.sropt(some.rets)
+}
 }
 }
 \author{
