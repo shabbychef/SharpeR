@@ -39,8 +39,8 @@ context("estimation functions: confint coverage")#FOLDUP
 test_that("confint.sr coverage",{#FOLDUP
 	set.char.seed("066dfa96-6dd7-4d14-ab74-49e81b3afd83")
 
-	ngen <- ceiling(THOROUGHNESS * 128)
-	alpha.tol = 0.05 + 0.05 / THOROUGHNESS
+	ngen <- ceiling(THOROUGHNESS * 64)
+	alpha.tol = 0.05 + 0.10 / THOROUGHNESS
 
 	ope <- 253
 	for (nyr in c(3,6,9)) {
@@ -62,8 +62,8 @@ test_that("confint.sr coverage",{#FOLDUP
 test_that("confint.sropt coverage",{#FOLDUP
 	set.char.seed("50c7aa74-9cec-4fef-980e-c25bfede8260")
 
-	ngen <- ceiling(THOROUGHNESS * 256)
-	alpha.tol = 0.05 + 0.05 / THOROUGHNESS
+	ngen <- ceiling(THOROUGHNESS * 64)
+	alpha.tol = 0.05 + 0.10 / THOROUGHNESS
 
 	ope <- 253
 	for (df1 in c(2,4,8,16)) {

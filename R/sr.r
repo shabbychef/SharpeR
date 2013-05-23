@@ -204,14 +204,19 @@ as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 .as.sr.unified <- function(x,mu,sigma,c0,ope,na.rm,epoch) {
 	z <- .compute_sr(mu,c0,sigma,ope)
 	dim(z) <- c(length(mu),1)
+
+
 	# what bother;
-	if (length(dimnames(x)) == 1) {
+	if (length(dimnames(x)) == 1) 
 		rownames(z) <- unlist(dimnames(x))
-	} else {
+	else 
 		rownames(z) <- unlist(dimnames(x)[2])
-	}
 	if (is.null(rownames(z)))
 		rownames(z) <- deparse(substitute(x))
+
+	# make it a col vector if not otherwise defined.
+	if (is.null(dim(x))) 
+		dim(x) <- c(length(x),1)
 	if (na.rm) 
 		df <- apply(!is.na(x),2,sum)
 	else
@@ -227,7 +232,8 @@ as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- mean(x,na.rm=na.rm)
 	sigma <- sd(x,na.rm=na.rm)
-	retval <- .as.sr.unified(x,mu,sigma,c0,ope,na.rm,epoch)
+	retval <- .as.sr.unified(x=x,mu=mu,sigma=sigma,c0=c0,ope=ope,
+													 na.rm=na.rm,epoch=epoch)
 	return(retval)
 }
 #' @rdname as.sr
@@ -236,7 +242,8 @@ as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 as.sr.data.frame <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- apply(x,2,mean,na.rm=na.rm)
 	sigma <- apply(x,2,sd,na.rm=na.rm)
-	retval <- .as.sr.unified(x,mu,sigma,c0,ope,na.rm,epoch)
+	retval <- .as.sr.unified(x=x,mu=mu,sigma=sigma,c0=c0,ope=ope,
+													 na.rm=na.rm,epoch=epoch)
 	return(retval)
 }
 #' @rdname as.sr
