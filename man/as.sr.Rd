@@ -3,6 +3,7 @@
 \alias{as.sr.data.frame}
 \alias{as.sr.default}
 \alias{as.sr.lm}
+\alias{as.sr.timeSeries}
 \alias{as.sr.xts}
 \title{Compute the Sharpe ratio.}
 \usage{
@@ -19,6 +20,9 @@
 
   \method{as.sr}{xts} (x, c0 = 0, ope = 1, na.rm = FALSE,
     epoch = "yr")
+
+  \method{as.sr}{timeSeries} (x, c0 = 0, ope = 1,
+    na.rm = FALSE, epoch = "yr")
 }
 \arguments{
   \item{x}{vector of returns, or object of class

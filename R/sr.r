@@ -201,20 +201,33 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	UseMethod("as.sr", x)
 }
+.as.sr.unified <- function(x,mu,sigma,c0,ope,na.rm,epoch) {
+	z <- .compute_sr(mu,c0,sigma,ope)
+	dim(z) <- c(length(mu),1)
+	# what bother;
+	if (length(dimnames(x)) == 1) {
+		rownames(z) <- unlist(dimnames(x))
+	} else {
+		rownames(z) <- unlist(dimnames(x)[2])
+	}
+	if (is.null(rownames(z)))
+		rownames(z) <- deparse(substitute(x))
+	if (na.rm) 
+		df <- apply(!is.na(x),2,sum)
+	else
+		df <- dim(x)[1]
+
+	retval <- sr(z,df=df-1,c0=c0,ope=ope,
+							 rescal=1/sqrt(df),epoch=epoch)
+	return(retval)
+}
 #' @rdname as.sr
 #' @method as.sr default
 #' @S3method as.sr default
 as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- mean(x,na.rm=na.rm)
 	sigma <- sd(x,na.rm=na.rm)
-	z <- .compute_sr(mu,c0,sigma,ope)
-	dim(z) <- c(1,1)
-	rownames(z) <- unlist(dimnames(x))
-	if (is.null(rownames(z)))
-		rownames(z) <- deparse(substitute(x))
-	df <- ifelse(na.rm,sum(!is.na(x)),length(x))
-	retval <- sr(z,df=df-1,c0=c0,ope=ope,
-							 rescal=1/sqrt(df),epoch=epoch)
+	retval <- .as.sr.unified(x,mu,sigma,c0,ope,na.rm,epoch)
 	return(retval)
 }
 #' @rdname as.sr
@@ -223,14 +236,7 @@ as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 as.sr.data.frame <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- apply(x,2,mean,na.rm=na.rm)
 	sigma <- apply(x,2,sd,na.rm=na.rm)
-	z <- .compute_sr(mu,c0,sigma,ope)
-	dim(z) <- c(length(mu),1)
-	rownames(z) <- unlist(colnames(x))
-	if (is.null(rownames(z)))
-		rownames(z) <- deparse(substitute(x))
-	df <- ifelse(na.rm,apply(!is.na(x),2,sum),dim(x)[1])
-	retval <- sr(z,df=df-1,c0=c0,ope=ope,
-							 rescal=1/sqrt(df),epoch=epoch)
+	retval <- .as.sr.unified(x,mu,sigma,c0,ope,na.rm,epoch)
 	return(retval)
 }
 #' @rdname as.sr
@@ -257,6 +263,13 @@ as.sr.xts <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 		epoch <- "yr"
 	}
 	retval <- as.sr.data.frame(as.data.frame(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
+	return(retval)
+}
+#' @rdname as.sr
+#' @method as.sr timeSeries
+#' @S3method as.sr timeSeries
+as.sr.timeSeries <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+	retval <- as.sr.xts(as.xts(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
 	return(retval)
 }
 #' @title Is this in the "sr" class?

@@ -54,6 +54,7 @@ PKG_TESTR 			 = tests/run-all.R
 NODIST_FILES		 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
 NODIST_FILES		+= rebuildTags.sh .tags .R_tags
 NODIST_DIRS			 = .git man-roxygen m4
+NODIST_DIRS			+= inst/doc/figure inst/doc/cache
 
 RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
@@ -84,6 +85,8 @@ else
 	$(error unknown VIGNETTE_PRAGMA $(VIGNETTE_PRAGMA))
 	#BUILD_FLAGS 		?= --no-vignettes
 endif
+
+INSTALL_FLAGS 		?= --preclean --no-multiarch --library=$(LOCAL) 
 
 TEST_PRAGMA     ?= release
 
@@ -235,14 +238,18 @@ RSYNC_FLAGS     = -av --delete
 # a parallel version of this package, but without the support structure
 $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES) 
 	$(call WARN_DEPS)
+	@-echo clean up first
+	@-rm -rf $(STAGED_PKG)
 	$(call MKDIR,$(STAGED_PKG))
+	@-echo sync over
 	rsync $(RSYNC_FLAGS) \
-		--include=man/ --include=man/* \
-		--include=NAMESPACE --include=DESCRIPTION \
-		--exclude-from=.gitignore \
-		$(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_FILES))) $(patsubst %,--exclude=%,$(NODIST_DIRS)) \
-		--exclude=$(LOCAL) --exclude=$(basename $(STAGING)) --exclude=$(RCHECK) \
-		. $(@D)
+  --include=man/ --include=man/* \
+  --include=NAMESPACE --include=DESCRIPTION \
+  --exclude-from=.gitignore \
+ $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_FILES)))  --exclude=$(LOCAL) \
+ $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_DIRS)))  --exclude=$(basename $(STAGING)) \
+  --exclude=$(RCHECK) \
+  . $(@D)
 	touch $@
 
 staged : $(STAGED_PKG)/DESCRIPTION
@@ -255,12 +262,11 @@ $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS) $(EXTRA_PKG_DEPS)
 
 build : $(PKG_TGZ)
 
-
 # an 'install'
 $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ) 
 	$(call WARN_DEPS)
 	$(call MKDIR,$(LOCAL))
-	$(RLOCAL) CMD INSTALL --preclean --no-multiarch --library=$(LOCAL) $<
+	$(RLOCAL) CMD INSTALL $(INSTALL_FLAGS) $<
 	touch $@
 
 install: $(LOCAL)/$(PKG_NAME)/INDEX
