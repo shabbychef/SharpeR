@@ -155,6 +155,7 @@
 #' 311--331. \url{http://dx.doi.org/10.1111/j.1467-9469.2011.00729.x}
 #'
 #' @name SharpeR
+#' @rdname SharpeR
 #' @docType package
 #' @title statistics concerning Sharpe ratio and Markowitz portfolio
 #' @keywords package
@@ -171,6 +172,27 @@
 #' 
 #' This package is maintained as a hobby. 
 #'
+NULL
+
+#' @title News for package 'SharpeR':
+#'
+#' \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+#' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
+#' 
+#' @section Changes in \SharpeR{} Version 0.1307 (2013-05-30) :
+#'
+#' \itemize{
+#' \item proper d.f. in sr objects with different nan fill.
+#' \item restore dynamic vignette.
+#' }
+#'
+#' @section \SharpeR{} Initial Version 0.1306 (2013-05-21) :
+#' \itemize{
+#' \item put on CRAN
+#' }
+#'
+#' @name SharpeR-NEWS
+#' @rdname NEWS
 NULL
 
 #for vim modeline: (do not edit)

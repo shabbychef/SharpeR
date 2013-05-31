@@ -19,7 +19,7 @@ R_FILES 				+= $(wildcard ./tests/*.R)
 
 M4_FILES				?= $(wildcard m4/*.m4)
 
-VERSION 				 = 0.1306
+VERSION 				 = 0.1307
 TODAY 					:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 				:= SharpeR
@@ -63,7 +63,7 @@ VIGNETTE_SRCS  		 = $(VIGNETTE_D)/$(PKG_NAME).Rnw $(VIGNETTE_D)/$(PKG_NAME).bib
 VIGNETTE_PDF   		 = $(VIGNETTE_D)/$(PKG_NAME).pdf
 VIGNETTE_HTML  		 = $(VIGNETTE_D)/index.html
 
-SUPPORT_FILES 		 = ./DESCRIPTION ./NAMESPACE $(RD_DUMMY)
+SUPPORT_FILES 		 = ./DESCRIPTION ./NAMESPACE ./ChangeLog $(RD_DUMMY) ./inst/CITATION
 
 # 'static' means that we will build the pdf and index.html and distribute
 # those but not the sources.
@@ -86,7 +86,8 @@ else
 	#BUILD_FLAGS 		?= --no-vignettes
 endif
 
-INSTALL_FLAGS 		?= --preclean --no-multiarch --library=$(LOCAL) 
+#INSTALL_FLAGS 		?= --preclean --no-multiarch --library=$(LOCAL) 
+INSTALL_FLAGS 		?= --preclean --library=$(LOCAL) 
 
 TEST_PRAGMA     ?= release
 

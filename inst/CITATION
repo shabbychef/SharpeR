@@ -1,0 +1,19 @@
+
+citHeader("To cite the 'SharpeR' package in publications use:")
+
+year = sub('.*(2[[:digit:]]{3})-.*', '\\1', meta$Date, perl = TRUE)
+vers = paste('R package version', meta$Version)
+
+citEntry(
+  entry = 'manual',
+	key = paste(meta$Package,'-Manual',sep=''),
+  title = paste(meta$Package, ': ', meta$Title,sep=''),
+  author = as.person(meta$Author),
+  year = year,
+  note = vers,
+  url = meta$URL,
+  textVersion = paste('Steven E. Pav (', year, '). ', meta$Package, ': ', meta$Title, '. ', vers, '.', sep = '')
+)
+
+#for vim modeline: (do not edit)
+# vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r
