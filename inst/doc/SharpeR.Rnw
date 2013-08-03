@@ -1,6 +1,7 @@
-%\VignetteEngine{knitr}
+%\VignetteEngine{knitr:knitr}
 %\VignetteIndexEntry{Statistics of the Sharpe ratio}
-%\VignetteKeywords{Finance}
+%\VignetteKeyword{Finance}
+%\VignetteKeyword{Sharpe}
 %\VignettePackage{SharpeR}
 \documentclass[10pt,a4paper,english]{article}
 

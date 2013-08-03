@@ -74,8 +74,11 @@ VIGNETTE_PRAGMA ?= dynamic
 ifeq ($(VIGNETTE_PRAGMA),static)
 	BUILD_FLAGS 		?= --no-vignettes
 	NODIST_FILES 		+= $(VIGNETTE_SRCS)
-	EXTRA_PKG_DEPS 	 = $(VIGNETTE_PDF) $(VIGNETTE_HTML)
-	SUPPORT_FILES 	+= $(VIGNETTE_PDF) $(VIGNETTE_HTML)
+	NODIST_FILES 		+= $(VIGNETTE_HTML)
+	EXTRA_PKG_DEPS 	 = $(VIGNETTE_PDF)
+	#EXTRA_PKG_DEPS 	+= $(VIGNETTE_HTML)
+	SUPPORT_FILES 	+= $(VIGNETTE_PDF) 
+	#SUPPORT_FILES 	+= $(VIGNETTE_HTML)
 else ifeq ($(VIGNETTE_PRAGMA),dynamic)
 	BUILD_FLAGS 		?= 
 	NODIST_FILES 		+= $(VIGNETTE_PDF) $(VIGNETTE_HTML)
@@ -281,11 +284,10 @@ $(VIGNETTE_PDF) : $(LOCAL)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
 $(VIGNETTE_HTML) : $(LOCAL)/$(PKG_NAME)/doc/index.html
 	cp $< $@
 
-static_vignette : ./inst/doc/$(PKG_NAME).pdf ./inst/doc/index.html 
+static_vignette : $(VIGNETTE_PDF) 
 
 # rely on the 'install' target above.
 $(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
-
 
 # check and install
 $(RCHECK_SENTINEL) : $(PKG_TGZ)
@@ -392,10 +394,11 @@ fake2 :
 	$(MAKE) deps
 	$(MAKE) docs
 	VIGNETTE_PRAGMA=dynamic $(MAKE) install
-	$(MAKE) inst/doc/SharpeR.pdf inst/doc/index.html
+	$(MAKE) $(VIGNETTE_PDF) 
 	VIGNETTE_PRAGMA=static $(MAKE) build
 	VIGNETTE_PRAGMA=static $(MAKE) check
 
+#$(MAKE) $(VIGNETTE_PDF) $(VIGNETTE_HTML)
 
 # FTP junk
 ~/.netrc :

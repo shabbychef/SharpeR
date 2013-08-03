@@ -1,7 +1,7 @@
 \docType{package}
-\name{SharpeR-Package}
-\alias{SharpeR-Package}
-\alias{SharpeR-Package-package}
+\name{SharpeR}
+\alias{SharpeR}
+\alias{SharpeR-package}
 \title{statistics concerning Sharpe ratio and Markowitz portfolio}
 \description{
   Inference on Sharpe ratio and Markowitz portfolio.
