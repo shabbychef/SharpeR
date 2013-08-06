@@ -17,6 +17,8 @@ R_FILES 				+= $(wildcard ./inst/tests/*.r)
 R_FILES 				+= $(wildcard ./man-roxygen/*.R)
 R_FILES 				+= $(wildcard ./tests/*.R)
 
+R_QPDF 					?= $(shell which qpdf)
+
 M4_FILES				?= $(wildcard m4/*.m4)
 
 VERSION 				 = 0.1307
@@ -53,8 +55,9 @@ PKG_TESTR 			 = tests/run-all.R
 RD_DUMMY 				 = man/$(PKG_NAME).Rd
 
 # vignette stuff
-VIGNETTE_D 				 = vignette
+VIGNETTE_D 				 = vignettes
 VIGNETTE_CACHE 		 = $(VIGNETTE_D)/cache
+VIGNETTE_EXTRAS		 = $(VIGNETTE_D)/figure
 VIGNETTE_SRCS  		 = $(VIGNETTE_D)/$(PKG_NAME).Rnw $(VIGNETTE_D)/$(PKG_NAME).bib
 VIGNETTE_PDF   		 = $(VIGNETTE_D)/$(PKG_NAME).pdf
 VIGNETTE_HTML  		 = $(VIGNETTE_D)/index.html
@@ -69,30 +72,10 @@ NODIST_DIRS			+= $(VIGNETTE_D)/figure
 
 SUPPORT_FILES 		 = ./DESCRIPTION ./NAMESPACE ./ChangeLog $(RD_DUMMY) ./inst/CITATION
 
-# 'static' means that we will build the pdf and index.html and distribute
-# those but not the sources.
-# 'dynamic' means we distribute the sources and not the pdf and index.html
-VIGNETTE_PRAGMA ?= dynamic
-
-# for R CMD build
-ifeq ($(VIGNETTE_PRAGMA),static)
-	BUILD_FLAGS 		?= --no-vignettes
-	NODIST_FILES 		+= $(VIGNETTE_SRCS)
-	NODIST_FILES 		+= $(VIGNETTE_HTML)
-	EXTRA_PKG_DEPS 	 = $(VIGNETTE_PDF)
-	#EXTRA_PKG_DEPS 	+= $(VIGNETTE_HTML)
-	SUPPORT_FILES 	+= $(VIGNETTE_PDF) 
-	#SUPPORT_FILES 	+= $(VIGNETTE_HTML)
-else ifeq ($(VIGNETTE_PRAGMA),dynamic)
-	BUILD_FLAGS 		?= 
-	NODIST_FILES 		+= $(VIGNETTE_PDF) $(VIGNETTE_HTML)
-	SUPPORT_FILES 	+= $(VIGNETTE_SRCS)
-	EXTRA_PKG_DEPS 	 = 
-else
-	$(error unknown VIGNETTE_PRAGMA $(VIGNETTE_PRAGMA))
-	#BUILD_FLAGS 		?= --no-vignettes
-endif
-
+BUILD_FLAGS 		?= --compact-vignettes
+NODIST_FILES 		+= $(VIGNETTE_PDF) $(VIGNETTE_HTML)
+SUPPORT_FILES 	+= $(VIGNETTE_SRCS)
+EXTRA_PKG_DEPS 	 = 
 #EXTRA_PKG_DEPS 	 += $(VIGNETTE_CACHE_SENTINEL)
 
 #INSTALL_FLAGS 		?= --preclean --no-multiarch --library=$(LOCAL) 
@@ -116,7 +99,7 @@ endef
 fooz :
 	echo $(patsubst %,%\${\n},$(NODIST_FILES))
 
-STAGING 				?= .staging/$(VIGNETTE_PRAGMA)
+STAGING 				?= .staging
 STAGED_PKG 			 = $(STAGING)/$(PKG_NAME)
 
 # latex bother. bleah.
@@ -188,9 +171,6 @@ help:
 	@echo "Using R in: $(RBIN)"
 	@echo "Set the RBIN environment variable to change this."
 	@echo ""
-	@echo "also try:"
-	@echo "VIGNETTE_PRAGMA=static make build"
-	@echo ""
 
 # dev stuff
 ~/.ctags :
@@ -258,6 +238,7 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
   --include=man/ --include=man/* \
   --include=NAMESPACE --include=DESCRIPTION \
   --include=$(VIGNETTE_CACHE) --include=$(VIGNETTE_CACHE)/* \
+  --include=$(VIGNETTE_EXTRAS) \
   --exclude-from=.gitignore \
  $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_FILES)))  --exclude=$(LOCAL) \
  $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_DIRS)))  --exclude=$(basename $(STAGING)) \
@@ -269,7 +250,7 @@ staged : $(STAGED_PKG)/DESCRIPTION $(EXTRA_PKG_DEPS)
 
 # make the 'package', which is a tar.gz
 $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS) $(EXTRA_PKG_DEPS) 
-	$(RLOCAL) CMD build $(BUILD_FLAGS) $(<D)
+	R_QPDF=$(R_QPDF) $(RLOCAL) CMD build $(BUILD_FLAGS) $(<D)
 
 #package : $(PKG_TGZ)
 
@@ -301,7 +282,10 @@ $(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
 # check and install
 $(RCHECK_SENTINEL) : $(PKG_TGZ)
 	$(call WARN_DEPS)
-	$(RLOCAL) CMD check --as-cran --outdir=$(RCHECK) $^ 
+	$(RLOCAL) CMD check --as-cran $^ 
+
+
+#$(RLOCAL) CMD check --as-cran --outdir=$(RCHECK) $^ 
 	
 check: $(RCHECK_SENTINEL)
 
@@ -350,7 +334,7 @@ $(PKG_NAME).pdf: $(VIGNETTE_SRCS) deps $(LOCAL)/$(PKG_NAME)/INDEX
 
 #the_vignette: $(PKG_NAME).pdf
 
-$(VIGNETTE_CACHE_SENTINEL) : $(VIGNETTE_SRCS) deps $(LOCAL)/$(PKG_NAME)/INDEX
+$(VIGNETTE_CACHE_SENTINEL) : $(VIGNETTE_SRCS) $(LOCAL)/$(PKG_NAME)/INDEX
 	$(call MKDIR,$(VIGNETTE_CACHE))
 	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
 				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,TTR" \
@@ -398,27 +382,6 @@ tag :
 ################################
 # CRAN SUBMISSION
 ################################
-
-# don't ask.
-#convoluted_build.sh : 
-	#@-echo '#! /bin/bash' > $@
-	#@-echo '#' >> $@
-	#@-echo '' >> $@
-	#@-echo 'make deps' >> $@
-	#@-echo 'VIGNETTE_PRAGMA=dynamic make install' >> $@
-	#@-echo 'make vignette/SharpeR.pdf vignette/index.html' >> $@
-	#@-echo 'VIGNETTE_PRAGMA=static make build' >> $@
-	#@-echo 'VIGNETTE_PRAGMA=static make check' >> $@
-
-#fake2 : 
-	#$(MAKE) deps
-	#$(MAKE) docs
-	#VIGNETTE_PRAGMA=dynamic $(MAKE) install
-	#$(MAKE) $(VIGNETTE_PDF) 
-	#VIGNETTE_PRAGMA=static $(MAKE) build
-	#VIGNETTE_PRAGMA=static $(MAKE) check
-
-#$(MAKE) $(VIGNETTE_PDF) $(VIGNETTE_HTML)
 
 # FTP junk
 ~/.netrc :

@@ -581,7 +581,14 @@ opts_knit$set(eval.after='fig.cap')
 opts_chunk$set(warning=FALSE,message=FALSE)
 #opts_chunk$set(results="asis")
 opts_chunk$set(cache=TRUE,cache.path="cache/")
+
 opts_chunk$set(fig.path="figure/",dev=c("pdf","cairo_ps"))
+opts_chunk$set(fig.width=5,fig.height=5)
+
+# doing this means that png files are made of figures;
+# the savings is small, and it looks like shit:
+#opts_chunk$set(fig.path="figure/",dev=c("png","pdf","cairo_ps"))
+#opts_chunk$set(fig.width=4,fig.height=4)
 # for figures? this is sweave-specific?
 #opts_knit$set(eps=TRUE)
 
@@ -1294,18 +1301,77 @@ print(mysr)
 # try a whole lot of windows:
 win1 <- seq(4,204,by=10)
 zeds <- brute.force(SPY.lret,win1=win1)
-asro <- sropt(z.s=zeds,df1=2,df2=length(SPY.lret) - max(win1),ope=mysr$ope)
-print(asro)
-print(inference(asro,type="KRS"))
+SPY.MAC.asro <- sropt(z.s=zeds,df1=2,df2=length(SPY.lret) - max(win1),ope=mysr$ope)
+print(SPY.MAC.asro)
+print(inference(SPY.MAC.asro,type="KRS"))
 @
 
 The \txtSR for \StockTicker{SPY} over this period is \Sexpr{mysr$sr}\yrto{-1/2}. The
-optimal \txtSR for the tested MAC strategies is \Sexpr{asro$sropt}\yrto{-1/2}. 
+optimal \txtSR for the tested MAC strategies is \Sexpr{SPY.MAC.asro$sropt}\yrto{-1/2}. 
 The KRS estimate (using the $\nlatf=2$ approximation) for the upper bound on 
 signal-to-noise of the optimal MAC strategy is 
-only \Sexpr{inference(asro,type="KRS")}\yrto{-1/2}. \cite{kubokawa1993estimation}
+only \Sexpr{inference(SPY.MAC.asro,type="KRS")}\yrto{-1/2}. \cite{kubokawa1993estimation}
 This leaves little room for excitement about MAC strategies on
 \StockTicker{SPY}.
+
+%UNFOLD
+
+\section{Hypothesis Tests}%FOLDUP
+
+
+<<'sr_eq_test'>>=
+# function for Q-Q plot against uniformity
+qqunif <- function(x,xlab="Theoretical Quantiles under Uniformity",
+									 ylab=NULL,...) {
+	if (is.null(ylab))
+		ylab=paste("Sample Quantiles (",deparse(substitute(x)),")",sep="")
+	qqplot(qunif(ppoints(length(x))),x,xlab=xlab,ylab=ylab,...)
+	abline(0,1,col='red')
+}
+
+# under normality.
+nro <- 1000
+nco <- 20
+nrep <- 1000
+afoo <- replicate(nrep,sr_equality_test(matrix(rnorm(nro*nco),ncol=nco),type="F"))
+vvv <- unlist(afoo["p.value",])
+qqunif(vvv)
+
+# howzabout heteroskedasticity?
+afoo <- replicate(nrep,sr_equality_test(matrix(rt(nro*nco,df=4),ncol=nco),type="F"))
+vvv <- unlist(afoo["p.value",])
+qqunif(vvv)
+@
+
+<<'two_stocks'>>=
+
+require(quantmod)
+
+DJIA <- getSymbols(Symbols='DJIA',src='FRED',auto.assign=FALSE)
+DJIA <- DJIA[!is.na(DJIA)]
+
+DJIA.lr <- diff(log(DJIA))
+DJIA.lr <- DJIA.lr[-1]
+
+AAPL <- getSymbols(Symbols='AAPL',src='yahoo',from='1995-01-01',auto.assign=FALSE)
+AAPL <- AAPL[,"AAPL.Adjusted"]
+AAPL <- AAPL[!is.na(AAPL)]
+
+AAPL.lr <- diff(log(AAPL))
+AAPL.lr <- AAPL.lr[-1]
+
+t.inter <- function(xTEO,yTEO) {
+	xTEO[xTEO %in% yTEO]
+}
+
+foo.time <- t.inter(time(AAPL.lr),time(DJIA.lr))
+
+blah <- cbind(AAPL.lr[foo.time,],DJIA.lr[foo.time,])
+
+sr_equality_test(blah)
+sr_equality_test(blah,type="F")
+
+@
 
 %UNFOLD
 
