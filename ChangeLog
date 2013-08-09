@@ -1,4 +1,7 @@
 
+2013-08-08 Steven E. Pav <shabbychef@gmail.com>
+* restore vignette to package
+
 2013-05-30 Steven E. Pav <shabbychef@gmail.com>
 * as.sr : fix df bug
 
