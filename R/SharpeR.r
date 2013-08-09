@@ -183,7 +183,7 @@ NULL
 #'
 #' \itemize{
 #' \item proper d.f. in sr objects with different nan fill.
-#' \item restore dynamic vignette.
+#' \item restore vignette.
 #' }
 #'
 #' @section \SharpeR{} Initial Version 0.1306 (2013-05-21) :

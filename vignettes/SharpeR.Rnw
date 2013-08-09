@@ -10,6 +10,8 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 %\usepackage[authoryear]{natbib}
+%\usepackage[iso]{datetime}
+\usepackage{datetime}
 
 \makeatletter
 \makeatother
@@ -582,8 +584,9 @@ opts_chunk$set(warning=FALSE,message=FALSE)
 #opts_chunk$set(results="asis")
 opts_chunk$set(cache=TRUE,cache.path="cache/")
 
-opts_chunk$set(fig.path="figure/",dev=c("pdf","cairo_ps"))
-opts_chunk$set(fig.width=5,fig.height=5)
+#opts_chunk$set(fig.path="figure/",dev=c("pdf","cairo_ps"))
+opts_chunk$set(fig.path="figure/",dev=c("pdf"))
+opts_chunk$set(fig.width=5,fig.height=4,dpi=64)
 
 # doing this means that png files are made of figures;
 # the savings is small, and it looks like shit:
@@ -601,6 +604,12 @@ opts_chunk$set(tidy=TRUE,tidy.opts=list(width.cutoff=50,keep.blank.line=TRUE))
 
 compile.time <- Sys.time()
 
+# from the environment
+
+# only recompute if FORCE_RECOMPUTE=True w/out case match.
+FORCE_RECOMPUTE <- 
+	(toupper(Sys.getenv('FORCE_RECOMPUTE',unset='False')) == "TRUE")
+
 # compiler flags!
 
 # not used yet
@@ -617,6 +626,7 @@ options("getSymbols.warning4.0"=FALSE)
 
 \title{SharpeR}
 \author{Steven E. Pav}
+\date{\today, \currenttime}
 
 \maketitle
 %UNFOLD
@@ -744,7 +754,7 @@ print(my.sr)
 @
 
 Throughout, \Rcode{ope} stands for `Observations Per Epoch', and is the
-(average) number of returns observed per the annualizatin period, called
+(average) number of returns observed per the annualization period, called
 the \Rcode{epoch}.  At the moment there is not much hand holding regarding
 these parameters: no checking is performed for sane values.
 
@@ -776,8 +786,9 @@ print(asr)
 
 Here is an example using \Robject{xts} objects. In this case, if the \Rcode{ope}
 is not given, it is inferred from the time marks of the input object.
-<<'some_stocks'>>=
+<<'stock_loading',eval=FALSE,echo=TRUE>>=
 require(quantmod)
+# get price data, compute log returns on adjusted closes
 get.ret <- function(sym,warnings=FALSE,...) {
 	# getSymbols.yahoo will barf sometimes; do a trycatch
   trynum <- 0
@@ -786,11 +797,37 @@ get.ret <- function(sym,warnings=FALSE,...) {
 		try(OHLCV <- getSymbols(sym,auto.assign=FALSE,warnings=warnings,...),silent=TRUE)
   }
 	adj.names <- paste(c(sym,"Adjusted"),collapse=".",sep="")
-	lrets <- diff(log(OHLCV[,adj.names]))
+	if (adj.names %in% colnames(OHLCV)) {
+		adj.close <- OHLCV[,adj.names]
+	} else {
+		# for DJIA from FRED, say. 
+		adj.close <- OHLCV[,sym]
+	}
+	rm(OHLCV)
+	# rename it
+	colnames(adj.close) <- c(sym)
+	adj.close <- adj.close[!is.na(adj.close)]
+	lrets <- diff(log(adj.close))
 	#chop first
 	lrets[-1,]
 }
 get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+@
+<<'stock_loading_sneaky',eval=TRUE,echo=FALSE>>=
+# sleight of hand to load precomputed data instead.
+get.rets <- function(syms,from='2003-01-01',to='2013-01-01',...) {
+	fname <- system.file('extdata','ret_data.rda',package='SharpeR')
+	if (fname == "") {
+		fname <- 'ret_data.rda'
+	}
+	# poofs all.ret here
+	load(fname)
+	sub.data <- all.ret[paste(from,to,sep="::"),colnames(all.ret) %in% syms]
+	return(sub.data)
+}
+@
+<<'helper_function'>>=
+require(quantmod)
 # quantmod::periodReturn does not deal properly with multiple
 # columns, and the straightforward apply(mtms,2,periodReturn) barfs
 my.periodReturn <- function(mtms,...) {
@@ -801,7 +838,15 @@ my.periodReturn <- function(mtms,...) {
 			return(retv) 
 		}))
 }
-some.rets <- get.rets(c("AAPL","IBM","A","C"),from="2001-01-01")
+# convert log return to mtm, ignoring NA
+lr2mtm <- function(x,...) {
+	x[is.na(x)] = 0
+	exp(cumsum(x))
+}
+@
+<<'some_stocks'>>=
+some.rets <- get.rets(c("IBM","AAPL","XOM"),
+	from="2007-01-01",to="2013-01-01")
 print(as.sr(some.rets))
 @
 
@@ -811,8 +856,7 @@ both be changed. Changing the annualization will not change statistical
 significance, it merely changes the units.
 
 <<'reannualize'>>=
-some.rets <- get.rets(c("XOM"),from="2001-01-01")
-yearly <- as.sr(some.rets)
+yearly <- as.sr(some.rets[,"XOM"])
 monthly <- reannualize(yearly,new.ope=21,new.epoch="mo.")
 print(yearly)
 # significance should be the same, but units changed.
@@ -830,21 +874,22 @@ the more natural units of reward to variability, and in annualized terms (or
 whatever the epoch is.)
 
 As an example, here I perform a CAPM attribution to the monthly returns of
-\StockTicker{BRK-B}. Note that the statistical significance here is certainly
+\StockTicker{AAPL}. Note that the statistical significance here is certainly
 tainted by selection bias, a topic beyond the scope of this note.
 
-<<'BRKB'>>=
+<<'AAPL'>>=
 # get the returns (see above for the function)
-some.rets <- get.rets(c("BRK-B","SPY"),from="1996-05-09")
+aapl.rets <- get.rets(c("AAPL","SPY"),from="2003-01-01",to="2013-01-01")
 # make them monthly:
-mo.rets <- my.periodReturn(exp(cumsum(some.rets)),period='monthly',type='arithmetic')
+mo.rets <- my.periodReturn(lr2mtm(aapl.rets),period='monthly',type='arithmetic')
+rm(aapl.rets)  # cleanup
 # look at both of them together:
 both.sr <- as.sr(mo.rets)
 print(both.sr)
 # confindence intervals on the Sharpe:
 print(confint(both.sr))
 # perform a CAPM attribution, using SPY as 'the market'
-linmod <- lm(BRK.B.Adjusted ~ SPY.Adjusted,data=mo.rets)
+linmod <- lm(AAPL ~ SPY,data=mo.rets)
 # convert attribution model to Sharpe
 CAPM.sr <- as.sr(linmod,ope=both.sr$ope,epoch="yr")
 # statistical significance does not change (though note the sr summary
@@ -866,17 +911,18 @@ of Wright \etal \cite{Leung2008,Wright2012}
 
 <<'SPDRcheck'>>=
 # get the sector 'spiders'
-some.rets <- get.rets(c("XLY","XLE","XLP","XLF","XLV","XLI","XLB","XLK","XLU"),from="1999-01-01")
+secto.rets <- get.rets(c("XLY","XLE","XLP","XLF","XLV","XLI","XLB","XLK","XLU"),
+	from="2003-01-01",to="2013-01-01")
 # make them monthly:
-mo.rets <- my.periodReturn(exp(cumsum(some.rets)),period='monthly',type='arithmetic')
+mo.rets <- my.periodReturn(lr2mtm(secto.rets),period='monthly',type='arithmetic')
 # one-sample test on utilities:
-XLU.monthly <- mo.rets[,"XLU.Adjusted"]
+XLU.monthly <- mo.rets[,"XLU"]
 print(sr_test(XLU.monthly),alternative="two.sided")
 
 # test for equality of Sharpe among the different spiders
-print(sr_equality_test(some.rets))
+print(sr_equality_test(secto.rets))
 # perform a paired two-sample test via sr_test:
-XLF.monthly <- mo.rets[,"XLF.Adjusted"]
+XLF.monthly <- mo.rets[,"XLF"]
 print(sr_test(x=XLU.monthly,y=XLF.monthly,ope=12,paired=TRUE))
 @
 
@@ -897,9 +943,9 @@ determining the sample size is shown in \figref{power_thing}, as a function of
 Euler's number appears here coincidentally, as it is nearly equal to
 $\wrapBracks{\funcit{\minv{\Phi}}{0.95}}^2$.
 
-<<'power_thing',fig.cap="The percent error of the power mnemonic $e\\approx\\ssiz \\psnrsq$ is plotted versus \\psnr.">>=
+<<'power_thing',fig.cap="The percent error of the power mnemonic $e\\approx\\ssiz \\psnrsq$ is plotted versus \\psnr.",fig.height=4,fig.width=5>>=
 ope <- 253
- zetas <- seq(0.1,2.5,length.out=101)
+ zetas <- seq(0.1,2.5,length.out=51)
 ssizes <- sapply(zetas,function(zed) { 
  x <- power.sr_test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,ope=ope)
  x$n / ope 
@@ -931,12 +977,12 @@ constructor can be used directly, but the helper function is preferred:
 ope <- 253
 n.stok <- 7
 n.yr <- 8
-# somewhat unrealistic: the returns are independent.
-some.rets <- matrix(rnorm(n.yr * ope * n.stok),ncol=n.stok)
-asro <- as.sropt(some.rets,ope=ope)
+# somewhat unrealistic: independent returns.
+rand.rets <- matrix(rnorm(n.yr * ope * n.stok),ncol=n.stok)
+asro <- as.sropt(rand.rets,ope=ope)
+rm(rand.rets)
 print(asro)
 # from an xts object
-some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"),from="2001-01-01")
 asro <- as.sropt(some.rets)
 print(asro)
 @
@@ -1063,7 +1109,7 @@ sample.haircut <- function(n,p,...) {
 	# I have got to figure out how to deal with vectors...
 	ssnr <- (t(smeas$w) %*% t(popX$mu)) / sqrt(t(smeas$w) %*% popX$sig %*% smeas$w)
 	hcut <- 1 - (ssnr / popX$SNR)
-	# to compute the plugin estimator, estimate zeta.star
+	# for plugin estimator, estimate zeta.star
 	asro <- sropt(z.s=sqrt(t(smeas$w) %*% smeas$mu),df1=p,df2=n)
 	zeta.hat.s <- inference(asro,type="KRS")  # or 'MLE', 'unbiased'
 	return(c(hcut,zeta.hat.s))
@@ -1072,8 +1118,9 @@ sample.haircut <- function(n,p,...) {
 # set everything up
 set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
 ope <- 253
+LONG.FORM <- FALSE
 n.sim <- if (LONG.FORM) 2048 else 512
-n.stok <- 8
+n.stok <- if (LONG.FORM) 8 else 6
 n.yr <- 4
 n.obs <- ceiling(ope * n.yr)
 zeta.s <- 1.20 / sqrt(ope)   # optimal SNR, in daily units
@@ -1242,7 +1289,8 @@ brute.force <- function(lrets,rrets=exp(lrets)-1,win1,win2=win1) {
 			dum.bt <- trades[mwin:(length(trades)-1)] * rrets[mwin:length(rrets)]  # braindead backtest.
 			mysr <- as.sr(dum.bt)
 			zeds[iidx,jidx] <- mysr$sr
-			if (symmetric) zeds[jidx,iidx] <- - zeds[iidx,jidx]  # abuse symmetry of arithmetic returns
+			# abuse symmetry of arithmetic returns
+			if (symmetric) zeds[jidx,iidx] <- - zeds[iidx,jidx]  
 		}
 	}
 	retv <- max(zeds,na.rm=TRUE) 
@@ -1259,8 +1307,8 @@ set.seed(as.integer(charToRaw("e23769f4-94f8-4c36-bca1-28c48c49b4fb")))
 ope <- 253
 n.yr <- 4
 n.obs <- ceiling(ope * n.yr)
-n.sim <- if (LONG.FORM) 2048 else 512
-win1 <- c(2,4,8,16,32,64,128,256)
+n.sim <- if (LONG.FORM) 2048 else 1024
+win1 <- if (LONG.FORM) c(2,4,8,16,32,64,128,256) else c(4,16,64,256)
 
 # run them
 system.time(max.zeds <- replicate(n.sim,sim.one(n.obs,win1)))
@@ -1295,9 +1343,12 @@ Instead, I apply the $\nlatf=2$ approximation to the brute-force MAC overfit on
 
 <<'now_on_spy'>>=
 # is MAC on SPY significant?
-SPY.lret <- get.ret('SPY',from="1995-01-01")
-mysr <- as.sr(SPY.lret)  # just to get the ope
+SPY.lret <- get.rets(c('SPY'),from="2003-01-01",to="2013-01-01")
+# oops! there might be NAs in there!
+mysr <- as.sr(SPY.lret,na.rm=TRUE)  # just to get the ope
 print(mysr)
+# get rid of NAs
+SPY.lret[is.na(SPY.lret)] <- 0
 # try a whole lot of windows:
 win1 <- seq(4,204,by=10)
 zeds <- brute.force(SPY.lret,win1=win1)
@@ -1316,10 +1367,29 @@ This leaves little room for excitement about MAC strategies on
 
 %UNFOLD
 
+\section{Distribution Functions}%FOLDUP
+
+There are \Rcode{dpqr} functions for the \txtSR distribution, as well as the
+`optimal \txtSR' distribution. These are merely rescaled non-central 
+\tstat and \Fstat distributions, provided for convenience, and for testing
+purposes. See the help for \Rfunction{dsr} and \Rfunction{dsropt} for more details.
+
+%UNFOLD
+
 \section{Hypothesis Tests}%FOLDUP
 
+The function \Rfunction{sr\_equality\_test}, implements the 
+tests of Leung \etal and of Wright \etal for testing the equality 
+of \txtSR. \cite{Leung2008,Wright2012} I have found that these tests
+(or my implementation thereof!) apparently reject the null 
+`for the wrong reason'.
 
-<<'sr_eq_test'>>=
+Here I confirm that the tests give approximately uniform p-values under
+the null in three situations: when stock returns are independent Gaussians, 
+when they are independent and \tlaw{}-distributed, and when they are Gaussian
+and correlated.
+
+<<'sr_eq_test_normal',fig.cap=paste("P-values from \\Rfunction{sr\\_equality\\_test} on",n.sim,"multiple realizations of independent, normally distributed returns series are Q-Q plotted against uniformity.")>>=
 # function for Q-Q plot against uniformity
 qqunif <- function(x,xlab="Theoretical Quantiles under Uniformity",
 									 ylab=NULL,...) {
@@ -1330,57 +1400,72 @@ qqunif <- function(x,xlab="Theoretical Quantiles under Uniformity",
 }
 
 # under normality.
-nro <- 1000
-nco <- 20
-nrep <- 1000
-afoo <- replicate(nrep,sr_equality_test(matrix(rnorm(nro*nco),ncol=nco),type="F"))
-vvv <- unlist(afoo["p.value",])
-qqunif(vvv)
-
-# howzabout heteroskedasticity?
-afoo <- replicate(nrep,sr_equality_test(matrix(rt(nro*nco,df=4),ncol=nco),type="F"))
-vvv <- unlist(afoo["p.value",])
-qqunif(vvv)
+n.ro <- if (LONG.FORM) 253*4 else 253*2
+n.co <- if (LONG.FORM) 20 else 4
+n.sim <- if (LONG.FORM) 1024 else 512
+set.seed(as.integer(charToRaw("e3709e11-37e0-449b-bcdf-9271fb1666e5")))
+afoo <- replicate(n.sim,sr_equality_test(matrix(rnorm(n.ro*n.co),ncol=n.co),type="F"))
+sr_eq.pvals <- unlist(afoo["p.value",])
+qqunif(sr_eq.pvals)
 @
 
-<<'two_stocks'>>=
+<<'sr_eq_test_hetero',fig.cap=paste("P-values from \\Rfunction{sr\\_equality\\_test} on",n.sim,"multiple realizations of independent, \\tlaw{}-distributed returns series are Q-Q plotted against uniformity.")>>=
+# try heteroskedasticity?
+set.seed(as.integer(charToRaw("81c97c5e-7b21-4672-8140-bd01d98d1d2e")))
+afoo <- replicate(n.sim,sr_equality_test(matrix(rt(n.ro*n.co,df=4),ncol=n.co),type="F"))
+sr_eq.pvals <- unlist(afoo["p.value",])
+qqunif(sr_eq.pvals)
+@
 
-require(quantmod)
-
-DJIA <- getSymbols(Symbols='DJIA',src='FRED',auto.assign=FALSE)
-DJIA <- DJIA[!is.na(DJIA)]
-
-DJIA.lr <- diff(log(DJIA))
-DJIA.lr <- DJIA.lr[-1]
-
-AAPL <- getSymbols(Symbols='AAPL',src='yahoo',from='1995-01-01',auto.assign=FALSE)
-AAPL <- AAPL[,"AAPL.Adjusted"]
-AAPL <- AAPL[!is.na(AAPL)]
-
-AAPL.lr <- diff(log(AAPL))
-AAPL.lr <- AAPL.lr[-1]
-
-t.inter <- function(xTEO,yTEO) {
-	xTEO[xTEO %in% yTEO]
+<<'sr_eq_test_correlated',fig.cap=paste("P-values from \\Rfunction{sr\\_equality\\_test} on",n.sim,"multiple realizations of correlated, normally-distributed returns series are Q-Q plotted against uniformity.")>>=
+# try correlated returns
+n.fact <- max(2,n.co - 5)
+gen.ret <- function(n1,n2,f=max(2,n2-2),fuzz=0.1) {
+	A <- matrix(rnorm(n1*f),nrow=n1)
+	B <- matrix(rnorm(f*n2),nrow=f)
+	C <- sqrt(1-fuzz^2) * A %*% B + fuzz * matrix(rnorm(n1*n2),nrow=n1)
 }
-
-foo.time <- t.inter(time(AAPL.lr),time(DJIA.lr))
-
-blah <- cbind(AAPL.lr[foo.time,],DJIA.lr[foo.time,])
-
-sr_equality_test(blah)
-sr_equality_test(blah,type="F")
-
+set.seed(as.integer(charToRaw("e4d61c2c-efb3-4cba-9a6e-5f5276ce2ded")))
+afoo <- replicate(n.sim,sr_equality_test(gen.ret(n.ro,n.co,n.fact),type="F"))
+sr_eq.pvals <- unlist(afoo["p.value",])
+qqunif(sr_eq.pvals)
 @
 
-%UNFOLD
+<<'sr_eq_test_mtime_pre',echo=FALSE>>=
+n.co <- if (LONG.FORM) 100 else 50 
+n.sim <- if (LONG.FORM) 1024 else 128
+@
 
-\section{Distribution Functions}%FOLDUP
+As a followup, I consider the case where the returns are those of several
+randomly generated market-timing strategies which are always fully invested
+long or short in the market, with equal probability.  I look at \Sexpr{n.sim}
+simulations of \Sexpr{n.co} random market timing strategies rebalancing weekly
+on a 10 year history of \StockTicker{SPY}.  
+The 'p-values' from \Rfunction{sr\_equality\_test} applied to the returns are
+Q-Q plotted against uniformity in \figref{sr_eq_test_mtime}. The type I rate of
+this test is far larger than the nominal rate: it is rejecting for
+`uninteresting reasons'.  I suspect this test breaks down because of small
+sample size or small 'aspect ratio' (ratio of weeks to
+strategies in this example).  In summary, one should exercise caution 
+when interpreting the results of the Sharpe equality test: it would be
+worthwhile to compare the results against a `Monte Carlo null' as illustrated
+here.
 
-There are \Rcode{dpqr} functions for the \txtSR distribution, as well as the
-`optimal \txtSR' distribution. These are merely rescaled non-central 
-\tstat and \Fstat distributions, provided for convenience, and for testing
-purposes. See the help for \Rfunction{dsr} and \Rfunction{dsropt} for more details.
+<<'sr_eq_test_mtime',fig.cap=paste("P-values from \\Rfunction{sr\\_equality\\_test} on",n.sim,"multiple realizations of",n.co,"market timing strategies' returns series are Q-Q plotted against uniformity. Nominal coverage is not maintained: the test is far too liberal in this case.")>>=
+n.co <- if (LONG.FORM) 100 else 50 
+n.sim <- if (LONG.FORM) 1024 else 128
+SPY.lret <- get.rets(c('SPY'),from="2003-01-01",to="2013-01-01")
+SPY.wk.rret <- my.periodReturn(lr2mtm(SPY.lret),period='weekly',
+	type='arithmetic')
+gen.tim <- function(n2) {
+	mkt.timing.signal <- sign(rnorm(n2*length(SPY.wk.rret)))
+	mkt.ret <- matrix(rep(SPY.wk.rret,n2) * mkt.timing.signal,ncol=n2)
+}
+set.seed(as.integer(charToRaw("447cfe85-b612-4b14-bd01-404e6e99aca4")))
+system.time(afoo <- replicate(n.sim,sr_equality_test(gen.tim(n.co),type="F")))
+sr_eq.pvals <- unlist(afoo["p.value",])
+qqunif(sr_eq.pvals)
+@
 
 %UNFOLD
 

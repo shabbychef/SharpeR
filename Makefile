@@ -18,6 +18,8 @@ R_FILES 				+= $(wildcard ./man-roxygen/*.R)
 R_FILES 				+= $(wildcard ./tests/*.R)
 
 R_QPDF 					?= $(shell which qpdf)
+R_GSCMD					?= $(shell which gs)
+GS_QUALITY 			?= 'ebook'
 
 M4_FILES				?= $(wildcard m4/*.m4)
 
@@ -52,31 +54,43 @@ PKG_TESTR 			 = tests/run-all.R
 
 #INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%,$(TEST_DEPS)) 
 
-RD_DUMMY 				 = man/$(PKG_NAME).Rd
+RD_DUMMY 					 = man/$(PKG_NAME).Rd
+
+
+# extradata
+EXTDATA_D 				 = inst/extdata
+EXTDATA_FILES	 		 = $(EXTDATA_D)/ret_data.rda
 
 # vignette stuff
 VIGNETTE_D 				 = vignettes
 VIGNETTE_CACHE 		 = $(VIGNETTE_D)/cache
-VIGNETTE_EXTRAS		 = $(VIGNETTE_D)/figure
+VIGNETTE_EXTRAS		 = 
 VIGNETTE_SRCS  		 = $(VIGNETTE_D)/$(PKG_NAME).Rnw $(VIGNETTE_D)/$(PKG_NAME).bib
 VIGNETTE_PDF   		 = $(VIGNETTE_D)/$(PKG_NAME).pdf
 VIGNETTE_HTML  		 = $(VIGNETTE_D)/index.html
 VIGNETTE_CACHE_SENTINEL = $(VIGNETTE_CACHE)/__$(PKG_NAME).etc
 
 # do not distribute these!
-NODIST_FILES		 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
-NODIST_FILES		+= rebuildTags.sh .tags .R_tags
-NODIST_DIRS			 = .git man-roxygen m4
-#NODIST_DIRS			+= $(VIGNETTE_D)/figure $(VIGNETTE_D)/cache
-NODIST_DIRS			+= $(VIGNETTE_D)/figure 
+NODIST_R_DIR			 = nodist
+NODIST_FILES			 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
+NODIST_FILES			+= rebuildTags.sh .tags .R_tags
+NODIST_DIRS				 = .git man-roxygen m4 $(NODIST_R_DIR)
+NODIST_DIRS				+= $(VIGNETTE_D)/figure 
 
 SUPPORT_FILES 		 = ./DESCRIPTION ./NAMESPACE ./ChangeLog $(RD_DUMMY) ./inst/CITATION
 
-BUILD_FLAGS 		?= --compact-vignettes
+# for building the package.tgz
+#BUILD_FLAGS 		?= --compact-vignettes
+BUILD_FLAGS 		?= --compact-vignettes="gs+qpdf"
+BUILD_ENV 			 = R_QPDF=$(R_QPDF) R_GSCMD=$(R_GSCMD) \
+									 GS_QUALITY=$(GS_QUALITY)
+
 NODIST_FILES 		+= $(VIGNETTE_PDF) $(VIGNETTE_HTML)
 SUPPORT_FILES 	+= $(VIGNETTE_SRCS)
 EXTRA_PKG_DEPS 	 = 
 #EXTRA_PKG_DEPS 	 += $(VIGNETTE_CACHE_SENTINEL)
+
+EXTRA_PKG_DEPS 	 += $(EXTDATA_FILES)
 
 #INSTALL_FLAGS 		?= --preclean --no-multiarch --library=$(LOCAL) 
 INSTALL_FLAGS 		?= --preclean --library=$(LOCAL) 
@@ -237,8 +251,8 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
 	rsync $(RSYNC_FLAGS) \
   --include=man/ --include=man/* \
   --include=NAMESPACE --include=DESCRIPTION \
-  --include=$(VIGNETTE_CACHE) --include=$(VIGNETTE_CACHE)/* \
-  --include=$(VIGNETTE_EXTRAS) \
+  --include=$(EXTDATA_D)/ \
+	--exclude=Makefile \
   --exclude-from=.gitignore \
  $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_FILES)))  --exclude=$(LOCAL) \
  $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_DIRS)))  --exclude=$(basename $(STAGING)) \
@@ -250,11 +264,17 @@ staged : $(STAGED_PKG)/DESCRIPTION $(EXTRA_PKG_DEPS)
 
 # make the 'package', which is a tar.gz
 $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS) $(EXTRA_PKG_DEPS) 
-	R_QPDF=$(R_QPDF) $(RLOCAL) CMD build $(BUILD_FLAGS) $(<D)
+	$(call WARN_DEPS)
+	# check values
+	@$(BUILD_ENV) $(RLOCAL) --slave -e 'print(Sys.getenv("R_QPDF"));print(Sys.getenv("R_GSCMD"));print(Sys.getenv("GS_QUALITY"));'
+	$(BUILD_ENV) $(RLOCAL) CMD build $(BUILD_FLAGS) $(<D)
 
 #package : $(PKG_TGZ)
 
 build : $(PKG_TGZ)
+
+build_list : $(PKG_TGZ)
+	tar -tzvf $<
 
 # an 'install'
 $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ) 
@@ -282,7 +302,7 @@ $(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
 # check and install
 $(RCHECK_SENTINEL) : $(PKG_TGZ)
 	$(call WARN_DEPS)
-	$(RLOCAL) CMD check --as-cran $^ 
+	$(RLOCAL) CMD check --as-cran --timings $^ 
 
 
 #$(RLOCAL) CMD check --as-cran --outdir=$(RCHECK) $^ 
@@ -322,8 +342,6 @@ cheapR :
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
 				 R_DEFAULT_PACKAGES=$(BASE_DEF_PACKAGES) $(R) -q --no-save
 
-
-
 $(PKG_NAME).pdf: $(VIGNETTE_SRCS) deps $(LOCAL)/$(PKG_NAME)/INDEX 
 	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
 				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,TTR" \
@@ -335,13 +353,26 @@ $(PKG_NAME).pdf: $(VIGNETTE_SRCS) deps $(LOCAL)/$(PKG_NAME)/INDEX
 #the_vignette: $(PKG_NAME).pdf
 
 $(VIGNETTE_CACHE_SENTINEL) : $(VIGNETTE_SRCS) $(LOCAL)/$(PKG_NAME)/INDEX
+	$(call WARN_DEPS)
 	$(call MKDIR,$(VIGNETTE_CACHE))
 	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
 				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,TTR" \
+				 FORCE_RECOMPUTE='TRUE' \
 				 $(R) $(R_FLAGS) --slave -e "setwd('$(VIGNETTE_D)');knitr::knit(basename('$<'));"
 	touch $@
 
 vignette_cache : $(VIGNETTE_CACHE_SENTINEL)
+
+# make data needed by the vignette. what bother.
+$(EXTDATA_FILES) : $(NODIST_R_DIR)/make_ret_data.R
+	$(call WARN_DEPS)
+	$(call MKDIR,$(EXTDATA_D))
+	R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,quantmod" \
+				 $(R) $(R_FLAGS) --slave -e \
+				 "setwd('$(NODIST_R_DIR)');source(basename('$<'));"
+	# horribly hacky!
+	mv $(NODIST_R_DIR)/*.rda $(EXTDATA_D)
 
 ################################
 # CLEAN UP 
