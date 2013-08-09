@@ -407,8 +407,8 @@ gitpull :
 	git pull origin master
 
 tag :
-	echo "git tag -a r$(VERSION) -m 'release $(VERSION)'"
-	echo "git push --tags"
+	@-echo "git tag -a r$(VERSION) -m 'release $(VERSION)'"
+	@-echo "git push --tags"
 
 ################################
 # CRAN SUBMISSION
