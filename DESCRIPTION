@@ -4,13 +4,13 @@ Author: Steven E. Pav
 Authors@R: c(person("Steven", "Pav", role=c("aut","cre"),
     email="shabbychef@gmail.com"))
 Version: 0.1307
-Date: 2013-08-08
+Date: 2013-08-11
 License: LGPL-3
 Title: Statistical significance of Sharpe ratio
 Description: a collection of tools for analyzing significance of trading
     strategies, based on the Sharpe ratio and overfit of the same.
 Depends:
-    R (>= 2.4.0)
+    R (>= 3.0.0)
 Suggests:
     quantmod,
     MASS,
@@ -22,7 +22,7 @@ VignetteBuilder: knitr
 Collate:
     'utils.r'
     'distributions.r'
-    'estimation.r'
     'sr.r'
+    'estimation.r'
     'SharpeR.r'
     'tests.r'
