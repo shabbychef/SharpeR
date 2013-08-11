@@ -1470,7 +1470,7 @@ qqunif(sr_eq.pvals)
 %UNFOLD
 
 % bibliography%FOLDUP
-\nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940}
+\nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850}
 
 %\bibliographystyle{jss}
 \bibliographystyle{acm}

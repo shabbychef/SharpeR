@@ -197,6 +197,12 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' Returns <- rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 #' APT_mod <- lm(Returns ~ Factors)
 #' asr <- as.sr(APT_mod,ope=ope)
+#'
+#' # compute the Sharpe of a bunch of strategies:
+#' my.returns <- matrix(rnorm(253*3*4),ncol=4)
+#' asr <- as.sr(my.returns)  # without sensible colnames?
+#' colnames(my.returns) <- c("strat a","strat b","strat c","strat d")
+#' asr <- as.sr(my.returns)
 #'   
 as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	UseMethod("as.sr", x)
@@ -205,14 +211,21 @@ as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	z <- .compute_sr(mu,c0,sigma,ope)
 	dim(z) <- c(length(mu),1)
 
-
-	# what bother;
+	# what bother; try to find the rownames
 	if (length(dimnames(x)) == 1) 
-		rownames(z) <- unlist(dimnames(x))
+		rnz <- unlist(dimnames(x))
 	else 
-		rownames(z) <- unlist(dimnames(x)[2])
-	if (is.null(rownames(z)))
-		rownames(z) <- deparse(substitute(x))
+		rnz <- unlist(dimnames(x)[2])
+	if (is.null(rnz))
+		rnz <- deparse(substitute(x))
+
+	if (length(rnz) == dim(z)[1]) {
+		rownames(z) <- rnz
+	} else {
+		rstub <- deparse(substitute(x))
+		rownames(z) <- sapply(1:dim(z)[1],
+													function(n) { sprintf('%s_%d',rstub,n) })
+	}
 
 	# make it a col vector if not otherwise defined.
 	if (is.null(dim(x))) 
@@ -237,13 +250,20 @@ as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	return(retval)
 }
 #' @rdname as.sr
-#' @method as.sr data.frame
-#' @S3method as.sr data.frame
-as.sr.data.frame <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+#' @method as.sr matrix
+#' @S3method as.sr matrix
+as.sr.matrix <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- apply(x,2,mean,na.rm=na.rm)
 	sigma <- apply(x,2,sd,na.rm=na.rm)
 	retval <- .as.sr.unified(x=x,mu=mu,sigma=sigma,c0=c0,ope=ope,
 													 na.rm=na.rm,epoch=epoch)
+	return(retval)
+}
+#' @rdname as.sr
+#' @method as.sr data.frame
+#' @S3method as.sr data.frame
+as.sr.data.frame <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+	retval <- as.sr.matrix(x,c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
 	return(retval)
 }
 #' @rdname as.sr

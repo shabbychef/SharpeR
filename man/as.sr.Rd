@@ -3,6 +3,7 @@
 \alias{as.sr.data.frame}
 \alias{as.sr.default}
 \alias{as.sr.lm}
+\alias{as.sr.matrix}
 \alias{as.sr.timeSeries}
 \alias{as.sr.xts}
 \title{Compute the Sharpe ratio.}
@@ -10,6 +11,9 @@
   as.sr(x,c0=0,ope=1,na.rm=FALSE,epoch="yr")
 
   \method{as.sr}{default} (x, c0 = 0, ope = 1,
+    na.rm = FALSE, epoch = "yr")
+
+  \method{as.sr}{matrix} (x, c0 = 0, ope = 1,
     na.rm = FALSE, epoch = "yr")
 
   \method{as.sr}{data.frame} (x, c0 = 0, ope = 1,
@@ -105,6 +109,12 @@ asr <- as.sr(APT_mod,ope=ope)
 Returns <- rnorm(dim(Factors)[1],mean=0.0005,sd=0.012)
 APT_mod <- lm(Returns ~ Factors)
 asr <- as.sr(APT_mod,ope=ope)
+
+# compute the Sharpe of a bunch of strategies:
+my.returns <- matrix(rnorm(253*3*4),ncol=4)
+asr <- as.sr(my.returns)  # without sensible colnames?
+colnames(my.returns) <- c("strat a","strat b","strat c","strat d")
+asr <- as.sr(my.returns)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

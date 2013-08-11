@@ -40,6 +40,46 @@
 
 # equality of SR#FOLDUP
 
+# the guts of a SR equality test, hinging on different
+# covariance functions.
+.sr_eq_guts <- function(X,contrasts,estfunc=cov) {
+	X <- na.omit(X)
+	n <- dim(X)[1]
+	p <- dim(X)[2]
+	if (is.null(contrasts))
+		contrasts <- .atoeplitz(c(1,-1,array(0,p-2)),c(1,array(0,p-2)))
+	k <- dim(contrasts)[1]
+	if (dim(contrasts)[2] != p)
+		stop("size mismatch in 'X', 'contrasts'")
+
+	# cat together X and X squared
+	XX2 <- cbind(X,X^2)
+	mm2 <- colMeans(XX2)
+
+	m1 <- mm2[1:p]
+	m2 <- mm2[p + (1:p)]
+	# the SR:
+	SR <- m1 / sqrt(m2 - m1^2)
+
+	# construct/estimate Sigma hat
+	Shat = estfunc(XX2)
+
+	# construct D matrix
+	deno <- (m2 - m1^2)^(3/2)
+	D1 <- diag(m2 / deno)
+	D2 <- diag(-m1 / (2*deno))
+	Dt <- rbind(D1,D2)
+
+	# Omegahat
+	Ohat <- t(Dt) %*% Shat %*% Dt
+
+	# the test statistic:
+	ESR <- contrasts %*% SR
+	COC <- contrasts %*% Ohat %*% t(contrasts)
+
+	retval <- list(n=n,k=k,p=p,SR=SR,ESR=ESR,COC=COC)
+	return(retval)
+}
 #' @title Paired test for equality of Sharpe ratio
 #'
 #' @description 
@@ -142,53 +182,27 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
 	dname <- deparse(substitute(X))
-	X <- na.omit(X)
+	subprob <- .sr_eq_guts(X,contrasts,estfunc=cov)
 	type <- match.arg(type)
-	n <- dim(X)[1]
-	p <- dim(X)[2]
-	if (is.null(contrasts))
-		contrasts <- .atoeplitz(c(1,-1,array(0,p-2)),c(1,array(0,p-2)))
-	k <- dim(contrasts)[1]
-	if (dim(contrasts)[2] != p)
-		stop("size mismatch in 'X', 'contrasts'")
-	if ((type == "t") && (k != 1))
+
+	if ((type == "t") && (subprob$k != 1))
 		stop("can only perform t-test on single contrast");
 
-	# compute moments
-	m1 <- colMeans(X)
-	m2 <- colMeans(X^2)
-	# construct Sigma hat
-	Shat <- cov(cbind(X,X^2))
-	#Shat <- .agram(cbind(X,X^2))
-	# the SR
-	SR <- m1 / sqrt(diag(Shat[1:p,1:p]))
-
-	# construct D matrix
-	deno <- (m2 - m1^2)^(3/2)
-	D1 <- diag(m2 / deno)
-	D2 <- diag(-m1 / (2*deno))
-	Dt <- rbind(D1,D2)
-
-	# Omegahat
-	Ohat <- t(Dt) %*% Shat %*% Dt
-
-	# the test statistic:
-	ESR <- contrasts %*% SR
-	COC <- contrasts %*% Ohat %*% t(contrasts)
 	if (type == "t") {
-		ts <- ESR * sqrt(n / COC)
+		ts <- subprob$ESR * sqrt(subprob$n / subprob$COC)
 		names(ts) <- "t"
 		pval <- switch(alternative,
-									 two.sided = .oneside2two(pt(ts,df=n-1)),
-									 less = pt(ts,df=n-1,lower.tail=TRUE),
-									 greater = pt(ts,df=n-1,lower.tail=FALSE))
+									 two.sided = .oneside2two(pt(ts,df=subprob$n-1)),
+									 less = pt(ts,df=subprob$n-1,lower.tail=TRUE),
+									 greater = pt(ts,df=subprob$n-1,lower.tail=FALSE))
 		statistic <- ts
 	} else {
-		T2 <- n * t(ESR) %*% solve(COC,ESR)
+		T2 <- subprob$n * t(subprob$ESR) %*% solve(subprob$COC,subprob$ESR)
 		names(T2) <- "T2"
 		pval <- switch(type,
-									 chisq = pchisq(T2,df=k,ncp=0,lower.tail=FALSE),
-									 F = pf((n-k) * T2/((n-1) * k),df1=k,df2=n-k,lower.tail=FALSE))
+									 chisq = pchisq(T2,df=subprob$k,ncp=0,lower.tail=FALSE),
+									 F = pf((subprob$n-subprob$k) * T2/((subprob$n-1) * subprob$k),
+													df1=subprob$k,df2=subprob$n-subprob$k,lower.tail=FALSE))
 		statistic <- T2
 		if (alternative != "two.sided") {
 			warning("cannot perform directional tests on T^2")
@@ -197,16 +211,16 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 	}
 
 	# attach names
-	names(k) <- "contrasts"
+	names(subprob$k) <- "contrasts"
 	method <- paste(c("test for equality of Sharpe ratio, via",type,"test"),collapse=" ")
-	names(SR) <- sapply(1:p,function(x) { paste(c("strat",x),collapse="_") })
+	names(subprob$SR) <- sapply(1:subprob$p,function(x) { paste(c("strat",x),collapse="_") })
 
 	cozeta <- 0
 	names(cozeta) <- "sum squared contrasts of SNR"
 
-	retval <- list(statistic = statistic, parameter = k,
-							 df1 = p, df2 = n, p.value = pval, 
-							 SR = SR, null.value = cozeta,
+	retval <- list(statistic = statistic, parameter = subprob$k,
+							 df1 = subprob$p, df2 = subprob$n, p.value = pval, 
+							 SR = subprob$SR, null.value = cozeta,
 							 alternative = alternative,
 							 method = method, data.name = dname)
 	class(retval) <- "htest"

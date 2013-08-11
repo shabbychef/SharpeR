@@ -23,7 +23,7 @@ GS_QUALITY 			?= 'ebook'
 
 M4_FILES				?= $(wildcard m4/*.m4)
 
-VERSION 				 = 0.1307
+VERSION 				 = 0.1308
 TODAY 					:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 				:= SharpeR

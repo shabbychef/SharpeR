@@ -14,12 +14,13 @@ Title: Statistical significance of Sharpe ratio
 Description: a collection of tools for analyzing significance of trading 
     strategies, based on the Sharpe ratio and overfit of the same.
 Depends: 
-    R (>= 2.4.0)
+    R (>= 3.0.0)
 Suggests: 
     quantmod,
     MASS,
 		TTR,
     testthat, 
+		sandwich,
     knitr
 URL: http://www.r-project.org, https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
