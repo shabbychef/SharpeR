@@ -9,9 +9,10 @@
 \usepackage{url}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{hyperref}
 %\usepackage[authoryear]{natbib}
 %\usepackage[iso]{datetime}
-\usepackage{datetime}
+%\usepackage{datetime}
 
 \makeatletter
 \makeatother
@@ -625,8 +626,9 @@ options("getSymbols.warning4.0"=FALSE)
 \begin{document}
 
 \title{SharpeR}
-\author{Steven E. Pav}
-\date{\today, \currenttime}
+\author{Steven E. Pav %
+\thanks{\email{shabbychef@gmail.com}}}
+%\date{\today, \currenttime}
 
 \maketitle
 %UNFOLD
@@ -1329,7 +1331,9 @@ years of daily data. By selecting the combination of windows with the highest
 true signal-noise-ratio, I have subjected myself to overfit bias. I repeat this
 experiment \Sexpr{n.sim} times, then Q-Q plot the maximal \txtSR values over
 those experiments versus an optimal \txtSR distribution assuming $\nlatf=2$ in
-\figref{estimate_overfit}.  The fit is reasonable except in the case where the
+\figref{estimate_overfit}.  The fit is reasonable\footnote{And much better 
+when the overfitting is more aggressive, which takes more processing time 
+to simulate.} except in the case where the
 maximal in-sample \txtSR is very low (recall that it can be negative for this
 brute-force search, whereas the optimal \txtSR distribution does not produce
 negative values). This case is unlikely to lead to a trading catastrophe,
@@ -1387,7 +1391,9 @@ of \txtSR. \cite{Leung2008,Wright2012} I have found that these tests
 Here I confirm that the tests give approximately uniform p-values under
 the null in three situations: when stock returns are independent Gaussians, 
 when they are independent and \tlaw{}-distributed, and when they are Gaussian
-and correlated.
+and correlated. Visual confirmation is via \figref{sr_eq_test_normal} through
+\figref{sr_eq_test_correlated}, showing Q-Q plots against uniformity of the
+putative p-values in Monte Carlo simulations with data drawn from the null.
 
 <<'sr_eq_test_normal',fig.cap=paste("P-values from \\Rfunction{sr\\_equality\\_test} on",n.sim,"multiple realizations of independent, normally distributed returns series are Q-Q plotted against uniformity.")>>=
 # function for Q-Q plot against uniformity
