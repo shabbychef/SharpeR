@@ -36,6 +36,46 @@
 ########################################################################
 # Estimation 
 
+# variance/covariance of SR based on observations;
+# feed in an n x p matrix of returns and a function
+# which computes a variance-covariance matrix from
+# an lm object (such as vcov, or vcovHAC from sandwich)
+sr_vcov <- function(X,vcov.func=vcov) {
+	X <- na.omit(X)
+	p <- dim(X)[2]
+
+	# cat together X and X squared
+	XX2 <- cbind(X,X^2)
+	mod2 <- lm(XX2 ~ 1)
+
+	mm2 <- mod2$coefficients
+
+	# mean of X and X^2
+	m1 <- mm2[1:p]
+	m2 <- mm2[p + (1:p)]
+	# volatility
+	sig2 <- (m2 - m1^2)
+	# the SR:
+	SR <- m1 / sqrt(sig2)
+
+	# estimate Sigma hat
+	Shat = vcov.func(mod2)
+
+	# construct D matrix
+	deno <- (sig2)^(3/2)
+	D1 <- diag(m2 / deno)
+	D2 <- diag(-m1 / (2*deno))
+	Dt <- rbind(D1,D2)
+
+	# Omegahat
+	Ohat <- t(Dt) %*% Shat %*% Dt
+
+	retval <- list(p=p,SR=SR,Ohat=Ohat)
+	return(retval)
+}
+
+
+
 # inference on the t-stat#FOLDUP
 
 # standard error on the non-centrality parameter of a t-stat

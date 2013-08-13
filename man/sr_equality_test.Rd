@@ -85,6 +85,26 @@ pvs <- replicate(1024,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="c
 plot(ecdf(pvs))
 abline(0,1,col='red')
 }
+\dontrun{
+if (require(sandwich)) {
+  set.seed(as.integer(charToRaw("0b2fd4e9-3bdf-4e3e-9c75-25c6d18c331f")))
+  n.manifest <- 10
+  n.latent <- 4
+  n.day <- 1024
+  snr <- 0.95
+  latent.rets <- matrix(rnorm(n.day*n.latent),ncol=n.latent) \%*\%
+		matrix(runif(n.latent*n.manifest),ncol=n.manifest)
+  noise.rets <- matrix(rnorm(n.day*n.manifest),ncol=n.manifest)
+  some.rets <- snr * latent.rets + sqrt(1-snr^2) * noise.rets
+  # naive vcov
+  pvs0 <- sr_equality_test(some.rets)
+  # HAC vcov
+  pvs1 <- sr_equality_test(some.rets,vcov.func=vcovHAC)
+  # more elaborately:
+  pvs <- sr_equality_test(some.rets,vcov.func=function(amod) {
+		vcovHAC(amod,prewhite=TRUE) })
+}
+}
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
@@ -107,6 +127,11 @@ abline(0,1,col='red')
 
   Memmel, C. "Performance hypothesis testing with the
   Sharpe ratio." Finance Letters 1 (2003): 21--23.
+
+  Ledoit, O., and Wolf, M. "Robust performance hypothesis
+  testing with the Sharpe ratio." Journal of Empirical
+  Finance 15, no. 5 (2008): 850-859.
+  \url{http://www.ledoit.net/jef2008_abstract.htm}
 }
 \seealso{
   \code{\link{sr_test}}

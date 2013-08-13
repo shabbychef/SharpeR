@@ -33,7 +33,6 @@
 # 2FIX:
 # add britten-jones weights CI
 
-
 ########################################################################
 # Tests 
 ########################################################################
@@ -42,7 +41,7 @@
 
 # the guts of a SR equality test, hinging on different
 # covariance functions.
-.sr_eq_guts <- function(X,contrasts,estfunc=cov) {
+.sr_eq_guts <- function(X,contrasts,vcov.func=vcov) {
 	X <- na.omit(X)
 	n <- dim(X)[1]
 	p <- dim(X)[2]
@@ -52,32 +51,16 @@
 	if (dim(contrasts)[2] != p)
 		stop("size mismatch in 'X', 'contrasts'")
 
-	# cat together X and X squared
-	XX2 <- cbind(X,X^2)
-	mm2 <- colMeans(XX2)
+	retval <- sr_vcov(X,vcov.func=vcov.func)
 
-	m1 <- mm2[1:p]
-	m2 <- mm2[p + (1:p)]
-	# the SR:
-	SR <- m1 / sqrt(m2 - m1^2)
-
-	# construct/estimate Sigma hat
-	Shat = estfunc(XX2)
-
-	# construct D matrix
-	deno <- (m2 - m1^2)^(3/2)
-	D1 <- diag(m2 / deno)
-	D2 <- diag(-m1 / (2*deno))
-	Dt <- rbind(D1,D2)
-
-	# Omegahat
-	Ohat <- t(Dt) %*% Shat %*% Dt
+	# store these:
+	retval$n <- n
+	retval$k <- k
 
 	# the test statistic:
-	ESR <- contrasts %*% SR
-	COC <- contrasts %*% Ohat %*% t(contrasts)
+	retval$ESR <- contrasts %*% retval$SR
+	retval$COC <- contrasts %*% retval$Ohat %*% t(contrasts)
 
-	retval <- list(n=n,k=k,p=p,SR=SR,ESR=ESR,COC=COC)
 	return(retval)
 }
 #' @title Paired test for equality of Sharpe ratio
@@ -145,6 +128,8 @@
 #' Memmel, C. "Performance hypothesis testing with the Sharpe ratio." Finance
 #' Letters 1 (2003): 21--23.
 #'
+#' @template ref-LW
+#'
 #' @examples 
 #' # under the null 
 #' rv <- sr_equality_test(matrix(rnorm(500*5),ncol=5))
@@ -174,35 +159,60 @@
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
 #' }
+#' \dontrun{
+#' if (require(sandwich)) {
+#'   set.seed(as.integer(charToRaw("0b2fd4e9-3bdf-4e3e-9c75-25c6d18c331f")))
+#'   n.manifest <- 10
+#'   n.latent <- 4
+#'   n.day <- 1024
+#'   snr <- 0.95
+#'   latent.rets <- matrix(rnorm(n.day*n.latent),ncol=n.latent) %*%
+#'		matrix(runif(n.latent*n.manifest),ncol=n.manifest)
+#'   noise.rets <- matrix(rnorm(n.day*n.manifest),ncol=n.manifest)
+#'   some.rets <- snr * latent.rets + sqrt(1-snr^2) * noise.rets
+#'   # naive vcov
+#'   pvs0 <- sr_equality_test(some.rets)
+#'   # HAC vcov
+#'   pvs1 <- sr_equality_test(some.rets,vcov.func=vcovHAC)
+#'   # more elaborately:
+#'   pvs <- sr_equality_test(some.rets,vcov.func=function(amod) {
+#'		vcovHAC(amod,prewhite=TRUE) })
+#' }
+#' }
 #'
 #'@export
 sr_equality_test <- function(X,type=c("chisq","F","t"),
 														 alternative=c("two.sided","less","greater"),
-														 contrasts=NULL) {
+														 contrasts=NULL,
+														 vcov.func=vcov) {
 	# all this stolen from t.test.default:
 	alternative <- match.arg(alternative)
 	dname <- deparse(substitute(X))
-	subprob <- .sr_eq_guts(X,contrasts,estfunc=cov)
-	type <- match.arg(type)
 
-	if ((type == "t") && (subprob$k != 1))
+	# delegate
+	srmom <- .sr_eq_guts(X,contrasts,vcov.func=vcov.func)
+
+	type <- match.arg(type)
+	if ((type == "t") && (srmom$k != 1))
 		stop("can only perform t-test on single contrast");
 
 	if (type == "t") {
-		ts <- subprob$ESR * sqrt(subprob$n / subprob$COC)
+		#ts <- srmom$ESR * sqrt(srmom$n / srmom$COC)
+		ts <- srmom$ESR * sqrt(1 / srmom$COC)
 		names(ts) <- "t"
 		pval <- switch(alternative,
-									 two.sided = .oneside2two(pt(ts,df=subprob$n-1)),
-									 less = pt(ts,df=subprob$n-1,lower.tail=TRUE),
-									 greater = pt(ts,df=subprob$n-1,lower.tail=FALSE))
+									 two.sided = .oneside2two(pt(ts,df=srmom$n-1)),
+									 less = pt(ts,df=srmom$n-1,lower.tail=TRUE),
+									 greater = pt(ts,df=srmom$n-1,lower.tail=FALSE))
 		statistic <- ts
 	} else {
-		T2 <- subprob$n * t(subprob$ESR) %*% solve(subprob$COC,subprob$ESR)
+		#T2 <- srmom$n * t(srmom$ESR) %*% solve(srmom$COC,srmom$ESR)
+		T2 <- t(srmom$ESR) %*% solve(srmom$COC,srmom$ESR)
 		names(T2) <- "T2"
 		pval <- switch(type,
-									 chisq = pchisq(T2,df=subprob$k,ncp=0,lower.tail=FALSE),
-									 F = pf((subprob$n-subprob$k) * T2/((subprob$n-1) * subprob$k),
-													df1=subprob$k,df2=subprob$n-subprob$k,lower.tail=FALSE))
+									 chisq = pchisq(T2,df=srmom$k,ncp=0,lower.tail=FALSE),
+									 F = pf((srmom$n-srmom$k) * T2/((srmom$n-1) * srmom$k),
+													df1=srmom$k,df2=srmom$n-srmom$k,lower.tail=FALSE))
 		statistic <- T2
 		if (alternative != "two.sided") {
 			warning("cannot perform directional tests on T^2")
@@ -211,16 +221,16 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 	}
 
 	# attach names
-	names(subprob$k) <- "contrasts"
+	names(srmom$k) <- "contrasts"
 	method <- paste(c("test for equality of Sharpe ratio, via",type,"test"),collapse=" ")
-	names(subprob$SR) <- sapply(1:subprob$p,function(x) { paste(c("strat",x),collapse="_") })
+	names(srmom$SR) <- sapply(1:srmom$p,function(x) { paste(c("strat",x),collapse="_") })
 
 	cozeta <- 0
 	names(cozeta) <- "sum squared contrasts of SNR"
 
-	retval <- list(statistic = statistic, parameter = subprob$k,
-							 df1 = subprob$p, df2 = subprob$n, p.value = pval, 
-							 SR = subprob$SR, null.value = cozeta,
+	retval <- list(statistic = statistic, parameter = srmom$k,
+							 df1 = srmom$p, df2 = srmom$n, p.value = pval, 
+							 SR = srmom$SR, null.value = cozeta,
 							 alternative = alternative,
 							 method = method, data.name = dname)
 	class(retval) <- "htest"

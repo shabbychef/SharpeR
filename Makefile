@@ -23,7 +23,7 @@ GS_QUALITY 			?= 'ebook'
 
 M4_FILES				?= $(wildcard m4/*.m4)
 
-VERSION 				 = 0.1308
+VERSION 				 = 0.1309
 TODAY 					:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 				:= SharpeR
@@ -48,11 +48,19 @@ RSCRIPT   			 = $(RBIN)/Rscript
 R_FLAGS 				?= -q --no-save --no-restore --no-init-file
 
 # packages I need to test this one
-TEST_DEPS  			 = testthat roxygen2 knitr TTR quantmod MASS
+TEST_DEPS  			 = testthat roxygen2 knitr TTR quantmod MASS sandwich
 INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
 PKG_TESTR 			 = tests/run-all.R
 
-#INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%,$(TEST_DEPS)) 
+# see http://stackoverflow.com/a/7531247/164611
+null  					:=
+space 					:= $(null) #
+comma 					:= ,
+# turn space list to comma list:
+COMMA_IT 				 = $(subst $(space),$(comma),$(strip $(1)))
+
+TEST_DEPS_LIST  	 = $(call COMMA_IT,$(TEST_DEPS))
+
 
 RD_DUMMY 					 = man/$(PKG_NAME).Rd
 
@@ -211,6 +219,17 @@ TAGS:
 % : m4/%.m4 Makefile
 	m4 -I ./m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
 
+%.md : %.Rmd
+	$(call WARN_DEPS)
+	$(call MKDIR,$(EXTDATA_D))
+	R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,quantmod" \
+				 $(R) $(R_FLAGS) --slave -e \
+				 "setwd(dirname('$@'));knitr::knit(basename('$<'));"
+
+README.md : $(NODIST_R_DIR)/README.md
+	mv $< $@
+
 # macro for local R
 RLOCAL = R_LIBS=$(LOCAL) $(R) $(R_FLAGS)
 
@@ -255,7 +274,7 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
   --include=man/ --include=man/* \
   --include=NAMESPACE --include=DESCRIPTION \
   --include=$(EXTDATA_D)/ \
-	--exclude=Makefile \
+	--exclude=Makefile --exclude=README.md \
   --exclude-from=.gitignore \
  $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_FILES)))  --exclude=$(LOCAL) \
  $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_DIRS)))  --exclude=$(basename $(STAGING)) \
