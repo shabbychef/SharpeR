@@ -11,53 +11,53 @@
 # Created: 2012.12.28
 #
 
-R_DEV_FILES 		?= $(wildcard ./R/*.r)
-R_FILES 				?= $(R_DEV_FILES)
-R_FILES 				+= $(wildcard ./inst/tests/*.r)
-R_FILES 				+= $(wildcard ./man-roxygen/*.R)
-R_FILES 				+= $(wildcard ./tests/*.R)
+R_DEV_FILES 			?= $(wildcard ./R/*.r)
+R_FILES 					?= $(R_DEV_FILES)
+R_FILES 					+= $(wildcard ./inst/tests/*.r)
+R_FILES 					+= $(wildcard ./man-roxygen/*.R)
+R_FILES 					+= $(wildcard ./tests/*.R)
 
-R_QPDF 					?= $(shell which qpdf)
-R_GSCMD					?= $(shell which gs)
-GS_QUALITY 			?= 'ebook'
+R_QPDF 						?= $(shell which qpdf)
+R_GSCMD						?= $(shell which gs)
+GS_QUALITY 				?= 'ebook'
 
-M4_FILES				?= $(wildcard m4/*.m4)
+M4_FILES					?= $(wildcard m4/*.m4)
 
-VERSION 				 = 0.1309
-TODAY 					:= $(shell date +%Y-%m-%d)
+VERSION 					 = 0.1309
+TODAY 						:= $(shell date +%Y-%m-%d)
 
-PKG_NAME 				:= SharpeR
-PKG_VERSION			:= $(VERSION)
-PKG_SRC 				:= $(shell basename $(PWD))
+PKG_NAME 					:= SharpeR
+PKG_VERSION				:= $(VERSION)
+PKG_SRC 					:= $(shell basename $(PWD))
 
-PKG_TGZ 				 = $(PKG_NAME)_$(PKG_VERSION).tar.gz
+PKG_TGZ 					 = $(PKG_NAME)_$(PKG_VERSION).tar.gz
 
-LOCAL 					:= .local
-RCHECK 					 = $(PKG_NAME).Rcheck
-RCHECK_SENTINEL  = $(RCHECK)/$(PKG_NAME)/DESCRIPTION
+LOCAL 						:= .local
+RCHECK 						 = $(PKG_NAME).Rcheck
+RCHECK_SENTINEL 	 = $(RCHECK)/$(PKG_NAME)/DESCRIPTION
 
 # Specify the directory holding R binaries. To use an alternate R build (say a
 # pre-prelease version) use `make RBIN=/path/to/other/R/` or `export RBIN=...`
 # If no alternate bin folder is specified, the default is to use the folder
 # containing the first instance of R on the PATH.
-RBIN 						?= $(shell dirname "`which R`")
-R         			 = $(RBIN)/R
-RSCRIPT   			 = $(RBIN)/Rscript
-#R_FLAGS 				?= --vanilla --verbose -q
-#R_FLAGS 				?= --vanilla -q
-R_FLAGS 				?= -q --no-save --no-restore --no-init-file
+RBIN 							?= $(shell dirname "`which R`")
+R         				 = $(RBIN)/R
+RSCRIPT   				 = $(RBIN)/Rscript
+#R_FLAGS 					?= --vanilla --verbose -q
+#R_FLAGS 					?= --vanilla -q
+R_FLAGS 					?= -q --no-save --no-restore --no-init-file
 
 # packages I need to test this one
-TEST_DEPS  			 = testthat roxygen2 knitr TTR quantmod MASS sandwich
-INSTALLED_DEPS 	 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
-PKG_TESTR 			 = tests/run-all.R
+TEST_DEPS  				 = testthat roxygen2 knitr TTR quantmod MASS sandwich
+INSTALLED_DEPS 		 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
+PKG_TESTR 				 = tests/run-all.R
 
 # see http://stackoverflow.com/a/7531247/164611
-null  					:=
-space 					:= $(null) #
-comma 					:= ,
+null  						:=
+space 						:= $(null) #
+comma 						:= ,
 # turn space list to comma list:
-COMMA_IT 				 = $(subst $(space),$(comma),$(strip $(1)))
+COMMA_IT 					 = $(subst $(space),$(comma),$(strip $(1)))
 
 TEST_DEPS_LIST  	 = $(call COMMA_IT,$(TEST_DEPS))
 
@@ -88,22 +88,22 @@ NODIST_DIRS				+= $(VIGNETTE_D)/figure
 SUPPORT_FILES 		 = ./DESCRIPTION ./NAMESPACE ./ChangeLog $(RD_DUMMY) ./inst/CITATION
 
 # for building the package.tgz
-#BUILD_FLAGS 		?= --compact-vignettes
-BUILD_FLAGS 		?= --compact-vignettes="gs+qpdf"
-BUILD_ENV 			 = R_QPDF=$(R_QPDF) R_GSCMD=$(R_GSCMD) \
+#BUILD_FLAGS 			?= --compact-vignettes
+BUILD_FLAGS 			?= --compact-vignettes="gs+qpdf"
+BUILD_ENV 				 = R_QPDF=$(R_QPDF) R_GSCMD=$(R_GSCMD) \
 									 GS_QUALITY=$(GS_QUALITY)
 
-NODIST_FILES 		+= $(VIGNETTE_PDF) $(VIGNETTE_HTML)
-SUPPORT_FILES 	+= $(VIGNETTE_SRCS)
-EXTRA_PKG_DEPS 	 = 
-#EXTRA_PKG_DEPS 	 += $(VIGNETTE_CACHE_SENTINEL)
+NODIST_FILES 			+= $(VIGNETTE_PDF) $(VIGNETTE_HTML)
+SUPPORT_FILES 		+= $(VIGNETTE_SRCS)
+EXTRA_PKG_DEPS 		 = 
+#EXTRA_PKG_DEPS 	+= $(VIGNETTE_CACHE_SENTINEL)
 
-EXTRA_PKG_DEPS 	 += $(EXTDATA_FILES)
+EXTRA_PKG_DEPS 		+= $(EXTDATA_FILES)
 
 #INSTALL_FLAGS 		?= --preclean --no-multiarch --library=$(LOCAL) 
 INSTALL_FLAGS 		?= --preclean --library=$(LOCAL) 
 
-TEST_PRAGMA     ?= release
+TEST_PRAGMA     	?= release
 
 # for R CMD build
 ifeq ($(TEST_PRAGMA),thorough)
