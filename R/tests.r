@@ -94,7 +94,8 @@
 #'
 #' sr_equality_test(X,type=c("chisq","F","t"),
 #'                  alternative=c("two.sided","less","greater"),
-#'                  contrasts=NULL)
+#'                  contrasts=NULL,
+#'                  vcov.func=vcov) 
 #'
 #' @param X an \eqn{n \times p}{n x p} matrix of paired observations.
 #' @param contrasts an \eqn{k \times p}{k x p} matrix of the contrasts
@@ -107,6 +108,12 @@
 #'        \code{"less"}. You can specify just the initial letter.
 #'        This is only relevant for the \code{"t"} test.
 #'        \code{"greater"} corresponds to \eqn{H_a: E s > 0}{Ha: E s > 0}.
+#' @param vcov.func a function which takes a model of class lm (one of
+#'        the form x ~ 1), and produces a variance-covariance matrix.
+#'        The default is \code{\link{vcov}}, which produces a 'vanilla'
+#'        estimate of covariance. Other sensible options are
+#'        \code{vcovHAC} from the \code{sandwich} package.
+#'
 #' @keywords htest
 #' @return Object of class \code{htest}, a list of the test statistic,
 #' the size of \code{X}, and the \code{method} noted.
@@ -129,6 +136,7 @@
 #' Letters 1 (2003): 21--23.
 #'
 #' @template ref-LW
+#' @template ref-Lo
 #'
 #' @examples 
 #' # under the null 
