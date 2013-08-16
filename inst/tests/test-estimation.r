@@ -27,7 +27,6 @@
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
-
 # helpers#FOLDUP
 set.char.seed <- function(str) {
 	set.seed(as.integer(charToRaw(str)))
@@ -39,7 +38,7 @@ context("estimation functions: confint coverage")#FOLDUP
 test_that("confint.sr coverage",{#FOLDUP
 	set.char.seed("066dfa96-6dd7-4d14-ab74-49e81b3afd83")
 
-	ngen <- ceiling(THOROUGHNESS * 64)
+	ngen <- ceiling(THOROUGHNESS * 32)
 	alpha.tol = 0.05 + 0.10 / THOROUGHNESS
 
 	ope <- 253

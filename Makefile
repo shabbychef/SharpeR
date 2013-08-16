@@ -231,7 +231,8 @@ README.md : $(NODIST_R_DIR)/README.md
 	mv $< $@
 
 # macro for local R
-RLOCAL = R_LIBS=$(LOCAL) $(R) $(R_FLAGS)
+R_LOCALLY  						= R_LIBS=$(LOCAL) $(R) $(R_FLAGS)
+R_TIME_LOCALLY  			= R_LIBS=$(LOCAL) time --verbose $(R) $(R_FLAGS)
 
 # make directories
 local_d :
@@ -247,14 +248,14 @@ echo :
 # install an R package in the 'LOCAL' directory.
 $(LOCAL)/%/DESCRIPTION : 
 	$(call MKDIR,$(LOCAL))
-	$(RLOCAL) -e "install.packages('$*', repos = 'http://cran.cnr.Berkeley.edu')" 
+	$(R_LOCALLY) -e "install.packages('$*', repos = 'http://cran.cnr.Berkeley.edu')" 
 
 deps: $(INSTALLED_DEPS)
 
 # roxygen it.
 man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
 	$(call WARN_DEPS)
-	$(RLOCAL) --slave -e "require(roxygen2); roxygenize('.', '.', overwrite=TRUE, unlink.target=TRUE)"
+	$(R_LOCALLY) --slave -e "require(roxygen2); roxygenize('.', '.', overwrite=TRUE, unlink.target=TRUE)"
 	touch $@
 
 docs: README.md DESCRIPTION man/$(PKG_NAME).Rd 
@@ -288,8 +289,8 @@ staged : $(STAGED_PKG)/DESCRIPTION $(EXTRA_PKG_DEPS)
 $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS) $(EXTRA_PKG_DEPS) 
 	$(call WARN_DEPS)
 	# check values
-	@$(BUILD_ENV) $(RLOCAL) --slave -e 'print(Sys.getenv("R_QPDF"));print(Sys.getenv("R_GSCMD"));print(Sys.getenv("GS_QUALITY"));'
-	$(BUILD_ENV) $(RLOCAL) CMD build $(BUILD_FLAGS) $(<D)
+	@$(BUILD_ENV) $(R_LOCALLY) --slave -e 'print(Sys.getenv("R_QPDF"));print(Sys.getenv("R_GSCMD"));print(Sys.getenv("GS_QUALITY"));'
+	$(BUILD_ENV) $(R_LOCALLY) CMD build $(BUILD_FLAGS) $(<D)
 
 #package : $(PKG_TGZ)
 
@@ -302,7 +303,7 @@ build_list : $(PKG_TGZ)
 $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ) 
 	$(call WARN_DEPS)
 	$(call MKDIR,$(LOCAL))
-	$(RLOCAL) CMD INSTALL $(INSTALL_FLAGS) $<
+	$(R_LOCALLY) CMD INSTALL $(INSTALL_FLAGS) $<
 	touch $@
 
 install: $(LOCAL)/$(PKG_NAME)/INDEX
@@ -324,10 +325,9 @@ $(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
 # check and install
 $(RCHECK_SENTINEL) : $(PKG_TGZ)
 	$(call WARN_DEPS)
-	$(RLOCAL) CMD check --as-cran --timings $^ 
+	$(R_TIME_LOCALLY) CMD check --as-cran --timings $^ 
 
-
-#$(RLOCAL) CMD check --as-cran --outdir=$(RCHECK) $^ 
+#$(R_LOCALLY) CMD check --as-cran --outdir=$(RCHECK) $^ 
 	
 check: $(RCHECK_SENTINEL)
 
@@ -342,7 +342,7 @@ checksee : $(RCHECK_SENTINEL)
 # UNIT TESTING
 ################################
 
-#$(RLOCAL) --slave -e "if (require(testthat) && require($(PKG_NAME))) testthat::test_dir('./inst/tests')" | tee $@
+#$(R_LOCALLY) --slave -e "if (require(testthat) && require($(PKG_NAME))) testthat::test_dir('./inst/tests')" | tee $@
 
 # 2FIX:
 unit_test.log : $(LOCAL)/$(PKG_NAME)/INDEX $(LOCAL)/testthat/DESCRIPTION $(PKG_TESTR)

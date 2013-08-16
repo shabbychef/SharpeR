@@ -18,9 +18,9 @@ Depends:
 Suggests: 
     quantmod,
     MASS,
-		TTR,
+    TTR,
     testthat, 
-		sandwich,
+    sandwich,
     knitr
 URL: http://www.r-project.org, https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr

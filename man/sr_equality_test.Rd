@@ -4,7 +4,7 @@
 \usage{
   sr_equality_test(X,type=c("chisq","F","t"),
     alternative=c("two.sided","less","greater"),
-    contrasts=NULL)
+    contrasts=NULL, vcov.func=vcov)
 }
 \arguments{
   \item{X}{an \eqn{n \times p}{n x p} matrix of paired
@@ -24,6 +24,13 @@
   specify just the initial letter.  This is only relevant
   for the \code{"t"} test.  \code{"greater"} corresponds to
   \eqn{H_a: E s > 0}{Ha: E s > 0}.}
+
+  \item{vcov.func}{a function which takes a model of class
+  lm (one of the form x ~ 1), and produces a
+  variance-covariance matrix.  The default is
+  \code{\link{vcov}}, which produces a 'vanilla' estimate
+  of covariance. Other sensible options are \code{vcovHAC}
+  from the \code{sandwich} package.}
 }
 \value{
   Object of class \code{htest}, a list of the test
@@ -132,6 +139,10 @@ if (require(sandwich)) {
   testing with the Sharpe ratio." Journal of Empirical
   Finance 15, no. 5 (2008): 850-859.
   \url{http://www.ledoit.net/jef2008_abstract.htm}
+
+  Lo, Andrew W. "The statistics of Sharpe ratios."
+  Financial Analysts Journal 58, no. 4 (2002): 36-52.
+  \url{http://ssrn.com/paper=377260}
 }
 \seealso{
   \code{\link{sr_test}}

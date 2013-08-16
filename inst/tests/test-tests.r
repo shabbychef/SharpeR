@@ -27,7 +27,6 @@
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
-
 # helpers#FOLDUP
 set.char.seed <- function(str) {
 	set.seed(as.integer(charToRaw(str)))
@@ -37,15 +36,14 @@ THOROUGHNESS <- getOption('test.thoroughness',1.0)
 
 context("test hypothesis tests")#FOLDUP
 test_that("sr_equality_test uniformity",{#FOLDUP
+	ngen <- ceiling(THOROUGHNESS * 32)
+	alpha.floor = 0.001 + 0.003 * (THOROUGHNESS / (1 + THOROUGHNESS))
+
 	set.char.seed("0b144107-4de8-4e00-95f7-d746db3aef8e")
-
-	ngen <- ceiling(THOROUGHNESS * 64)
-	alpha.floor = 0.01 + 0.04 * (THOROUGHNESS / (1 + THOROUGHNESS))
-
 	ope <- 253
-	for (nyr in c(3,6,9)) {
+	for (nyr in c(2,4)) {
 		nday <- ceiling(ope * nyr)
-		for (nstock in c(2,4,8)) {
+		for (nstock in c(2,4)) {
 			for (mu in c(0,0.1)) {
 				pvs <- rep(0,ngen)
 				for (iii in (1:ngen)) {
@@ -58,14 +56,37 @@ test_that("sr_equality_test uniformity",{#FOLDUP
 			}
 		}
 	}
+
+	if (require(sandwich)) {
+		ngen <- ceiling(THOROUGHNESS * 16)
+
+		set.char.seed("d1cbe090-dca6-4543-8332-1da96f1665a8")
+		ope <- 253
+		for (nyr in c(1,2)) {
+			nday <- ceiling(ope * nyr)
+			for (nstock in c(2)) {
+				for (mu in c(0,0.1)) {
+					pvs <- rep(0,ngen)
+					for (iii in (1:ngen)) {
+						X <- matrix(rnorm(nday * nstock,mean=mu),ncol=nstock)
+						etc <- sr_equality_test(X,vcov.func=vcovHAC)
+						pvs[iii] <- etc$p.value
+					}
+					meta.test <- ks.test(pvs,punif)
+					expect_true(meta.test$p.value > alpha.floor)
+				}
+			}
+		}
+	}
+
+
 })#UNFOLD
 
 test_that("sr_test uniformity",{#FOLDUP
+	ngen <- ceiling(THOROUGHNESS * 64)
+	alpha.floor = 0.001 + 0.003 * (THOROUGHNESS / (1 + THOROUGHNESS))
+
 	set.char.seed("3e4249f2-18d4-4d5c-98be-c32cc05e74c7")
-
-	ngen <- ceiling(THOROUGHNESS * 256)
-	alpha.floor = 0.01 + 0.03 * (THOROUGHNESS / (1 + THOROUGHNESS))
-
 	ope <- 253
 	for (nyr in c(2,4)) {
 		nday <- ceiling(ope * nyr)

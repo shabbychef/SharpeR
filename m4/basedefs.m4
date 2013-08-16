@@ -5,6 +5,6 @@ define(`LQ',`changequote(<,>)`dnl'
 changequote`'')
 define(`RQ',`changequote(<,>)dnl`
 'changequote`'')
-define(`m4_R_FILES',`m4_CHOMP_SYS(`ls  R/*.r | perl -pe "s{^R/}{    `'RQ()};s{$}{`'RQ()};";')')dnl
+define(`m4_R_FILES',`m4_CHOMP_SYS(`ls  R/*.r | sort | perl -pe "s{^R/}{    `'RQ()};s{$}{`'RQ()};";')')dnl
 dnl vim modelines;
 dnl vim:ts=2:sw=2:syn=m4:ft=m4:si:cin:nu
