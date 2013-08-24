@@ -308,17 +308,6 @@ $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ)
 
 install: $(LOCAL)/$(PKG_NAME)/INDEX
 
-# fucking shit.
-# * Sat May 11 2013 09:48:00 PM Steven E. Pav <steven@cerebellumcapital.com>
-# static vignettes? CRAN having problems with quantmod.
-#$(VIGNETTE_PDF) : $(LOCAL)/$(PKG_NAME)/doc/$(PKG_NAME).pdf
-	#cp $< $@
-
-#$(VIGNETTE_HTML) : $(LOCAL)/$(PKG_NAME)/doc/index.html
-	#cp $< $@
-
-#static_vignette : $(VIGNETTE_PDF) 
-
 # rely on the 'install' target above.
 $(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
 
@@ -372,7 +361,18 @@ $(PKG_NAME).pdf: $(VIGNETTE_SRCS) deps $(LOCAL)/$(PKG_NAME)/INDEX
 		$(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 	if grep Rerun $(PKG_NAME).log > /dev/null; then $(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
 
-#the_vignette: $(PKG_NAME).pdf
+$(PKG_NAME)_fast.pdf : $(VIGNETTE_SRCS) 
+	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,TTR" \
+				 $(R) $(R_FLAGS) --slave -e "knitr::knit2pdf('$<');"
+	if grep Citation $(PKG_NAME).log > /dev/null; then $(PREBIB) $(BIBTEX) $(PKG_NAME); \
+		$(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
+	if grep Rerun $(PKG_NAME).log > /dev/null; then $(PRETEX) "$(R)" CMD pdflatex $(PKG_NAME).tex; fi
+	mv $(PKG_NAME).pdf $<
+
+fast_vignette: $(PKG_NAME)_fast.pdf
+
+the_vignette: $(PKG_NAME).pdf
 
 $(VIGNETTE_CACHE_SENTINEL) : $(VIGNETTE_SRCS) $(LOCAL)/$(PKG_NAME)/INDEX
 	$(call WARN_DEPS)
@@ -400,17 +400,20 @@ $(EXTDATA_FILES) : $(NODIST_R_DIR)/make_ret_data.R
 # CLEAN UP 
 ################################
 
-clean : 
+texclean :
+	-rm -rf $(PKG_NAME).log
+	-rm -rf $(PKG_NAME).aux
+	-rm -rf $(PKG_NAME).out
+	-rm -rf $(PKG_NAME).bbl
+	-rm -rf $(PKG_NAME).blg
+
+clean : texclean
 	-rm DESCRIPTION
 	-rm -rf man/*.Rd
 	-rm -rf $(STAGED_PKG)
 	-rm -rf $(RCHECK)
 	-rm -rf $(PKG_NAME).tex
-	-rm -rf $(PKG_NAME).log
-	-rm -rf $(PKG_NAME).aux
 	-rm -rf $(PKG_NAME).pdf
-	-rm -rf $(PKG_NAME).bbl
-	-rm -rf $(PKG_NAME).blg
 
 realclean : clean
 	-rm -rf $(LOCAL)

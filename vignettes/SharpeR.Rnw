@@ -62,7 +62,7 @@
 \providecommand{\mathSUB}[2]{\MATHIT{\neSUB{#1}{#2}}}
 \renewcommand{\Pr}[1]{\ensuremath{\operatorname{Pr}\left\{#1\right\}}}
 \providecommand{\vect}[1]{\MATHIT{\boldsymbol{#1}}}
-\providecommand{\eye}{\ensuremath{I}}
+%\providecommand{\eye}{\ensuremath{I}}
 \providecommand{\Mtx}[1]{\MATHIT{\mathsf{#1}}}
 \providecommand{\MtxUL}[3]{\mathUL{\Mtx{#1}}{#2}{#3}}
 \providecommand{\nePAIR}[2]{#1\lMr{#2}}
@@ -133,6 +133,8 @@
 \providecommand{\tr}[1]{\mathSUP{#1}{\top}}
 \providecommand{\minv}[1]{\mathSUP{#1}{-1}}
 \providecommand{\trminv}[1]{\mathSUP{#1}{-\top}}
+% null space
+\providecommand{\mnull}[1]{\mathSUP{#1}{C}}
 
 % these are private to this file%FOLDUP
 \providecommand{\prvsymi}{x}
@@ -323,8 +325,9 @@
 \providecommand{\ssr}[1][]{\ssrUL{}{#1}}
 \providecommand{\ssrsq}[1][]{\ssrUL{2}{#1}}
 \providecommand{\ssropt}{\ssr[*]}
+\providecommand{\ssroptG}[1]{\ssr[*,#1]}
 \providecommand{\ssrsqopt}{\ssrsq[*]}
-\providecommand{\ssrsqoptp}[1]{\ssrsq[*,#1]}
+\providecommand{\ssrsqoptG}[1]{\ssrsq[*,#1]}
 
 %\providecommand{\svmu}[1][]{\smean{\vreti[#1]}}
 %\providecommand{\svsig}[1][]{\MATHIT{S_{#1}}}
@@ -352,8 +355,10 @@
 
 % optimum SNR in the population
 \providecommand{\psnropt}{\psnr[*]}
+\providecommand{\psnroptG}[1]{\psnr[*,#1]}
 \providecommand{\psnrpopt}{\psnr[*]}
 \providecommand{\psnrsqopt}{\psnrsq[*]}
+\providecommand{\psnrsqoptG}[1]{\psnrsq[*,#1]}
 \providecommand{\psnrsqpopt}{\psnrsq[*]}
 
 % population SNR of the *sample optimal* portfolio. bleah
@@ -543,6 +548,9 @@
 \providecommand{\sportw}[1][{}]{\vectUL{\hat{w}}{}{#1}}
 \providecommand{\sportwopt}{\sportw[*]}
 \providecommand{\pportwopt}{\pportw[*]}
+
+\providecommand{\sportwoptG}[1]{\sportw[*,#1]}
+\providecommand{\pportwoptG}[1]{\pportw[*,#1]}
 
 
 % basis vectors
@@ -735,6 +743,56 @@ misapplied to geometric returns without even an appeal to Taylor's theorem.
 \subsection{Asymptotic Distribution of \txtSR}%FOLDUP
 %UNFOLD
 
+%UNFOLD
+
+\section{\txtSR and Constrained Portfolio Optimization}%FOLDUP
+
+Let \Mtx{G} be an $\nstrat[g] \times \nstrat$ matrix of rank $\nstrat[g] \le
+\nstrat$. Let \mnull{\Mtx{G}} be the matrix whose rows span the null space
+of the rows of \Mtx{G}, \ie $\mnull{\Mtx{G}}\tr{\Mtx{G}} = 0$. 
+Consider the constrained optimization problem
+\begin{equation}
+\max_{\sportw : \mnull{\Mtx{G}} \sportw = 0,\, \qform{\svsig}{\sportw} \le R^2} 
+\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
+\label{eqn:opt_port_cons_I}
+\end{equation}
+where, as previously, \svmu, \svsig are the sample mean vector and covariance 
+matrix, 
+\rfr is the risk-free rate, and $R > 0$ is a risk `budget'. 
+
+The gist of this constraint is that feasible portfolios must be some
+linear combination of the rows of \Mtx{G}. When viewed in this light, this
+problem clearly reduces to that of optimizing the portfolio on 
+\nstrat[g] assets with sample mean $\Mtx{G}\svmu$ and sample covariance
+$\qoform{\svsig}{\Mtx{G}}$. This problem has solution
+$$
+\sportwoptG{\Mtx{G}} 
+= c\, \tr{\Mtx{G}} \minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}} \Mtx{G}\svmu,
+$$
+where the constant $c$ is chosen to maximize return under the given risk
+budget. The \txtSR of this portfolio is
+\begin{equation}
+\ssroptG{\Mtx{G}} 
+ = \frac{\trAB{\sportwoptG{\Mtx{G}}}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwoptG{\Mtx{G}}}}}
+ = \sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}}
+- \frac{\rfr}{R}.
+\end{equation}
+Again, for purposes of estimating the population analogue, we can largely
+ignore, for simplicity of exposition, the deterministic `drag' term
+$\rfr/R$. The random term, 
+$\ssiz
+\wrapParens{\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}}^2$,
+is a Hotelling \Tstat, which follows a non-central \flaw{} distribution, up to
+scaling:
+\begin{equation*}
+\frac{\ssiz}{\ssiz-1}\frac{\ssiz-\nstrat[g]}{\nstrat[g]}
+\wrapParens{\ssroptG{\Mtx{G}} + \frac{\rfr}{R}}^2 \sim
+\ncflaw{\nstrat[g],\ssiz-\nstrat[g],\ssiz\wrapParens{\psnroptG{\Mtx{G}} +
+\frac{\rfr}{R}}^2}.
+\end{equation*}
+This allows us to make inference about \psnroptG{\Mtx{G}}, the population
+analogue of \ssroptG{\Mtx{G}}.
+
 \subsection{Spanning and Hedging}%FOLDUP
 
 Consider the constrained portfolio optimization problem on \nstrat assets,
@@ -743,16 +801,16 @@ Consider the constrained portfolio optimization problem on \nstrat assets,
 \frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
 \label{eqn:cons_port_prob}
 \end{equation}
-where $\Mtx{G}$ is an $n_g \times \nstrat$ matrix of rank $n_g$, and,
+where $\Mtx{G}$ is an $\nstrat[g] \times \nstrat$ matrix of rank \nstrat[g], and,
 as previously, \svmu, \svsig are sample mean vector and covariance matrix, 
 \rfr is the risk-free rate, and $R > 0$ is a risk `budget'. We can interpret
 the \Mtx{G} constraint as stating that the covariance of the returns of
 a feasible portfolio with the returns of a portfolio whose weights are in
 a given row of \Mtx{G} shall equal the corresponding element of \vect{g}.
 In the garden variety application of this problem, \Mtx{G} consists of 
-$n_g$ rows of the identity matrix, and \vect{g} is the zero vector;
+\nstrat[g] rows of the identity matrix, and \vect{g} is the zero vector;
 in this case, feasible portfolios are `hedged' with respect 
-to the $n_g$ assets selected by \Mtx{G}
+to the \nstrat[g] assets selected by \Mtx{G}
 (although they may hold some position in the hedged assets).
 
 Assuming that
@@ -778,9 +836,12 @@ returns. Setting $\vect{g} = 0$ ensures the problem is feasible, and
 I will make this assumption hereafter. Under this assumption, the optimal
 portfolio is 
 \begin{equation*}
-\sportwopt = c \wrapParens{\minv{\svsig}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\Mtx{G}}\svmu}.
+\sportwopt 
+= c \wrapParens{\minv{\svsig}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\Mtx{G}}\svmu}
+= c_1 \sportwoptG{\eye} - c_2 \sportwoptG{\Mtx{G}},
 \end{equation*}
+using the notation from the previous section.
 Note that, up to scaling, $\minv{\svsig}\svmu$ is the unconstrained optimal
 portfolio, and thus the imposition of the \Mtx{G} constraint only changes
 the unconstrained portfolio in assets corresponding to columns of \Mtx{G} 
@@ -791,10 +852,14 @@ changes in the leading constant to satisfy the risk budget).
 
 The squared \txtSR of the optimal portfolio is
 \begin{equation}
-\ssrsqopt = \qform{\minv{\svsig}}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}.
+\ssrsqopt 
+= \qform{\minv{\svsig}}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}
+= \ssrsqoptG{\eye} - \ssrsqoptG{\Mtx{G}},
 \label{eqn:ssr_Gcons}
 \end{equation}
+using the notation from the previous section, and setting $\rfr=0$.
+
 Some natural questions to ask are
 \begin{enumerate}
 \item Is the constrained portfolio `good'? More formally, does the optimal
@@ -804,22 +869,27 @@ constrained portfolio using the (unknown) population parameters have non-zero
 in \txtSR? Can we estimate the size of the drop?
 \end{enumerate}
 
-These questions are related to the known tests 
-of \emph{portfolio spanning}.  \cite{KanZhou2012,BrittenJones1999,HKspan1987}
+\nocite{BrittenJones1999}
+The first question generalizes the known tests of \emph{portfolio spanning}.  
+\cite{KanZhou2012,HKspan1987}
 A spanning test considers whether the optimal portfolio on a 
 pre-fixed subset of \nstrat[1] assets has the same \txtSR as the
 optimal portfolio on all \nstrat assets, \ie whether those \nstrat[1]
-assets `span' the set of all assets.
+assets `span' the set of all assets. 
 
 If you let \Mtx{G} be the $\nstrat[1] \times \nstrat$ matrix consisting
 of the \nstrat[1] rows of the identity matrix corresponding to the
 \nstrat[1] assets to be tested for spanning, then the term
 $$
-\ssrsqoptp{\Mtx{G}} = 
+\ssrsqoptG{\Mtx{G}} = 
 \qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}
 $$
 is the squared \txtSR of the optimal portfolio on only the \nstrat[1] spanning
-assets.
+assets. A spanning test is then a test of
+the hypothesis
+$$
+H_0: \psnrsqoptG{\eye} = \psnrsqoptG{\Mtx{G}}.
+$$
 
 
 
