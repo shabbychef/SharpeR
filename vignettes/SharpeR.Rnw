@@ -324,6 +324,7 @@
 \providecommand{\ssrsq}[1][]{\ssrUL{2}{#1}}
 \providecommand{\ssropt}{\ssr[*]}
 \providecommand{\ssrsqopt}{\ssrsq[*]}
+\providecommand{\ssrsqoptp}[1]{\ssrsq[*,#1]}
 
 %\providecommand{\svmu}[1][]{\smean{\vreti[#1]}}
 %\providecommand{\svsig}[1][]{\MATHIT{S_{#1}}}
@@ -678,12 +679,13 @@ $$
 \sportwopt = \frac{R}{\sqrt{\qform{\minv{\svsig}}{\svmu}}} \minv{\svsig}\svmu.
 $$
 The \txtSR of this portfolio is 
-$$
+\begin{equation}
 \ssropt 
 = \frac{\trAB{\sportwopt}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwopt}}} 
 = \sqrt{\qform{\minv{\svsig}}{\svmu}} - \frac{\rfr}{R}
 = \sqrt{\Tstat / \ssiz} - \frac{\rfr}{R},
-$$
+\label{eqn:ssr_uncons}
+\end{equation}
 where \Tstat is Hotelling's statistic, and \ssiz is the number of independent 
 observations (\eg `days') used to construct \svmu. The term $\rfr / R$ is a
 deterministic `drag' term that merely shifts the location of \ssropt, and so
@@ -729,6 +731,112 @@ arithmetic return of the portfolio over that period. This holds even when the
 portfolio holds some stocks `short.'  Often this portfolio accounting is
 misapplied to geometric returns without even an appeal to Taylor's theorem.
 
+
+\subsection{Asymptotic Distribution of \txtSR}%FOLDUP
+%UNFOLD
+
+\subsection{Spanning and Hedging}%FOLDUP
+
+Consider the constrained portfolio optimization problem on \nstrat assets,
+\begin{equation}
+\max_{\sportw : \Mtx{G}\svsig \sportw = \vect{g},\, \qform{\svsig}{\sportw} \le R^2} 
+\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
+\label{eqn:cons_port_prob}
+\end{equation}
+where $\Mtx{G}$ is an $n_g \times \nstrat$ matrix of rank $n_g$, and,
+as previously, \svmu, \svsig are sample mean vector and covariance matrix, 
+\rfr is the risk-free rate, and $R > 0$ is a risk `budget'. We can interpret
+the \Mtx{G} constraint as stating that the covariance of the returns of
+a feasible portfolio with the returns of a portfolio whose weights are in
+a given row of \Mtx{G} shall equal the corresponding element of \vect{g}.
+In the garden variety application of this problem, \Mtx{G} consists of 
+$n_g$ rows of the identity matrix, and \vect{g} is the zero vector;
+in this case, feasible portfolios are `hedged' with respect 
+to the $n_g$ assets selected by \Mtx{G}
+(although they may hold some position in the hedged assets).
+
+Assuming that
+the \Mtx{G} constraint and risk budget can be simultaneously satisfied,
+the solution to this problem, via the Lagrange multiplier technique,
+is
+\begin{equation}
+	\begin{split}
+	\sportwopt &= c\wrapParens{\minv{\svsig}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\Mtx{G}}\svmu} +
+	\tr{\Mtx{G}}{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}\vect{g},\,\\
+	c^2 &= \frac{R^2 - \qform{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}{\vect{g}}}{
+	\qform{\minv{\svsig}}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}},
+	\end{split}
+\end{equation}
+where the numerator in the last equation need be positive for the problem
+to be feasible.
+
+The case where $\vect{g} \ne 0$ is `pathological', as it requires a fixed
+non-zero covariance of the target portfolio with some other portfolio's
+returns. Setting $\vect{g} = 0$ ensures the problem is feasible, and
+I will make this assumption hereafter. Under this assumption, the optimal
+portfolio is 
+\begin{equation*}
+\sportwopt = c \wrapParens{\minv{\svsig}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\Mtx{G}}\svmu}.
+\end{equation*}
+Note that, up to scaling, $\minv{\svsig}\svmu$ is the unconstrained optimal
+portfolio, and thus the imposition of the \Mtx{G} constraint only changes
+the unconstrained portfolio in assets corresponding to columns of \Mtx{G} 
+containing non-zero elements. In the garden variety application where
+\Mtx{G} is a single row of the identity matrix, the imposition of the
+constraint only changes the holdings in the asset to be hedged (modulo
+changes in the leading constant to satisfy the risk budget).
+
+The squared \txtSR of the optimal portfolio is
+\begin{equation}
+\ssrsqopt = \qform{\minv{\svsig}}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}.
+\label{eqn:ssr_Gcons}
+\end{equation}
+Some natural questions to ask are
+\begin{enumerate}
+\item Is the constrained portfolio `good'? More formally, does the optimal
+constrained portfolio using the (unknown) population parameters have non-zero
+\txtSR? Can we estimate how large it is?
+\item Does the imposition of the \Mtx{G} constraint cause a material decrease
+in \txtSR? Can we estimate the size of the drop?
+\end{enumerate}
+
+These questions are related to the known tests 
+of \emph{portfolio spanning}.  \cite{KanZhou2012,BrittenJones1999,HKspan1987}
+A spanning test considers whether the optimal portfolio on a 
+pre-fixed subset of \nstrat[1] assets has the same \txtSR as the
+optimal portfolio on all \nstrat assets, \ie whether those \nstrat[1]
+assets `span' the set of all assets.
+
+If you let \Mtx{G} be the $\nstrat[1] \times \nstrat$ matrix consisting
+of the \nstrat[1] rows of the identity matrix corresponding to the
+\nstrat[1] assets to be tested for spanning, then the term
+$$
+\ssrsqoptp{\Mtx{G}} = 
+\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}
+$$
+is the squared \txtSR of the optimal portfolio on only the \nstrat[1] spanning
+assets.
+
+
+
+%UNFOLD
+
+\subsection{Optimal \txtSR under Positivity Constraint}%FOLDUP
+
+Consider the following portfolio optimization problem:
+\begin{equation}
+\max_{\sportw : \sportw \ge 0,\, \qform{\svsig}{\sportw} \le R^2} 
+\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
+\label{eqn:cons_port_posi}
+\end{equation}
+where the constraint $\sportw \ge 0$ is to be interpreted element-wise.
+
+\cite{Silvapulle1996137}
+%UNFOLD
 %UNFOLD
 
 \section{Using the \Robject{sr} Class}%FOLDUP
