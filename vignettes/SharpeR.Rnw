@@ -684,12 +684,12 @@ the risk-free rate, and $R$ is a cap on portfolio `risk' as estimated by
 imposes a `self-financing constraint' which does not actually bound portfolio
 weights.)  The solution to this problem is
 $$
-\sportwopt = \frac{R}{\sqrt{\qform{\minv{\svsig}}{\svmu}}} \minv{\svsig}\svmu.
+\sportwopt \defeq \frac{R}{\sqrt{\qform{\minv{\svsig}}{\svmu}}} \minv{\svsig}\svmu.
 $$
 The \txtSR of this portfolio is 
 \begin{equation}
 \ssropt 
-= \frac{\trAB{\sportwopt}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwopt}}} 
+\defeq \frac{\trAB{\sportwopt}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwopt}}} 
 = \sqrt{\qform{\minv{\svsig}}{\svmu}} - \frac{\rfr}{R}
 = \sqrt{\Tstat / \ssiz} - \frac{\rfr}{R},
 \label{eqn:ssr_uncons}
@@ -765,15 +765,21 @@ linear combination of the rows of \Mtx{G}. When viewed in this light, this
 problem clearly reduces to that of optimizing the portfolio on 
 \nstrat[g] assets with sample mean $\Mtx{G}\svmu$ and sample covariance
 $\qoform{\svsig}{\Mtx{G}}$. This problem has solution
-$$
+\begin{equation}
 \sportwoptG{\Mtx{G}} 
-= c\, \tr{\Mtx{G}} \minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}} \Mtx{G}\svmu,
-$$
+\defeq c\, \tr{\Mtx{G}} \minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}} \Mtx{G}\svmu,
+\label{eqn:opt_port_solve_I}
+\end{equation}
 where the constant $c$ is chosen to maximize return under the given risk
-budget. The \txtSR of this portfolio is
+budget:
+$$
+c =
+\frac{R}{\sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}}}.
+$$
+The \txtSR of this portfolio is
 \begin{equation}
 \ssroptG{\Mtx{G}} 
- = \frac{\trAB{\sportwoptG{\Mtx{G}}}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwoptG{\Mtx{G}}}}}
+\defeq \frac{\trAB{\sportwoptG{\Mtx{G}}}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwoptG{\Mtx{G}}}}}
  = \sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}}
 - \frac{\rfr}{R}.
 \end{equation}
@@ -891,8 +897,6 @@ $$
 H_0: \psnrsqoptG{\eye} = \psnrsqoptG{\Mtx{G}}.
 $$
 
-
-
 %UNFOLD
 
 \subsection{Optimal \txtSR under Positivity Constraint}%FOLDUP
@@ -904,8 +908,27 @@ Consider the following portfolio optimization problem:
 \label{eqn:cons_port_posi}
 \end{equation}
 where the constraint $\sportw \ge 0$ is to be interpreted element-wise.
+In general, the optimal portfolio, call it \sportwoptG{+}, must be found
+numerically.\footnote{Unless, by some miracle, the unconstrained optimal
+portfolio happens to satisfy the positivity constraint.}
 
-\cite{Silvapulle1996137}
+The squared \txtSR of the portfolio \sportwoptG{+} has value
+$$
+\ssrsqoptG{+} = 
+\frac{\wrapParens{\trAB{\sportwoptG{+}}{\svmu}}^2}{{\qform{\svsig}{\sportwoptG{+}}}}.
+$$
+
+Unfortunately, the sample statistic \ssrsqoptG{+} is not a \emph{similar}
+statistic.  \cite{Sen1999264} That is, it depends on the population 
+analogue, \psnrsqoptG{+}, but also on the uknown nuisance 
+parameter, \pvsig.  Using \ssrsqoptG{+} to test the
+hypothesis $H_0: \psnrsqoptG{+} = 0$ only yields a conservative test, with
+a maximal type I rate.
+\nocite{Silvapulle1996137,Perlman_1969}
+
+To a certain degree, this makes sense, since the  ...
+
+
 %UNFOLD
 %UNFOLD
 
