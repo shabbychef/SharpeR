@@ -917,17 +917,27 @@ $$
 \ssrsqoptG{+} = 
 \frac{\wrapParens{\trAB{\sportwoptG{+}}{\svmu}}^2}{{\qform{\svsig}{\sportwoptG{+}}}}.
 $$
+The statistic $\ssiz\ssrsqoptG{+}$, which is a constrained Hotelling \Tstat, 
+has been studied to test the hypothesis of zero multivariate mean against
+an inequality-constrained alternative hypothesis.  \cite{Silvapulle:1995:HTT:219373.219391,Sen1999264} 
 
-Unfortunately, the sample statistic \ssrsqoptG{+} is not a \emph{similar}
-statistic.  \cite{Sen1999264} That is, it depends on the population 
+Unfortunately, \ssrsqoptG{+} is not a \emph{similar}
+statistic.  That is, its distribution depends on the population 
 analogue, \psnrsqoptG{+}, but also on the uknown nuisance 
-parameter, \pvsig.  Using \ssrsqoptG{+} to test the
-hypothesis $H_0: \psnrsqoptG{+} = 0$ only yields a conservative test, with
-a maximal type I rate.
-\nocite{Silvapulle1996137,Perlman_1969}
+parameter, \pvsig.  And so using \ssrsqoptG{+} to test the
+hypothesis $H_0: \psnrsqoptG{+} = 0$ only yields a conservative test, 
+with a maximal type I rate. Intuitively, the Hotelling \Tstat,
+which is invariant with respect to an invertible transform, should
+not mix well with the positive-orthant constraint, which is not 
+invariant.
+\nocite{Perlman_1969,Sen20023,nla.cat-vn3800977}
 
-To a certain degree, this makes sense, since the  ...
-
+One consequence of non-similarity is that using in-sample \txtSR as 
+a yardstick of the quality of so constrained portfolio is unwise. For 
+one can imagine a set of two zero-mean assets, and another set of
+two assets with positive mean, where the differences in the covariances
+on the two sets implies that the sample optimal constrained \txtSR of the
+first set is likely to be larger than that of the second. 
 
 %UNFOLD
 %UNFOLD
@@ -1678,6 +1688,7 @@ qqunif(sr_eq.pvals)
 
 % bibliography%FOLDUP
 \nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850}
+\nocite{1307.0450}
 
 %\bibliographystyle{jss}
 \bibliographystyle{acm}

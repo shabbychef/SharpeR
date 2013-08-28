@@ -1033,12 +1033,20 @@ Classical least squares (CLS) and partial least squares (PLS) are two common mul
   publisher={Blackwell Pub.}
 }
 
+@book{rao1952,
+    author = {Rao, C. Radhakrishna},
+    title = {Advanced Statistical Methods in Biometric Research},
+  	publisher={John Wiley and Sons},
+    year = {1952},
+		pages={390}
+}
+
 @book{linmod2007,
     author = {Rao, C. Radhakrishna and Toutenburg, Helge and Shalabh and Heumann, Christian and Schomaker, Michael},
     title = {Linear Models and Generalizations: Least Squares and Alternatives, 3rd Edition},
 		publisher={Springer},
     year = {2008},
-		pages={590}}
+		pages={590}
 }
 
 @book{Kutner2004Applied,
@@ -1109,7 +1117,7 @@ keywords = "non-centrality parameter"
 	keywords = "Dependent inequality constraints",
 	keywords = "Nonstandard conditions",
 	keywords = "One-sided F-test",
-	sep_note = "Shows a connection between the chi-bar squared weights for the LRT (presumably Perlman's) and the F test for testing mu in C0 versus alternative mu in C1 minus C0, where C0 and C1 are closed convex cones; of particular interest, I suspect for finance is when C0 is the singleton zero and C1 is the positive orthant."
+	sep_note = "Shows a connection between the chi-bar squared weights for the LRT (presumably Perlman's) and the F test for testing mu in C0 versus alternative mu in C1 minus C0, where C0 and C1 are closed convex cones; of particular interest, I suspect for finance is when C0 is the singleton zero and C1 is the positive orthant. I believe the results here assume you know the covariance matrix up to a multiplicative constant, which is case ii in the parlance of Tsai and Sen, not case iii, which is of the most interest in portfolio theory. silvapulle_one_sided_F.pdf"
 }
 
 
@@ -1135,7 +1143,7 @@ keywords = "non-centrality parameter"
 
 @article{Silvapulle:1995:HTT:219373.219391,
  author = {Silvapulle, Mervyn J.},
- title = {A Hotelling's T2-type statistic for testing against one-sided hypotheses},
+ title = {A {H}otelling's {$T^2$}-type statistic for testing against one-sided hypotheses},
  journal = {J. Multivar. Anal.},
  issue_date = {Nov. 1995},
  volume = {55},
@@ -1150,7 +1158,7 @@ keywords = "non-centrality parameter"
  acmid = {219391},
  publisher = {Academic Press, Inc.},
  address = {Orlando, FL, USA},
- sep_note = "specifically looking at the Hotelling T2 for testing zero mean versus alternative of mean in the positive orthant. Shown to be asymptotically equivalent to Perlman's LRT, but to have different power in finite samples. Illustrates some differences graphically. As in Perlman's test, the weights of the chi-bar square which determine the survival function of the one-sided Hotelling statistic depend on the unknown covariance parameter. Also as in Perlman, the maximal value of the weights over all possible covariance matrices is taken to get a p-value, so the test can be very conservative. This has consequences for use in finance, since it implies some disconnect between the sample statistic and the underlying population parameters (and that disconnect changes character as the sample size increases)."
+ sep_note = "specifically looking at the Hotelling T2 for testing zero mean versus alternative of mean in the positive orthant. Shown to be asymptotically equivalent to Perlman's LRT, but to have different power in finite samples. Illustrates some differences graphically. As in Perlman's test, the weights of the chi-bar square which determine the survival function of the one-sided Hotelling statistic depend on the unknown covariance parameter. Also as in Perlman, the maximal value of the weights over all possible covariance matrices is taken to get a p-value, so the test can be very conservative. This has consequences for use in finance, since it implies some disconnect between the sample statistic and the underlying population parameters (and that disconnect changes character as the sample size increases). silvapulle_hotelling.pdf"
 }
 
 
@@ -1209,7 +1217,7 @@ keywords = "Union-intersection principle"
 	issn = "0047-259X",
 	doi = "10.1006/jmva.1998.1791",
 	url = "http://www.sciencedirect.com/science/article/pii/S0047259X98917912",
-	author = "Pranab K. Sen and Ming-Tien Tsai",
+	author = "Pranab Kumar Sen and Ming-Tien Tsai",
 	keywords = "Bartlett adjustment",
 	keywords = "M-matrix",
 	keywords = "non-null distribution",
@@ -1222,18 +1230,19 @@ keywords = "Union-intersection principle"
 	keywords = "unbiasedness"
 }
 
-@Book{ nla.cat-vn3800977,
-author = { Silvapulle, Mervyn J., and Sen, Pranab Kumar, },
-title = { Constrained statistical inference : inequality, order, and shape restrictions},
-isbn = { 0471208272 },
-publisher = { Wiley-Interscience, Hoboken, N.J. : },
-pages = { xvii, 532 p. : },
-year = { 2005 },
-type = { Book },
-language = { English },
-subjects = { Multivariate analysis. },
-life-dates = { 2005 -  },
-catalogue-url = { http://nla.gov.au/nla.cat-vn3800977 },
+@Book{nla.cat-vn3800977,
+author = {Mervyn J. Silvapulle and Pranab Kumar Sen},
+title = {Constrained statistical inference : inequality, order, and shape restrictions},
+isbn = {0471208272},
+publisher = {Wiley-Interscience, Hoboken, N.J.},
+pages = {xvii, 532 p.},
+year = {2005},
+type = {Book},
+language = {English},
+subjects = {Multivariate analysis.},
+life-dates = {2005 - },
+catalogue-url = {http://nla.gov.au/nla.cat-vn3800977},
+sep_note = "the book."
 }
 
 
@@ -1439,8 +1448,7 @@ abstract = { ABSTRACT Several years ago Sharpe suggested a measure for the evalu
      publisher = {American Statistical Association},
      copyright = {Copyright © 1975 American Statistical Association},
     }
-% Kubokawa, T., C. P. Robert, and A. K. Saleh. "Estimation of noncentrality parameters." Canadian Journal of Statistics 21, no. 1 (1993): 45-57.
-																																																														
+		
 @article{kubokawa1993estimation,
   title={Estimation of noncentrality parameters},
   author={Kubokawa, Tatsuya and Robert, C. P. and Saleh, A. K. Md. E.},
@@ -1629,9 +1637,10 @@ url1 = {http://EconPapers.repec.org/RePEc:ner:tilbur:urn:nbn:nl:ui:12-365641}
 
 @misc{1307.0450,
 Author = {M. Andrecut},
-Title = {Portfolio Optimization in R},
+Title = {Portfolio Optimization in {R}},
 Year = {2013},
 Eprint = {arXiv:1307.0450},
+url = {http://arxiv.org/abs/1307.0450},
 }
 
 @article{Leung2008,
