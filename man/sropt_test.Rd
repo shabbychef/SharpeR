@@ -58,7 +58,7 @@
   mu = delta_0^2}
 
   The default alternative hypothesis is the one-sided
-  \deqn{H_0: \mu^{\top}\Sigma^{-1}\mu > \delta_0^2}{H0: mu'
+  \deqn{H_1: \mu^{\top}\Sigma^{-1}\mu > \delta_0^2}{H1: mu'
   Sigma^-1 mu > delta_0^2} but this can be set otherwise.
 
   Note there is no 'drag' term here since this represents a

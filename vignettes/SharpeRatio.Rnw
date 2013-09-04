@@ -489,8 +489,7 @@ opt.pos.T2 <- function(mu1,mu2,sig1,sig12,sig2) {
 %UNFOLD
 
 % bibliography%FOLDUP
-\nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850}
-\nocite{1307.0450}
+\nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850,sref2011}
 
 %\bibliographystyle{jss}
 %\bibliographystyle{siam}

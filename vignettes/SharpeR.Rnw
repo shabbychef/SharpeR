@@ -487,23 +487,31 @@ cat(sprintf("the aspect ratio is %2.2f yr^{-1}\n",aspect.ratio))
 \subsection{The Haircut}%FOLDUP
 
 Care must be taken interpreting the confidence intervals and the estimated
-optimal SNR. This is because \psnropt is the \emph{maximal} population SNR achieved 
-by any portfolio; it is at least equal to, and potentially much larger than, 
-the SNR achieved by the portfolio based on sample statistics, \sportwopt. There
-is a gap or `haircut' due to mis-estimation of the optimal portfolio. One would
-suspect that this gap is worse when the true effect size (\ie \psnropt) is
-smaller, when there are fewer observations (\ssiz), and when there are more
-assets (\nlatf).
+optimal SNR. This is because \psnropt is the \emph{maximal} population 
+SNR achieved by any portfolio; it is at least equal to, and potentially much
+larger than, the SNR achieved by the portfolio based on sample statistics,
+\sportwopt. There is a gap or `haircut' due to mis-estimation of the optimal
+portfolio. One would suspect that this gap is worse when the true effect size
+(\ie \psnropt) is smaller, when there are fewer observations (\ssiz), and when
+there are more assets (\nlatf).
 
-I define the haircut as the quantity
+Assuming \pvmu is not all zeros, define the haircut as the quantity
 \begin{equation}
-\hcut \defeq 1 - \frac{\trAB{\sportwopt}{\pvmu}}{\psnropt\sqrt{\qform{\pvsig}{\sportwopt}}}
+\hcut \defeq 1 - \frac{1}{\psnropt}\frac{\trAB{\sportwopt}{\pvmu}}{\sqrt{\qform{\pvsig}{\sportwopt}}}
 = 1 - \wrapParens{\frac{\trAB{\sportwopt}{\pvmu}}{\trAB{\pportwopt}{\pvmu}}}
 \wrapParens{\frac{\sqrt{\qform{\pvsig}{\pportwopt}}}{\sqrt{\qform{\pvsig}{\sportwopt}}}},
 \label{eqn:hcut_def}
 \end{equation}
 where \pportwopt is the population optimal portfolio, positively proportional
-to $\minv{\pvsig}{\pvmu}.$ Modeling the haircut is not straightforward
+to $\minv{\pvsig}{\pvmu}.$ Thus the haircut is one minus the ratio of 
+population SNR achieved by the sample Markowitz portfolio to the 
+optimal population SNR (which is achieved by the population Markowitz
+portfolio). A smaller value means that the sample portfolio achieves
+a larger proportion of possible SNR, or, equivalently, a larger value of
+the haircut means greater mis-estimation of the optimal portfolio.
+The haircut takes values in $\wrapBracks{0,2}$.
+
+Modeling the haircut is not straightforward
 because it is a random quantity which is not observed. That is, it mixes the
 unknown population parameters \pvsig and \pvmu with the sample quantity
 \sportwopt, which is random. 
@@ -931,8 +939,8 @@ qqunif(sr_eq.pvals)
 %UNFOLD
 
 % bibliography%FOLDUP
-\nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850}
-\nocite{1307.0450,sref2011}
+\nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850,sref2011}
+\nocite{1307.0450}
 
 %\bibliographystyle{jss}
 %\bibliographystyle{ieeetr}

@@ -795,47 +795,43 @@ power.sropt_test <- function(df1=NULL,df2=NULL,zeta.s=NULL,
 
 #UNFOLD
 
-# spanning tests
-#' @title spanning test for sub-portfolio.
-#'
-#' @description 
-#'
-#' Performs a test of portfolio spanning.
-#'
-#' @details 
-#'
-#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
-#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
-#' \eqn{\Sigma}{Sigma}. Let \eqn{G} be some \eqn{n_g \times p}{n_g x p} matrix
-#' of rank \eqn{n_g}{n_g}. Let 
-#' optimization problem
-#' \deqn{\zeta_* = \max_w \frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta* = max w (w'mu)/sqrt(w'Sigma w)}
-#' Let \eqn{zeta_{*,G}{zeta*G} be the maximum of the same problem subject
-#' to the constraint \eqn{G \Sigma w = 0}{G Sigma w = 0}.
-#'
-#' A spanning test tests the hypothesis
-#' \deqn{H_0: \zeta_* = \zeta_{*,G}}{H0: zeta* = zeta*G}
-#' against the alternative hypothesis
-#' \deqn{H_1: \zeta_* > \zeta_{*,G}}{H0: zeta* > zeta*G}
-#'
-#' The spanning test also provides estimates and confidence intervals on the
-#' difference
-#' \deqn{\Delta\zeta_*^2 = \zeta_*^2 - \zeta_{*,G}^2}{Delta zeta*^2 = zeta*^2 - zeta*G^2}
-#' 
-#' @usage
-#'
-#' 2FIX: start here ... 
-#'
-#' @template etc
-#' @template sropt
-#' @template ref-JW
-#'@export
+# spanning tests #FOLDUP
+# ' @title spanning test for sub-portfolio.
+# '
+# ' @description 
+# '
+# ' Performs a test of portfolio spanning.
+# '
+# ' @details 
+# '
+# ' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+# ' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+# ' \eqn{\Sigma}{Sigma}. Let \eqn{G} be some \eqn{n_g \times p}{n_g x p} matrix
+# ' of rank \eqn{n_g}{n_g}. Let 
+# ' optimization problem
+# ' \deqn{\zeta_* = \max_w \frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta* = max w (w'mu)/sqrt(w'Sigma w)}
+# ' Let \eqn{zeta_{*,G}{zeta*G} be the maximum of the same problem subject
+# ' to the constraint \eqn{G \Sigma w = 0}{G Sigma w = 0}.
+# '
+# ' A spanning test tests the hypothesis
+# ' \deqn{H_0: \zeta_* = \zeta_{*,G}}{H0: zeta* = zeta*G}
+# ' against the alternative hypothesis
+# ' \deqn{H_1: \zeta_* > \zeta_{*,G}}{H0: zeta* > zeta*G}
+# '
+# ' The spanning test also provides estimates and confidence intervals on the
+# ' difference
+# ' \deqn{\Delta\zeta_*^2 = \zeta_*^2 - \zeta_{*,G}^2}{Delta zeta*^2 = zeta*^2 - zeta*G^2}
+# ' 
+# ' @usage
+# '
+# ' 2FIX: start here ... 
+# '
+# ' @template etc
+# ' @template sropt
+# ' @template ref-JW
+# ' @export
 
 #UNFOLD
-
-
-
-
 
 #for vim modeline: (do not edit)
 # vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r
