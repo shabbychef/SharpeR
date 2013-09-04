@@ -89,7 +89,7 @@ SUPPORT_FILES 		 = ./DESCRIPTION ./NAMESPACE ./ChangeLog $(RD_DUMMY) ./inst/CITA
 
 # for building the package.tgz
 #BUILD_FLAGS 			?= --compact-vignettes
-BUILD_FLAGS 			?= --compact-vignettes="gs+qpdf"
+BUILD_FLAGS 			?= --compact-vignettes="gs+qpdf" --resave-data=best
 BUILD_ENV 				 = R_QPDF=$(R_QPDF) R_GSCMD=$(R_GSCMD) \
 									 GS_QUALITY=$(GS_QUALITY)
 

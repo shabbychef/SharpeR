@@ -151,7 +151,8 @@ perform inference on the population analogues using the sample statistics.
 
 The importance of each of these assumptions (\viz homoskedasticity,
 independence, normality, \etc) can and should be checked. 
-\cite{Lumley:2002,Opdyke2007} The reader must be warned that this package is distributed without any warranty
+\cite{Lumley:2002,Opdyke2007} 
+The reader must be warned that this package is distributed without any warranty
 of any kind, and in no way should any analysis performed with this package be
 interpreted as implicit investment advice by the author(s).
 
@@ -180,6 +181,9 @@ stocks at the start of the period, then \trAB{\vreti}{\sportw} is the
 arithmetic return of the portfolio over that period. This holds even when the
 portfolio holds some stocks `short.'  Often this portfolio accounting is
 misapplied to geometric returns without even an appeal to Taylor's theorem.
+
+For more details on the \txtSR and portfolio optimization, see the 
+vignette, ``Statistics of the \txtSR'' distributed with this package.
 %UNFOLD
 
 \section{Using the \Robject{sr} Class}%FOLDUP
@@ -928,7 +932,7 @@ qqunif(sr_eq.pvals)
 
 % bibliography%FOLDUP
 \nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850}
-\nocite{1307.0450}
+\nocite{1307.0450,sref2011}
 
 %\bibliographystyle{jss}
 %\bibliographystyle{ieeetr}
