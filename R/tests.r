@@ -608,7 +608,8 @@ power.sr_test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #'             zeta.s=0,ope=1,conf.level=0.95)
 #'
 #' @param X a (non-empty) numeric matrix of data values, each row independent,
-#        each column representing an asset.
+#'       each column representing an asset, or an object of 
+#'       class \code{sropt}.
 #' @param alternative a character string specifying the alternative hypothesis,
 #'       must be one of \code{"two.sided"}, \code{"greater"} (default) or
 #'       \code{"less"}.  You can specify just the initial letter.
@@ -638,6 +639,16 @@ power.sr_test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #' plot(ecdf(pvs))
 #' abline(0,1,col='red') 
 #' 
+#' # input a sropt objects:
+#' nfac <- 5
+#' nyr <- 10
+#' ope <- 253
+#' # simulations with no covariance structure.
+#' # under the null:
+#' set.seed(as.integer(charToRaw("be determinstic")))
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
+#' stest <- sropt_test(asro,alternative="two.sided")
 #'
 #'@export
 sropt_test <- function(X,alternative=c("greater","two.sided","less"),
@@ -651,7 +662,13 @@ sropt_test <- function(X,alternative=c("greater","two.sided","less"),
 		stop("'conf.level' must be a single number between 0 and 1")
 
 	dname <- deparse(substitute(X))
-	subtest <- as.sropt(X,ope=ope)
+	if (is.sropt(X)) {
+		subtest <- X
+		if (!is.null(ope))  
+			subtest <- reannualize(subtest,new.ope=ope)
+	} else {
+		subtest <- as.sropt(X,ope=ope)
+	}
 	statistic <- subtest$T2
 	names(statistic) <- "T2"
 	estimate <- subtest$sropt
@@ -676,6 +693,7 @@ sropt_test <- function(X,alternative=c("greater","two.sided","less"),
 	names(df1) <- "df1"
 	names(df2) <- "df2"
 	df <- c(df1,df2)
+	names(zeta.s) <- "optimal signal-noise ratio"
 	#attr(cint, "conf.level") <- conf.level
 	retval <- list(statistic = statistic, parameter = df,
 								 estimate = estimate, p.value = pval, 
@@ -796,40 +814,49 @@ power.sropt_test <- function(df1=NULL,df2=NULL,zeta.s=NULL,
 #UNFOLD
 
 # spanning tests #FOLDUP
-# ' @title spanning test for sub-portfolio.
-# '
-# ' @description 
-# '
-# ' Performs a test of portfolio spanning.
-# '
-# ' @details 
-# '
-# ' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
-# ' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
-# ' \eqn{\Sigma}{Sigma}. Let \eqn{G} be some \eqn{n_g \times p}{n_g x p} matrix
-# ' of rank \eqn{n_g}{n_g}. Let 
-# ' optimization problem
-# ' \deqn{\zeta_* = \max_w \frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta* = max w (w'mu)/sqrt(w'Sigma w)}
-# ' Let \eqn{zeta_{*,G}{zeta*G} be the maximum of the same problem subject
-# ' to the constraint \eqn{G \Sigma w = 0}{G Sigma w = 0}.
-# '
-# ' A spanning test tests the hypothesis
-# ' \deqn{H_0: \zeta_* = \zeta_{*,G}}{H0: zeta* = zeta*G}
-# ' against the alternative hypothesis
-# ' \deqn{H_1: \zeta_* > \zeta_{*,G}}{H0: zeta* > zeta*G}
-# '
-# ' The spanning test also provides estimates and confidence intervals on the
-# ' difference
-# ' \deqn{\Delta\zeta_*^2 = \zeta_*^2 - \zeta_{*,G}^2}{Delta zeta*^2 = zeta*^2 - zeta*G^2}
-# ' 
-# ' @usage
-# '
-# ' 2FIX: start here ... 
-# '
-# ' @template etc
-# ' @template sropt
-# ' @template ref-JW
-# ' @export
+#' @title spanning test for sub-portfolio.
+#'
+#' @description 
+#'
+#' Performs a test of portfolio spanning.
+#'
+#' @details 
+#'
+#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+#' \eqn{\Sigma}{Sigma}. Let \eqn{G} be some \eqn{n_g \times p}{n_g x p} matrix
+#' of rank \eqn{n_g}{n_g}. Let 
+#' \deqn{\Delta\zeta_{*} = \max_{w\,: G\Sigma w = 0}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{Delta zeta* = max {(w'mu)/sqrt(w'Sigma w)|G Sigma w = 0}}
+#'
+#' A spanning test tests the hypothesis
+#' \deqn{H_0: \Delta \zeta_{*} = 0}{H0: Delta zeta* = 0}
+#' against the alternative hypothesis
+#' \deqn{H_1: \Delta \zeta_{*} > 0}{H0: Delta zeta* > 0}
+#'
+#' An alternative formulation, is as follows. Let
+#' \deqn{\zeta_{*,I} = \max_{w\,: w = I v}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta*,I = max {(w'mu)/sqrt(w'Sigma w)|w = I v}}
+#' and, similarly, let
+#' \deqn{\zeta_{*,G} = \max_{w\,: w = G v}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta*,G = max {(w'mu)/sqrt(w'Sigma w)|w = G v}}
+#'
+#' Then
+#' \deqn{\left(\Delta\zeta_{*}\right)^2 = \zeta_{*,I}^2 - \zeta_{*,G}^2}{(Delta zeta*)^2 = zeta*,I^2 - zeta*,G^2}
+#' And so the spanning test tests 
+#' \deqn{H_0: \zeta_{*,I}^2 = \zeta_{*,G}^2}{H0: zeta*,I^2 = zeta*,G^2}
+#' against the alternative hypothesis
+#' \deqn{H_1: \zeta_{*,I}^2 > \zeta_{*,G}^2}{H0: zeta*,I^2 > zeta*,G^2}
+#'
+#' The spanning test also provides estimates and confidence intervals on the
+#' difference 
+#' \eqn{\zeta_{*,I}^2 - \zeta_{*,G}^2}{zeta*,I^2 - zeta*,G^2}
+#' 
+#' @usage
+#'
+#' 2FIX: start here ... 
+#'
+#' @template etc
+#' @template sropt
+#' @template ref-JW
+#' @export
 
 #UNFOLD
 

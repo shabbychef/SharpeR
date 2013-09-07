@@ -917,5 +917,137 @@ qco_sropt <- Vectorize(.qco_sropt,
 											SIMPLIFY = TRUE)
 #UNFOLD
 
+# co-F
+# pco_f, qco_f#FOLDUP
+#  ' @title The 'confidence distribution' for non-central F distribution.
+#  '
+#  ' @description 
+#  '
+#  ' Distribution function and quantile function for the 'confidence
+#  ' distribution' of the non-central F distribution. This is just an inversion
+#  ' to perform inference on \eqn{\lambda}{lambda} given observed statistic 
+#  ' \eqn{F}.
+#  '
+#  ' @details
+#  ' 
+#  ' Suppose \eqn{x} follows a non-central F distribution
+#  ' for known degrees of freedom, and 
+#  ' unknown non-centrality parameter \eqn{\lambda}{lambda}. The 
+#  ' 'confidence distribution' views \eqn{\lambda}{lambda} as a random
+#  ' quantity once \eqn{x} is observed. As such, the CDF of
+#  ' the confidence distribution is the same as that of the 
+#  ' non-central F distribution (up to a flip of \code{lower.tail});
+#  ' while the quantile function is used to compute confidence
+#  ' intervals on \eqn{\lambda}{lambda} given \eqn{x}{x}.
+#  '
+#  ' @usage
+#  '
+#  ' pco_f(q,df1,df2,x,lower.tail=TRUE,log.p=FALSE) 
+#  '
+#  ' qco_f(p,df1,df2,x,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
+#  '
+#  ' @param q vector of quantiles.
+#  ' @param p vector of probabilities.
+#  ' @param x an observed statistic following a non-central F distribution.
+#  ' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#  ' @param lower.tail logical; if TRUE (default), probabilities are
+#  '        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
+#  ' @param lb the lower bound for the output of \code{qco_f}.
+#  ' @param ub the upper bound for the output of \code{qco_f}.
+#  ' @inheritParams qf
+#  ' @keywords distribution 
+#  ' @return \code{pco_f} gives the distribution function, and
+#  ' \code{qco_f} gives the quantile function.
+#  '
+#  ' Invalid arguments will result in return value \code{NaN} with a warning.
+#  ' @aliases qco_f 
+#  ' @seealso \code{\link{pf},\link{qf}}
+#  ' @export 
+#  ' @template etc
+#  ' @note
+#  ' When \code{lower.tail} is true, \code{pco_f} is monotonic increasing 
+#  ' with respect to \code{q}, and decreasing in \code{x}; these are reversed
+#  ' when \code{lower.tail} is false. Similarly, \code{qco_f} is increasing
+#  ' in \code{sign(as.double(lower.tail) - 0.5) * p} and
+#  ' \code{- sign(as.double(lower.tail) - 0.5) * x}.
+#  '
+#  ' @examples 
+#  '
+#  '
+pco_f <- function(q,df1,df2,x,lower.tail=TRUE,log.p=FALSE) {
+	# delegate
+	retv <- pf(q=x,df1=df1,df2=df2,ncp=q,
+						 lower.tail=!lower.tail,log.p=log.p)  # sic the tail reversal
+	return(retv)
+}
+# create a scalar function that we later vectorize. 
+# 
+# this inverts pco_f; note that when lower.tail=TRUE,
+# pco_f is increasing in q, but decreasing in x.
+# pco_f only accepts non-negative q 
+#
+# here we try to find lb <= q < ub such that
+# pco_f(q,df1,df2,x,ope,lower.tail,log.p) = p
+# however, there may be no such q, since we are limited to
+# the range [lp,up) where
+# lp = pco_f(lb,df1,df2,x,ope,lower.tail,log.p)
+# up = pco_f(ub,df1,df2,x,ope,lower.tail,log.p)
+# if p < lp we return lb;
+# if q >= up, we return ub;
+.qco_f <- function(p,df1,df2,x,lower.tail=TRUE,log.p=FALSE,
+												lb=0,ub=Inf) {
+	if ((lb > ub) || (is.infinite(lb)) || (min(lb,ub) < 0))
+		stop("nonsensical lb and/or ub")
+
+	eqv.p <- if (log.p) exp(p) else p
+
+	if (eqv.p == 1)
+		return(ifelse(lower.tail,Inf,0))
+	if (eqv.p == 0)
+		return(ifelse(lower.tail,0,Inf))
+	if ((eqv.p < 0) || (eqv.p > 1))
+		return (NaN)
+
+	# create a function increasing in its argument that
+	# we wish to zero
+	# do *not* pass on ope b/c this function is a tight loop
+	if (lower.tail) {
+		zerf <- function(q) {
+			pco_f(q,df1=df1,df2=df2,x=x,lower.tail=lower.tail,log.p=log.p) - p
+		}
+	} else {
+		zerf <- function(q) {
+			p - pco_f(q,df1=df1,df2=df2,x=x,lower.tail=lower.tail,log.p=log.p)
+		}
+	}
+	flb <- zerf(lb)
+	if (flb > 0)
+		return(lb)
+	if (is.infinite(ub)) {
+		ub <- 1 + lb
+		fub <- zerf(ub)
+		while ((fub < 0) && (!is.infinite(ub))) {
+			ub <- 2 * ub
+			fub <- zerf(ub)
+		}
+		if (is.infinite(ub) && (fub < 0)) 
+			return(ub)
+	} else {
+		fub <- zerf(ub)
+		if (fub < 0)
+			return(ub)
+	}
+
+	ncp <- uniroot(zerf,interval=c(lb,ub),
+								 f.lower=flb,f.upper=fub)
+	retv <- ncp$root
+	return(retv)
+}
+#  ' @export 
+qco_f <- Vectorize(.qco_f,
+									 vectorize.args = c("p","df1","df2","x"),
+									 SIMPLIFY = TRUE)
+#UNFOLD
+
 #for vim modeline: (do not edit)
 # vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r

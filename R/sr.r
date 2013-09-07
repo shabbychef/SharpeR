@@ -590,6 +590,8 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 	if (is.null(T2)) 
 		T2 <- .sropt2T(retval)
 	retval$T2 <- T2
+	# not sure I should do this ...
+	retval$pval <- pT2(T2,retval$df1,retval$df2,lower.tail=FALSE)
 	class(retval) <- "sropt"
 	return(retval)
 }
@@ -793,6 +795,12 @@ print.sropt <- function(x,...) {
 	z.star <- .annualize(z.star,x$ope)
 	z.star <- z.star - x$drag
 	return(z.star)
+}
+get.T2 <- function(x) {
+	return(x$T2)
+}
+get.pval <- function(x) {
+	return(x$pval)
 }
 #UNFOLD
 #UNFOLD
