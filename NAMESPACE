@@ -1,5 +1,6 @@
 export(as.sr)
 export(as.sropt)
+export(del_sropt)
 export(dsr)
 export(dsropt)
 export(inference)

@@ -69,6 +69,8 @@ print(roll.own)
 rvs <- rsropt(5,df1,df2,zeta.s,ope,drag=0)
 roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 print(roll.own)
+
+FUCK. 2FIX
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
@@ -79,10 +81,13 @@ print(roll.own)
   \code{\link{as.sropt}}
 
   Other sropt: \code{\link{as.sropt}},
+  \code{\link{as.sropt}}, \code{\link{as.sropt.default}},
   \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
-  \code{\link{confint.sropt}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
+  \code{\link{as.sropt.xts}}, \code{\link{as.sropt.xts}},
+  \code{\link{confint.sr}}, \code{\link{confint.sropt}},
+  \code{\link{del_sropt}}, \code{\link{dsropt}},
+  \code{\link{is.sropt}}, \code{\link{is.sropt}},
+  \code{\link{power.sropt_test}},
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{sropt_test}}
 }

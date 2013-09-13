@@ -6,6 +6,8 @@
   \method{print}{sr} (x, ...)
 
   \method{print}{sropt} (x, ...)
+
+  \method{print}{sropt} (x, ...)
 }
 \arguments{
   \item{x}{an object of class \code{sr} or \code{sropt}.}

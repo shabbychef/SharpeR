@@ -1,4 +1,4 @@
-%\VignetteEngine{knitr:knitr}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Statistics of the Sharpe ratio}
 %\VignetteKeyword{Finance}
 %\VignetteKeyword{Sharpe}

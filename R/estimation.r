@@ -36,6 +36,7 @@
 ########################################################################
 # Estimation 
 
+# variance covariance#FOLDUP
 # variance/covariance of SR based on observations;
 # feed in an n x p matrix of returns and a function
 # which computes a variance-covariance matrix from
@@ -73,8 +74,7 @@ sr_vcov <- function(X,vcov.func=vcov) {
 	retval <- list(p=p,SR=SR,Ohat=Ohat)
 	return(retval)
 }
-
-
+#UNFOLD
 
 # inference on the t-stat#FOLDUP
 
@@ -191,6 +191,8 @@ se.sr <- function(z, type=c("t","Lo")) {
 	retval <- .t2sr(z,retval)
 	return(retval)
 }
+# do not have to include this, as confint is a generic provided
+# by R. I think.
 #  ' @usage
 #  '
 #  ' confint(object,level=0.95,level.lo=(1-level)/2,level.hi=1-level.lo,...)
@@ -198,6 +200,7 @@ se.sr <- function(z, type=c("t","Lo")) {
 							 #level.lo=(1-level)/2,level.hi=1-level.lo,...) {
 	#UseMethod("confint", object)
 #}
+
 #' @title Confidence Interval on (optimal) Signal-Noise Ratio
 #'
 #' @description 

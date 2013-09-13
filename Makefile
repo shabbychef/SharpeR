@@ -105,6 +105,8 @@ INSTALL_FLAGS 		?= --preclean --library=$(LOCAL)
 
 TEST_PRAGMA     	?= release
 
+GIT_BRANCH 				?= master
+
 # for R CMD build
 ifeq ($(TEST_PRAGMA),thorough)
 	# noop
@@ -426,10 +428,10 @@ realclean : clean
 ################################
 
 gitpush :
-	git push origin master
+	git push origin $(GIT_BRANCH)
 
 gitpull :
-	git pull origin master
+	git pull origin $(GIT_BRANCH)
 
 tag :
 	@-echo "git tag -a r$(VERSION) -m 'release $(VERSION)'"

@@ -1,4 +1,4 @@
-%\VignetteEngine{knitr:knitr}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Using the SharpeR Package}
 %\VignetteKeyword{Finance}
 %\VignetteKeyword{Sharpe}

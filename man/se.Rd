@@ -80,8 +80,8 @@ anse <- se(asr,type="Lo")
   \code{\link{confint.sr}}, \code{\link{confint.sropt}},
   \code{\link{dsr}}, \code{\link{is.sr}},
   \code{\link{power.sr_test}}, \code{\link{print.sr}},
-  \code{\link{print.sropt}}, \code{\link{reannualize}},
-  \code{\link{reannualize.sr}},
+  \code{\link{print.sropt}}, \code{\link{print.sropt}},
+  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{sr}},
   \code{\link{sr_equality_test}}, \code{\link{sr_test}}
 }

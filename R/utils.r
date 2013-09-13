@@ -47,6 +47,15 @@
 
 # the mean gram 
 #.mean.gram <- function(X) { (t(X) %*% X) / dim(X)[1] }
+
+# quadratic forms
+.qform <- function(bread,meat) {
+	return(t(bread) %*% (meat %*% bread))
+}
+# and 'outter' 
+.qoform <- function(bread,meat) {
+	return(bread %*% (meat %*% t(bread)))
+}
 #UNFOLD
 
 # stats utils#FOLDUP

@@ -64,15 +64,18 @@ roll.daily <- reannualize(roll.own,new.ope=1,new.epoch="day")
   \code{\link{confint.sr}}, \code{\link{confint.sropt}},
   \code{\link{dsr}}, \code{\link{is.sr}},
   \code{\link{power.sr_test}}, \code{\link{print.sr}},
-  \code{\link{print.sropt}}, \code{\link{se}},
-  \code{\link{se.sr}}, \code{\link{sr}},
+  \code{\link{print.sropt}}, \code{\link{print.sropt}},
+  \code{\link{se}}, \code{\link{se.sr}}, \code{\link{sr}},
   \code{\link{sr_equality_test}}, \code{\link{sr_test}}
 
   Other sropt: \code{\link{as.sropt}},
+  \code{\link{as.sropt}}, \code{\link{as.sropt.default}},
   \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
-  \code{\link{confint.sropt}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
-  \code{\link{sropt}}, \code{\link{sropt_test}}
+  \code{\link{as.sropt.xts}}, \code{\link{as.sropt.xts}},
+  \code{\link{confint.sr}}, \code{\link{confint.sropt}},
+  \code{\link{del_sropt}}, \code{\link{dsropt}},
+  \code{\link{is.sropt}}, \code{\link{is.sropt}},
+  \code{\link{power.sropt_test}}, \code{\link{sropt}},
+  \code{\link{sropt_test}}
 }
 
