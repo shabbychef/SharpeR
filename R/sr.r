@@ -807,6 +807,7 @@ get.T2 <- function(x) {
 get.pval <- function(x) {
 	return(x$pval)
 }
+<<<<<<< HEAD
 #UNFOLD
 #UNFOLD
 
