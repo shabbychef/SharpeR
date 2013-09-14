@@ -887,7 +887,6 @@ get.pval <- function(x) {
 #' roll.own <- sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,del_df=del_df,ope=ope)
 #' print(roll.own)
 #'
-#' del_sropt(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr")
 del_sropt <- function(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr") {
 	retval <- list(sropt = z.s,sroptsub = z.sub,
 								 df1 = df1,df2 = df2,del_df = del_df,
@@ -899,41 +898,35 @@ del_sropt <- function(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr") {
 	class(retval) <- "del_sropt"
 	return(retval)
 }
-#' @title Compute the Sharpe ratio of the Markowitz portfolio.
+#' @title Compute the Sharpe ratio of a hedged Markowitz portfolio.
 #'
 #' @description 
 #'
-#' Computes the Sharpe ratio of the Markowitz portfolio of some observed returns.
+#' Computes the Sharpe ratio of the hedged Markowitz portfolio of some observed returns.
 #'
 #' @details
 #' 
 #' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
 #' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
-#' \eqn{\Sigma}{Sigma}. Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
-#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). Let
+#' \eqn{\Sigma}{Sigma}. Let \eqn{G} be a \eqn{g \times q}{g x q} matrix
+#' of rank \eqn{g}.
+#' Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and 
+#' \eqn{S}{S} be the sample covariance matrix (using Bessel's correction). 
+#' Let
 #' \deqn{\zeta(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w) = (w'xbar - c0)/sqrt(w'Sw)}
 #' be the (sample) Sharpe ratio of the portfolio \eqn{w}{w}, subject to 
 #' risk free rate \eqn{c_0}{c0}.
 #'
-#' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
-#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2},}
+#' Let \eqn{w_*}{w*} be the solution to the portfolio optimization 
+#' problem:
+#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2,\,G S w = 0} \zeta(w),}{max {zeta(w) | 0 < w'Sw <= R^2, G S w = 0},}
 #' with maximum value \eqn{z_* = \zeta\left(w_*\right)}{z* = zeta(w*)}.
-#' Then 
-#' \deqn{w_* = R \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
-#' w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)}
-#' and
-#' \deqn{z_* = \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
-#' z* = sqrt(xbar' S^-1 xbar) - c0/R}
-#'
-#' The units of \eqn{z_*}{z*} are \eqn{\mbox{time}^{-1/2}}{per root time}.
-#' Typically the Sharpe ratio is \emph{annualized} by multiplying by
-#' \eqn{\sqrt{\mbox{ope}}}{sqrt(ope)}, where \eqn{\mbox{ope}}{ope} 
-#' is the number of observations
-#' per year (or whatever the target annualization epoch.)
 #'
 #' Note that if \code{ope} and \code{epoch} are not given, the 
 #' converter from \code{xts} attempts to infer the observations per epoch,
 #' assuming yearly epoch.
+#'
+#' 2FIX: start here.
 #'
 #' @usage
 #'
@@ -1032,11 +1025,11 @@ as.sropt.xts <- function(X,drag=0,ope=1,epoch="yr") {
 	retval <- as.sropt.default(X,drag=drag,ope=ope,epoch=epoch)
 	return(retval)
 }
-#' @title Is this in the "sropt" class?
+#' @title Is this in the "del_sropt" class?
 #'
 #' @description 
 #'
-#' Checks if an object is in the class \code{'sropt'}
+#' Checks if an object is in the class \code{'del_sropt'}
 #'
 #' @details
 #'
@@ -1044,27 +1037,21 @@ as.sropt.xts <- function(X,drag=0,ope=1,epoch="yr") {
 #'
 #' @usage
 #'
-#' is.sropt(x)
+#' is.del_sropt(x)
 #'
 #' @param x an object of some kind.
 #' @return a boolean.
-#' @seealso sropt
+#' @seealso del_sropt
 #' @template etc
-#' @family sropt
+#' @family del_sropt
 #' @export
 #'
 #' @examples 
-#' nfac <- 5
-#' nyr <- 10
-#' ope <- 253
-#' # simulations with no covariance structure.
-#' # under the null:
-#' set.seed(as.integer(charToRaw("be determinstic")))
-#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
-#' asro <- as.sropt(Returns,drag=0,ope=ope)
-#' is.sropt(asro)
-is.sropt <- function(x) inherits(x,"sropt")
+#' roll.own <- sropt(z.s=2,z.sub=1,df1=10,df2=1000,del_df=3,ope=1,epoch="yr")
+#' is.sropt(roll.own)
+is.del_sropt <- function(x) inherits(x,"del_sropt")
 
+#' 2FIX: start here.
 #' @rdname print
 #' @method print sropt
 #' @S3method print sropt
