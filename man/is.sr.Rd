@@ -33,7 +33,7 @@ is.sr(rvs)
   \code{\link{as.sr.timeSeries}}, \code{\link{as.sr.xts}},
   \code{\link{confint.sr}}, \code{\link{confint.sropt}},
   \code{\link{dsr}}, \code{\link{power.sr_test}},
-  \code{\link{print.sr}}, \code{\link{print.sropt}},
+  \code{\link{print.del_sropt}}, \code{\link{print.sr}},
   \code{\link{print.sropt}}, \code{\link{reannualize}},
   \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{se}},

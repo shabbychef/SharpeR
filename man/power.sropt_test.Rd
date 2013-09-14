@@ -67,13 +67,11 @@ anex <- power.sropt_test(8,4*253,1,0.05,NULL,ope=253)
   \code{\link{power.t.test}}, \code{\link{sropt_test}}
 
   Other sropt: \code{\link{as.sropt}},
-  \code{\link{as.sropt}}, \code{\link{as.sropt.default}},
   \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.xts}}, \code{\link{as.sropt.xts}},
-  \code{\link{confint.sr}}, \code{\link{confint.sropt}},
-  \code{\link{del_sropt}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{is.sropt}},
-  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
+  \code{\link{confint.sropt}}, \code{\link{dsropt}},
+  \code{\link{is.sropt}}, \code{\link{reannualize}},
+  \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{sropt}},
   \code{\link{sropt_test}}
 }

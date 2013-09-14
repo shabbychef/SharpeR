@@ -103,7 +103,7 @@ print(summary(ssizes * zetas * zetas - exp(1)))
   \code{\link{as.sr.timeSeries}}, \code{\link{as.sr.xts}},
   \code{\link{confint.sr}}, \code{\link{confint.sropt}},
   \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{print.sr}}, \code{\link{print.sropt}},
+  \code{\link{print.del_sropt}}, \code{\link{print.sr}},
   \code{\link{print.sropt}}, \code{\link{reannualize}},
   \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{se}},

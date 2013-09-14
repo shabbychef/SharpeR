@@ -40,7 +40,19 @@
   defaulting to 'yr'.}
 }
 \value{
-  a list cast to class \code{del_sropt}.
+  a list cast to class \code{del_sropt}, with attributes
+  \item{sropt}{the optimal Sharpe statistic.}
+  \item{sropt.sub}{the optimal Sharpe statistic on the
+  subspace.} \item{df1}{the number of assets.}
+  \item{df2}{the number of observed vectors.}
+  \item{del_df}{the input \code{del_df} term.}
+  \item{drag}{the input \code{drag} term.} \item{ope}{the
+  input \code{ope} term.} \item{T2}{the Hotelling \eqn{T^2}
+  statistic.} \item{T2.sub}{the Hotelling \eqn{T^2}
+  statistic on the subspace.}
+
+  roll.own <-
+  sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,del_df=del_df,ope=ope)
 }
 \description{
   Spawns an object of class \code{del_sropt}.
@@ -84,10 +96,8 @@ wsub <- solve(Sigma[1:5,1:5],mu[1:5])
 zsub <- t(mu[1:5]) \%*\% wsub
 del_df <- length(w) - length(wsub)
 
-roll.own <- sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,del_df=del_df,ope=ope)
+roll.own <- del_sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,del_df=del_df,ope=ope)
 print(roll.own)
-
-del_sropt(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr")
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
@@ -97,16 +107,10 @@ del_sropt(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr")
 
   \code{\link{as.del_sropt}}
 
-  Other sropt: \code{\link{as.sropt}},
-  \code{\link{as.sropt}}, \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.xts}}, \code{\link{as.sropt.xts}},
-  \code{\link{confint.sr}}, \code{\link{confint.sropt}},
-  \code{\link{dsropt}}, \code{\link{is.sropt}},
-  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
-  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
-  \code{\link{reannualize.sropt}}, \code{\link{sropt}},
-  \code{\link{sropt_test}}
+  Other del_sropt: \code{\link{as.del_sropt}},
+  \code{\link{as.del_sropt.default}},
+  \code{\link{as.del_sropt.xts}},
+  \code{\link{is.del_sropt}}
 }
 \keyword{univar}
 

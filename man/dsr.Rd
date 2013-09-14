@@ -129,7 +129,7 @@ plot(ecdf(pvs.HA))
   \code{\link{as.sr.timeSeries}}, \code{\link{as.sr.xts}},
   \code{\link{confint.sr}}, \code{\link{confint.sropt}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
-  \code{\link{print.sr}}, \code{\link{print.sropt}},
+  \code{\link{print.del_sropt}}, \code{\link{print.sr}},
   \code{\link{print.sropt}}, \code{\link{reannualize}},
   \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{se}},

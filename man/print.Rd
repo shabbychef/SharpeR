@@ -1,4 +1,5 @@
 \name{print.sr}
+\alias{print.del_sropt}
 \alias{print.sr}
 \alias{print.sropt}
 \title{Print values.}
@@ -7,7 +8,7 @@
 
   \method{print}{sropt} (x, ...)
 
-  \method{print}{sropt} (x, ...)
+  \method{print}{del_sropt} (x, ...)
 }
 \arguments{
   \item{x}{an object of class \code{sr} or \code{sropt}.}

@@ -1,0 +1,110 @@
+\name{as.del_sropt}
+\alias{as.del_sropt}
+\alias{as.del_sropt.default}
+\alias{as.del_sropt.xts}
+\title{Compute the Sharpe ratio of a hedged Markowitz portfolio.}
+\usage{
+  as.del_sropt(X,G,drag=0,ope=1,epoch="yr")
+
+  \method{as.del_sropt}{default} (X, G, drag = 0, ope = 1,
+    epoch = "yr")
+
+  \method{as.del_sropt}{xts} (X, G, drag = 0, ope = 1,
+    epoch = "yr")
+}
+\arguments{
+  \item{X}{matrix of returns, or \code{xts} object.}
+
+  \item{G}{an \eqn{g \times q}{g x q} matrix of hedge
+  constraints. A garden variety application would have
+  \code{G} be one row of the identity matrix, with a one in
+  the column of the instrument to be 'hedged out'.}
+
+  \item{drag}{the 'drag' term, \eqn{c_0/R}{c0/R}. defaults
+  to 0. It is assumed that \code{drag} has been annualized,
+  \emph{i.e.} has been multiplied by
+  \eqn{\sqrt{ope}}{sqrt(ope)}. This is in contrast to the
+  \code{c0} term given to \code{\link{sr}}.}
+
+  \item{ope}{the number of observations per 'epoch'. For
+  convenience of interpretation, The Sharpe ratio is
+  typically quoted in 'annualized' units for some epoch,
+  that is, 'per square root epoch', though returns are
+  observed at a frequency of \code{ope} per epoch.  The
+  default value is 1, meaning the code will not attempt to
+  guess, what the observation frequency is, and no
+  annualization adjustments will be made.}
+
+  \item{epoch}{the string representation of the 'epoch',
+  defaulting to 'yr'.}
+}
+\value{
+  An object of class \code{del_sropt}.
+}
+\description{
+  Computes the Sharpe ratio of the hedged Markowitz
+  portfolio of some observed returns.
+}
+\details{
+  Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of
+  a \eqn{q}{q}-variate normal random variable with mean
+  \eqn{\mu}{mu} and covariance matrix \eqn{\Sigma}{Sigma}.
+  Let \eqn{G} be a \eqn{g \times q}{g x q} matrix of rank
+  \eqn{g}. Let \eqn{\bar{x}}{xbar} be the (vector) sample
+  mean, and \eqn{S}{S} be the sample covariance matrix
+  (using Bessel's correction). Let \deqn{\zeta(w) =
+  \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{zeta(w)
+  = (w'xbar - c0)/sqrt(w'Sw)} be the (sample) Sharpe ratio
+  of the portfolio \eqn{w}{w}, subject to risk free rate
+  \eqn{c_0}{c0}.
+
+  Let \eqn{w_*}{w*} be the solution to the portfolio
+  optimization problem: \deqn{\max_{w: 0 < w^{\top}S w \le
+  R^2,\,G S w = 0} \zeta(w),}{max {zeta(w) | 0 < w'Sw <=
+  R^2, G S w = 0},} with maximum value \eqn{z_* =
+  \zeta\left(w_*\right)}{z* = zeta(w*)}.
+
+  Note that if \code{ope} and \code{epoch} are not given,
+  the converter from \code{xts} attempts to infer the
+  observations per epoch, assuming yearly epoch.
+}
+\examples{
+nfac <- 5
+nyr <- 10
+ope <- 253
+# simulations with no covariance structure.
+# under the null:
+set.seed(as.integer(charToRaw("be determinstic")))
+Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+# hedge out the first one:
+G <- diag(nfac)[1,]
+asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
+\dontrun{
+# using real data.
+if (require(quantmod)) {
+  get.ret <- function(sym,...) {
+    OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
+    lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
+    # chomp first NA!
+    lrets[-1,]
+  }
+  get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+  some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
+  # hedge out SPY
+  G <- diag(dim(some.rets)[2])[5,]
+  asro <- as.del_sropt(some.rets,G)
+}
+}
+}
+\author{
+  Steven E. Pav \email{shabbychef@gmail.com}
+}
+\seealso{
+  \code{\link{del_sropt}}, \code{\link{sropt}},
+  \code{\link{sr}}
+
+  Other del_sropt: \code{\link{del_sropt}},
+  \code{\link{is.del_sropt}}
+}
+\keyword{univar}
+

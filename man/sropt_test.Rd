@@ -92,13 +92,10 @@ stest <- sropt_test(asro,alternative="two.sided")
   \code{\link{sr_test}}, \code{\link{t.test}}.
 
   Other sropt: \code{\link{as.sropt}},
-  \code{\link{as.sropt}}, \code{\link{as.sropt.default}},
   \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.xts}}, \code{\link{as.sropt.xts}},
-  \code{\link{confint.sr}}, \code{\link{confint.sropt}},
-  \code{\link{del_sropt}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{is.sropt}},
-  \code{\link{power.sropt_test}},
+  \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
+  \code{\link{confint.sropt}}, \code{\link{dsropt}},
+  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{sropt}}
 }

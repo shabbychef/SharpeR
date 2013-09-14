@@ -52,7 +52,7 @@
 .qform <- function(bread,meat) {
 	return(t(bread) %*% (meat %*% bread))
 }
-# and 'outter' 
+# and 'outer' 
 .qoform <- function(bread,meat) {
 	return(bread %*% (meat %*% t(bread)))
 }
