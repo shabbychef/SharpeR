@@ -37,11 +37,72 @@
 # Estimation 
 
 # variance covariance#FOLDUP
-# variance/covariance of SR based on observations;
-# feed in an n x p matrix of returns and a function
-# which computes a variance-covariance matrix from
-# an lm object (such as vcov, or vcovHAC from sandwich)
-sr_vcov <- function(X,vcov.func=vcov) {
+#' @title Compute variance covariance of Sharpe Ratios.
+#'
+#' @description
+#'
+#' Computes the variance covariance matrix of sample Sharpe ratios.
+#'
+#' @details
+#'
+#' Given \eqn{n} contemporaneous observations of \eqn{p} returns
+#' streams, this function estimates the asymptotic variance
+#' covariance matrix of the vector of sample Sharpes, 
+#' \eqn{\left[\zeta_1,\zeta_2,\ldots,\zeta_p\right]}{[zeta1,zeta2,...,zetap]}
+#'
+#' One may use the default method for computing covariance,
+#' via the \code{\link{vcov}} function, or via a 'fancy' estimator,
+#' like \code{sandwich:vcovHAC}, \code{sandwich:vcovHC}, \emph{etc.}
+#'
+#' This code first estimates the covariance of the \eqn{2p} vector of 
+#' the vector \eqn{x} stacked on its Hadamard square, \eqn{x^2}. This is
+#' then translated back to a variance covariance on the vector of
+#' sample Sharpe ratios via the Delta method.
+#'
+#' @usage
+#'
+#' sr_vcov(X,vcov.func=vcov,ope=1)
+#'
+#' @param X an \eqn{n \times p}{n x p} matrix of observed returns.
+#' @param vcov.func a function which takes an object of class \code{lm},
+#' and computes a variance-covariance matrix.
+#' @template param-ope
+#' @keywords univar 
+#'
+#' @return a list containing the following components:
+#' \item{SR}{a vector of (annualized) Sharpe ratios.}
+#' \item{Ohat}{a \eqn{p \times p}{p x p} variance covariance matrix.}
+#' \item{p}{the number of assets.}
+#' @seealso sr-distribution functions, \code{\link{dsr}}
+#' @rdname sr_vcov
+#' @export 
+#' @template etc
+#' @template sr
+#' @template ref-Lo
+#'
+#' @examples 
+#' X <- matrix(rnorm(1000*3),ncol=3)
+#' colnames(X) <- c("ABC","XYZ","WORM")
+#' Sigmas <- sr_vcov(X)
+#' # make it fat tailed:
+#' X <- matrix(rt(1000*3,df=5),ncol=3)
+#' Sigmas <- sr_vcov(X)
+#' \dontrun{
+#' if (require(sandwich)) {
+#'	Sigmas <- sr_vcov(X,vcov.func=vcovHC)
+#' }
+#' }
+#' # add some autocorrelation to X
+#' Xf <- filter(X,c(0.2),"recursive")
+#' colnames(Xf) <- colnames(X)
+#' Sigmas <- sr_vcov(Xf)
+#' \dontrun{
+#' if (require(sandwich)) {
+#'	Sigmas <- sr_vcov(Xf,vcov.func=vcovHAC)
+#' }
+#' }
+#'
+sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 	X <- na.omit(X)
 	p <- dim(X)[2]
 
@@ -71,7 +132,15 @@ sr_vcov <- function(X,vcov.func=vcov) {
 	# Omegahat
 	Ohat <- t(Dt) %*% Shat %*% Dt
 
-	retval <- list(p=p,SR=SR,Ohat=Ohat)
+	# get names;
+	strnames <- if (is.null(colnames(X))) sapply(1:p,function(n) { sprintf("asset_%03d",n) }) else colnames(X)
+	
+	dim(SR) <- c(p,1)
+	rownames(SR) <- strnames
+	rownames(Ohat) <- strnames
+	colnames(Ohat) <- strnames
+	retval <- list(SR=.annualize(SR,ope),
+								 Ohat=(ope^2) * Ohat,p=p)
 	return(retval)
 }
 #UNFOLD

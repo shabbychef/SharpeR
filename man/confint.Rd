@@ -120,7 +120,8 @@ coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
   \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{se}},
   \code{\link{se.sr}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}}
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_vcov}}
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},

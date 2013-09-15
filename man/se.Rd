@@ -84,7 +84,8 @@ anse <- se(asr,type="Lo")
   \code{\link{print.sropt}}, \code{\link{reannualize}},
   \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{sr}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}}
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_vcov}}
 }
 \keyword{htest}
 
