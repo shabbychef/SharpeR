@@ -1066,9 +1066,8 @@ is.del_sropt <- function(x) inherits(x,"del_sropt")
 #' @export
 print.del_sropt <- function(x,...) {
 # 2FIX: start here.
-	Fval <- .del_sropt.Fval(x)
-	pval <- .del_sropt.pval(x)
-	coefs <- cbind(x$sropt.del,Fval,pval)
+	Fandp <- .del_sropt.pval(x)
+	coefs <- cbind(x$sropt.del,Fandp$Fval,Fandp$pval)
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "F value","Pr(>F)")
 	rownames(coefs) <- .get_strat_names(x$sropt)
@@ -1077,14 +1076,18 @@ print.del_sropt <- function(x,...) {
 							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)
 }
 .del_sropt.Fval <- function(x) {
+	#retval$T2.del <- retval$T2 - retval$T2.sub
 	#2FIX
 # perform the LRT to get the F stat
-	
 }
 .del_sropt.pval <- function(x) {
-	#2FIX
-# convert same to pvalue
-
+	Fval <- .del_sropt.Fval(x)
+	# 2FIX: make sure these are legit:
+	df1 <- x$df1 - x$del_df
+	df2 <- x$df2 - x$df1
+	pval <- pf(Fval,df1,df2,ncp=0,lower.tail=FALSE)
+	retval <- list(pval=pval,Fval=Fval)
+	return(retval)
 }
 #UNFOLD
 
