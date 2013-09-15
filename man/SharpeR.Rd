@@ -109,6 +109,36 @@
   }
 }
 
+\section{Spanning and Hedging}{
+  Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a
+  \eqn{q}-variate normal random variable with mean
+  \eqn{\mu}{mu} and covariance matrix \eqn{\Sigma}{Sigma}.
+  Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and
+  \eqn{S} be the sample covariance matrix (using Bessel's
+  correction). Let \deqn{Z(w) = \frac{w^{\top}\bar{x} -
+  c_0}{\sqrt{w^{\top}S w}}}{Z(w) = (w'xbar -
+  c0)/sqrt(w'Sw)} be the (sample) Sharpe ratio of the
+  portfolio \eqn{w}, subject to risk free rate
+  \eqn{c_0}{c0}.
+
+  Let \eqn{w_*}{w*} be the solution to the portfolio
+  optimization problem: \deqn{\max_{w: 0 < w^{\top}S w \le
+  R^2} Z(w),}{max {Z(w) | 0 < w'Sw <= R^2},} with maximum
+  value \eqn{z_* = Z\left(w_*\right)}{z* = Z(w*)}. Then
+  \deqn{w_* = R
+  \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
+  w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)} and \deqn{z_* =
+  \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
+  z* = sqrt(xbar' S^-1 xbar) - c0/R}
+
+  The variable \eqn{z_*}{z*} follows an \emph{Optimal
+  Sharpe ratio} distribution. For convenience, we may
+  assume that the sample statistic has been annualized in
+  the same manner as the Sharpe ratio, that is by
+  multiplying by \eqn{d}, the number of observations per
+  epoch.
+}
+
 \section{Legal Mumbo Jumbo}{
   SharpeR is distributed in the hope that it will be
   useful, but WITHOUT ANY WARRANTY; without even the

@@ -118,6 +118,22 @@
 #' \item \eqn{c_0/R} is denoted by \code{drag}.
 #' }
 #'
+#' @section Spanning and Hedging:
+#'
+#' As above, let 
+#' \deqn{Z(w) = \frac{w^{\top}\bar{x} - c_0}{\sqrt{w^{\top}S w}}}{Z(w) = (w'xbar - c0)/sqrt(w'Sw)}
+#' be the (sample) Sharpe ratio of the portfolio \eqn{w}, subject to 
+#' risk free rate \eqn{c_0}{c0}.
+#'
+#' Let \eqn{G} be a \eqn{g \times q}{g x q} matrix of 'hedge constraints'. 
+#' Let \eqn{w_*}{w*} be the solution to the portfolio optimization problem:
+#' \deqn{\max_{w: 0 < w^{\top}S w \le R^2,\,G S w = 0} Z(w),}{max {Z(w) | 0 < w'Sw <= R^2, G S w = 0},}
+#' with maximum value \eqn{z_* = Z\left(w_*\right)}{z* = Z(w*)}.
+#' Then \eqn{z_*^2}{z*^2} can be expressed as the difference of two squared
+#' optimal Sharpe ratio random variables. A monotonic transform takes this
+#' difference to the LRT statistic for portfolio spanning, first described by
+#' Rao, and refined by Giri. 
+#'
 #' @section Legal Mumbo Jumbo:
 #'
 #' SharpeR is distributed in the hope that it will be useful,
@@ -130,6 +146,9 @@
 #' @template ref-JW
 #' @template ref-Lo
 #' @template ref-Opdyke
+#' @template ref-LW
+#' @template ref-NG1
+#' @template ref-RR
 #'
 #' @references
 #'
@@ -166,8 +185,8 @@
 #' autocorrelation.
 #' \item Tests on Sharpe under positivity constraint. (\emph{c.f.} Silvapulle)
 #' \item Portfolio spanning tests.
-#' \item Tests on portfolio weights.
 #' \item Tests of hedge restrictions.
+#' \item Tests on portfolio weights.
 #' }
 #' 
 #' This package is maintained as a hobby. 
@@ -178,6 +197,14 @@ NULL
 #'
 #' \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
+#'
+#' @section Changes in \SharpeR{} Version 0.1309 (2013-09-17) :
+#'
+#' \itemize{
+#' \item spanning/hedging tests.
+#' \item sr equality test via callback variance covariance computation.
+#' \item split vignette in two.
+#' }
 #' 
 #' @section Changes in \SharpeR{} Version 0.1307 (2013-05-30) :
 #'
