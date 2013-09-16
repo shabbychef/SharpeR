@@ -11,8 +11,8 @@
   Corrections for standard error based on skew, kurtosis
   and autocorrelation. \item Tests on Sharpe under
   positivity constraint. (\emph{c.f.} Silvapulle) \item
-  Portfolio spanning tests. \item Tests on portfolio
-  weights. \item Tests of hedge restrictions. }
+  Portfolio spanning tests. \item Tests of hedge
+  restrictions. \item Tests on portfolio weights. }
 
   This package is maintained as a hobby.
 }
@@ -110,33 +110,22 @@
 }
 
 \section{Spanning and Hedging}{
-  Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a
-  \eqn{q}-variate normal random variable with mean
-  \eqn{\mu}{mu} and covariance matrix \eqn{\Sigma}{Sigma}.
-  Let \eqn{\bar{x}}{xbar} be the (vector) sample mean, and
-  \eqn{S} be the sample covariance matrix (using Bessel's
-  correction). Let \deqn{Z(w) = \frac{w^{\top}\bar{x} -
+  As above, let \deqn{Z(w) = \frac{w^{\top}\bar{x} -
   c_0}{\sqrt{w^{\top}S w}}}{Z(w) = (w'xbar -
   c0)/sqrt(w'Sw)} be the (sample) Sharpe ratio of the
   portfolio \eqn{w}, subject to risk free rate
   \eqn{c_0}{c0}.
 
-  Let \eqn{w_*}{w*} be the solution to the portfolio
-  optimization problem: \deqn{\max_{w: 0 < w^{\top}S w \le
-  R^2} Z(w),}{max {Z(w) | 0 < w'Sw <= R^2},} with maximum
-  value \eqn{z_* = Z\left(w_*\right)}{z* = Z(w*)}. Then
-  \deqn{w_* = R
-  \frac{S^{-1}\bar{x}}{\sqrt{\bar{x}^{\top}S^{-1}\bar{x}}}}{%
-  w* = R S^-1 xbar / sqrt(xbar' S^-1 xbar)} and \deqn{z_* =
-  \sqrt{\bar{x}^{\top} S^{-1} \bar{x}} - \frac{c_0}{R}}{%
-  z* = sqrt(xbar' S^-1 xbar) - c0/R}
-
-  The variable \eqn{z_*}{z*} follows an \emph{Optimal
-  Sharpe ratio} distribution. For convenience, we may
-  assume that the sample statistic has been annualized in
-  the same manner as the Sharpe ratio, that is by
-  multiplying by \eqn{d}, the number of observations per
-  epoch.
+  Let \eqn{G} be a \eqn{g \times q}{g x q} matrix of 'hedge
+  constraints'. Let \eqn{w_*}{w*} be the solution to the
+  portfolio optimization problem: \deqn{\max_{w: 0 <
+  w^{\top}S w \le R^2,\,G S w = 0} Z(w),}{max {Z(w) | 0 <
+  w'Sw <= R^2, G S w = 0},} with maximum value \eqn{z_* =
+  Z\left(w_*\right)}{z* = Z(w*)}. Then \eqn{z_*^2}{z*^2}
+  can be expressed as the difference of two squared optimal
+  Sharpe ratio random variables. A monotonic transform
+  takes this difference to the LRT statistic for portfolio
+  spanning, first described by Rao, and refined by Giri.
 }
 
 \section{Legal Mumbo Jumbo}{
@@ -166,6 +155,19 @@
   Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the
   p-values?" Journal of Asset Management 8, no. 5 (2006):
   308-336. \url{http://ssrn.com/paper=886728}
+
+  Ledoit, O., and Wolf, M. "Robust performance hypothesis
+  testing with the Sharpe ratio." Journal of Empirical
+  Finance 15, no. 5 (2008): 850-859.
+  \url{http://www.ledoit.net/jef2008_abstract.htm}
+
+  Giri, N. "On the likelihood ratio test of a normal
+  multivariate testing problem." Annals of Mathematical
+  Statistics 35, no. 1 (1964): 181-189.
+  \url{http://projecteuclid.org/euclid.aoms/1177703740}
+
+  Rao, C. R. "Advanced Statistical Methods in Biometric
+  Research." Wiley (1952).
 
   Kan, Raymond and Smith, Daniel R. "The Distribution of
   the Sample Minimum-Variance Frontier." Journal of

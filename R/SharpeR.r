@@ -148,7 +148,6 @@
 #' @template ref-Opdyke
 #' @template ref-LW
 #' @template ref-NG1
-#' @template ref-RR
 #'
 #' @references
 #'

@@ -17,7 +17,7 @@
   To satisfy the minimum requirements of an S3 class.
 }
 \examples{
-roll.own <- sropt(z.s=2,z.sub=1,df1=10,df2=1000,del_df=3,ope=1,epoch="yr")
+roll.own <- del_sropt(z.s=2,z.sub=1,df1=10,df2=1000,del_df=3,ope=1,epoch="yr")
 is.sropt(roll.own)
 }
 \author{

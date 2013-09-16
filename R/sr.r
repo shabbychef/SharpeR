@@ -915,12 +915,29 @@ del_sropt <- function(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr") {
 								 df1 = df1,df2 = df2,del_df = del_df,
 								 drag = drag,ope = ope,epoch = epoch)
 
-	retval$T2.sub <- .sropt2T(list(sropt=z.sub,drag=drag,ope=ope,df2=df2-del_df))
-	retval$T2 <- .sropt2T(retval)
+	retval$T2.sub <- .sropt2T(list(sropt=z.sub,drag=drag,ope=ope,df2=df2))
+	#retval$T2 <- .sropt2T(retval)
+	retval$T2 <- .sropt2T(list(sropt=z.s,drag=drag,ope=ope,df2=df2))
 	retval$T2.del <- retval$T2 - retval$T2.sub
 
-
 	class(retval) <- "del_sropt"
+	return(retval)
+}
+# the statistical guts.
+.del_sropt.asF <- function(x) {
+	# see Giri eqn (1.9) and section 3.
+	# make Z ~ B(bdf1,bdf2) under the null
+	Z <- (1 + x$T2.sub) / (1 + x$T2)
+	bdf1 <- (x$df2 - x$df1) / 2
+	bdf2 <- (x$del_df) / 2
+	# transform beta to F; 
+	# define the F so that it is non-central under the alternative
+	# (on the top)
+	Fval <- (bdf1 * (1-Z)) / (bdf2 * Z)
+	df1 <- 2*bdf2
+	df2 <- 2*bdf1;
+	pval <- pf(Fval,df1,df2,ncp=0,lower.tail=FALSE)
+	retval <- list(Fval=Fval,df1=df1,df2=df2,pval=pval)
 	return(retval)
 }
 #' @title Compute the Sharpe ratio of a hedged Markowitz portfolio.
@@ -978,7 +995,7 @@ del_sropt <- function(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr") {
 #' set.seed(as.integer(charToRaw("be determinstic")))
 #' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 #' # hedge out the first one:
-#' G <- diag(nfac)[1,]
+#' G <- matrix(diag(nfac)[1,],nrow=1)
 #' asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
 #' \dontrun{
 #' # using real data.
@@ -1009,6 +1026,7 @@ as.del_sropt.default <- function(X,G,drag=0,ope=1,epoch="yr") {
 	# get the zeta.s
 	z.s <- .T2sropt(hotval)
 	dim(z.s) <- c(1,1)
+	if (!is.matrix(G)) G <- matrix(G,nrow=1)
 
 	if (length(hotval$w) != dim(G)[2]) stop("wrong size hedge constraint?")
 
@@ -1056,7 +1074,7 @@ as.del_sropt.xts <- function(X,G,drag=0,ope=1,epoch="yr") {
 #' @export
 #'
 #' @examples 
-#' roll.own <- sropt(z.s=2,z.sub=1,df1=10,df2=1000,del_df=3,ope=1,epoch="yr")
+#' roll.own <- del_sropt(z.s=2,z.sub=1,df1=10,df2=1000,del_df=3,ope=1,epoch="yr")
 #' is.sropt(roll.own)
 is.del_sropt <- function(x) inherits(x,"del_sropt")
 
@@ -1065,8 +1083,7 @@ is.del_sropt <- function(x) inherits(x,"del_sropt")
 #' @S3method print del_sropt
 #' @export
 print.del_sropt <- function(x,...) {
-# 2FIX: start here.
-	Fandp <- .del_sropt.pval(x)
+	Fandp <- Fandp <- .del_sropt.asF(x)
 	coefs <- cbind(x$sropt.del,Fandp$Fval,Fandp$pval)
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "F value","Pr(>F)")
@@ -1074,20 +1091,6 @@ print.del_sropt <- function(x,...) {
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
 							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)
-}
-.del_sropt.Fval <- function(x) {
-	#retval$T2.del <- retval$T2 - retval$T2.sub
-	#2FIX
-# perform the LRT to get the F stat
-}
-.del_sropt.pval <- function(x) {
-	Fval <- .del_sropt.Fval(x)
-	# 2FIX: make sure these are legit:
-	df1 <- x$df1 - x$del_df
-	df2 <- x$df2 - x$df1
-	pval <- pf(Fval,df1,df2,ncp=0,lower.tail=FALSE)
-	retval <- list(pval=pval,Fval=Fval)
-	return(retval)
 }
 #UNFOLD
 

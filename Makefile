@@ -398,6 +398,12 @@ $(EXTDATA_FILES) : $(NODIST_R_DIR)/make_ret_data.R
 	# horribly hacky!
 	mv $(NODIST_R_DIR)/*.rda $(EXTDATA_D)
 
+newbuild :
+	$(MAKE) clean
+	$(MAKE) docs
+	$(MAKE) tags
+	$(MAKE) build
+
 ################################
 # CLEAN UP 
 ################################
