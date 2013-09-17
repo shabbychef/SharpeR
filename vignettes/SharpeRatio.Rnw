@@ -1,5 +1,5 @@
 %\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Statistics of the Sharpe ratio}
+%\VignetteIndexEntry{Notes on the Sharpe ratio}
 %\VignetteKeyword{Finance}
 %\VignetteKeyword{Sharpe}
 %\VignettePackage{SharpeR}
@@ -76,7 +76,7 @@ options("getSymbols.warning4.0"=FALSE)
 % document incantations%FOLDUP
 \begin{document}
 
-\title{Statistics of the \txtSR}
+\title{Notes on the \txtSR}
 \author{Steven E. Pav %
 \thanks{\email{shabbychef@gmail.com}}}
 %\date{\today, \currenttime}
@@ -181,7 +181,196 @@ arithmetic return of the portfolio over that period. This holds even when the
 portfolio holds some stocks `short.'  Often this portfolio accounting is
 misapplied to geometric returns without even an appeal to Taylor's theorem.
 
-\subsection{Asymptotic Distribution of \txtSR}%FOLDUP
+%\subsection{Asymptotic Distribution of \txtSR}%FOLDUP
+%%UNFOLD
+
+\subsection{The Haircut}%FOLDUP
+
+Care must be taken interpreting the confidence intervals and the estimated
+optimal SNR. This is because \psnropt is the \emph{maximal} population 
+SNR achieved by any portfolio; it is at least equal to, and potentially much
+larger than, the SNR achieved by the portfolio based on sample statistics,
+\sportwopt. There is a gap or `haircut' due to mis-estimation of the optimal
+portfolio. One would suspect that this gap is worse when the true effect size
+(\ie \psnropt) is smaller, when there are fewer observations (\ssiz), and when
+there are more assets (\nlatf).
+
+Assuming \pvmu is not all zeros, define the haircut as the quantity
+\begin{equation}
+\hcut \defeq 1 - \frac{1}{\psnropt}\frac{\trAB{\sportwopt}{\pvmu}}{\sqrt{\qform{\pvsig}{\sportwopt}}}
+= 1 - \wrapParens{\frac{\trAB{\sportwopt}{\pvmu}}{\trAB{\pportwopt}{\pvmu}}}
+\wrapParens{\frac{\sqrt{\qform{\pvsig}{\pportwopt}}}{\sqrt{\qform{\pvsig}{\sportwopt}}}},
+\label{eqn:hcut_def}
+\end{equation}
+where \pportwopt is the population optimal portfolio, positively proportional
+to $\minv{\pvsig}{\pvmu}.$ Thus the haircut is one minus the ratio of 
+population SNR achieved by the sample Markowitz portfolio to the 
+optimal population SNR (which is achieved by the population Markowitz
+portfolio). A smaller value means that the sample portfolio achieves
+a larger proportion of possible SNR, or, equivalently, a larger value of
+the haircut means greater mis-estimation of the optimal portfolio.
+The haircut takes values in $\wrapBracks{0,2}$.
+
+Modeling the haircut is not straightforward
+because it is a random quantity which is not observed. That is, it mixes the
+unknown population parameters \pvsig and \pvmu with the sample quantity
+\sportwopt, which is random. 
+
+When $\ssiz/\nlatf$ is large, the following is a reasonable approximation to
+the distribution of \hcut:
+\begin{equation}  
+\sqrt{\nlatf - 1} \ftan{\farcsin{1-\hcut}} \approx
+\nctlaw{\sqrt{\ssiz}\psnropt,\nlatf-1},
+\label{eqn:hcut_apx}
+\end{equation}
+where \nctlaw{x,y} is a non-central \tstat-distribution with non-centrality
+parameter $x$ and $y$ degrees of freedom.
+This approximation can be found by ignoring all variability in the sample
+estimate of the covariance matrix, that is by assuming that the sample optimal
+portfolio was computed with the \emph{population} covariance:
+$\sportwopt \propto \minv{\pvsig}{\svmu}$. Because mis-estimation of the
+covariance matrix should contribute some error, I expect that this
+approximation is a `stochastic lower bound' on the true haircut. Numerical
+simulations, however, suggest it is a fairly tight bound for large $\ssiz/\nlatf$.
+(I would be willing to guess that the true distribution involves a non-central
+\flaw{}-distribution, but the proof is beyond me at the moment.)
+
+%Numerical experiments support the following as an approximation to
+%the median value of the haircut distribution:
+%$$
+%1 - \fsin{\farctan{\frac{\sqrt{\ssiz}\psnropt}{\sqrt{\nlatf-1}}}}.
+%$$
+
+Here I look at the haircut via Monte Carlo simulations:
+
+<<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
+require(MASS)
+
+# simple markowitz.
+simple.marko <- function(rets) {
+	mu.hat <- as.vector(apply(rets,MARGIN=2,mean,na.rm=TRUE))
+	Sig.hat <- cov(rets)
+	w.opt <- solve(Sig.hat,mu.hat)
+	retval <- list('mu'=mu.hat,'sig'=Sig.hat,'w'=w.opt)
+	return(retval)
+}
+# make multivariate pop. & sample w/ given zeta.star
+gen.pop <- function(n,p,zeta.s=0) {
+	true.mu <- matrix(rnorm(p),ncol=p)
+	#generate an SPD population covariance. a hack.
+	xser <- matrix(rnorm(p*(p + 100)),ncol=p)
+	true.Sig <- t(xser) %*% xser
+	pre.sr <- sqrt(true.mu %*% solve(true.Sig,t(true.mu)))
+	#scale down the sample mean to match the zeta.s
+	true.mu <- (zeta.s/pre.sr[1]) * true.mu 
+  X <- mvrnorm(n=n,mu=true.mu,Sigma=true.Sig)
+	retval = list('X'=X,'mu'=true.mu,'sig'=true.Sig,'SNR'=zeta.s)
+	return(retval)
+}
+# a single simulation
+sample.haircut <- function(n,p,...) {
+	popX <- gen.pop(n,p,...)
+	smeas <- simple.marko(popX$X)
+	# I have got to figure out how to deal with vectors...
+	ssnr <- (t(smeas$w) %*% t(popX$mu)) / sqrt(t(smeas$w) %*% popX$sig %*% smeas$w)
+	hcut <- 1 - (ssnr / popX$SNR)
+	# for plugin estimator, estimate zeta.star
+	asro <- sropt(z.s=sqrt(t(smeas$w) %*% smeas$mu),df1=p,df2=n)
+	zeta.hat.s <- inference(asro,type="KRS")  # or 'MLE', 'unbiased'
+	return(c(hcut,zeta.hat.s))
+}
+
+# set everything up
+set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
+ope <- 253
+LONG.FORM <- FALSE
+n.sim <- if (LONG.FORM) 2048 else 512
+n.stok <- if (LONG.FORM) 8 else 6
+n.yr <- 4
+n.obs <- ceiling(ope * n.yr)
+zeta.s <- 1.20 / sqrt(ope)   # optimal SNR, in daily units
+
+# run some experiments
+system.time(experiments <- replicate(n.sim,sample.haircut(n.obs,n.stok,zeta.s)))
+hcuts <- experiments[1,]
+print(summary(hcuts))
+# haircut approximation in the equation above
+qhcut <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
+	1 - sin(atan((1/sqrt(df1-1)) * qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail)))
+}
+# if you wanted to look at how bad the plug-in estimator is, then
+# uncomment the following (you are warned):
+# zeta.hat.s <- experiments[2,];                                   
+# qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.hat.s),hcuts,
+# 			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles");
+# qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.hat.s) },
+# 			 col=2)
+
+# qqplot;
+qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
+			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles")
+qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.s) },
+			 col=2)
+@
+<<'hcut_med',include=FALSE>>=
+medv.true <- median(hcuts)
+med.snr.true <- zeta.s * (1 - medv.true)
+@
+
+I check the quality of the approximation given in \eqnref{hcut_apx} by a Q-Q 
+plot in \figref{haircutting}.  For the case where
+$\ssiz=\Sexpr{n.obs}$ (\Sexpr{n.yr} years of daily observations), 
+$\nlatf=\Sexpr{n.stok}$ and $\psnropt=\Sexpr{zeta.s * sqrt(ope)}\yrto{-1/2}$, 
+the t-approximation is very good indeed. 
+%Note that computing prediction
+%intervals for this unobserved, random quantity using this equation is not
+%feasible because it relies on the unobserved \psnropt.  Using a plugin
+%estimate, based on debiasing \ssropt, or the MLE, \etc, do not give satisfactory
+%results either.
+%, as illustrated in \figref{hcut_plugin}.
+%<<'hcut_plugin',fig.cap="Empirical p-values using \\eqnref{hcut_apx} and a (feasible) plug-in estimate of \\psnropt are shown. The plug-in approach does not give good estimates, and is not suggested.">>=
+%# and the plugin approximation:
+%plot(ecdf(plugin.p))
+%abline(a=0,b=1,col=2)
+%@
+%Let's look at the range of haircuts and the approximate median value:
+%<<'hcut_continued'>>=
+%# now check the median approximation
+%print(summary(hcuts))
+%medv.apx <- 1 - sin(atan(sqrt((n.obs * zeta.s^2) / (n.stok - 1))))
+%cat(sprintf("modeled median is %2.2f\n",medv.apx))
+%@
+
+%Continuing, 
+%In this case, where we optimize over \Sexpr{n.stok} assets given \Sexpr{n.yr} 
+%years of daily observations, and a population SNR of 
+%\Sexpr{zeta.s * sqrt(ope)} \yrto{-1/2}, 
+The median value of the haircut is on the 
+order of \Sexpr{signif(100 * medv.true,2)}\%, meaning that the median
+population SNR of the sample portfolios is around \Sexpr{med.snr.true *
+sqrt(ope)}\yrto{-1/2}.  The maximum value of the haircut over the
+\Sexpr{n.sim} simulations, however is \Sexpr{max(hcuts)}, which is larger than
+one; this happens if and only if the sample portfolio has negative expected
+return: $\trAB{\sportwopt}{\pvmu} < 0$. In this case the Markowitz portfolio
+is actually \emph{destroying value} because of modeling error: the mean return
+of the selected portfolio is negative, even though positive mean is achievable.
+
+%Again, it is not clear how to estimate the haircut given the observed
+%statistics \svmu and \svsig, other than lamely `plugging in' the sample
+%estimate in place of \psnropt.
+
+The approximation in \eqnref{hcut_apx} involves the unknown population
+parameters \pvmu and \pvsig, but does not make use of the observed quantities
+\svmu and \svsig. It seems mostly of theoretical interest, perhaps for
+producing prediction intervals on \hcut when planning a trading strategy 
+(\ie balancing \ssiz and \nlatf). A more practical problem is that of 
+estimating confidence intervals on 
+$\trAB{\sportw}{\pvmu} / \sqrt{\qform{\minv{\pvsig}}{\sportw}}$ having 
+observed \svmu and \svsig. In this case one \emph{cannot} simply 
+plug-in some estimate of \psnropt computed from \ssropt (via MLE, KRS, \etc)
+into \eqnref{hcut_apx}. The reason is that the error in the approximation of
+\psnropt is not independent of the modeling error that causes the haircut.
+
 %UNFOLD
 
 %UNFOLD
@@ -189,12 +378,12 @@ misapplied to geometric returns without even an appeal to Taylor's theorem.
 \section{\txtSR and Constrained Portfolio Optimization}%FOLDUP
 
 \label{subsec:basic_conpo}
-Let \Mtx{G} be an $\nstrat[g] \times \nstrat$ matrix of rank $\nstrat[g] \le
-\nstrat$. Let \mnull{\Mtx{G}} be the matrix whose rows span the null space
-of the rows of \Mtx{G}, \ie $\mnull{\Mtx{G}}\tr{\Mtx{G}} = 0$. 
+Let \hejG be an $\nstrathej \times \nstrat$ matrix of rank $\nstrathej \le
+\nstrat$. Let \mnull{\hejG} be the matrix whose rows span the null space
+of the rows of \hejG, \ie $\mnull{\hejG}\tr{\hejG} = 0$. 
 Consider the constrained optimization problem
 \begin{equation}
-\max_{\sportw : \mnull{\Mtx{G}} \sportw = 0,\, \qform{\svsig}{\sportw} \le R^2} 
+\max_{\sportw : \mnull{\hejG} \sportw = 0,\, \qform{\svsig}{\sportw} \le R^2} 
 \frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
 \label{eqn:opt_port_cons_I}
 \end{equation}
@@ -203,98 +392,98 @@ matrix,
 \rfr is the risk-free rate, and $R > 0$ is a risk `budget'. 
 
 The gist of this constraint is that feasible portfolios must be some
-linear combination of the rows of \Mtx{G}. When viewed in this light, this
+linear combination of the rows of \hejG. When viewed in this light, this
 problem clearly reduces to that of optimizing the portfolio on 
-\nstrat[g] assets with sample mean $\Mtx{G}\svmu$ and sample covariance
-$\qoform{\svsig}{\Mtx{G}}$. This problem has solution
+\nstrathej assets with sample mean $\hejG\svmu$ and sample covariance
+$\qoform{\svsig}{\hejG}$. This problem has solution
 \begin{equation}
-\sportwoptG{\Mtx{G}} 
-\defeq c\, \tr{\Mtx{G}} \minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}} \Mtx{G}\svmu,
+\sportwoptG{\hejG} 
+\defeq c\, \tr{\hejG} \minv{\wrapParens{\qoform{\svsig}{\hejG}}} \hejG\svmu,
 \label{eqn:opt_port_solve_I}
 \end{equation}
 where the constant $c$ is chosen to maximize return under the given risk
 budget:
 $$
 c =
-\frac{R}{\sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}}}.
+\frac{R}{\sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}}.
 $$
 The \txtSR of this portfolio is
 \begin{equation}
-\ssroptG{\Mtx{G}} 
-\defeq \frac{\trAB{\sportwoptG{\Mtx{G}}}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwoptG{\Mtx{G}}}}}
- = \sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}}
+\ssroptG{\hejG} 
+\defeq \frac{\trAB{\sportwoptG{\hejG}}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwoptG{\hejG}}}}
+ = \sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}
 - \frac{\rfr}{R}.
 \end{equation}
 Again, for purposes of estimating the population analogue, we can largely
 ignore, for simplicity of exposition, the deterministic `drag' term
 $\rfr/R$. The random term, 
 $\ssiz
-\wrapParens{\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}}^2$,
+\wrapParens{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}^2$,
 is a Hotelling \Tstat, which follows a non-central \flaw{} distribution, up to
 scaling:
 \begin{equation*}
-\frac{\ssiz}{\ssiz-1}\frac{\ssiz-\nstrat[g]}{\nstrat[g]}
-\wrapParens{\ssroptG{\Mtx{G}} + \frac{\rfr}{R}}^2 \sim
-\ncflaw{\nstrat[g],\ssiz-\nstrat[g],\ssiz\wrapParens{\psnroptG{\Mtx{G}} +
+\frac{\ssiz}{\ssiz-1}\frac{\ssiz-\nstrathej}{\nstrathej}
+\wrapParens{\ssroptG{\hejG} + \frac{\rfr}{R}}^2 \sim
+\ncflaw{\nstrathej,\ssiz-\nstrathej,\ssiz\wrapParens{\psnroptG{\hejG} +
 \frac{\rfr}{R}}^2}.
 \end{equation*}
-This allows us to make inference about \psnroptG{\Mtx{G}}, the population
-analogue of \ssroptG{\Mtx{G}}.
+This allows us to make inference about \psnroptG{\hejG}, the population
+analogue of \ssroptG{\hejG}.
 
 \subsection{Spanning and Hedging}%FOLDUP
 
 Consider the constrained portfolio optimization problem on \nstrat assets,
 \begin{equation}
-\max_{\sportw : \Mtx{G}\svsig \sportw = \vect{g},\, \qform{\svsig}{\sportw} \le R^2} 
+\max_{\sportw : \hejG\svsig \sportw = \hejg,\, \qform{\svsig}{\sportw} \le R^2} 
 \frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
 \label{eqn:cons_port_prob}
 \end{equation}
-where $\Mtx{G}$ is an $\nstrat[g] \times \nstrat$ matrix of rank \nstrat[g], and,
+where $\hejG$ is an $\nstrathej \times \nstrat$ matrix of rank \nstrathej, and,
 as previously, \svmu, \svsig are sample mean vector and covariance matrix, 
 \rfr is the risk-free rate, and $R > 0$ is a risk `budget'. We can interpret
-the \Mtx{G} constraint as stating that the covariance of the returns of
+the \hejG constraint as stating that the covariance of the returns of
 a feasible portfolio with the returns of a portfolio whose weights are in
-a given row of \Mtx{G} shall equal the corresponding element of \vect{g}.
-In the garden variety application of this problem, \Mtx{G} consists of 
-\nstrat[g] rows of the identity matrix, and \vect{g} is the zero vector;
+a given row of \hejG shall equal the corresponding element of \hejg.
+In the garden variety application of this problem, \hejG consists of 
+\nstrathej rows of the identity matrix, and \hejg is the zero vector;
 in this case, feasible portfolios are `hedged' with respect 
-to the \nstrat[g] assets selected by \Mtx{G}
+to the \nstrathej assets selected by \hejG
 (although they may hold some position in the hedged assets).
 
 Assuming that
-the \Mtx{G} constraint and risk budget can be simultaneously satisfied,
+the \hejG constraint and risk budget can be simultaneously satisfied,
 the solution to this problem, via the Lagrange multiplier technique,
 is
 \begin{equation}
 	\begin{split}
 	\sportwopt &= c\wrapParens{\minv{\svsig}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\Mtx{G}}\svmu} +
-	\tr{\Mtx{G}}{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}\vect{g},\,\\
-	c^2 &= \frac{R^2 - \qform{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}{\vect{g}}}{
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\hejG}\svmu} +
+	\tr{\hejG}{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}\hejg,\,\\
+	c^2 &= \frac{R^2 - \qform{\wrapParens{\qoform{\svsig}{\hejG}}}{\hejg}}{
 	\qform{\minv{\svsig}}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}},
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}},
 	\end{split}
 \end{equation}
 where the numerator in the last equation need be positive for the problem
 to be feasible.
 
-The case where $\vect{g} \ne 0$ is `pathological', as it requires a fixed
+The case where $\hejg \ne 0$ is `pathological', as it requires a fixed
 non-zero covariance of the target portfolio with some other portfolio's
-returns. Setting $\vect{g} = 0$ ensures the problem is feasible, and
+returns. Setting $\hejg = 0$ ensures the problem is feasible, and
 I will make this assumption hereafter. Under this assumption, the optimal
 portfolio is 
 \begin{equation*}
 \sportwopt 
 = c \wrapParens{\minv{\svsig}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\Mtx{G}}\svmu}
-= c_1 \sportwoptG{\eye} - c_2 \sportwoptG{\Mtx{G}},
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\hejG}\svmu}
+= c_1 \sportwoptG{\eye} - c_2 \sportwoptG{\hejG},
 \end{equation*}
 using the notation from \subsecref{basic_conpo}.
 Note that, up to scaling, $\minv{\svsig}\svmu$ is the unconstrained optimal
-portfolio, and thus the imposition of the \Mtx{G} constraint only changes
-the unconstrained portfolio in assets corresponding to columns of \Mtx{G} 
+portfolio, and thus the imposition of the \hejG constraint only changes
+the unconstrained portfolio in assets corresponding to columns of \hejG 
 containing non-zero elements. In the garden variety application where
-\Mtx{G} is a single row of the identity matrix, the imposition of the
+\hejG is a single row of the identity matrix, the imposition of the
 constraint only changes the holdings in the asset to be hedged (modulo
 changes in the leading constant to satisfy the risk budget).
 
@@ -302,49 +491,67 @@ The squared \txtSR of the optimal portfolio is
 \begin{equation}
 \ssrsqopt 
 = \qform{\minv{\svsig}}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}
-= \ssrsqoptG{\eye} - \ssrsqoptG{\Mtx{G}},
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}
+= \ssrsqoptG{\eye} - \ssrsqoptG{\hejG},
 \label{eqn:ssr_Gcons}
 \end{equation}
 using the notation from \subsecref{basic_conpo}, and setting $\rfr=0$.
 
 Some natural questions to ask are
 \begin{enumerate}
-\item Does the imposition of the \Mtx{G} constraint cause a material decrease
+\item Does the imposition of the \hejG constraint cause a material decrease
 in \txtSR? Can we estimate the size of the drop? 
 
 Performing the same computations on the population analogues (\ie \pvmu,
 \pvsig), we have
-$\psnrsqopt = \psnrsqoptG{\eye} - \psnrsqoptG{\Mtx{G}}$, and thus the 
-drop in squared \txtSNR by imposing the \Mtx{G} constraint is equal to 
-$\psnrsqoptG{\Mtx{G}}$. We can perform inference on this quantity by
-considering the statistic $\ssrsqoptG{\Mtx{G}}$, as in the previous section.
+$\psnrsqopt = \psnrsqoptG{\eye} - \psnrsqoptG{\hejG}$, and thus the 
+drop in squared \txtSNR by imposing the \hejG constraint is equal to 
+$\psnrsqoptG{\hejG}$. We can perform inference on this quantity by
+considering the statistic $\ssrsqoptG{\hejG}$, as in the previous section.
 
 \item Is the constrained portfolio `good'? Formally we can see this as a test
-of the hypothesis $H_0: \psnrsqoptG{\eye} - \psnrsqoptG{\Mtx{G}} = 0$, or
-as point or interval estimates of $\psnrsqoptG{\eye} - \psnrsqoptG{\Mtx{G}}$.
+of the hypothesis $H_0: \psnrsqoptG{\eye} - \psnrsqoptG{\hejG} = 0$, or
+as point or interval estimates of $\psnrsqoptG{\eye} - \psnrsqoptG{\hejG}$.
 
 \nocite{BrittenJones1999}
 This generalizes the known tests of \emph{portfolio spanning}.  
 \cite{KanZhou2012,HKspan1987}
 A spanning test considers whether the optimal portfolio on a 
-pre-fixed subset of \nstrat[1] assets has the same \txtSR as the
-optimal portfolio on all \nstrat assets, \ie whether those \nstrat[1]
+pre-fixed subset of \nstrathej assets has the same \txtSR as the
+optimal portfolio on all \nstrat assets, \ie whether those \nstrathej
 assets `span' the set of all assets. 
 
-If you let \Mtx{G} be the $\nstrat[1] \times \nstrat$ matrix consisting
-of the \nstrat[1] rows of the identity matrix corresponding to the
-\nstrat[1] assets to be tested for spanning, then the term
+If you let \hejG be the $\nstrathej \times \nstrat$ matrix consisting
+of the \nstrathej rows of the identity matrix corresponding to the
+\nstrathej assets to be tested for spanning, then the term
 $$
-\ssrsqoptG{\Mtx{G}} = 
-\qform{\minv{\wrapParens{\qoform{\svsig}{\Mtx{G}}}}}{\wrapParens{\Mtx{G}\svmu}}
+\ssrsqoptG{\hejG} = 
+\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}
 $$
-is the squared \txtSR of the optimal portfolio on only the \nstrat[1] spanning
+is the squared \txtSR of the optimal portfolio on only the \nstrathej spanning
 assets. A spanning test is then a test of
 the hypothesis
 $$
-H_0: \psnrsqoptG{\eye} = \psnrsqoptG{\Mtx{G}}.
+H_0: \psnrsqoptG{\eye} = \psnrsqoptG{\hejG}.
 $$
+
+The test statistic
+\begin{equation}
+F_{\hejG} = \frac{\nlatf - \nstrat}{\nstrat - \nstrathej}\frac{\ssrsqoptG{\eye} -
+\ssrsqoptG{\hejG}}{1 + \ssrsqoptG{\eye}}
+\label{eqn:giri_lrt}
+\end{equation}
+was shown by Rao to follow an \flaw{} distribution under the null hypothesis. 
+(Actually, a beta distribution, which can be transformed to an \flaw{}.)
+Giri showed that, under the alternative, and conditional on observing
+$1 + \ssrsqoptG{\eye}$, that 
+$$
+F_{\hejG} \sim
+\ncflaw{\nstrat - \nstrathej,\nlatf-\nstrat,\frac{\psnrsqoptG{\eye} -
+\psnrsqoptG{\hejG}}{1 + \ssrsqoptG{\eye}}}.
+$$
+
+\cite{rao1952,giri1964likelihood}
 
 \end{enumerate}
 

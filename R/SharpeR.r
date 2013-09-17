@@ -197,7 +197,7 @@ NULL
 #' \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 #'
-#' @section Changes in \SharpeR{} Version 0.1309 (2013-09-17) :
+#' @section Changes in \SharpeR{} Version 0.1309 (2013-09-20) :
 #'
 #' \itemize{
 #' \item spanning/hedging tests.

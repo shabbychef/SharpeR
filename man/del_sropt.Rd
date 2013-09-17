@@ -2,7 +2,7 @@
 \alias{del_sropt}
 \title{Create an 'del_sropt' object.}
 \usage{
-  del_sropt(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr")
+  del_sropt(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr")
 }
 \arguments{
   \item{z.s}{an optimum Sharpe ratio statistic, on some set
@@ -12,9 +12,8 @@
   linear subspace of the assets.  If larger than \code{z.s}
   an error is thrown.}
 
-  \item{del_df}{the difference in rank of the full set and
-  the linear subspace. Equivalently the 'number of degrees
-  of freedom lost' by restricting attention to the
+  \item{df1.sub}{the rank of the linear subspace of the
+  hedge constraint. by restricting attention to the
   subspace.}
 
   \item{ope}{the number of observations per 'epoch'. For
@@ -45,14 +44,14 @@
   \item{sropt.sub}{the optimal Sharpe statistic on the
   subspace.} \item{df1}{the number of assets.}
   \item{df2}{the number of observed vectors.}
-  \item{del_df}{the input \code{del_df} term.}
+  \item{df1.sub}{the input \code{df1.sub} term.}
   \item{drag}{the input \code{drag} term.} \item{ope}{the
   input \code{ope} term.} \item{T2}{the Hotelling \eqn{T^2}
   statistic.} \item{T2.sub}{the Hotelling \eqn{T^2}
   statistic on the subspace.}
 
   roll.own <-
-  sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,del_df=del_df,ope=ope)
+  sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,df1.sub=df1.sub,ope=ope)
 }
 \description{
   Spawns an object of class \code{del_sropt}.
@@ -67,11 +66,10 @@
   \code{sropt_sub} The (optimal) Sharpe ratio statistic on
   some subset, or linear subspace, of the assets. \item
   \code{df1} The number of assets. \item \code{df2} The
-  number of observations. \item \code{del_df} The number of
-  degrees of freedom lost when constrained to the subspace,
-  or the difference in number of assets when a subset.
-  \item \code{drag} The drag term, which is the 'risk free
-  rate' divided by the maximum risk. \item \code{ope} The
+  number of observations. \item \code{df1.sub} The number
+  of degrees of freedom in the hedge constraint. \item
+  \code{drag} The drag term, which is the 'risk free rate'
+  divided by the maximum risk. \item \code{ope} The
   'observations per epoch'. \item \code{epoch} The string
   name of the 'epoch'. }
 
@@ -87,16 +85,19 @@
 ope <- 253
 
 set.seed(as.integer(charToRaw("be determinstic")))
-X <- matrix(rnorm(1000*10),nrow=1000)
+n.stock <- 10
+X <- matrix(rnorm(1000*n.stock),nrow=1000)
 Sigma <- cov(X)
 mu <- colMeans(X)
 w <- solve(Sigma,mu)
 z <- t(mu) \%*\% w
-wsub <- solve(Sigma[1:5,1:5],mu[1:5])
-zsub <- t(mu[1:5]) \%*\% wsub
-del_df <- length(w) - length(wsub)
+n.sub <- 6
+w.sub <- solve(Sigma[1:n.sub,1:n.sub],mu[1:n.sub])
+z.sub <- t(mu[1:n.sub]) \%*\% w.sub
+df1.sub <- n.stock - n.sub
 
-roll.own <- del_sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,del_df=del_df,ope=ope)
+roll.own <- del_sropt(z.s=z,z.sub=z.sub,df1=10,df2=1000,
+ df1.sub=df1.sub,ope=ope)
 print(roll.own)
 }
 \author{

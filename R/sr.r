@@ -489,17 +489,16 @@ reannualize.sropt <- function(object,new.ope=NULL,new.epoch=NULL) {
 # markowitz, possibly on a subset, or basket, of the
 # assets.
 .sub.markowitz <- function(mu,Sigma,w=NULL,H=NULL) {
-	save.mu <- mu
 	if (!is.null(H)) {
 		mu <- H %*% mu
 		Sigma <- .qoform(H,Sigma)
 	}
 	if (is.null(w)) 
 		w <- solve(Sigma,mu)
+	zeta.sq <- t(mu) %*% w
+
 	if (!is.null(H)) 
 		w <- t(H) %*% mu
-
-	zeta.sq <- t(save.mu) %*% w
 	retval <- list(w=w,zeta.sq=zeta.sq)
 	return(retval)
 }
@@ -844,9 +843,8 @@ print.sropt <- function(x,...) {
 #' some subset, or linear subspace, of the assets.
 #' \item \code{df1} The number of assets.
 #' \item \code{df2} The number of observations.
-#' \item \code{del_df} The number of degrees of freedom lost when 
-#' constrained to the subspace, or the difference in number of assets
-#' when a subset.
+#' \item \code{df1.sub} The number of degrees of freedom in the 
+#' hedge constraint.
 #' \item \code{drag} The drag term, which is the 'risk free rate' divided by
 #' the maximum risk.
 #' \item \code{ope} The 'observations per epoch'.
@@ -859,13 +857,13 @@ print.sropt <- function(x,...) {
 #'
 #' @usage
 #'
-#' del_sropt(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr")
+#' del_sropt(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr")
 #'
 #' @param z.s an optimum Sharpe ratio statistic, on some set of assets.
 #' @param z.sub an optimum Sharpe ratio statistic, on a linear subspace
 #' of the assets.  If larger than \code{z.s} an error is thrown.
-#' @param del_df the difference in rank of the full set and the linear
-#' subspace. Equivalently the 'number of degrees of freedom lost'
+#' @param df1.sub the rank of the linear subspace of the hedge
+#' constraint. 
 #' by restricting attention to the subspace.
 #' @inheritParams sropt
 #' @template param-ope
@@ -875,13 +873,13 @@ print.sropt <- function(x,...) {
 #' \item{sropt.sub}{the optimal Sharpe statistic on the subspace.}
 #' \item{df1}{the number of assets.}
 #' \item{df2}{the number of observed vectors.}
-#' \item{del_df}{the input \code{del_df} term.}
+#' \item{df1.sub}{the input \code{df1.sub} term.}
 #' \item{drag}{the input \code{drag} term.}
 #' \item{ope}{the input \code{ope} term.}
 #' \item{T2}{the Hotelling \eqn{T^2} statistic.}
 #' \item{T2.sub}{the Hotelling \eqn{T^2} statistic on the subspace.}
 #'
-#' roll.own <- sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,del_df=del_df,ope=ope)
+#' roll.own <- sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,df1.sub=df1.sub,ope=ope)
 #'
 #' @seealso \code{\link{as.del_sropt}}
 #' @rdname del_sropt
@@ -897,22 +895,25 @@ print.sropt <- function(x,...) {
 #' ope <- 253
 #'
 #' set.seed(as.integer(charToRaw("be determinstic")))
-#' X <- matrix(rnorm(1000*10),nrow=1000)
+#' n.stock <- 10
+#' X <- matrix(rnorm(1000*n.stock),nrow=1000)
 #' Sigma <- cov(X)
 #' mu <- colMeans(X)
 #' w <- solve(Sigma,mu)
 #' z <- t(mu) %*% w
-#' wsub <- solve(Sigma[1:5,1:5],mu[1:5])
-#' zsub <- t(mu[1:5]) %*% wsub
-#' del_df <- length(w) - length(wsub)
+#' n.sub <- 6
+#' w.sub <- solve(Sigma[1:n.sub,1:n.sub],mu[1:n.sub])
+#' z.sub <- t(mu[1:n.sub]) %*% w.sub
+#' df1.sub <- n.stock - n.sub
 #'
-#' roll.own <- del_sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,del_df=del_df,ope=ope)
+#' roll.own <- del_sropt(z.s=z,z.sub=z.sub,df1=10,df2=1000,
+#'  df1.sub=df1.sub,ope=ope)
 #' print(roll.own)
 #'
-del_sropt <- function(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr") {
+del_sropt <- function(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr") {
 	retval <- list(sropt = z.s,sropt.sub = z.sub,
 								 sropt.del = sqrt((z.s)^2 - (z.sub)^2),
-								 df1 = df1,df2 = df2,del_df = del_df,
+								 df1 = df1,df2 = df2,df1.sub = df1.sub,
 								 drag = drag,ope = ope,epoch = epoch)
 
 	retval$T2.sub <- .sropt2T(list(sropt=z.sub,drag=drag,ope=ope,df2=df2))
@@ -927,16 +928,16 @@ del_sropt <- function(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr") {
 .del_sropt.asF <- function(x) {
 	# see Giri eqn (1.9) and section 3.
 	# make Z ~ B(bdf1,bdf2) under the null
-	Z <- (1 + x$T2.sub) / (1 + x$T2)
+	Z <- (x$df2 + x$T2.sub) / (x$df2 + x$T2)
 	bdf1 <- (x$df2 - x$df1) / 2
-	bdf2 <- (x$del_df) / 2
+	bdf2 <- (x$df1 - x$df1.sub) / 2
 	# transform beta to F; 
 	# define the F so that it is non-central under the alternative
 	# (on the top)
-	Fval <- (bdf1 * (1-Z)) / (bdf2 * Z)
 	df1 <- 2*bdf2
 	df2 <- 2*bdf1;
-	pval <- pf(Fval,df1,df2,ncp=0,lower.tail=FALSE)
+	Fval <- (df2 * (1-Z)) / (df1 * Z)
+	pval <- pf(Fval,df1,df2,lower.tail=FALSE)
 	retval <- list(Fval=Fval,df1=df1,df2=df2,pval=pval)
 	return(retval)
 }
@@ -997,6 +998,12 @@ del_sropt <- function(z.s,z.sub,df1,df2,del_df,drag=0,ope=1,epoch="yr") {
 #' # hedge out the first one:
 #' G <- matrix(diag(nfac)[1,],nrow=1)
 #' asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
+#' print(asro)
+#' G <- diag(nfac)[c(1:3),]
+#' asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
+#' # compare to sropt on the remaining assets
+#' # they should be close, but not exact.
+#' asro.alt <- as.sropt(Returns[,4:nfac],drag=0,ope=ope)
 #' \dontrun{
 #' # using real data.
 #' if (require(quantmod)) {
@@ -1038,7 +1045,7 @@ as.del_sropt.default <- function(X,G,drag=0,ope=1,epoch="yr") {
 
 	# this stinks
 	retv <- del_sropt(z.s=z.s,z.sub=z.sub,df1=hotval$df1,df2=hotval$df2,
-										del_df=dim(G)[1],drag=drag,ope=ope,epoch=epoch)
+										df1.sub=dim(G)[1],drag=drag,ope=ope,epoch=epoch)
 
 	return(retv)
 }
@@ -1074,7 +1081,7 @@ as.del_sropt.xts <- function(X,G,drag=0,ope=1,epoch="yr") {
 #' @export
 #'
 #' @examples 
-#' roll.own <- del_sropt(z.s=2,z.sub=1,df1=10,df2=1000,del_df=3,ope=1,epoch="yr")
+#' roll.own <- del_sropt(z.s=2,z.sub=1,df1=10,df2=1000,df1.sub=3,ope=1,epoch="yr")
 #' is.sropt(roll.own)
 is.del_sropt <- function(x) inherits(x,"del_sropt")
 
@@ -1083,7 +1090,7 @@ is.del_sropt <- function(x) inherits(x,"del_sropt")
 #' @S3method print del_sropt
 #' @export
 print.del_sropt <- function(x,...) {
-	Fandp <- Fandp <- .del_sropt.asF(x)
+	Fandp <- .del_sropt.asF(x)
 	coefs <- cbind(x$sropt.del,Fandp$Fval,Fandp$pval)
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											 "F value","Pr(>F)")
@@ -1093,6 +1100,16 @@ print.del_sropt <- function(x,...) {
 							 cs.ind=c(1),tst.ind=c(2),dig.tst=2)
 }
 #UNFOLD
+
+## test them:
+#X <- matrix(rnorm(1000*10,0.1),ncol=10)
+#G <- diag(dim(X)[2])[1,]
+#foo <- as.del_sropt(X,G)
+#print(foo)
+
+#X <- matrix(rnorm(1000*10,0.00001),ncol=10)
+#foo <- as.del_sropt(X,G)
+#print(foo)
 
 #for vim modeline: (do not edit)
 # vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r

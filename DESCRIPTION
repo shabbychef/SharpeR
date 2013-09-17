@@ -23,7 +23,7 @@ VignetteBuilder: knitr
 Collate:
     'utils.r'
     'distributions.r'
-    'estimation.r'
     'sr.r'
+    'estimation.r'
     'SharpeR.r'
     'tests.r'

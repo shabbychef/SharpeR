@@ -1,4 +1,8 @@
 
+2013-09-20 Steven E. Pav <shabbychef@gmail.com>
+* add spanning tests
+* split vignette in two
+
 2013-08-08 Steven E. Pav <shabbychef@gmail.com>
 * restore vignette to package
 

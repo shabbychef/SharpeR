@@ -77,7 +77,10 @@ ope <- 253
 set.seed(as.integer(charToRaw("be determinstic")))
 Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 # hedge out the first one:
-G <- diag(nfac)[1,]
+G <- matrix(diag(nfac)[1,],nrow=1)
+asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
+print(asro)
+G <- diag(nfac)[c(1:3),]
 asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
 \dontrun{
 # using real data.
