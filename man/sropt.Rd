@@ -68,6 +68,7 @@ ope <- 253
 zeta.s <- 1.0
 df1 <- 10
 df2 <- 6 * ope
+set.seed(as.integer(charToRaw("fix seed")))
 rvs <- rsropt(1,df1,df2,zeta.s,ope,drag=0)
 roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 print(roll.own)
@@ -75,8 +76,6 @@ print(roll.own)
 rvs <- rsropt(5,df1,df2,zeta.s,ope,drag=0)
 roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 print(roll.own)
-
-FUCK. 2FIX
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

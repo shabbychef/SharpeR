@@ -121,23 +121,23 @@ following portfolio optimization problem:
 \label{eqn:port_prob}
 \end{equation}
 where \svmu, \svsig are the sample mean vector and covariance matrix, \rfr is
-the risk-free rate, and $R$ is a cap on portfolio `risk' as estimated by
+the risk-free rate, and $\Rbuj$ is a cap on portfolio `risk' as estimated by
 \svsig. (Note this differs from the traditional definition of the problem which
 imposes a `self-financing constraint' which does not actually bound portfolio
 weights.)  The solution to this problem is
 $$
-\sportwopt \defeq \frac{R}{\sqrt{\qform{\minv{\svsig}}{\svmu}}} \minv{\svsig}\svmu.
+\sportwopt \defeq \frac{\Rbuj}{\sqrt{\qform{\minv{\svsig}}{\svmu}}} \minv{\svsig}\svmu.
 $$
 The \txtSR of this portfolio is 
 \begin{equation}
 \ssropt 
 \defeq \frac{\trAB{\sportwopt}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwopt}}} 
-= \sqrt{\qform{\minv{\svsig}}{\svmu}} - \frac{\rfr}{R}
-= \sqrt{\Tstat / \ssiz} - \frac{\rfr}{R},
+= \sqrt{\qform{\minv{\svsig}}{\svmu}} - \frac{\rfr}{\Rbuj}
+= \sqrt{\Tstat / \ssiz} - \frac{\rfr}{\Rbuj},
 \label{eqn:ssr_uncons}
 \end{equation}
 where \Tstat is Hotelling's statistic, and \ssiz is the number of independent 
-observations (\eg `days') used to construct \svmu. The term $\rfr / R$ is a
+observations (\eg `days') used to construct \svmu. The term $\rfr / \Rbuj$ is a
 deterministic `drag' term that merely shifts the location of \ssropt, and so
 we can (mostly) ignore it when testing significance of \ssropt.
 
@@ -183,6 +183,408 @@ misapplied to geometric returns without even an appeal to Taylor's theorem.
 
 %\subsection{Asymptotic Distribution of \txtSR}%FOLDUP
 %%UNFOLD
+
+%UNFOLD
+
+\section{\txtSR and Portfolio Optimization}%FOLDUP
+
+Let $\vreti[1],\vreti[2],\ldots,\vreti[\ssiz]$ be independent draws from
+a \nstrat-variate normal with population mean \pvmu and population covariance
+\pvsig. Let \svmu be the usual sample estimate of the mean,
+$\svmu = \sum_i \vreti[i] / \ssiz,$ and let \svsig be the usual sample
+estimate of the covariance, 
+$$
+\svsig \defeq \oneby{\ssiz - 1}\sum_i \ogram{\wrapParens{\vreti[i] - \svmu}}.
+$$
+
+Consider the unconstrained optimization problem
+\begin{equation}
+\max_{\sportw : \qform{\svsig}{\sportw} \le \Rbuj^2} 
+\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
+\label{eqn:opt_port_I}
+\end{equation}
+where \rfr is the risk-free rate, and $\Rbuj > 0$ is a risk `budget'. 
+
+This problem has solution
+\begin{equation}
+\sportwopt \defeq c\, \minv{\svsig}\svmu,
+\label{eqn:opt_port_solve_I}
+\end{equation}
+where the constant $c$ is chosen to maximize return under the given risk
+budget:
+$$
+c =
+\frac{\Rbuj}{\sqrt{\qform{\minv{\svsig}}{\svmu}}}.
+$$
+The \txtSR of this portfolio is
+\begin{equation}
+\ssropt
+\defeq \frac{\trAB{\sportwopt}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwopt}}}
+ = \sqrt{\qform{\minv{\svsig}}{\svmu}}
+- \rdrag.
+\end{equation}
+The term $\rfr/\Rbuj$ is deterministic; we can treat it as an annoying
+additive constant that has to be minded. Define the population analogue of
+this quantity as
+\begin{equation}
+\psnropt 
+\defeq \sqrt{\qform{\minv{\pvsig}}{\pvmu}}
+- \rdrag.
+\end{equation}
+
+
+The random term,
+$\ssiz \wrapParens{\qform{\minv{\svsig}}{\svmu}}^2$,
+is a Hotelling \Tstat, which follows a non-central \flaw{} distribution, up to
+scaling:
+\begin{equation*}
+\frac{\ssiz}{\ssiz-1}\frac{\ssiz-\nstrat}{\nstrat}
+\wrapParens{\ssropt + \rdrag}^2 \sim
+\ncflaw{\nstrat,\ssiz-\nstrat,\ssiz\wrapParens{\psnropt + \rdrag}^2}.
+\end{equation*}
+This allows us to make inference about \psnropt.
+
+By using the 
+'biased' covariance estimate, defined as 
+$$
+\svsigu \defeq \frac{\ssiz-1}{\ssiz} \svsig 
+= \oneby{\ssiz}\sum_i \ogram{\wrapParens{\vreti[i] - \svmu}},
+$$
+the above expression can be simplified slightly as 
+\begin{equation*}
+\frac{\ssiz-\nstrat}{\nstrat}
+\qform{\minv{\svsigu}}{\svmu} \sim
+\ncflaw{\nstrat,\ssiz-\nstrat,\ssiz\wrapParens{\psnropt + \rdrag}^2}.
+\end{equation*}
+
+%UNFOLD
+
+\section{\txtSR and Constrained Portfolio Optimization}%FOLDUP
+
+\label{subsec:basic_conpo}
+Let \hejG be an $\nstrathej \times \nstrat$ matrix of rank $\nstrathej \le
+\nstrat$. Let \mnull{\hejG} be the matrix whose rows span the null space
+of the rows of \hejG, \ie $\mnull{\hejG}\tr{\hejG} = 0$. 
+Consider the constrained optimization problem
+\begin{equation}
+\max_{\sportw : \mnull{\hejG} \sportw = 0,\, \qform{\svsig}{\sportw} \le \Rbuj^2} 
+\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
+\label{eqn:opt_port_cons_I}
+\end{equation}
+where, as previously, \svmu, \svsig are the sample mean vector and covariance 
+matrix, 
+\rfr is the risk-free rate, and $\Rbuj > 0$ is a risk `budget'. 
+
+The gist of this constraint is that feasible portfolios must be some
+linear combination of the rows of \hejG. When viewed in this light, this
+problem clearly reduces to that of optimizing the portfolio on 
+\nstrathej assets with sample mean $\hejG\svmu$ and sample covariance
+$\qoform{\svsig}{\hejG}$. This problem has solution
+\begin{equation}
+\sportwoptG{\hejG} 
+\defeq c\, \tr{\hejG} \minv{\wrapParens{\qoform{\svsig}{\hejG}}} \hejG\svmu,
+\label{eqn:opt_port_solve_cons_I}
+\end{equation}
+where the constant $c$ is chosen to maximize return under the given risk
+budget:
+$$
+c =
+\frac{\Rbuj}{\sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}}.
+$$
+The \txtSR of this portfolio is
+\begin{equation}
+\ssroptG{\hejG} 
+\defeq \frac{\trAB{\sportwoptG{\hejG}}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwoptG{\hejG}}}}
+ = \sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}
+- \frac{\rfr}{\Rbuj}.
+\end{equation}
+Again, for purposes of estimating the population analogue, we can largely
+ignore, for simplicity of exposition, the deterministic `drag' term
+$\rfr/\Rbuj$. The random term, 
+$\ssiz
+\wrapParens{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}^2$,
+is a Hotelling \Tstat, which follows a non-central \flaw{} distribution, up to
+scaling:
+\begin{equation*}
+\frac{\ssiz}{\ssiz-1}\frac{\ssiz-\nstrathej}{\nstrathej}
+\wrapParens{\ssroptG{\hejG} + \frac{\rfr}{\Rbuj}}^2 \sim
+\ncflaw{\nstrathej,\ssiz-\nstrathej,\ssiz\wrapParens{\psnroptG{\hejG} +
+\frac{\rfr}{\Rbuj}}^2}.
+\end{equation*}
+This allows us to make inference about \psnroptG{\hejG}, the population
+analogue of \ssroptG{\hejG}.
+
+\subsection{Spanning and Hedging}%FOLDUP
+
+Consider the constrained portfolio optimization problem on \nstrat assets,
+\begin{equation}
+\max_{\sportw : \hejG\svsig \sportw = \hejg,\, \qform{\svsig}{\sportw} \le
+\Rbuj^2} 
+\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
+\label{eqn:cons_port_prob}
+\end{equation}
+where $\hejG$ is an $\nstrathej \times \nstrat$ matrix of rank \nstrathej, and,
+as previously, \svmu, \svsig are sample mean vector and covariance matrix, 
+\rfr is the risk-free rate, and $\Rbuj > 0$ is a risk `budget'. We can interpret
+the \hejG constraint as stating that the covariance of the returns of
+a feasible portfolio with the returns of a portfolio whose weights are in
+a given row of \hejG shall equal the corresponding element of \hejg.
+In the garden variety application of this problem, \hejG consists of 
+\nstrathej rows of the identity matrix, and \hejg is the zero vector;
+in this case, feasible portfolios are `hedged' with respect 
+to the \nstrathej assets selected by \hejG
+(although they may hold some position in the hedged assets).
+
+Assuming that
+the \hejG constraint and risk budget can be simultaneously satisfied,
+the solution to this problem, via the Lagrange multiplier technique,
+is
+\begin{equation}
+	\begin{split}
+	\sportwopt &= c\wrapParens{\minv{\svsig}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\hejG}\svmu} +
+	\tr{\hejG}{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}\hejg,\,\\
+	c^2 &= \frac{\Rbuj^2 - \qform{\wrapParens{\qoform{\svsig}{\hejG}}}{\hejg}}{
+	\qform{\minv{\svsig}}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}},
+	\end{split}
+\end{equation}
+where the numerator in the last equation need be positive for the problem
+to be feasible.
+
+The case where $\hejg \ne 0$ is `pathological', as it requires a fixed
+non-zero covariance of the target portfolio with some other portfolio's
+returns. Setting $\hejg = 0$ ensures the problem is feasible, and
+I will make this assumption hereafter. Under this assumption, the optimal
+portfolio is 
+\begin{equation*}
+\sportwopt 
+= c \wrapParens{\minv{\svsig}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\hejG}\svmu}
+= c_1 \sportwoptG{\eye} - c_2 \sportwoptG{\hejG},
+\end{equation*}
+using the notation from \subsecref{basic_conpo}.
+Note that, up to scaling, $\minv{\svsig}\svmu$ is the unconstrained optimal
+portfolio, and thus the imposition of the \hejG constraint only changes
+the unconstrained portfolio in assets corresponding to columns of \hejG 
+containing non-zero elements. In the garden variety application where
+\hejG is a single row of the identity matrix, the imposition of the
+constraint only changes the holdings in the asset to be hedged (modulo
+changes in the leading constant to satisfy the risk budget).
+
+The squared \txtSR of the optimal portfolio is
+\begin{equation}
+\ssrsqopt 
+= \qform{\minv{\svsig}}{\svmu} -
+	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}
+= \ssrsqoptG{\eye} - \ssrsqoptG{\hejG},
+\label{eqn:ssr_Gcons}
+\end{equation}
+using the notation from \subsecref{basic_conpo}, and setting $\rfr=0$.
+
+Some natural questions to ask are
+\begin{enumerate}
+\item Does the imposition of the \hejG constraint cause a material decrease
+in \txtSR? Can we estimate the size of the drop? 
+
+Performing the same computations on the population analogues (\ie \pvmu,
+\pvsig), we have
+$\psnrsqopt = \psnrsqoptG{\eye} - \psnrsqoptG{\hejG}$, and thus the 
+drop in squared \txtSNR by imposing the \hejG constraint is equal to 
+$\psnrsqoptG{\hejG}$. We can perform inference on this quantity by
+considering the statistic $\ssrsqoptG{\hejG}$, as in the previous section.
+
+\item Is the constrained portfolio `good'? Formally we can see this as a test
+of the hypothesis $H_0: \psnrsqoptG{\eye} - \psnrsqoptG{\hejG} = 0$, or
+as point or interval estimates of $\psnrsqoptG{\eye} - \psnrsqoptG{\hejG}$.
+
+\nocite{BrittenJones1999}
+This generalizes the known tests of \emph{portfolio spanning}.  
+\cite{KanZhou2012,HKspan1987}
+A spanning test considers whether the optimal portfolio on a 
+pre-fixed subset of \nstrathej assets has the same \txtSR as the
+optimal portfolio on all \nstrat assets, \ie whether those \nstrathej
+assets `span' the set of all assets. 
+
+If you let \hejG be the $\nstrathej \times \nstrat$ matrix consisting
+of the \nstrathej rows of the identity matrix corresponding to the
+\nstrathej assets to be tested for spanning, then the term
+$$
+\ssrsqoptG{\hejG} = 
+\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}
+$$
+is the squared \txtSR of the optimal portfolio on only the \nstrathej spanning
+assets. A spanning test is then a test of
+the hypothesis
+$$
+H_0: \psnrsqoptG{\eye} = \psnrsqoptG{\hejG}.
+$$
+
+The test statistic
+\begin{equation}
+F_{\hejG} = \frac{\ssiz - \nstrat}{\nstrat - \nstrathej}\frac{\ssrsqoptG{\eye} -
+\ssrsqoptG{\hejG}}{1 + \ssrsqoptG{\eye}}
+\label{eqn:giri_lrt}
+\end{equation}
+was shown by Rao to follow an \flaw{} distribution under the null hypothesis. 
+(Actually, a beta distribution, which can be transformed to an \flaw{}.)
+Giri showed that, under the alternative, and conditional on observing
+$1 + \ssrsqoptG{\eye}$, that 
+$$
+F_{\hejG} \sim
+\ncflaw{\ssiz - \nstrathej,\nlatf-\nstrat,\frac{\psnrsqoptG{\eye} -
+\psnrsqoptG{\hejG}}{1 + \ssrsqoptG{\eye}}}.
+$$
+
+(2FIX: problems with $\ssiz-1$ vs $\ssiz$ in definition of \pvsig?
+Compare with \svsigu ?)
+
+\cite{rao1952,giri1964likelihood}
+
+\end{enumerate}
+
+
+%UNFOLD
+
+\subsection{Optimal \txtSR under Positivity Constraint}%FOLDUP
+
+Consider the following portfolio optimization problem:
+\begin{equation}
+\max_{\sportw : \sportw \ge 0,\, \qform{\svsig}{\sportw} \le \Rbuj^2} 
+\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
+\label{eqn:cons_port_posi}
+\end{equation}
+where the constraint $\sportw \ge 0$ is to be interpreted element-wise.
+In general, the optimal portfolio, call it \sportwoptG{+}, must be found
+numerically.\footnote{Unless, by some miracle, the unconstrained optimal
+portfolio happens to satisfy the positivity constraint.}
+
+The squared \txtSR of the portfolio \sportwoptG{+} has value
+$$
+\ssrsqoptG{+} = 
+\frac{\wrapParens{\trAB{\sportwoptG{+}}{\svmu}}^2}{{\qform{\svsig}{\sportwoptG{+}}}}.
+$$
+The statistic $\ssiz\ssrsqoptG{+}$, which is a constrained Hotelling \Tstat, 
+has been studied to test the hypothesis of zero multivariate mean against
+an inequality-constrained alternative hypothesis.  \cite{Silvapulle:1995:HTT:219373.219391,Sen1999264} 
+
+Unfortunately, \ssrsqoptG{+} is not a \emph{similar}
+statistic.  That is, its distribution depends on the population 
+analogue, \psnrsqoptG{+}, but also on the uknown nuisance 
+parameter, \pvsig.  And so using \ssrsqoptG{+} to test the
+hypothesis $H_0: \psnrsqoptG{+} = 0$ only yields a conservative test, 
+with a maximal type I rate. Intuitively, the Hotelling \Tstat,
+which is invariant with respect to an invertible transform, should
+not mix well with the positive-orthant constraint, which is not 
+invariant.
+\nocite{Perlman_1969,Sen20023,nla.cat-vn3800977}
+
+One consequence of non-similarity is that using in-sample \txtSR as 
+a yardstick of the quality of so constrained portfolio is unwise. For 
+one can imagine universe A, containing of two zero-mean assets, and
+universe B with two assets with positive mean, where the different covariances
+in the two universes implies that the sample optimal constrained \txtSR 
+is likely to be larger in universe A than in universe B.
+
+<<'pos_cons_example', include=FALSE, warning=FALSE, message=FALSE>>=
+base.opt.1 <- function(rho,c1,c2) {
+# compute v1, v2 that solve
+#
+#   min      v1^2 + v2^2
+#   st.         v1 >= c1
+#     -rho v1 + v2 >= c2 
+# 
+# return as a list?
+# the prospective solutions are
+# (0,0), (c1,0), (-2rho c2/(1+rho^2),c2(1-rho^2)/(1+rho^2)),
+# and (c1,c2+rho*c1)
+	rho2 <- rho^2
+	oneprho2 <- 1 + rho2;
+	solns <- matrix(c(0,0, c1,0, -2*rho*c2/(oneprho2),c2*(1-rho^2)/(oneprho2),
+c1,c2+rho*c1),nrow=2)
+	feasible <- solns[1,] >= c1
+	solns <- solns[,feasible]
+	feasible <- -rho * solns[1,] + solns[2,] >= c2
+	solns <- solns[,feasible]
+	solns <- matrix(solns,nrow=2)
+
+	vals <- colSums(solns ^ 2)
+	retval <- solns[,which.min(vals)]
+	return(retval)
+}
+base.opt.2 <- function(rho,psi1,psi2) {
+# compute lam1, lam2 that solve
+# 
+#   min     [lam1,lam2] * R^-1 [lam1,lam2]'
+#   st.     R^-1 ([psi1,psi2]' + [lam1,lam2]') >= 0
+#
+#   where   R = [1,rho]
+#               [rho,1]
+#    so  R^-1 = [1, -rho]
+#               [-rho, 1] / (1-rho^2)
+#
+# and then return R^-1 ([psi1,psi2]' + [lam1,lam2]')
+	c1 <- rho * psi2 - psi1;
+	c2 <- rho * psi1 - psi2;
+	rv <- base.opt.1(rho,c1,c2)
+	lam2 <- rv[2] / (1-rho^2)
+	lam1 <- rv[1] + rho * lam2
+	nmu1 <- psi1 + lam1
+	nmu2 <- psi2 + lam2
+	# deal with roundoff
+	w1 <- max(0,nmu1 - rho * nmu2)
+	w2 <- max(0,-rho * nmu1 + nmu2)
+	return(c(w1,w2))
+}
+base.opt.3 <- function(mu1,mu2,sig1,sig12,sig2) {
+# compute w1, w2 to solve
+#
+#   max   [w1,w2] * [mu1,mu2]'  / sqrt([w1,w2] * Sig * [w1,w2]')
+#   st.   w1 >= 0
+#         w2 >= 0
+#
+#  where  Sig = [sig1   sig12]
+#               [sig12   sig2]
+	rho <- sig12 / sqrt(sig1 * sig2)
+	psi1 <- mu1 / sqrt(sig1)
+	psi2 <- mu2 / sqrt(sig2)
+	rv <- base.opt.2(rho,psi1,psi2)
+	return(rv)
+}
+# test it
+base.opt.3(1,0.5,1,0.4,1);
+base.opt.3(1,0.5,1,0.5,1);
+base.opt.3(1,0.5,1,0.6,1);
+base.opt.3(1,0.5,1,0.8,1);
+
+base.opt.3(1,0.5,1,-0.8,1);
+opt.pos.T2 <- function(mu1,mu2,sig1,sig12,sig2) {
+# compute the maximum value of 
+#
+#   max   [w1,w2] * [mu1,mu2]'  / sqrt([w1,w2] * Sig * [w1,w2]')
+#   st.   w1 >= 0
+#         w2 >= 0
+	rv <- base.opt.3(mu1,mu2,sig1,sig12,sig2)
+	w <- as.vector(rv)
+	mu <- as.vector(c(mu1,mu2))
+	Sig <- matrix(c(sig1,sig12,sig12,sig2),nrow=2)
+	T <- (mu %*% w) / sqrt(t(w) %*% Sig %*% w)
+	return(T^2)
+}
+
+	
+
+
+@
+
+
+
+
+%UNFOLD
+%UNFOLD
+
+\section{Miscellanea}%FOLDUP
+
 
 \subsection{The Haircut}%FOLDUP
 
@@ -370,327 +772,6 @@ observed \svmu and \svsig. In this case one \emph{cannot} simply
 plug-in some estimate of \psnropt computed from \ssropt (via MLE, KRS, \etc)
 into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 \psnropt is not independent of the modeling error that causes the haircut.
-
-%UNFOLD
-
-%UNFOLD
-
-\section{\txtSR and Constrained Portfolio Optimization}%FOLDUP
-
-\label{subsec:basic_conpo}
-Let \hejG be an $\nstrathej \times \nstrat$ matrix of rank $\nstrathej \le
-\nstrat$. Let \mnull{\hejG} be the matrix whose rows span the null space
-of the rows of \hejG, \ie $\mnull{\hejG}\tr{\hejG} = 0$. 
-Consider the constrained optimization problem
-\begin{equation}
-\max_{\sportw : \mnull{\hejG} \sportw = 0,\, \qform{\svsig}{\sportw} \le R^2} 
-\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
-\label{eqn:opt_port_cons_I}
-\end{equation}
-where, as previously, \svmu, \svsig are the sample mean vector and covariance 
-matrix, 
-\rfr is the risk-free rate, and $R > 0$ is a risk `budget'. 
-
-The gist of this constraint is that feasible portfolios must be some
-linear combination of the rows of \hejG. When viewed in this light, this
-problem clearly reduces to that of optimizing the portfolio on 
-\nstrathej assets with sample mean $\hejG\svmu$ and sample covariance
-$\qoform{\svsig}{\hejG}$. This problem has solution
-\begin{equation}
-\sportwoptG{\hejG} 
-\defeq c\, \tr{\hejG} \minv{\wrapParens{\qoform{\svsig}{\hejG}}} \hejG\svmu,
-\label{eqn:opt_port_solve_I}
-\end{equation}
-where the constant $c$ is chosen to maximize return under the given risk
-budget:
-$$
-c =
-\frac{R}{\sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}}.
-$$
-The \txtSR of this portfolio is
-\begin{equation}
-\ssroptG{\hejG} 
-\defeq \frac{\trAB{\sportwoptG{\hejG}}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwoptG{\hejG}}}}
- = \sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}
-- \frac{\rfr}{R}.
-\end{equation}
-Again, for purposes of estimating the population analogue, we can largely
-ignore, for simplicity of exposition, the deterministic `drag' term
-$\rfr/R$. The random term, 
-$\ssiz
-\wrapParens{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}^2$,
-is a Hotelling \Tstat, which follows a non-central \flaw{} distribution, up to
-scaling:
-\begin{equation*}
-\frac{\ssiz}{\ssiz-1}\frac{\ssiz-\nstrathej}{\nstrathej}
-\wrapParens{\ssroptG{\hejG} + \frac{\rfr}{R}}^2 \sim
-\ncflaw{\nstrathej,\ssiz-\nstrathej,\ssiz\wrapParens{\psnroptG{\hejG} +
-\frac{\rfr}{R}}^2}.
-\end{equation*}
-This allows us to make inference about \psnroptG{\hejG}, the population
-analogue of \ssroptG{\hejG}.
-
-\subsection{Spanning and Hedging}%FOLDUP
-
-Consider the constrained portfolio optimization problem on \nstrat assets,
-\begin{equation}
-\max_{\sportw : \hejG\svsig \sportw = \hejg,\, \qform{\svsig}{\sportw} \le R^2} 
-\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
-\label{eqn:cons_port_prob}
-\end{equation}
-where $\hejG$ is an $\nstrathej \times \nstrat$ matrix of rank \nstrathej, and,
-as previously, \svmu, \svsig are sample mean vector and covariance matrix, 
-\rfr is the risk-free rate, and $R > 0$ is a risk `budget'. We can interpret
-the \hejG constraint as stating that the covariance of the returns of
-a feasible portfolio with the returns of a portfolio whose weights are in
-a given row of \hejG shall equal the corresponding element of \hejg.
-In the garden variety application of this problem, \hejG consists of 
-\nstrathej rows of the identity matrix, and \hejg is the zero vector;
-in this case, feasible portfolios are `hedged' with respect 
-to the \nstrathej assets selected by \hejG
-(although they may hold some position in the hedged assets).
-
-Assuming that
-the \hejG constraint and risk budget can be simultaneously satisfied,
-the solution to this problem, via the Lagrange multiplier technique,
-is
-\begin{equation}
-	\begin{split}
-	\sportwopt &= c\wrapParens{\minv{\svsig}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\hejG}\svmu} +
-	\tr{\hejG}{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}\hejg,\,\\
-	c^2 &= \frac{R^2 - \qform{\wrapParens{\qoform{\svsig}{\hejG}}}{\hejg}}{
-	\qform{\minv{\svsig}}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}},
-	\end{split}
-\end{equation}
-where the numerator in the last equation need be positive for the problem
-to be feasible.
-
-The case where $\hejg \ne 0$ is `pathological', as it requires a fixed
-non-zero covariance of the target portfolio with some other portfolio's
-returns. Setting $\hejg = 0$ ensures the problem is feasible, and
-I will make this assumption hereafter. Under this assumption, the optimal
-portfolio is 
-\begin{equation*}
-\sportwopt 
-= c \wrapParens{\minv{\svsig}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\hejG}\svmu}
-= c_1 \sportwoptG{\eye} - c_2 \sportwoptG{\hejG},
-\end{equation*}
-using the notation from \subsecref{basic_conpo}.
-Note that, up to scaling, $\minv{\svsig}\svmu$ is the unconstrained optimal
-portfolio, and thus the imposition of the \hejG constraint only changes
-the unconstrained portfolio in assets corresponding to columns of \hejG 
-containing non-zero elements. In the garden variety application where
-\hejG is a single row of the identity matrix, the imposition of the
-constraint only changes the holdings in the asset to be hedged (modulo
-changes in the leading constant to satisfy the risk budget).
-
-The squared \txtSR of the optimal portfolio is
-\begin{equation}
-\ssrsqopt 
-= \qform{\minv{\svsig}}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}
-= \ssrsqoptG{\eye} - \ssrsqoptG{\hejG},
-\label{eqn:ssr_Gcons}
-\end{equation}
-using the notation from \subsecref{basic_conpo}, and setting $\rfr=0$.
-
-Some natural questions to ask are
-\begin{enumerate}
-\item Does the imposition of the \hejG constraint cause a material decrease
-in \txtSR? Can we estimate the size of the drop? 
-
-Performing the same computations on the population analogues (\ie \pvmu,
-\pvsig), we have
-$\psnrsqopt = \psnrsqoptG{\eye} - \psnrsqoptG{\hejG}$, and thus the 
-drop in squared \txtSNR by imposing the \hejG constraint is equal to 
-$\psnrsqoptG{\hejG}$. We can perform inference on this quantity by
-considering the statistic $\ssrsqoptG{\hejG}$, as in the previous section.
-
-\item Is the constrained portfolio `good'? Formally we can see this as a test
-of the hypothesis $H_0: \psnrsqoptG{\eye} - \psnrsqoptG{\hejG} = 0$, or
-as point or interval estimates of $\psnrsqoptG{\eye} - \psnrsqoptG{\hejG}$.
-
-\nocite{BrittenJones1999}
-This generalizes the known tests of \emph{portfolio spanning}.  
-\cite{KanZhou2012,HKspan1987}
-A spanning test considers whether the optimal portfolio on a 
-pre-fixed subset of \nstrathej assets has the same \txtSR as the
-optimal portfolio on all \nstrat assets, \ie whether those \nstrathej
-assets `span' the set of all assets. 
-
-If you let \hejG be the $\nstrathej \times \nstrat$ matrix consisting
-of the \nstrathej rows of the identity matrix corresponding to the
-\nstrathej assets to be tested for spanning, then the term
-$$
-\ssrsqoptG{\hejG} = 
-\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}
-$$
-is the squared \txtSR of the optimal portfolio on only the \nstrathej spanning
-assets. A spanning test is then a test of
-the hypothesis
-$$
-H_0: \psnrsqoptG{\eye} = \psnrsqoptG{\hejG}.
-$$
-
-The test statistic
-\begin{equation}
-F_{\hejG} = \frac{\nlatf - \nstrat}{\nstrat - \nstrathej}\frac{\ssrsqoptG{\eye} -
-\ssrsqoptG{\hejG}}{1 + \ssrsqoptG{\eye}}
-\label{eqn:giri_lrt}
-\end{equation}
-was shown by Rao to follow an \flaw{} distribution under the null hypothesis. 
-(Actually, a beta distribution, which can be transformed to an \flaw{}.)
-Giri showed that, under the alternative, and conditional on observing
-$1 + \ssrsqoptG{\eye}$, that 
-$$
-F_{\hejG} \sim
-\ncflaw{\nstrat - \nstrathej,\nlatf-\nstrat,\frac{\psnrsqoptG{\eye} -
-\psnrsqoptG{\hejG}}{1 + \ssrsqoptG{\eye}}}.
-$$
-
-\cite{rao1952,giri1964likelihood}
-
-\end{enumerate}
-
-
-%UNFOLD
-
-\subsection{Optimal \txtSR under Positivity Constraint}%FOLDUP
-
-Consider the following portfolio optimization problem:
-\begin{equation}
-\max_{\sportw : \sportw \ge 0,\, \qform{\svsig}{\sportw} \le R^2} 
-\frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
-\label{eqn:cons_port_posi}
-\end{equation}
-where the constraint $\sportw \ge 0$ is to be interpreted element-wise.
-In general, the optimal portfolio, call it \sportwoptG{+}, must be found
-numerically.\footnote{Unless, by some miracle, the unconstrained optimal
-portfolio happens to satisfy the positivity constraint.}
-
-The squared \txtSR of the portfolio \sportwoptG{+} has value
-$$
-\ssrsqoptG{+} = 
-\frac{\wrapParens{\trAB{\sportwoptG{+}}{\svmu}}^2}{{\qform{\svsig}{\sportwoptG{+}}}}.
-$$
-The statistic $\ssiz\ssrsqoptG{+}$, which is a constrained Hotelling \Tstat, 
-has been studied to test the hypothesis of zero multivariate mean against
-an inequality-constrained alternative hypothesis.  \cite{Silvapulle:1995:HTT:219373.219391,Sen1999264} 
-
-Unfortunately, \ssrsqoptG{+} is not a \emph{similar}
-statistic.  That is, its distribution depends on the population 
-analogue, \psnrsqoptG{+}, but also on the uknown nuisance 
-parameter, \pvsig.  And so using \ssrsqoptG{+} to test the
-hypothesis $H_0: \psnrsqoptG{+} = 0$ only yields a conservative test, 
-with a maximal type I rate. Intuitively, the Hotelling \Tstat,
-which is invariant with respect to an invertible transform, should
-not mix well with the positive-orthant constraint, which is not 
-invariant.
-\nocite{Perlman_1969,Sen20023,nla.cat-vn3800977}
-
-One consequence of non-similarity is that using in-sample \txtSR as 
-a yardstick of the quality of so constrained portfolio is unwise. For 
-one can imagine universe A, containing of two zero-mean assets, and
-universe B with two assets with positive mean, where the different covariances
-in the two universes implies that the sample optimal constrained \txtSR 
-is likely to be larger in universe A than in universe B.
-
-<<'pos_cons_example', include=FALSE, warning=FALSE, message=FALSE>>=
-base.opt.1 <- function(rho,c1,c2) {
-# compute v1, v2 that solve
-#
-#   min      v1^2 + v2^2
-#   st.         v1 >= c1
-#     -rho v1 + v2 >= c2 
-# 
-# return as a list?
-# the prospective solutions are
-# (0,0), (c1,0), (-2rho c2/(1+rho^2),c2(1-rho^2)/(1+rho^2)),
-# and (c1,c2+rho*c1)
-	rho2 <- rho^2
-	oneprho2 <- 1 + rho2;
-	solns <- matrix(c(0,0, c1,0, -2*rho*c2/(oneprho2),c2*(1-rho^2)/(oneprho2),
-c1,c2+rho*c1),nrow=2)
-	feasible <- solns[1,] >= c1
-	solns <- solns[,feasible]
-	feasible <- -rho * solns[1,] + solns[2,] >= c2
-	solns <- solns[,feasible]
-	solns <- matrix(solns,nrow=2)
-
-	vals <- colSums(solns ^ 2)
-	retval <- solns[,which.min(vals)]
-	return(retval)
-}
-base.opt.2 <- function(rho,psi1,psi2) {
-# compute lam1, lam2 that solve
-# 
-#   min     [lam1,lam2] * R^-1 [lam1,lam2]'
-#   st.     R^-1 ([psi1,psi2]' + [lam1,lam2]') >= 0
-#
-#   where   R = [1,rho]
-#               [rho,1]
-#    so  R^-1 = [1, -rho]
-#               [-rho, 1] / (1-rho^2)
-#
-# and then return R^-1 ([psi1,psi2]' + [lam1,lam2]')
-	c1 <- rho * psi2 - psi1;
-	c2 <- rho * psi1 - psi2;
-	rv <- base.opt.1(rho,c1,c2)
-	lam2 <- rv[2] / (1-rho^2)
-	lam1 <- rv[1] + rho * lam2
-	nmu1 <- psi1 + lam1
-	nmu2 <- psi2 + lam2
-	# deal with roundoff
-	w1 <- max(0,nmu1 - rho * nmu2)
-	w2 <- max(0,-rho * nmu1 + nmu2)
-	return(c(w1,w2))
-}
-base.opt.3 <- function(mu1,mu2,sig1,sig12,sig2) {
-# compute w1, w2 to solve
-#
-#   max   [w1,w2] * [mu1,mu2]'  / sqrt([w1,w2] * Sig * [w1,w2]')
-#   st.   w1 >= 0
-#         w2 >= 0
-#
-#  where  Sig = [sig1   sig12]
-#               [sig12   sig2]
-	rho <- sig12 / sqrt(sig1 * sig2)
-	psi1 <- mu1 / sqrt(sig1)
-	psi2 <- mu2 / sqrt(sig2)
-	rv <- base.opt.2(rho,psi1,psi2)
-	return(rv)
-}
-# test it
-base.opt.3(1,0.5,1,0.4,1);
-base.opt.3(1,0.5,1,0.5,1);
-base.opt.3(1,0.5,1,0.6,1);
-base.opt.3(1,0.5,1,0.8,1);
-
-base.opt.3(1,0.5,1,-0.8,1);
-opt.pos.T2 <- function(mu1,mu2,sig1,sig12,sig2) {
-# compute the maximum value of 
-#
-#   max   [w1,w2] * [mu1,mu2]'  / sqrt([w1,w2] * Sig * [w1,w2]')
-#   st.   w1 >= 0
-#         w2 >= 0
-	rv <- base.opt.3(mu1,mu2,sig1,sig12,sig2)
-	w <- as.vector(rv)
-	mu <- as.vector(c(mu1,mu2))
-	Sig <- matrix(c(sig1,sig12,sig12,sig2),nrow=2)
-	T <- (mu %*% w) / sqrt(t(w) %*% Sig %*% w)
-	return(T^2)
-}
-
-	
-
-
-@
-
-
-
 
 %UNFOLD
 %UNFOLD

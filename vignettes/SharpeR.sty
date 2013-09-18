@@ -312,6 +312,9 @@
 
 % risk free
 \providecommand{\rfr}[1][0]{\mathSUB{r}{#1}}
+% risk budget
+\providecommand{\Rbuj}[1][]{\mathSUB{R}{#1}}
+\providecommand{\rdrag}[1][0]{\MATHIT{\frac{\rfr[#1]}{\Rbuj}}}
 
 % the symbol for SNR/SR
 %\providecommand{\prvSNR}[0]{\psi}
@@ -331,6 +334,8 @@
 %\providecommand{\svsig}[1][]{\MATHIT{S_{#1}}}
 \providecommand{\svmu}[1][]{\vectUL{\hat{\mu}}{}{#1}}
 \providecommand{\svsig}[1][]{\MtxUL{\hat{\Sigma}}{}{#1}}
+
+\providecommand{\svsigu}[1][]{\MtxUL{\tilde{\Sigma}}{}{#1}}
 
 \providecommand{\sfvmu}[1][]{\smean{\vreti[#1]^{*}}}
 \providecommand{\sfse}{\kappa}

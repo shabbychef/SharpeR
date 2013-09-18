@@ -131,6 +131,7 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 
 	# Omegahat
 	Ohat <- t(Dt) %*% Shat %*% Dt
+	# 2FIX: do I have to adjust for sample size or something?
 
 	# get names;
 	strnames <- if (is.null(colnames(X))) sapply(1:p,function(n) { sprintf("asset_%03d",n) }) else colnames(X)

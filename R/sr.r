@@ -599,6 +599,7 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL,...) {
 #' zeta.s <- 1.0
 #' df1 <- 10
 #' df2 <- 6 * ope
+#' set.seed(as.integer(charToRaw("fix seed")))
 #' rvs <- rsropt(1,df1,df2,zeta.s,ope,drag=0)
 #' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 #' print(roll.own)
@@ -606,8 +607,6 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL,...) {
 #' rvs <- rsropt(5,df1,df2,zeta.s,ope,drag=0)
 #' roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 #' print(roll.own)
-#'
-#' FUCK. 2FIX
 sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 	retval <- list(sropt = z.s,df1 = df1,df2 = df2,
 								 drag = drag,ope = ope,epoch = epoch)
@@ -784,7 +783,7 @@ print.sropt <- function(x,...) {
 	Tval <- x$T2
 	pval <- .sropt.pval(x)
 	ci <- confint(x,level=0.95)
-	coefs <- cbind(x$sropt,ci[1],ci[2],Tval,pval)
+	coefs <- cbind(x$sropt,ci,Tval,pval)
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
 											colnames(ci)[1],colnames(ci)[2],
 											 "T^2 value","Pr(>T^2)")
@@ -796,8 +795,7 @@ print.sropt <- function(x,...) {
 
 # SROPT methods#FOLDUP
 # get the T2-stat associated with an SROPT object.
-.sropt2T <- function(x) {
-	Tval <- x$T2
+.sropt2T <- function(x,Tval=x$T2) {
 	if (is.null(Tval)) {
 		tval <- .deannualize(x$sropt + x$drag,x$ope)
 		Tval <- x$df2 * (tval^2)
@@ -811,10 +809,11 @@ print.sropt <- function(x,...) {
 	z.star <- z.star - x$drag
 	return(z.star)
 }
-.sropt.pval <- function(x) {
-	retv <- ifelse(is.null(x$pval),
-								 pT2(Tval,x$df1,x$df2,lower.tail=FALSE),
-								 x$pval)
+.sropt.pval <- function(x,...) {
+	Tval <- .sropt2T(x,...)
+	retv <- x$pval
+	if (is.null(retv)) 
+		retv <- pT2(Tval,x$df1,x$df2,lower.tail=FALSE)
 	return(retv)
 }
 #UNFOLD

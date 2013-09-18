@@ -82,6 +82,9 @@ asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
 print(asro)
 G <- diag(nfac)[c(1:3),]
 asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
+# compare to sropt on the remaining assets
+# they should be close, but not exact.
+asro.alt <- as.sropt(Returns[,4:nfac],drag=0,ope=ope)
 \dontrun{
 # using real data.
 if (require(quantmod)) {

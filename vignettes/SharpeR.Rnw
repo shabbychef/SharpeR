@@ -430,6 +430,7 @@ the relevant degrees of freedom, and the annualization parameters. Again, the
 constructor can be used directly, but the helper function is preferred:
 
 <<'sropt_basics'>>=
+set.seed(as.integer(charToRaw("7bf4b86a-1834-4b58-9eff-6c7dec724fec")))
 # from a matrix object:
 ope <- 253
 n.stok <- 7
@@ -439,7 +440,14 @@ rand.rets <- matrix(rnorm(n.yr * ope * n.stok),ncol=n.stok)
 asro <- as.sropt(rand.rets,ope=ope)
 rm(rand.rets)
 print(asro)
+# under the alternative, when the mean is nonzero
+rand.rets <- matrix(rnorm(n.yr * ope * n.stok,mean=6e-4,sd=1e-2),ncol=n.stok)
+asro <- as.sropt(rand.rets,ope=ope)
+rm(rand.rets)
+print(asro)
 # from an xts object
+some.rets <- get.rets(c("IBM","AAPL","XOM"),
+	from="2007-01-01",to="2013-01-01")
 asro <- as.sropt(some.rets)
 print(asro)
 @
@@ -645,7 +653,46 @@ This leaves little room for excitement about MAC strategies on
 %UNFOLD
 %UNFOLD
 
-\section{Distribution Functions}%FOLDUP
+\section{Miscellanea}
+
+\subsection{Variance Covariance of the \txtSR}%FOLDUP
+
+Given \ssiz observations of the returns of \nlatf assets, the
+covariance of the sample \txtSR can be estimated via the Delta method.  
+This operates by stacking the \nlatf vector 
+of returns on top of the \nlatf vector of the returns squared element-wise.
+One then estimates the covariance of this $2\nlatf$ vector, using one's
+favorite covariance estimator. This estimate is then translated back to an
+estimate of the covariance of the \nlatf vector of \txtSR values. 
+This process was described by Lo, and Ledoit and Wolf for the
+$\nlatf=1$ case, and is used in the Sharpe equality tests of 
+Leung \etal and of Wright \etal. \cite{lo2002,Ledoit2008850,Leung2008,Wright2012}
+
+This basic function is available via the \Rcode{sr_vcov} function, which
+allows one to pass in a function to perform the covariance estimate of
+the $2\nlatf$ vector. The passed in function should operate on an
+\Rcode{lm} object. The default is the \Rcode{vcov} function; other
+sensible choices include \Rcode{sandwich:vcovHC} and \Rcode{sandwich:vcovHAC}
+to deal with heteroskedasticity and autocorrelation. 
+
+<<'sr_vcov'>>=
+# get returns
+some.rets <- get.rets(c("IBM","AAPL","XOM"),
+	from="2007-01-01",to="2013-01-01")
+ope <- 252
+vanilla.Sig <- sr_vcov(some.rets,ope=ope)
+print(vanilla.Sig)
+if (require(sandwich)) {
+	HC.Sig <- sr_vcov(some.rets,vcov=vcovHC,ope=ope)
+	print(HC.Sig)
+	HAC.Sig <- sr_vcov(some.rets,vcov=vcovHAC,ope=ope)
+	print(HAC.Sig)
+}
+@
+
+%UNFOLD
+
+\subsection{Distribution Functions}%FOLDUP
 
 There are \Rcode{dpqr} functions for the \txtSR distribution, as well as the
 `optimal \txtSR' distribution. These are merely rescaled non-central 
@@ -659,8 +706,7 @@ purposes. See the help for \Rfunction{dsr} and \Rfunction{dsropt} for more detai
 The function \Rfunction{sr\_equality\_test}, implements the 
 tests of Leung \etal and of Wright \etal for testing the equality 
 of \txtSR. \cite{Leung2008,Wright2012} I have found that these tests
-(or my implementation thereof!) apparently reject the null 
-`for the wrong reason'.
+can reject the null `for the wrong reason' when the problem is ill-scaled.
 
 Here I confirm that the tests give approximately uniform p-values under
 the null in three situations: when stock returns are independent Gaussians, 
