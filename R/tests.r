@@ -851,7 +851,7 @@ power.sropt_test <- function(df1=NULL,df2=NULL,zeta.s=NULL,
 #' 
 #' @usage
 #'
-#' 2FIX: start here ... 
+#' # 2FIX: start here ... 
 #'
 #' @template etc
 #' @template sropt

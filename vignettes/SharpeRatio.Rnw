@@ -65,10 +65,12 @@ FORCE_RECOMPUTE <-
 # compiler flags!
 
 # not used yet
-LONG.FORM <- TRUE
+LONG.FORM <- FALSE
 
 library(quantmod)
 options("getSymbols.warning4.0"=FALSE)
+
+library(SharpeR)
 @
 %UNFOLD
 %UNFOLD

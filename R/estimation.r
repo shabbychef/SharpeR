@@ -141,7 +141,7 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 	rownames(Ohat) <- strnames
 	colnames(Ohat) <- strnames
 	retval <- list(SR=.annualize(SR,ope),
-								 Ohat=(ope^2) * Ohat,p=p)
+								 Ohat=ope * Ohat,p=p)
 	return(retval)
 }
 #UNFOLD

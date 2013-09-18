@@ -65,7 +65,7 @@ FORCE_RECOMPUTE <-
 # compiler flags!
 
 # not used yet
-LONG.FORM <- TRUE
+LONG.FORM <- FALSE
 
 library(quantmod)
 options("getSymbols.warning4.0"=FALSE)
@@ -591,6 +591,7 @@ set.seed(as.integer(charToRaw("e23769f4-94f8-4c36-bca1-28c48c49b4fb")))
 ope <- 253
 n.yr <- 4
 n.obs <- ceiling(ope * n.yr)
+LONG.FORM <- FALSE
 n.sim <- if (LONG.FORM) 2048 else 1024
 win1 <- if (LONG.FORM) c(2,4,8,16,32,64,128,256) else c(4,16,64,256)
 
@@ -668,7 +669,7 @@ This process was described by Lo, and Ledoit and Wolf for the
 $\nlatf=1$ case, and is used in the Sharpe equality tests of 
 Leung \etal and of Wright \etal. \cite{lo2002,Ledoit2008850,Leung2008,Wright2012}
 
-This basic function is available via the \Rcode{sr_vcov} function, which
+This basic function is available via the \Rcode{sr\_vcov} function, which
 allows one to pass in a function to perform the covariance estimate of
 the $2\nlatf$ vector. The passed in function should operate on an
 \Rcode{lm} object. The default is the \Rcode{vcov} function; other
@@ -684,9 +685,9 @@ vanilla.Sig <- sr_vcov(some.rets,ope=ope)
 print(vanilla.Sig)
 if (require(sandwich)) {
 	HC.Sig <- sr_vcov(some.rets,vcov=vcovHC,ope=ope)
-	print(HC.Sig)
+	print(HC.Sig$Ohat)
 	HAC.Sig <- sr_vcov(some.rets,vcov=vcovHAC,ope=ope)
-	print(HAC.Sig)
+	print(HAC.Sig$Ohat)
 }
 @
 
@@ -726,6 +727,7 @@ qqunif <- function(x,xlab="Theoretical Quantiles under Uniformity",
 }
 
 # under normality.
+LONG.FORM <- FALSE
 n.ro <- if (LONG.FORM) 253*4 else 253*2
 n.co <- if (LONG.FORM) 20 else 4
 n.sim <- if (LONG.FORM) 1024 else 512
