@@ -183,7 +183,7 @@ portfolio holds some stocks `short.'  Often this portfolio accounting is
 misapplied to geometric returns without even an appeal to Taylor's theorem.
 
 For more details on the \txtSR and portfolio optimization, see the 
-vignette, ``Statistics of the \txtSR'' distributed with this package.
+vignette, ``Notes on the \txtSR'' distributed with this package.
 %UNFOLD
 
 \section{Using the \Robject{sr} Class}%FOLDUP
@@ -686,6 +686,8 @@ print(vanilla.Sig)
 if (require(sandwich)) {
 	HC.Sig <- sr_vcov(some.rets,vcov=vcovHC,ope=ope)
 	print(HC.Sig$Ohat)
+}
+if (require(sandwich)) {
 	HAC.Sig <- sr_vcov(some.rets,vcov=vcovHAC,ope=ope)
 	print(HAC.Sig$Ohat)
 }
@@ -793,6 +795,30 @@ set.seed(as.integer(charToRaw("447cfe85-b612-4b14-bd01-404e6e99aca4")))
 system.time(afoo <- replicate(n.sim,sr_equality_test(gen.tim(n.co),type="F")))
 sr_eq.pvals <- unlist(afoo["p.value",])
 qqunif(sr_eq.pvals)
+@
+
+\subsection{Equality Test with Fancy Covariance}
+
+The \Rcode{sr\_equality\_test} function now accepts an optional function
+to perform the inner variance-covariance estimation. I do not think this
+will correct the problems noted previously for the ill-scaled case. It
+does, however, allow one to take into account \eg heteroskedasticity
+and autocorrelation, as follows. Note that the use of a `fancy' covariance
+estimator does not change the conclusions of the Sharpe equality test
+in this case.
+
+<<'sr_fancy_eq'>>=
+# get returns
+some.rets <- get.rets(c("IBM","AAPL","XOM"),
+	from="2007-01-01",to="2013-01-01")
+# using the default vcov
+test.vanilla <- sr_equality_test(some.rets,type="F")
+print(test.vanilla)
+if (require(sandwich)) {
+	# and a fancy one:
+	test.HAC <- sr_equality_test(some.rets,type="F",vcov.func=vcovHAC)
+	print(test.HAC)
+}
 @
 
 %UNFOLD

@@ -94,7 +94,7 @@ is to make it simple to estimate profitability (in terms of risk-adjusted
 returns) of strategies or asset streams.
 \end{abstract}%UNFOLD
 
-\section{The \txtSR and Optimal \txtSR}%FOLDUP
+\section{The \txtSR and optimal \txtSR}%FOLDUP
 Sharpe defined the `reward to variability ratio', now known as the 
 `\txtSR', as the sample statistic
 $$
@@ -188,7 +188,7 @@ misapplied to geometric returns without even an appeal to Taylor's theorem.
 
 %UNFOLD
 
-\section{\txtSR and Portfolio Optimization}%FOLDUP
+\section{\txtSR and portfolio optimization}%FOLDUP
 
 Let $\vreti[1],\vreti[2],\ldots,\vreti[\ssiz]$ be independent draws from
 a \nstrat-variate normal with population mean \pvmu and population covariance
@@ -261,7 +261,7 @@ the above expression can be simplified slightly as
 
 %UNFOLD
 
-\section{\txtSR and Constrained Portfolio Optimization}%FOLDUP
+\section{\txtSR and constrained portfolio optimization}%FOLDUP
 
 \label{subsec:basic_conpo}
 Let \hejG be an $\nstrathej \times \nstrat$ matrix of rank $\nstrathej \le
@@ -316,7 +316,7 @@ scaling:
 This allows us to make inference about \psnroptG{\hejG}, the population
 analogue of \ssroptG{\hejG}.
 
-\subsection{Spanning and Hedging}%FOLDUP
+\subsection{Spanning and hedging}%FOLDUP
 
 Consider the constrained portfolio optimization problem on \nstrat assets,
 \begin{equation}
@@ -425,7 +425,7 @@ $$
 The test statistic
 \begin{equation}
 F_{\hejG} = \frac{\ssiz - \nstrat}{\nstrat - \nstrathej}\frac{\ssrsqoptG{\eye} -
-\ssrsqoptG{\hejG}}{1 + \ssrsqoptG{\eye}}
+\ssrsqoptG{\hejG}}{\frac{\ssiz - 1}{\ssiz} + \ssrsqoptG{\eye}}
 \label{eqn:giri_lrt}
 \end{equation}
 was shown by Rao to follow an \flaw{} distribution under the null hypothesis. 
@@ -435,7 +435,7 @@ $1 + \ssrsqoptG{\eye}$, that
 $$
 F_{\hejG} \sim
 \ncflaw{\ssiz - \nstrathej,\nlatf-\nstrat,\frac{\psnrsqoptG{\eye} -
-\psnrsqoptG{\hejG}}{1 + \ssrsqoptG{\eye}}}.
+\psnrsqoptG{\hejG}}{1 + \frac{\ssiz}{\ssiz-1}\ssrsqoptG{\eye}}}.
 $$
 
 (2FIX: problems with $\ssiz-1$ vs $\ssiz$ in definition of \pvsig?
@@ -448,7 +448,7 @@ Compare with \svsigu ?)
 
 %UNFOLD
 
-\subsection{Optimal \txtSR under Positivity Constraint}%FOLDUP
+\subsection{Optimal \txtSR under positivity constraint}%FOLDUP
 
 Consider the following portfolio optimization problem:
 \begin{equation}
@@ -588,7 +588,7 @@ opt.pos.T2 <- function(mu1,mu2,sig1,sig12,sig2) {
 \section{Miscellanea}%FOLDUP
 
 
-\subsection{The Haircut}%FOLDUP
+\subsection{The `haircut'}%FOLDUP
 
 Care must be taken interpreting the confidence intervals and the estimated
 optimal SNR. This is because \psnropt is the \emph{maximal} population 
