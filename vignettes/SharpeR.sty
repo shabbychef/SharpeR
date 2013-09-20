@@ -16,6 +16,8 @@
 
 \typeout{-- SharpeR.sty}
 
+\providecommand{\sidenote}[2][{}]{\footnotemark\marginpar[#1]{\footnotesize\thefootnote{}.{} {#2}}}
+
 % macros%FOLDUP
 
 % ack.
@@ -52,20 +54,19 @@
 \providecommand{\wrapNeBracks}[1]{\mtP{#1}{}{\wrapBracks{#1}}}
 \providecommand{\neSUB}[2]{\mtP{#2}{#1}{{{#1}_{#2}}}}
 
-\providecommand{\abs}[1]{\ensuremath{\left| #1 \right|}}
+\providecommand{\abs}[1]{\MATHIT{\left| #1 \right|}}
 \providecommand{\mathSUB}[2]{\MATHIT{\neSUB{#1}{#2}}}
-\renewcommand{\Pr}[1]{\ensuremath{\operatorname{Pr}\left\{#1\right\}}}
+\renewcommand{\Pr}[1]{\MATHIT{\operatorname{Pr}\left\{#1\right\}}}
 \providecommand{\vect}[1]{\MATHIT{\boldsymbol{#1}}}
-%\providecommand{\eye}{\ensuremath{I}}
+%\providecommand{\eye}{\MATHIT{I}}
 \providecommand{\Mtx}[1]{\MATHIT{\mathsf{#1}}}
 \providecommand{\MtxUL}[3]{\mathUL{\Mtx{#1}}{#2}{#3}}
 \providecommand{\nePAIR}[2]{#1\lMr{#2}}
-\providecommand{\VAR}[1]{\ensuremath{\operatorname{var}\wrapNeParens{#1}}}
 \providecommand{\mathUL}[3]{\MATHIT{\neUL{#1}{#2}{#3}}}
 \providecommand{\mathSUP}[2]{\MATHIT{\neSUP{#1}{#2}}}
 \providecommand{\vectUL}[3]{\mathUL{\vect{#1}}{#2}{#3}}
 \providecommand{\SEPbbb}[1]{\mathbb{#1}}
-\providecommand{\reals}[1]{\ensuremath{\SEPbbb{R}^{#1}}}
+\providecommand{\reals}[1]{\MATHIT{\SEPbbb{R}^{#1}}}
 
 \providecommand{\oneby}[1]{\MATHIT{\frac{1}{#1}}}
 
@@ -82,7 +83,7 @@
 \providecommand{\etal}{\emph{et al.}\xspace}
 \providecommand{\cf}{\emph{cf.}\xspace}
 
-\providecommand{\setwo}[2]{\ensuremath{\left\{ #1 \left|\; {#2} \right.\right\}}\xspace}
+\providecommand{\setwo}[2]{\MATHIT{\left\{ #1 \left|\; {#2} \right.\right\}}}
 
 \providecommand{\defeq}{=_{\mbox{df}}}
 
@@ -161,8 +162,8 @@
 %\providecommand{\grett}[1][t]{\mathSUB{l}{#1}}
 %\providecommand{\arett}[1][t]{\mathSUB{r}{#1}}
 
-\renewcommand{\exp}[1]{\ensuremath{e^{#1}}}
-\providecommand{\longexp}[1]{\ensuremath{\operatorname{exp}\wrapNeParens{#1}}}
+\renewcommand{\exp}[1]{\MATHIT{e^{#1}}}
+\providecommand{\longexp}[1]{\MATHIT{\operatorname{exp}\wrapNeParens{#1}}}
 
 %scalar returns:
 \providecommand{\reti}[1][]{\mathSUB{\prvsymi}{#1}}
@@ -308,6 +309,7 @@
 %\providecommand{\smu}[1][]{\smean{\reti[#1]}}
 \providecommand{\smu}[1][]{\mathSUB{\hat{\mu}}{#1}}
 \providecommand{\ssig}[1][]{\mathSUB{\hat{\sigma}}{#1}}
+\providecommand{\ssigu}[1][]{\mathSUB{\tilde{\sigma}}{#1}}
 \providecommand{\ssds}[1][]{\MATHIT{{s_N}_{#1}}}
 
 % risk free
@@ -330,12 +332,21 @@
 \providecommand{\ssrsqopt}{\ssrsq[*]}
 \providecommand{\ssrsqoptG}[1]{\ssrsq[*,#1]}
 
+% using the unbiased sigma: 
+\providecommand{\ussrUL}[2]{\mathUL{\tilde{\prvSNR}}{#1}{#2}}
+\providecommand{\ussr}[1][]{\ussrUL{}{#1}}
+\providecommand{\ussrsq}[1][]{\ussrUL{2}{#1}}
+\providecommand{\ussropt}{\ussr[*]}
+\providecommand{\ussrsqopt}{\ussrsq[*]}
+
+
+
 %\providecommand{\svmu}[1][]{\smean{\vreti[#1]}}
 %\providecommand{\svsig}[1][]{\MATHIT{S_{#1}}}
 \providecommand{\svmu}[1][]{\vectUL{\hat{\mu}}{}{#1}}
 \providecommand{\svsig}[1][]{\MtxUL{\hat{\Sigma}}{}{#1}}
 
-\providecommand{\svsigu}[1][]{\MtxUL{\tilde{\Sigma}}{}{#1}}
+\providecommand{\usvsig}[1][]{\MtxUL{\tilde{\Sigma}}{}{#1}}
 
 \providecommand{\sfvmu}[1][]{\smean{\vreti[#1]^{*}}}
 \providecommand{\sfse}{\kappa}
@@ -460,6 +471,9 @@
 \providecommand{\irate}{\MATHIT{c_0}}
 %UNFOLD
 
+\providecommand{\bigo}[1]{\MATHIT{\mathcal{O}\wrapParens{#1}}}
+\providecommand{\half}[1][1]{\MATHIT{\frac{#1}{2}}}
+
 % time commands; change the default!?
 \providecommand{\yrto}[1]{\mathSUP{\mbox{yr}}{#1}}
 \providecommand{\moto}[1]{\mathSUP{\mbox{mo.}}{#1}}
@@ -487,6 +501,7 @@
 \providecommand{\convec}[1][]{\vect{\mathSUB{v}{#1}}}
 \providecommand{\contar}[1][]{\MATHIT{c}}
 
+
 %noncentrality parameters
 \providecommand{\nctp}[1][]{\mathSUB{\delta}{#1}}
 \providecommand{\ncfp}[1][]{\mathSUB{\delta}{#1}}
@@ -504,8 +519,9 @@
 
 \providecommand{\median}[1]{\funcit{\mbox{median}}{#1}}
 \providecommand{\Pr}[1]{\funcit{\mbox{\large P}}{#1}}
-\providecommand{\E}[1]{\MATHIT{\mbox{\large E}\wrapNeBracks{#1}}}
-%\providecommand{\E}[1]{\ensuremath{\operatorname{E}\left[#1\right]}}
+%\providecommand{\E}[1]{\MATHIT{\mbox{\large E}\wrapNeBracks{#1}}}
+%%\providecommand{\E}[1]{\ensuremath{\operatorname{E}\left[#1\right]}}
+\providecommand{\E}[1]{\MATHIT{\operatorname{E}\wrapNeBracks{#1}}}
 \providecommand{\VAR}[1]{\funcit{\mbox{Var}}{#1}}
 \providecommand{\GAM}[1]{\MATHIT{\Gamma\wrapNeParens{#1}}}
 \providecommand{\skewness}[1]{\funcit{\mbox{skew}}{#1}}
