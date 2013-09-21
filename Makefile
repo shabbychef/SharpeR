@@ -11,6 +11,8 @@
 # Created: 2012.12.28
 #
 
+SHELL 						 = /bin/bash
+
 R_DEV_FILES 			?= $(wildcard ./R/*.r)
 R_FILES 					?= $(R_DEV_FILES)
 R_FILES 					+= $(wildcard ./inst/tests/*.r)
