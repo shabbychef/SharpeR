@@ -1,4 +1,5 @@
 \name{confint.sr}
+\alias{confint.del_sropt}
 \alias{confint.sr}
 \alias{confint.sropt}
 \title{Confidence Interval on (optimal) Signal-Noise Ratio}
@@ -8,6 +9,9 @@
     type = c("exact", "t", "Z"), ...)
 
   \method{confint}{sropt} (object, parm, level = 0.95,
+    level.lo = (1 - level)/2, level.hi = 1 - level.lo, ...)
+
+  \method{confint}{del_sropt} (object, parm, level = 0.95,
     level.lo = (1 - level)/2, level.hi = 1 - level.lo, ...)
 }
 \arguments{
@@ -96,6 +100,20 @@ rvs <- rsropt(128, df1, df2, zeta.s, ope)
 roll.own <- sropt(z.s=rvs,df1,df2,drag=0,ope=ope)
 aci <- confint(roll.own,level=0.95)
 coverage <- 1 - mean((zeta.s < aci[,1]) | (aci[,2] < zeta.s))
+# using "del_sropt" class
+nfac <- 5
+nyr <- 10
+ope <- 253
+set.seed(as.integer(charToRaw("be determinstic")))
+Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+# hedge out the first one:
+G <- matrix(diag(nfac)[1,],nrow=1)
+asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
+aci <- confint(asro,level=0.95)
+# under the alternative
+Returns <- matrix(rnorm(ope*nyr*nfac,mean=0.001,sd=0.0125),ncol=nfac)
+asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
+aci <- confint(asro,level=0.95)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

@@ -814,49 +814,49 @@ power.sropt_test <- function(df1=NULL,df2=NULL,zeta.s=NULL,
 #UNFOLD
 
 # spanning tests #FOLDUP
-#' @title spanning test for sub-portfolio.
-#'
-#' @description 
-#'
-#' Performs a test of portfolio spanning.
-#'
-#' @details 
-#'
-#' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
-#' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
-#' \eqn{\Sigma}{Sigma}. Let \eqn{G} be some \eqn{n_g \times p}{n_g x p} matrix
-#' of rank \eqn{n_g}{n_g}. Let 
-#' \deqn{\Delta\zeta_{*} = \max_{w\,: G\Sigma w = 0}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{Delta zeta* = max {(w'mu)/sqrt(w'Sigma w)|G Sigma w = 0}}
-#'
-#' A spanning test tests the hypothesis
-#' \deqn{H_0: \Delta \zeta_{*} = 0}{H0: Delta zeta* = 0}
-#' against the alternative hypothesis
-#' \deqn{H_1: \Delta \zeta_{*} > 0}{H0: Delta zeta* > 0}
-#'
-#' An alternative formulation, is as follows. Let
-#' \deqn{\zeta_{*,I} = \max_{w\,: w = I v}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta*,I = max {(w'mu)/sqrt(w'Sigma w)|w = I v}}
-#' and, similarly, let
-#' \deqn{\zeta_{*,G} = \max_{w\,: w = G v}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta*,G = max {(w'mu)/sqrt(w'Sigma w)|w = G v}}
-#'
-#' Then
-#' \deqn{\left(\Delta\zeta_{*}\right)^2 = \zeta_{*,I}^2 - \zeta_{*,G}^2}{(Delta zeta*)^2 = zeta*,I^2 - zeta*,G^2}
-#' And so the spanning test tests 
-#' \deqn{H_0: \zeta_{*,I}^2 = \zeta_{*,G}^2}{H0: zeta*,I^2 = zeta*,G^2}
-#' against the alternative hypothesis
-#' \deqn{H_1: \zeta_{*,I}^2 > \zeta_{*,G}^2}{H0: zeta*,I^2 > zeta*,G^2}
-#'
-#' The spanning test also provides estimates and confidence intervals on the
-#' difference 
-#' \eqn{\zeta_{*,I}^2 - \zeta_{*,G}^2}{zeta*,I^2 - zeta*,G^2}
-#' 
-#' @usage
-#'
-#' # 2FIX: start here ... 
-#'
-#' @template etc
-#' @template sropt
-#' @template ref-JW
-#' @export
+# ' @title spanning test for sub-portfolio.
+# '
+# ' @description 
+# '
+# ' Performs a test of portfolio spanning.
+# '
+# ' @details 
+# '
+# ' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
+# ' normal random variable with mean \eqn{\mu}{mu} and covariance matrix
+# ' \eqn{\Sigma}{Sigma}. Let \eqn{G} be some \eqn{n_g \times p}{n_g x p} matrix
+# ' of rank \eqn{n_g}{n_g}. Let 
+# ' \deqn{\Delta\zeta_{*} = \max_{w\,: G\Sigma w = 0}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{Delta zeta* = max {(w'mu)/sqrt(w'Sigma w)|G Sigma w = 0}}
+# '
+# ' A spanning test tests the hypothesis
+# ' \deqn{H_0: \Delta \zeta_{*} = 0}{H0: Delta zeta* = 0}
+# ' against the alternative hypothesis
+# ' \deqn{H_1: \Delta \zeta_{*} > 0}{H0: Delta zeta* > 0}
+# '
+# ' An alternative formulation, is as follows. Let
+# ' \deqn{\zeta_{*,I} = \max_{w\,: w = I v}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta*,I = max {(w'mu)/sqrt(w'Sigma w)|w = I v}}
+# ' and, similarly, let
+# ' \deqn{\zeta_{*,G} = \max_{w\,: w = G v}\frac{w^{\top}\mu}{\sqrt{w^{\top}\Sigma w}}}{zeta*,G = max {(w'mu)/sqrt(w'Sigma w)|w = G v}}
+# '
+# ' Then
+# ' \deqn{\left(\Delta\zeta_{*}\right)^2 = \zeta_{*,I}^2 - \zeta_{*,G}^2}{(Delta zeta*)^2 = zeta*,I^2 - zeta*,G^2}
+# ' And so the spanning test tests 
+# ' \deqn{H_0: \zeta_{*,I}^2 = \zeta_{*,G}^2}{H0: zeta*,I^2 = zeta*,G^2}
+# ' against the alternative hypothesis
+# ' \deqn{H_1: \zeta_{*,I}^2 > \zeta_{*,G}^2}{H0: zeta*,I^2 > zeta*,G^2}
+# '
+# ' The spanning test also provides estimates and confidence intervals on the
+# ' difference 
+# ' \eqn{\zeta_{*,I}^2 - \zeta_{*,G}^2}{zeta*,I^2 - zeta*,G^2}
+# ' 
+# ' @usage
+# '
+# ' # 2FIX: start here ... 
+# '
+# ' @template etc
+# ' @template sropt
+# ' @template ref-JW
+# ' @export
 
 #UNFOLD
 

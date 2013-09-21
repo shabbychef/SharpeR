@@ -146,9 +146,10 @@ plot(ecdf(isp))
 
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
-  \code{\link{as.sropt.xts}}, \code{\link{confint.sr}},
-  \code{\link{confint.sropt}}, \code{\link{is.sropt}},
-  \code{\link{power.sropt_test}},
+  \code{\link{as.sropt.xts}},
+  \code{\link{confint.del_sropt}},
+  \code{\link{confint.sr}}, \code{\link{confint.sropt}},
+  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{sropt}},
   \code{\link{sropt_test}}

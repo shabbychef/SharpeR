@@ -885,6 +885,7 @@ print.sropt <- function(x,...) {
 #' @export 
 #' @template etc
 #' @template del_sropt
+#' @template warning
 #'
 #' @note
 #' 2FIX: allow rownames?
@@ -927,7 +928,11 @@ del_sropt <- function(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr") {
 .del_sropt.asF <- function(x) {
 	# see Giri eqn (1.9) and section 3.
 	# make Z ~ B(bdf1,bdf2) under the null
-	Z <- (x$df2 + x$T2.sub) / (x$df2 + x$T2)
+	nmin <- x$df2 - 1
+	Z.num <- (1 + x$T2.sub/nmin)
+	Z.denom <- (1 + x$T2/nmin)
+	R1 <- 1 - (1 / Z.num)
+	Z <- Z.num / Z.denom
 	bdf1 <- (x$df2 - x$df1) / 2
 	bdf2 <- (x$df1 - x$df1.sub) / 2
 	# transform beta to F; 
@@ -937,7 +942,8 @@ del_sropt <- function(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr") {
 	df2 <- 2*bdf1;
 	Fval <- (df2 * (1-Z)) / (df1 * Z)
 	pval <- pf(Fval,df1,df2,lower.tail=FALSE)
-	retval <- list(Fval=Fval,df1=df1,df2=df2,pval=pval)
+	# Giri's R1
+	retval <- list(Fval=Fval,df1=df1,df2=df2,N=x$df2,pval=pval,R1=R1)
 	return(retval)
 }
 #' @title Compute the Sharpe ratio of a hedged Markowitz portfolio.
@@ -1090,8 +1096,10 @@ is.del_sropt <- function(x) inherits(x,"del_sropt")
 #' @export
 print.del_sropt <- function(x,...) {
 	Fandp <- .del_sropt.asF(x)
-	coefs <- cbind(x$sropt.del,Fandp$Fval,Fandp$pval)
+	ci <- confint(x,level=0.95)
+	coefs <- cbind(x$sropt.del,ci,Fandp$Fval,Fandp$pval)
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
+											colnames(ci)[1],colnames(ci)[2],
 											 "F value","Pr(>F)")
 	rownames(coefs) <- .get_strat_names(x$sropt)
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,

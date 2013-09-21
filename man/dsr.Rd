@@ -127,6 +127,7 @@ plot(ecdf(pvs.HA))
   \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
   \code{\link{as.sr.matrix}},
   \code{\link{as.sr.timeSeries}}, \code{\link{as.sr.xts}},
+  \code{\link{confint.del_sropt}},
   \code{\link{confint.sr}}, \code{\link{confint.sropt}},
   \code{\link{is.sr}}, \code{\link{power.sr_test}},
   \code{\link{print.del_sropt}}, \code{\link{print.sr}},

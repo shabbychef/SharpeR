@@ -122,6 +122,7 @@ checkit <- sr_test(asr,zeta=0)
   \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
   \code{\link{as.sr.matrix}},
   \code{\link{as.sr.timeSeries}}, \code{\link{as.sr.xts}},
+  \code{\link{confint.del_sropt}},
   \code{\link{confint.sr}}, \code{\link{confint.sropt}},
   \code{\link{dsr}}, \code{\link{is.sr}},
   \code{\link{power.sr_test}},

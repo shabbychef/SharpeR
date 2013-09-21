@@ -134,9 +134,10 @@ asr <- as.sr(my.returns)
   sr-distribution functions, \code{\link{dsr}, \link{psr},
   \link{qsr}, \link{rsr}}
 
-  Other sr: \code{\link{confint.sr}},
-  \code{\link{confint.sropt}}, \code{\link{dsr}},
-  \code{\link{is.sr}}, \code{\link{power.sr_test}},
+  Other sr: \code{\link{confint.del_sropt}},
+  \code{\link{confint.sr}}, \code{\link{confint.sropt}},
+  \code{\link{dsr}}, \code{\link{is.sr}},
+  \code{\link{power.sr_test}},
   \code{\link{print.del_sropt}}, \code{\link{print.sr}},
   \code{\link{print.sropt}}, \code{\link{reannualize}},
   \code{\link{reannualize.sr}},

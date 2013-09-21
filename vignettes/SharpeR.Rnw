@@ -654,54 +654,71 @@ This leaves little room for excitement about MAC strategies on
 %UNFOLD
 %UNFOLD
 
-\section{Miscellanea}
+\section{Using the \Robject{del\_sropt} Class}%FOLDUP
 
-\subsection{Variance Covariance of the \txtSR}%FOLDUP
+The class \Robject{del\_sropt} stores the `optimal' \txtSR of 
+the optimal hedge-constrained portfolio. See the `Notes on  
+\txtSR' vignette for more details. There is an object constructor,
+but likely the \Rcode{as.del\_sropt} function will prove more
+useful.
 
-Given \ssiz observations of the returns of \nlatf assets, the
-covariance of the sample \txtSR can be estimated via the Delta method.  
-This operates by stacking the \nlatf vector 
-of returns on top of the \nlatf vector of the returns squared element-wise.
-One then estimates the covariance of this $2\nlatf$ vector, using one's
-favorite covariance estimator. This estimate is then translated back to an
-estimate of the covariance of the \nlatf vector of \txtSR values. 
-This process was described by Lo, and Ledoit and Wolf for the
-$\nlatf=1$ case, and is used in the Sharpe equality tests of 
-Leung \etal and of Wright \etal. \cite{lo2002,Ledoit2008850,Leung2008,Wright2012}
-
-This basic function is available via the \Rcode{sr\_vcov} function, which
-allows one to pass in a function to perform the covariance estimate of
-the $2\nlatf$ vector. The passed in function should operate on an
-\Rcode{lm} object. The default is the \Rcode{vcov} function; other
-sensible choices include \Rcode{sandwich:vcovHC} and \Rcode{sandwich:vcovHAC}
-to deal with heteroskedasticity and autocorrelation. 
-
-<<'sr_vcov'>>=
-# get returns
-some.rets <- get.rets(c("IBM","AAPL","XOM"),
-	from="2007-01-01",to="2013-01-01")
-ope <- 252
-vanilla.Sig <- sr_vcov(some.rets,ope=ope)
-print(vanilla.Sig)
-if (require(sandwich)) {
-	HC.Sig <- sr_vcov(some.rets,vcov=vcovHC,ope=ope)
-	print(HC.Sig$Ohat)
-}
-if (require(sandwich)) {
-	HAC.Sig <- sr_vcov(some.rets,vcov=vcovHAC,ope=ope)
-	print(HAC.Sig$Ohat)
-}
+<<'del_sropt_basics'>>=
+set.seed(as.integer(charToRaw("364e72ab-1570-43bf-a1c6-ee7481e1c631")))
+# from a matrix object:
+ope <- 253
+n.stok <- 7
+n.yr <- 8
+# somewhat unrealistic: independent returns, under the null
+rand.rets <- matrix(rnorm(n.yr * ope * n.stok),ncol=n.stok)
+# the hedge constraint: hedge out the first stock.
+G <- diag(n.stok)[1,]
+asro <- as.del_sropt(rand.rets,G,ope=ope)
+print(asro)
+# hedge out the first two 
+G <- diag(n.stok)[1:2,]
+asro <- as.del_sropt(rand.rets,G,ope=ope)
+print(asro)
+# under the alternative, when the mean is nonzero
+rand.rets <- matrix(rnorm(n.yr * ope * n.stok,mean=6e-4,sd=1e-2),ncol=n.stok)
+G <- diag(n.stok)[1,]
+asro <- as.del_sropt(rand.rets,G,ope=ope)
+print(asro)
 @
 
-%UNFOLD
+Here I present an example of hedging out 
+\StockTicker{SPY} from a portfolio holding
+\StockTicker{IBM},
+\StockTicker{AAPL},
+and \StockTicker{XOM}. The 95\% confidence interval on the
+optimal hedged signal-noise ratio contains zero:
 
-\subsection{Distribution Functions}%FOLDUP
+<<'del_sropt_hedging'>>=
+# from an xts object
+some.rets <- get.rets(c("SPY","IBM","AAPL","XOM"),
+	from="2007-01-01",to="2013-01-01")
+# without the hedge, allowing SPY position
+asro <- as.sropt(some.rets)
+print(asro)
+# hedge out SPY!
+G <- diag(dim(some.rets)[2])[1,]
+asro.hej <- as.del_sropt(some.rets,G)
+print(asro.hej)
+@
 
-There are \Rcode{dpqr} functions for the \txtSR distribution, as well as the
-`optimal \txtSR' distribution. These are merely rescaled non-central 
-\tstat and \Fstat distributions, provided for convenience, and for testing
-purposes. See the help for \Rfunction{dsr} and \Rfunction{dsropt} for more details.
+One can compute confidence intervals for, and perform inference on,
+the population parameter,
+$\sqrt{\psnrsqoptG{\eye} - \psnrsqoptG{\hejG}}$. This is the
+optimal signal-noise ratio of a hedged portfolio.  These are
+all reported here in the same `annualized' units of \txtSR,
+and may be controlled by the \Rcode{ope} parameter.
 
+<<'del_sropt_estim'>>=
+# confidence intervals:
+print(confint(asro,level.lo=0.05,level.hi=1))
+# estimation
+print(inference(asro,type="KRS"))
+print(inference(asro,type="MLE"))
+@
 %UNFOLD
 
 \section{Hypothesis Tests}%FOLDUP
@@ -821,6 +838,57 @@ if (require(sandwich)) {
 }
 @
 
+%UNFOLD
+
+\section{Miscellanea}%FOLDUP
+
+\subsection{Variance Covariance of the \txtSR}%FOLDUP
+
+Given \ssiz observations of the returns of \nlatf assets, the
+covariance of the sample \txtSR can be estimated via the Delta method.  
+This operates by stacking the \nlatf vector 
+of returns on top of the \nlatf vector of the returns squared element-wise.
+One then estimates the covariance of this $2\nlatf$ vector, using one's
+favorite covariance estimator. This estimate is then translated back to an
+estimate of the covariance of the \nlatf vector of \txtSR values. 
+This process was described by Lo, and Ledoit and Wolf for the
+$\nlatf=1$ case, and is used in the Sharpe equality tests of 
+Leung \etal and of Wright \etal. \cite{lo2002,Ledoit2008850,Leung2008,Wright2012}
+
+This basic function is available via the \Rcode{sr\_vcov} function, which
+allows one to pass in a function to perform the covariance estimate of
+the $2\nlatf$ vector. The passed in function should operate on an
+\Rcode{lm} object. The default is the \Rcode{vcov} function; other
+sensible choices include \Rcode{sandwich:vcovHC} and \Rcode{sandwich:vcovHAC}
+to deal with heteroskedasticity and autocorrelation. 
+
+<<'sr_vcov'>>=
+# get returns
+some.rets <- get.rets(c("IBM","AAPL","XOM"),
+	from="2007-01-01",to="2013-01-01")
+ope <- 252
+vanilla.Sig <- sr_vcov(some.rets,ope=ope)
+print(vanilla.Sig)
+if (require(sandwich)) {
+	HC.Sig <- sr_vcov(some.rets,vcov=vcovHC,ope=ope)
+	print(HC.Sig$Ohat)
+}
+if (require(sandwich)) {
+	HAC.Sig <- sr_vcov(some.rets,vcov=vcovHAC,ope=ope)
+	print(HAC.Sig$Ohat)
+}
+@
+
+%UNFOLD
+
+\subsection{Distribution Functions}%FOLDUP
+
+There are \Rcode{dpqr} functions for the \txtSR distribution, as well as the
+`optimal \txtSR' distribution. These are merely rescaled non-central 
+\tstat and \Fstat distributions, provided for convenience, and for testing
+purposes. See the help for \Rfunction{dsr} and \Rfunction{dsropt} for more details.
+
+%UNFOLD
 %UNFOLD
 
 % bibliography%FOLDUP

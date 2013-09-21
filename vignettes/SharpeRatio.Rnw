@@ -241,8 +241,10 @@ These can be trivially translated into equivalent facts regarding the \txtSR:
 The geometric bias term \tbias does not equal one, thus the sample t statistic is a \emph{biased} estimator of
 the non-centrality parameter, \nctp when $\nctp \ne 0$, and the \txtSR is a biased estimator of the signal-to-noise
 ratio when it is nonzero. \cite{CambridgeJournals:4493808} The bias term is a function of sample size only, 
-and approaches one fairly quickly, 
-see \figref{sr_bias}.  However, there are situations in which it might be unacceptably large. 
+and approaches one fairly quickly.
+%and approaches one fairly quickly, 
+%see \figref{sr_bias}.  
+However, there are situations in which it might be unacceptably large. 
 <<'generate_tbias',include=FALSE>>=
 # the bias of the t
 f_tbias <- function(n) { 
@@ -264,16 +266,16 @@ $\tbias = \Sexpr{round(tbias,digits=4)}$, \ie almost eight percent.  The bias is
 so the \txtSR will overestimate the SNR when the latter is positive, and underestimate it when it is negative.
 The existence of this bias was first described by Miller and Gehr. \cite{CambridgeJournals:4493808} 
 
-<<'sr_bias',fig.cap="The approximate percent bias of the \\txtSR, $\\tbias - 1$ is given versus sample size, shown in black.  In green the approximation given by $\\tbias[\\ssiz+1] \\approx 1 + \\frac{3}{4\\ssiz} + \\frac{25}{32\\ssiz^2}$ is plotted.",include=FALSE>>=
-nvals <- 4:256
-tbias <- -1 + sapply(nvals, f_tbias)
-avals <- -1 + sapply(nvals, f_apx_tbias2)
-plot(nvals,tbias,type="l",log="xy",col="black",axes=F,ylab="bias in Sharpe ratio",xlab="number of samples")
-#lines(nvals,avals,col="green")
-#legend("topright",c("actual value","approximation"),lty=c(1,1),col=c("black","green"))
-#axis(1, at=(c(4,8,16,32,64,128,256)))
-#axis(2, at=(c(0.002,0.004,0.1,0.02,0.04,0.1,0.2,0.4)))
-@
+%<<'sr_bias',fig.cap="The approximate percent bias of the \\txtSR, $\\tbias - 1$ is given versus sample size, shown in black.  In green the approximation given by $\\tbias[\\ssiz+1] \\approx 1 + \\frac{3}{4\\ssiz} + \\frac{25}{32\\ssiz^2}$ is plotted.",include=FALSE>>=
+%nvals <- 4:256
+%tbias <- -1 + sapply(nvals, f_tbias)
+%avals <- -1 + sapply(nvals, f_apx_tbias2)
+%plot(nvals,tbias,type="l",log="xy",col="black",axes=F,ylab="bias in Sharpe ratio",xlab="number of samples")
+%#lines(nvals,avals,col="green")
+%#legend("topright",c("actual value","approximation"),lty=c(1,1),col=c("black","green"))
+%#axis(1, at=(c(4,8,16,32,64,128,256)))
+%#axis(2, at=(c(0.002,0.004,0.1,0.02,0.04,0.1,0.2,0.4)))
+%@
 
 A decent asymptotic approximation \cite{dlmf_gammarat} to \tbias is given by
 $$
@@ -466,8 +468,11 @@ scaling:
 \begin{equation*}
 \frac{\ssiz}{\ssiz-1}\frac{\ssiz-\nstrat}{\nstrat}
 \wrapParens{\ssropt + \rdrag}^2 \sim
-\ncflaw{\nstrat,\ssiz-\nstrat,\ssiz\wrapParens{\psnropt + \rdrag}^2}.
+\ncflaw{\nstrat,\ssiz-\nstrat,\ssiz\wrapParens{\psnropt + \rdrag}^2},
 \end{equation*}
+where \ncflaw{\df[1],\df[2],\ncfp} is the non-central \flaw{}-distribution
+with \df[1], \df[2] degrees of freedom and non-centrality parameter
+\ncfp.
 This allows us to make inference about \psnropt.
 
 By using the 
@@ -743,6 +748,8 @@ analogue of \ssroptG{\hejG}.
 
 \subsection{Spanning and hedging}%FOLDUP
 
+\label{sec:span_hedge}
+
 Consider the constrained portfolio optimization problem on \nstrat assets,
 \begin{equation}
 \max_{\sportw : \hejG\svsig \sportw = \hejg,\, \qform{\svsig}{\sportw} \le
@@ -850,27 +857,25 @@ $$
 The test statistic
 \begin{equation}
 F_{\hejG} = \frac{\ssiz - \nstrat}{\nstrat - \nstrathej}\frac{\ssrsqoptG{\eye} -
-\ssrsqoptG{\hejG}}{\frac{\ssiz - 1}{\ssiz} + \ssrsqoptG{\eye}}
+\ssrsqoptG{\hejG}}{\frac{\ssiz - 1}{\ssiz} + \ssrsqoptG{\hejG}}
 \label{eqn:giri_lrt}
 \end{equation}
-was shown by Rao to follow an \flaw{} distribution under the null hypothesis. 
-(Actually, a beta distribution, which can be transformed to an \flaw{}.)
+was shown by Rao to follow an \flaw{} distribution under 
+the null hypothesis. \cite{rao1952}
 Giri showed that, under the alternative, and conditional on observing
-$1 + \ssrsqoptG{\eye}$, that 
-$$
+\ssrsqoptG{\hejG},
+\begin{equation}
 F_{\hejG} \sim
-\ncflaw{\ssiz - \nstrathej,\nlatf-\nstrat,\frac{\psnrsqoptG{\eye} -
-\psnrsqoptG{\hejG}}{1 + \frac{\ssiz}{\ssiz-1}\ssrsqoptG{\eye}}}.
-$$
-
-(2FIX: problems with $\ssiz-1$ vs $\ssiz$ in definition of \pvsig?
-Compare with \usvsig ?)
-
-\cite{rao1952,giri1964likelihood}
+\ncflaw{\nstrat-\nstrathej,\ssiz-\nstrat,\frac{\ssiz}{1 +
+\frac{\ssiz}{\ssiz-1}\ssrsqoptG{\hejG}} \wrapParens{\psnrsqoptG{\eye} -
+\psnrsqoptG{\hejG}}},
+\label{eqn:giri_done_I}
+\end{equation}
+where \ncflaw{\df[1],\df[2],\ncfp} is the non-central \flaw{}-distribution
+with \df[1], \df[2] degrees of freedom and non-centrality parameter
+\ncfp.  See \secref{untangling_Giri}. \cite{giri1964likelihood}
 
 \end{enumerate}
-
-
 %UNFOLD
 
 \subsection{Optimal \txtSR under positivity constraint}%FOLDUP
@@ -1478,6 +1483,7 @@ Using the Taylor series expansion of the square root gives the approximate mean 
 
 \section{Untangling Giri}%FOLDUP
 
+\label{sec:untangling_Giri}
 \providecommand{\GXb}[1]{\mathSUB{\bar{X}}{\wrapBracks{#1}}}
 \providecommand{\GS}[1]{\mathSUB{S}{#1#1}}
 \providecommand{\GN}{\MATHIT{N}}
@@ -1485,6 +1491,10 @@ Using the Taylor series expansion of the square root gives the approximate mean 
 \providecommand{\Gins}[1]{\GS{#1} + \GN\GXgram{#1}}
 \providecommand{\GSR}[1]{\qform{\minv{\GS{#1}}}{\GXb{#1}}}
 \providecommand{\Gform}[1]{\GN\qform{\minv{\wrapParens{\Gins{#1}}}}{\GXb{#1}}}
+
+\providecommand{\Gpvmu}[1][{}]{\mathSUB{\xi}{\wrapNeBracks{#1}}}
+\providecommand{\Gpvsig}[1][{}]{\mathSUB{\Sigma}{#1#1}}
+\providecommand{\GSNR}[1][{}]{\qform{\minv{\Gpvsig[#1]}}{\Gpvmu[#1]}}
 
 
 Here I translate Giri's work on Rao's LRT into the terminology used in the rest
@@ -1517,21 +1527,57 @@ Thus the $Z$ statistic can be more simply defined as
 Z = \frac{1 + \GN\GSR{1}}{1 + \GN\GSR{2}}.
 \end{equation}
 
-In section 3, Giri claims that $Z$ takes a (non-central) beta distribution. 
+In section 3, Giri notes that, conditional on observing $R_1$, $Z$ 
+takes a (non-central) beta distribution with $\half\wrapParens{N-p}$
+and $\half\wrapParens{p-q}$ degrees of freedom and non-centrality
+parameter $\delta_2\wrapParens{1-R_1}$.  
 From inspection, it is a 'type II' non-central beta, which can be
 transformed into a noncentral \flaw{}:
 \begin{equation}
-\frac{N-FIX}{FIX} \frac{1-Z}{Z} = FIX \frac{\GN\GSR{2} - \GN\GSR{1}}{1 + \GN\GSR{1}}.
+\frac{N-p}{p-q} \frac{1-Z}{Z} = \frac{N-p}{p-q} \frac{\GN\GSR{2} - \GN\GSR{1}}{1 + \GN\GSR{1}}.
 \end{equation}
 
+Giri defines $R_1$ in equation (2.2). It is equivalent to
+$$
+1 - R_1 = \frac{1}{1 + \GN\GSR{1}}.
+$$
+Giri defines $\delta_1,\delta_2$ in equation (2.3). We have
+$$
+\delta_2 = \GN\GSNR - \GN\GSNR[1].
+$$
+Taking this all together, we have, conditional on observing
+$\GSR{1}$, 
+\begin{equation}
+\frac{N-p}{p-q} \frac{\GN\GSR{2} - \GN\GSR{1}}{1 + \GN\GSR{1}} \sim
+\ncflaw{p-q,N-p,\frac{\GN\wrapParens{\GSNR - \GSNR[1]}}{1 + \GN\GSR{1}}}.
+\end{equation}
 
 Now note that \GS{1} refers to the sample Gram matrix, and thus
 $\GS{1}/N$ is the biased covariance estimate, \usvsig on the subset
 of $q$ assets, while \GXb{1} is the mean of the subset of $q$
-assets. In the terminology of the rest of the paper, 
-$$
-\GN\GSR{i} = \frac{\ssiz}{\ssiz-1}\ssrsqoptG{i}
-$$
+assets. Giri's terminology translates into the terminology 
+of spanning tests used in \secref{span_hedge} as follows:
+\begin{equation*}
+\begin{split}
+\GN\GSR{1} &= \frac{\ssiz}{\ssiz-1}\ssrsqoptG{\hejG},\\
+\GN\GSR{2} &= \frac{\ssiz}{\ssiz-1}\ssrsqoptG{\eye},\\
+\GSNR[1] &= \psnrsqoptG{\hejG},\\
+\GSNR &= \psnrsqoptG{\eye},\\
+N &= \ssiz,\\
+p - q &= \nstrat - \nstrathej.
+\end{split}
+\end{equation*}
+
+Thus, conditional on observing \ssrsqoptG{\hejG}, we have
+\begin{equation}
+\frac{\ssiz-\nstrat}{\nstrat-\nstrathej}\frac{\ssrsqoptG{\eye} -
+\ssrsqoptG{\hejG}}{
+(\ssiz-1)/\ssiz + \ssrsqoptG{\hejG}} \sim
+\ncflaw{\nstrat-\nstrathej,\ssiz-\nstrat,\frac{\ssiz}{1 +
+\frac{\ssiz}{\ssiz-1}\ssrsqoptG{\hejG}} \wrapParens{\psnrsqoptG{\eye} -
+\psnrsqoptG{\hejG}}}.
+\label{eqn:giri_done}
+\end{equation}
 
 
 
