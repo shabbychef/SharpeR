@@ -174,6 +174,7 @@ or the \tstat-test can be translated into interesting facts about the \txtSR:
 one can construct hypothesis
 tests for the SNR, find the power and sample size of those tests, compute confidence intervals of the SNR, 
 correct for deviations from assumptions, \etc
+%UNFOLD
 
 \subsection{Tests involving the \txtSR}%FOLDUP
 
@@ -241,10 +242,11 @@ These can be trivially translated into equivalent facts regarding the \txtSR:
 The geometric bias term \tbias does not equal one, thus the sample t statistic is a \emph{biased} estimator of
 the non-centrality parameter, \nctp when $\nctp \ne 0$, and the \txtSR is a biased estimator of the signal-to-noise
 ratio when it is nonzero. \cite{CambridgeJournals:4493808} The bias term is a function of sample size only, 
-and approaches one fairly quickly.
-%and approaches one fairly quickly, 
-%see \figref{sr_bias}.  
+%and approaches one fairly quickly.
+and approaches one fairly quickly, 
+see \figref{sr_bias}.  
 However, there are situations in which it might be unacceptably large. 
+
 <<'generate_tbias',include=FALSE>>=
 # the bias of the t
 f_tbias <- function(n) { 
@@ -266,23 +268,22 @@ $\tbias = \Sexpr{round(tbias,digits=4)}$, \ie almost eight percent.  The bias is
 so the \txtSR will overestimate the SNR when the latter is positive, and underestimate it when it is negative.
 The existence of this bias was first described by Miller and Gehr. \cite{CambridgeJournals:4493808} 
 
-%<<'sr_bias',fig.cap="The approximate percent bias of the \\txtSR, $\\tbias - 1$ is given versus sample size, shown in black.  In green the approximation given by $\\tbias[\\ssiz+1] \\approx 1 + \\frac{3}{4\\ssiz} + \\frac{25}{32\\ssiz^2}$ is plotted.",include=FALSE>>=
-%nvals <- 4:256
-%tbias <- -1 + sapply(nvals, f_tbias)
-%avals <- -1 + sapply(nvals, f_apx_tbias2)
-%plot(nvals,tbias,type="l",log="xy",col="black",axes=F,ylab="bias in Sharpe ratio",xlab="number of samples")
-%#lines(nvals,avals,col="green")
-%#legend("topright",c("actual value","approximation"),lty=c(1,1),col=c("black","green"))
-%#axis(1, at=(c(4,8,16,32,64,128,256)))
-%#axis(2, at=(c(0.002,0.004,0.1,0.02,0.04,0.1,0.2,0.4)))
-%@
+%<<'sr_beast',echo=FALSE,fig.cap="The approximate percent bias of the \\txtSR, $\\tbias - 1$ is given versus sample size.",cache=FALSE>>=
+<<'sr_bias',echo=FALSE,fig.cap="The approximate relative bias of the \\txtSR, $\\tbias - 1$ is given versus sample size, shown in black.  In green the approximation given by $\\tbias[\\ssiz+1] \\approx 1 + \\frac{3}{4\\ssiz} + \\frac{25}{32\\ssiz^2}$ is plotted.">>=
+nvals <- 4:256
+tbias <- -1 + sapply(nvals, f_tbias)
+avals <- -1 + sapply(nvals, f_apx_tbias2)
+plot(nvals,tbias,type="l",log="xy",col="black",axes=F,ylab="bias in Sharpe ratio",xlab="number of samples")
+lines(nvals,avals,col="green")
+legend("topright",c("actual value","approximation"),lty=c(1,1),col=c("black","green"))
+axis(1, at=(c(4,8,16,32,64,128,256)))
+axis(2, at=(c(0.002,0.004,0.1,0.02,0.04,0.1,0.2,0.4)))
+@
 
 A decent asymptotic approximation \cite{dlmf_gammarat} to \tbias is given by
 $$
 \tbias[\ssiz+1] = 1 + \frac{3}{4\ssiz} + \frac{25}{32 \ssiz^2} + \bigo{\ssiz^{-3}}.
 $$
-
-
 %UNFOLD
 
 \subsection{Asymptotics and Confidence Intervals}%FOLDUP
@@ -410,6 +411,392 @@ into account the third and higher moments of the returns. See
 Opdyke \cite{Opdyke2007} or Baily and Lopez de Prado \cite{sref2011}.
 %UNFOLD
 
+\subsection{Power and Sample Size}%FOLDUP
+
+\label{subsec:SR_power_and_ssize}
+
+Consider the \tstat-test for the null hypothesis $H_0: \pmu = 0$.
+This is equivalent to testing $H_0: \psnr = 0$. A power rule ties
+together the (unknown) true effect size (\psnr), sample size (\ssiz),
+type I and type II rates.  Some example use cases:
+
+\begin{compactenum}
+\item Suppose you wanted to estimate the mean return of a pairs trade, but the stocks have only
+existed for two years. Is this enough data assuming the SNR is 2.0 \yrto{-1/2}?
+\item Suppose investors in a fund you manage want to `see some returns' within a year otherwise
+they will withdraw their investment.
+What SNR should you be hunting for so that, with probability one half,
+the actual returns will `look good' over the next year?
+\item Suppose you observe three months of a fund's returns, and you fail to reject the null under the
+one sample \tstat-test.  Assuming the SNR of the process is 1.5 \yrto{-1/2}, what is the probability of a type II error?
+\end{compactenum}
+
+<<'f_tpower',echo=FALSE>>=
+# the power of the univariate t-test;
+f_tpower <- function(n,rho = 0,alpha = 0.05) {
+	f_tpower_ncp(ncp = sqrt(n) * rho,n = n,alpha = alpha)
+}
+
+# the power of the univariate t-test as function of the ncp
+f_tpower_ncp <- function(ncp,n,alpha = 0.05) {
+	pt(qt(1-alpha,n-1),df = n-1,ncp = ncp,lower.tail = FALSE)
+}
+
+# the power of an f-test 
+f_fpower <- function(df1,df2,ncp,alpha = 0.05) {
+	pf(qf(alpha,df1=df1,df2=df2,ncp=0,lower.tail=FALSE),df1 = df1,df2 = df2,ncp = ncp,lower.tail = FALSE)
+}
+
+# find the sample size for a given power of the univariate t-test
+f_treqsize <- function(rho,powr = 0.80,alpha = 0.05) {
+	zz <- uniroot(function(n,rho,alpha,powr)(f_tpower(n,rho,alpha) - powr),
+								c(8,20 * 10 / (rho*rho)),rho = rho,powr = powr,alpha = alpha)
+	return(zz$root)
+}
+@
+
+For sufficiently large sample size (say $\ssiz \ge 30$), the power law 
+for the \tstat-test is well approximated by 
+\begin{equation}
+\ssiz \approx \frac{c}{\psnrsq},
+\label{eqn:tstatpowerlaw}
+\end{equation}
+where the constant $c$ depends on the type I rate and the type II rates,
+and whether one is performing a one- or two-sided test.
+This relationship was first noted by Johnson and Welch.  \cite{Johnson:1940}
+Unlike the type I rate, which is traditionally set at 0.05, there is 
+no widely accepted traditional value of power.  
+
+Values of the coefficient $c$ are given for one and two-sided t-tests
+at different power levels in \tabref{ttestpower}.  
+The case of $\typeI = 0.05,\powr = 0.80$ is known as 
+``Lehr's rule''. \cite{vanBelle2002_STRUTs,Lehr16} 
+<<'sr_power_table',echo=FALSE,results='asis'>>=
+dpy <- 253
+rhovals <- seq(0.5,3.0,by=0.10)
+rhovals_day <- rhovals / sqrt(dpy)
+samps25.1 <- (1/dpy) * unlist(lapply(rhovals_day, f_treqsize, powr = 0.25))
+samps50.1 <- (1/dpy) * unlist(lapply(rhovals_day, f_treqsize, powr = 0.50))
+samps80.1 <- (1/dpy) * unlist(lapply(rhovals_day, f_treqsize, powr = 0.80))
+#2sided test
+samps25.2 <- (1/dpy) * unlist(lapply(rhovals_day, f_treqsize, alpha=0.025, powr = 0.25))
+samps50.2 <- (1/dpy) * unlist(lapply(rhovals_day, f_treqsize, alpha=0.025, powr = 0.50))
+samps80.2 <- (1/dpy) * unlist(lapply(rhovals_day, f_treqsize, alpha=0.025, powr = 0.80))
+foo <- data.frame("one sided" = c(median(samps25.1 * rhovals**2),median(samps50.1 * rhovals**2),median(samps80.1 * rhovals**2)),
+									"two sided" = c(median(samps25.2 * rhovals**2),median(samps50.2 * rhovals**2),median(samps80.2 * rhovals**2)),
+									row.names = c("power = 0.25","power = 0.50","power = 0.80"))
+library(xtable)
+xres <- xtable(foo,label="tab:ttestpower",caption="Scaling of sample size with respect to $\\psnr^2$ required to achieve a fixed power in the t-test, at a fixed $\\typeI = 0.05$ rate.")
+print(xres,include.rownames=TRUE)
+@
+
+%#data <- data.frame(rho = rhovals,s50 = samps50,s80 = samps80)
+%#mod50 <- lm(log(s50) ~ log(rho),data)
+%#mod80 <- lm(log(s80) ~ log(rho),data)
+%#print(exp(mod50$coefficients[1]))
+%#print(exp(mod80$coefficients[1]))
+
+%The value $c=1$, \ie using sample size $\ssiz =  \frac{1}{\psnr^2}$ has power approximately equal to 
+%2FIX?
+
+Consider now the scaling in the rule $\ssiz \approx c\psnr^{-2}.$
+If the SNR \psnr is given in daily units, the sample size will be in days. One annualizes \psnr by multiplying
+by the square root of the number of days per year, which downscales \ssiz appropriately. That is, if \psnr is
+quoted in annualized terms, this rule of thumb gives the number of \emph{years} of observations required. This is
+very convenient since we usually think of \psnr and \ssr in annualized terms. 
+
+The following rule of thumb may prove useful:
+\begin{quote}
+The number of years required to reject non-zero mean with power of one half is around $2.7 / \psnr^2.$
+\end{quote}
+The mnemonic form of this is ``$e = nz^2$''. 
+Note that Euler's number appears here coincidentally, as it is nearly equal to
+$\wrapBracks{\funcit{\minv{\Phi}}{0.95}}^2$.
+The relative error in this approximation for
+determining the sample size is shown in \figref{power_thing}, as a function of
+\psnr; the error is smaller than one percent in the tested range.  
+
+<<'power_thing',echo=FALSE,fig.cap="The percent error of the power mnemonic $e\\approx\\ssiz \\psnrsq$ is plotted versus \\psnr.">>=
+ope <- 253
+ zetas <- seq(0.1,2.5,length.out=51)
+ssizes <- sapply(zetas,function(zed) { 
+ x <- power.sr_test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,ope=ope)
+ x$n / ope 
+})
+plot(zetas,100 * ((exp(1) / zetas^2) - ssizes)/ssizes, ylab="error in mnemonic rule (as %)")
+@
+
+<<'sobering',include=FALSE>>=
+foo.power <- power.sr_test(n=253,zeta=NULL,sig.level=0.05,power=0.5,ope=253)
+@
+
+The power rules are sobering indeed. Suppose you were a hedge fund manager
+whose investors threatened to perform a one-sided \tstat-test after one year.
+If your strategy's signal-to-noise ratio is less than
+\Sexpr{foo.power$zeta}\yrto{-1/2} (a value which 
+should be considered ``very good''), 
+your chances of `passing' the \tstat-test are less than fifty percent.
+
+%The presence of 
+
+%Note that when estimating the required sample size, one should always allow for a minimum number of samples 
+%(30 say), as otherwise the power of the test may be adversely affected by non-normality of the returns
+%distribution. This would only be a problem if \psnr was supposed to be very large, or if the mark frequency
+%was very low (say monthly marks).
+
+%Note that the relationship between sample size and SNR indicates that the proper units of 
+%SNR (and Sharpe ratio)
+%is inverse square root time, \eg ``we speculate the annualized SNR of this
+%fund is around $0.8\,\mbox{years}^{-0.5}$,'' or ``the Sharpe ratio of this stock over the past year is
+%$0.4\,\mbox{months}^{-0.5}$.''
+%%(Reporting Sharpe ratios with units would remove many operational ambiguities.)
+%For this reason, it may be more natural to consider the Sharpe ratio \emph{squared}. 
+
+%UNFOLD
+
+\subsection{Deviations from assumptions}%FOLDUP
+
+Van Belle suggests one consider, in priority order, assumptions of independence,
+heteroskedasticity, and normality in statistical tests. \cite{vanBelle2002_STRUTs} 
+
+\subsubsection{\txtSR and Autocorrelation}%FOLDUP
+
+The simplest relaxation of the \iid assumption of the returns \reti[i] is to assume the time-series of
+returns has a fixed autocorrelation. Let \pacor be the autocorrelation of the series of returns, 
+\ie the population correlation of \reti[i-1] with \reti[i].  \cite{BroDav:2002} In this case the 
+standard error of the mean tends to be an underestimate when $\pacor > 0$ and an overestimate when
+$\pacor < 0$. Van Belle \cite{vanBelle2002_STRUTs} notes that, under this formulation, 
+the \tstat statistic (under the null $\pmu = 0$)
+has standard error of approximately $\sqrt{(1 + \pacor) / (1 - \pacor)}$.  A Monte Carlo study confirms
+this approximation.  In \figref{autocorr_spread} the 
+empirical standard deviation of t-statistics computed on AR(1) series at given values of \pacor
+along with the fit value of $\sqrt{(1 + \pacor) / (1 - \pacor)}$. 
+
+The 'small angle' approximation for this correction is $1 + \pacor$, which is reasonably accurate
+for $\abs{\pacor} < 0.1$. An alternative expression of this approximation is ``a positive autocorrelation
+of \pacor inflates the Sharpe ratio by about \pacor percent.''
+
+% input{autocorr_study}%FOLDUP
+
+<<"autocorr_setup",echo=FALSE>>=
+########################################################################
+# AR time series #FOLDUP
+
+#generate an AR(1) series:
+AR1.filter <- function(phi,epsilons) {
+	n <- length(epsilons)
+	series <- numeric(n)
+	series[1] <- epsilons[1] / (1 - phi)
+	for(iii in 2:n) {
+		series[iii] <- phi * series[iii-1] + epsilons[iii]
+	}
+	return(series)
+}
+
+AR1.series <- function(n,phi,mu,sd,burn.in=100) {
+	series <- mu + AR1.filter(phi,rnorm(n + burn.in,mean=0,sd = sd))
+	return(series[(burn.in + 1):(burn.in + n)])
+}
+#UNFOLD
+# vanilla Sharpe ratio in terms of whatever input units
+f_vsharpe <- function(rets) {
+	return(mean(rets) / sd(rets))
+}
+# annualized Sharpe ratio
+f_asharpe <- function(rets, dpy = 253) {
+	return(sqrt(dpy) * f_vsharpe(rets))
+}
+# the t statistic
+f_tstat <- function(rets) { 
+	return(sqrt(length(rets)) * f_vsharpe(rets))
+}
+# for phi = -0.15 to 0.15 or so, generate 2048 returns series of length
+# around 3 years and look at the standard deviation of the t-statistic.
+
+# phi is the AR parameter;
+# ntrial is the number of times we run this;
+# nyr is the number of years of data to look at
+# dpy is days per year.
+# vsr is the 'vanilla' Sharpe ratio, daily;
+# sg is the daily volatility
+look_spread <- function(phi,ntrial,nyr,vsr=0,sg=0.01,dpy=253) {
+	n <- ceiling(nyr * dpy)
+	mu <- vsr * sg
+	ssrs <- replicate(ntrial,f_tstat(AR1.series(n,phi,mu,sg)))
+	return(sd(ssrs))
+}
+
+# the value estimated by Van Belle's trick:
+vb_spread <- function(phi,ntrial,nyr,vsr=0,sg=0.01,dpy=253) {
+	sqrt((1 + phi) / (1 - phi))
+}
+
+top_phi <- 0.2
+phivals <- seq(-top_phi,top_phi,length.out=7)
+ntrials <- ceiling(8 * mc.resolution)
+ny <- 3
+
+empiricals <- sapply(phivals,look_spread,ntrial = ntrials,nyr = ny)
+predicteds <- sapply(phivals,vb_spread,ntrial = ntrials,nyr = ny)
+@
+
+%spread as a function of autocorrelation%FOLDUP
+<<'autocorr_spread',echo=FALSE,fig.cap=paste("The empirical standard deviation for the \\tstat-statistic is shown at different values of the autocorrelation, \\pacor. Each point represents",ntrials,"series of approximately",ny,"years of daily data, with each series generated by an AR(1) process with normal innovations.  Each series has actual SNR of zero. The fit line is that suggested by Van Belle's correction for autocorrelation, namely $\\sqrt{(1 + \\pacor) / (1 - \\pacor)}$.")>>=
+plot(phivals,empiricals,pch=1,col="red",ylab="standard deviation of t statistic",
+		 xlab="autocorrelation")
+lines(phivals,predicteds,col="black")
+legend("topleft",c("Empirical","Predicted"),lty=c(0,1),pch=c(1,NA_integer_),col=c("red","black"))
+@
+%UNFOLD
+
+%UNFOLD
+
+The corrected \tstat-statistic has the form:
+\begin{equation}
+\tstat[0]' = \sqrt{\frac{1-\sacor}{1 + \sacor}} \sqrt{\ssiz} \frac{\smu - \pmu[0]}{\ssig} = \corcor \sqrt{\ssiz} \ssr[0],
+\label{corr_tstat}
+\end{equation}
+where \corcor is the correction factor for autocorrelation \cite{vanBelle2002_STRUTs}. The equivalent correction
+for Sharpe ratio is $\ssr[0]' = \corcor \ssr[0]$.
+
+2FIX: mention Lo's approximation
+
+%UNFOLD
+
+\subsubsection{\txtSR and Heteroskedasticity}%FOLDUP
+
+Here I will consider the case heteroskedastic asset returns with constant
+SNR. That is, both the volatility and expected return are changing over 
+time, with their ratio constant. 
+Suppose that \levi[i] and \reti[i] are independent random variables with
+$\levi[i] > 0$. One observes period returns of 
+$\levi[i]\reti[i]$ on period $i$. We have assumed that the SNR of \reti[{}]
+is a constant which we are trying to estimate.
+We have 
+\begin{equation}
+\begin{split}
+\E{\levi\reti} & = \E{\levi}\E{\reti},\\
+\VAR{\levi\reti} & = \E{\levi^2}\E{\reti^2} - \E{\levi}^2\E{\reti}^2 = \E{\reti^2}\VAR{\levi} + \VAR{\reti}\E{\levi}^2,
+\end{split}
+\end{equation}
+And thus, with some rearrangement,
+$$
+\psnr[\levi\reti] = \frac{\psnr[\reti]}{\sqrt{1 + \frac{\E{\reti^2}}{\VAR{\reti}}\frac{\VAR{\levi}}{\E{\levi}^2}}}.
+$$
+Thus measuring \txtSR without adjusting for heteroskedasticity 
+tends to give underestimates of the `true' \txtSR of the
+returns series, \reti[{}]. However, the deflation is typically modest.
+
+Note that when looking at \eg daily returns, the (non-annualized) \txtSR on the given mark frequency is usually
+on the order of 0.1 or less, thus $\E{\reti}^2 \approx 0.01 \VAR{\reti}$, and so $\E{\reti^2} \approx 1.01 \VAR{\reti}$.
+Thus it suffices to estimate the ratio $\VAR{\levi} / \E{\levi}^2$, the squared
+\emph{coefficient of variation} of \levi, to compute the correction factor.
+
+<<'leverage_foo',include=FALSE>>=
+Elevi <- 1.5 
+Elevis <- Elevi ** 2
+Vlevi <- 1 / 12
+ratlevi <- Vlevi / Elevis
+vixlevi <- (0.4)^2
+@
+
+%Consider, for example, the case where \levi is uniformly distributed between 1.0 and 2.0. In this case, we have
+%$\VAR{\levi} = 1/12$, and $\E{\levi}^2 = 2.25$; their ratio is approximately 
+%$\Sexpr{round(ratlevi,digits=4)}$, and thus, assuming the daily Sharpe is 0.1, we have 
+%$$
+%\sqrt{1 + \frac{\E{\reti^2}}{\VAR{\reti}}\frac{\VAR{\levi}}{\E{\levi}^2}} \approx 
+%\Sexpr{round(sqrt(1 + (1 + 0.1 ** 2) * ratlevi),digits=2)}.
+%$$
+%In this case the correction factor for leverage is very small indeed. 
+
+Consider, for example, the case where \levi is the \StockTicker{VIX} index.
+Empirically the \StockTicker{VIX} has a coefficient of variation around
+0.4. Assuming the daily \txtSR is 0.1, we have
+$$
+\sqrt{1 + \frac{\E{\reti^2}}{\VAR{\reti}}\frac{\VAR{\levi}}{\E{\levi}^2}} \approx 
+\Sexpr{round(sqrt(1 + (1 + 0.1 ** 2) * vixlevi),digits=2)}.
+$$
+In this case the correction factor for leverage is fairly small.
+
+%the assumption above is approximately equivalent to $\VAR{\levi}\ll\E{\levi}^2$, which is like saying that the
+%squared SNR of \levi is much greater than one. This is likely to be the case when the leverage is mostly concentrated
+%around \eg a mean value of 1. For example if \levi was uniformly distributed between 1.0 and 2.0, then $\E{\levi}^2 = 2.25$,
+%which is much larger than $\VAR{\levi} = 1/12 \approx 0.083$.
+
+
+
+%UNFOLD
+
+\subsubsection{\txtSR and Non-normality}%FOLDUP
+
+The distribution of the Sharpe ratio given in \subsecref{dist_o_SR} is only valid when
+the returns of the fund are normally distributed. If not, the Central Limit Theorem guarantees
+that the sample mean is \emph{asymptotically} normal (assuming the variance exists!), but the convergence
+to a normal can require a large sample size. In practice, the tests described in \subsecref{SR_tests}
+work fairly well for returns from kurtotic distributions, but can be easily fooled by skewed returns.
+
+There should be no real surprise in this statement. Suppose one is analyzing the returns of a hedge fund
+which is secretly writing insurance policies, and has had no claims in the past 5 years.  The true expected
+mean return of the fund might be zero or negative, but the historical data does not contain a `Black Swan'
+type event. \cite{0812979184} We need not make any fabulous conjectures about the `non-stationarity' of our 
+return series, or the failure of models or our ability to predict: skew is a property of the distribution, 
+and we do not have enough evidence to detect the skew.
+
+<<'skewstudy_prelim',echo=FALSE>>=
+fname <- system.file('extdata','skew_study.rda',package='SharpeR')
+if (fname == "") {
+	fname <- 'skew_study.rda'
+}
+# poofs res, ntrials, SPX.rets
+load(fname)
+
+SPX.start <- time(SPX.rets[1])
+SPX.end <- time(SPX.rets[length(SPX.rets)])
+@
+
+To demonstrate this fact, I look at the empirical type I rate for the hypothesis test: $H_0: \psnr = 1.0$
+versus the alternative $H_1: \psnr > 1.0$ for different distributions of returns: 
+I sample from a Gaussian 
+(as the benchmark); a \tstat-distribution with 10 degrees of freedom;
+a Tukey $h$-distribution, with different values of $h$; 
+and a `Lambert W x Gaussian' distribution, with different .  \cite{2010arXiv1010.2265G,2009arXiv0912.4554G,LambertW} 
+I also draw samples from the daily log returns of 
+the S \& P 500 over the period from \Sexpr{as.character(SPX.start,format="%B %d, %Y")} to 
+\Sexpr{as.character(SPX.end,format="%B %d, %Y")}, affinely transformed 
+to have $\psnr = 1.0$.  
+The \tstat- and Tukey distributions are fairly kurtotic, but have zero
+skew, while the Lambert W x Gaussian is skewed and (therefore) kurtotic.  
+At the nominal $\typeI = 0.05$ level, we expect to get a reject rate around five percent.
+
+% input{skew_study}%FOLDUP
+
+<<'skewstudy',echo=FALSE,results='asis'>>=
+# res, ntrials are poofed above.
+#digits=c(0,0,0,2,2,2),
+xres <- xtable(res,label="tab:sharpe_skew_robustness",
+							 display=c('s','s','s','g','g','fg'),
+							 caption=paste("Empirical type I rates of the test for $\\psnr = 1.0$ via distribution of the Sharpe ratio are given for various distributions of returns.  The empirical rates are based on ", 
+														 ntrials, 
+														 " simulations of three years of daily returns, with a nominal rate of $\\typeI = 0.05$. Skew appears to have a much more adverse effect than kurtosis alone."))
+print(xres,include.rownames=FALSE)
+@
+%UNFOLD
+
+The results are given in \tabref{sharpe_skew_robustness}, and indicate that skew is a more serious problem than
+kurtosis. The results from the S \& P 500 data are fairly encouraging: broad market returns are perhaps not as skewed 
+as the Lambert W x Gaussian distributions that we investigate, and the type I rate is near nominal when using three
+years of data. Lumley \etal found similar results for the \tstat-test when looking at sample sizes greater than 
+500. \cite{Lumley:2002} Since the \tstat-test statistic is equivalent to 
+\txtSR (up to scaling), this result
+carries over to the test for SNR.
+
+However, skew is a serious problem when using the \txtSR. 
+A practicioner must be reasonably satisfied that the
+return stream under examination is not seriously skewed to use the \txtSR. 
+Moreover, one can \emph{not} use historical data to detect skew, for the same
+reason that skew causes the distribution of \txtSR to degrade.
+
+%UNFOLD
 %UNFOLD
 
 %UNFOLD
@@ -1015,8 +1402,6 @@ opt.pos.T2 <- function(mu1,mu2,sig1,sig12,sig2) {
 %UNFOLD
 %UNFOLD
 
-
-
 \section{Miscellanea}%FOLDUP
 
 \subsection{Which Returns?}%FOLDUP
@@ -1045,70 +1430,23 @@ where \ssr[r] is the Sharpe measured using relative returns and \ssr uses log re
 is most accurate for daily returns, and for the modest values of \txtSR one expects to see for real funds.
 %UNFOLD
 
-\subsection{Sharpe is nearly leverage invariant}%FOLDUP
+\subsection{Sharpe Tricks}%FOLDUP
 
-Suppose that you observe the returns of a strategy, but the fund manager is changing the leverage
-from period to period. Suppose the fund manager's decisions are 
-completely uninformed\sidenote{I know this is a stretch...},
-and so that changes in leverage are completely independent from the future performance of the underlying 
-strategy. Can one compute the \txtSR on the observed returns without adjusting for leverage 
-(which may be unknown)?
+\subsubsection{\txtSR bounds probability of a loss}
 
-Given some modest conditions, one can indeed. Let \levi[i] be the leverage on period $i$, and let 
-$\levi[i]\reti[i]$ be the observed levered returns\sidenote{Here one must use 
-relative returns instead of log returns.}. 
-Suppose that \levi[i] and \reti[i] are independent random variables and $\levi[i] > 0$.
-We have 
-\begin{equation}
-\begin{split}
-\E{\levi\reti} & = \E{\levi}\E{\reti},\\
-\VAR{\levi\reti} & = \E{\levi^2}\E{\reti^2} - \E{\levi}^2\E{\reti}^2 = \E{\reti^2}\VAR{\levi} + \VAR{\reti}\E{\levi}^2,
-\end{split}
-\end{equation}
-And thus, with some rearrangement,
+Suppose the SNR of a return series is positive. Then,
+by Cantelli's inequality:
 $$
-\psnr[\levi\reti] = \frac{\psnr[\reti]}{\sqrt{1 + \frac{\E{\reti^2}}{\VAR{\reti}}\frac{\VAR{\levi}}{\E{\levi}^2}}}.
+\Pr{\reti < 0} = \Pr{{\pmu - \reti} > \pmu} = 
+ \Pr{{\pmu - \reti} > \psnr \psig} \le \frac{1}{1 + \psnr^2}.
 $$
-Thus measuring \txtSR without adjusting for leverage tends to give underestimates of the `true' \txtSR of the
-returns series. However, the deflation is probably very modest indeed.
+This is a \emph{very} loose upper bound on the probability of a loss, and is fairly useless on any timescale
+for which the SNR is less than one.
 
-Note that when looking at \eg daily returns, the (non-annualized) \txtSR on the given mark frequency is usually
-on the order of 0.1 or less, thus $\E{\reti}^2 \approx 0.01 \VAR{\reti}$, and so $\E{\reti^2} \approx 1.01 \VAR{\reti}$.
-Thus it suffices to estimate the ratio $\VAR{\levi} / \E{\levi}^2$, the squared
-\emph{coefficient of variation} of \levi, to compute the correction factor.
-
-<<'leverage_foo',include=FALSE>>=
-Elevi <- 1.5 
-Elevis <- Elevi ** 2
-Vlevi <- 1 / 12
-ratlevi <- Vlevi / Elevis
-vixlevi <- (0.4)^2
-@
-
-%Consider, for example, the case where \levi is uniformly distributed between 1.0 and 2.0. In this case, we have
-%$\VAR{\levi} = 1/12$, and $\E{\levi}^2 = 2.25$; their ratio is approximately 
-%$\Sexpr{round(ratlevi,digits=4)}$, and thus, assuming the daily Sharpe is 0.1, we have 
-%$$
-%\sqrt{1 + \frac{\E{\reti^2}}{\VAR{\reti}}\frac{\VAR{\levi}}{\E{\levi}^2}} \approx 
-%\Sexpr{round(sqrt(1 + (1 + 0.1 ** 2) * ratlevi),digits=2)}.
-%$$
-%In this case the correction factor for leverage is very small indeed. 
-
-Consider, for example, the case where \levi is the \StockTicker{VIX} index.
-Empirically the \StockTicker{VIX} has a coefficient of variation around
-0.4. Assuming the daily \txtSR is 0.1, we have
-$$
-\sqrt{1 + \frac{\E{\reti^2}}{\VAR{\reti}}\frac{\VAR{\levi}}{\E{\levi}^2}} \approx 
-\Sexpr{round(sqrt(1 + (1 + 0.1 ** 2) * vixlevi),digits=2)}.
-$$
-In this case the correction factor for leverage is fairly small.
-
-%the assumption above is approximately equivalent to $\VAR{\levi}\ll\E{\levi}^2$, which is like saying that the
-%squared SNR of \levi is much greater than one. This is likely to be the case when the leverage is mostly concentrated
-%around \eg a mean value of 1. For example if \levi was uniformly distributed between 1.0 and 2.0, then $\E{\levi}^2 = 2.25$,
-%which is much larger than $\VAR{\levi} = 1/12 \approx 0.083$.
+\subsubsection{\txtSR and drawdowns}
 
 %UNFOLD
+
 
 \subsection{The `haircut'}%FOLDUP
 
@@ -1309,10 +1647,10 @@ into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 %\bibliographystyle{ieeetr}
 \bibliographystyle{plainnat}
 %\bibliographystyle{acm}
-\bibliography{SharpeR}
+\bibliography{SharpeR,rauto}
 %UNFOLD
 
-\appendix
+\appendix%FOLDUP
 
 \section{Asymptotic Efficiency of Sharpe Ratio}%FOLDUP
 
@@ -1582,7 +1920,7 @@ Thus, conditional on observing \ssrsqoptG{\hejG}, we have
 
 
 %UNFOLD
-
+%UNFOLD
 \end{document}
 %for vim modeline: (do not edit)
-% vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=%%s:syn=rnoweb:ft=rnoweb
+% vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=%%s:syn=rnoweb:ft=rnoweb:nu

@@ -383,42 +383,7 @@ XLF.monthly <- mo.rets[,"XLF"]
 print(sr_test(x=XLU.monthly,y=XLF.monthly,ope=12,paired=TRUE))
 @
 
-The \emph{power} of the one-sample test for \txtSR follows a form first
-published by Johnson and Welch:\cite{Johnson:1940}
-$$
-\ssiz = \frac{c}{\psnrsq},
-$$
-where the constant $c$ depends on the type I and type II rates and whether one
-is performing a one- or two-sided test. A handy mnemonic instantiation of this
-rule, similar to `Lehr's rule,' \cite{vanBelle2002_STRUTs,Lehr16} is 
-$e \approx \ssiz \psnrsq$, where \psnr is the population signal-to-noise
-ratio, $e$ is Euler's number, and \ssiz is the sample size, in the \emph{same
-units} as \psnr. That is, if one measures SNR in annualized units, then \ssiz is
-the number of \emph{years}.  The relative error in this approximation for
-determining the sample size is shown in \figref{power_thing}, as a function of
-\psnr; the error is smaller than one percent in the tested range.  Note that
-Euler's number appears here coincidentally, as it is nearly equal to
-$\wrapBracks{\funcit{\minv{\Phi}}{0.95}}^2$.
 
-<<'power_thing',fig.cap="The percent error of the power mnemonic $e\\approx\\ssiz \\psnrsq$ is plotted versus \\psnr.",fig.height=4,fig.width=5>>=
-ope <- 253
- zetas <- seq(0.1,2.5,length.out=51)
-ssizes <- sapply(zetas,function(zed) { 
- x <- power.sr_test(n=NULL,zeta=zed,sig.level=0.05,power=0.5,ope=ope)
- x$n / ope 
-})
-plot(zetas,100 * ((exp(1) / zetas^2) - ssizes)/ssizes, ylab="error in mnemonic rule (as %)")
-@
-
-<<'sobering',include=FALSE>>=
-foo.power <- power.sr_test(n=253,zeta=NULL,sig.level=0.05,power=0.5,ope=253)
-@
-
-The power rules are sobering indeed. Suppose you were a hedge fund manager
-whose investors threatened to perform a one-sided \tstat-test after one year.
-If your strategy's signal-to-noise ratio is less than
-\Sexpr{foo.power$zeta}\yrto{-1/2} (a value which should be considered ``very good''), 
-your chances of `passing' the \tstat-test are less than fifty percent.
 %UNFOLD
 %UNFOLD
 

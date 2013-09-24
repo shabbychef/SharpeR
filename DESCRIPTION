@@ -3,14 +3,15 @@ Maintainer: Steven E. Pav <shabbychef@gmail.com>
 Author: Steven E. Pav
 Authors@R: c(person(c("Steven", "E."), "Pav", role=c("aut","cre"), 
     email="shabbychef@gmail.com"))
-Version: 0.1309
-Date: 2013-09-21
+Version: 0.1310
+Date: 2013-09-23
 License: LGPL-3
 Title: Statistical significance of Sharpe ratio
 Description: a collection of tools for analyzing significance of trading 
     strategies, based on the Sharpe ratio and overfit of the same.
 Depends: 
-    R (>= 3.0.0)
+    R (>= 3.0.0),
+		xtable
 Suggests: 
     quantmod,
     MASS,

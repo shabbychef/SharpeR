@@ -169,6 +169,11 @@
   Rao, C. R. "Advanced Statistical Methods in Biometric
   Research." Wiley (1952).
 
+  Rao, C. R. "On Some Problems Arising out of
+  Discrimination with Multiple Characters." Sankhya, 9, no.
+  4 (1949): 343-366.
+  \url{http://www.jstor.org/stable/25047988}
+
   Kan, Raymond and Smith, Daniel R. "The Distribution of
   the Sample Minimum-Variance Frontier." Journal of
   Management Science 54, no. 7 (2008): 1364--1380.

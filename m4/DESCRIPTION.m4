@@ -14,7 +14,8 @@ Title: Statistical significance of Sharpe ratio
 Description: a collection of tools for analyzing significance of trading 
     strategies, based on the Sharpe ratio and overfit of the same.
 Depends: 
-    R (>= 3.0.0)
+    R (>= 3.0.0),
+		xtable
 Suggests: 
     quantmod,
     MASS,

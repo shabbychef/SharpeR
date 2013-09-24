@@ -50,7 +50,8 @@ RSCRIPT   				 = $(RBIN)/Rscript
 R_FLAGS 					?= -q --no-save --no-restore --no-init-file
 
 # packages I need to test this one
-TEST_DEPS  				 = testthat roxygen2 knitr TTR quantmod MASS sandwich
+TEST_DEPS  				 = testthat roxygen2 knitr TTR quantmod MASS \
+										 sandwich xtable LambertW
 INSTALLED_DEPS 		 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
 PKG_TESTR 				 = tests/run-all.R
 
@@ -69,7 +70,7 @@ RD_DUMMY 					 = man/$(PKG_NAME).Rd
 
 # extradata
 EXTDATA_D 				 = inst/extdata
-EXTDATA_FILES	 		 = $(EXTDATA_D)/ret_data.rda
+EXTDATA_FILES	 		 = $(EXTDATA_D)/ret_data.rda $(EXTDATA_D)/skew_study.rda
 
 # vignette stuff
 VIGNETTE_D 				 = vignettes
@@ -390,7 +391,7 @@ $(VIGNETTE_CACHE_SENTINEL) : $(VIGNETTE_SRCS) $(LOCAL)/$(PKG_NAME)/INDEX
 vignette_cache : $(VIGNETTE_CACHE_SENTINEL)
 
 # make data needed by the vignette. what bother.
-$(EXTDATA_FILES) : $(NODIST_R_DIR)/make_ret_data.R
+$(EXTDATA_D)/%.rda : $(NODIST_R_DIR)/make_%.R
 	$(call WARN_DEPS)
 	$(call MKDIR,$(EXTDATA_D))
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
@@ -399,6 +400,16 @@ $(EXTDATA_FILES) : $(NODIST_R_DIR)/make_ret_data.R
 				 "setwd('$(NODIST_R_DIR)');source(basename('$<'));"
 	# horribly hacky!
 	mv $(NODIST_R_DIR)/*.rda $(EXTDATA_D)
+
+$(VIGNETTE_D)/rauto.bib : $(NODIST_R_DIR)/gen_bib.R
+	$(call WARN_DEPS)
+	$(call MKDIR,$(EXTDATA_D))
+	R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,quantmod" \
+				 $(R) $(R_FLAGS) --slave -e \
+				 "setwd('$(NODIST_R_DIR)');source(basename('$<'));"
+	# horribly hacky!
+	mv $(NODIST_R_DIR)/*.bib $@
 
 cachedata: $(EXTDATA_FILES)
 
