@@ -75,14 +75,21 @@
 \providecommand{\txtSR}{Sharpe ratio\xspace}
 \providecommand{\txtSNR}{Signal-noise ratio\xspace}
 
-\providecommand{\eg}{\emph{e.g.},\xspace}
-\providecommand{\ie}{\emph{i.e.},\xspace}
-\providecommand{\nb}{\emph{n.b.},\xspace}
-\providecommand{\iid}{\emph{i.i.d.}\xspace}
-\providecommand{\viz}{\emph{viz.}\xspace}
-\providecommand{\etc}{\emph{etc.}\xspace}
-\providecommand{\etal}{\emph{et al.}\xspace}
-\providecommand{\cf}{\emph{cf.}\xspace}
+
+% abbreviations
+\providecommand{\myabrvc}[1]{\emph{#1},\xspace}
+\providecommand{\myabrv}[1]{\emph{#1}\xspace}
+
+\providecommand{\eg}{\myabrvc{e.g.}}
+\providecommand{\ie}{\myabrvc{i.e.}}
+\providecommand{\nb}{\myabrvc{n.b.}}
+
+\providecommand{\iid}{\myabrv{i.i.d.}}
+\providecommand{\viz}{\myabrv{viz.}}
+\providecommand{\etc}{\myabrv{etc.}}
+\providecommand{\etal}{\myabrv{et al.}}
+\providecommand{\cf}{\myabrv{cf.}}
+
 
 \providecommand{\setwo}[2]{\MATHIT{\left\{ #1 \left|\; {#2} \right.\right\}}}
 
@@ -112,6 +119,23 @@
 \providecommand{\trace}[1]{\funcit{\mbox{tr}}{#1}}
 % is this replicated elsewhere?
 \providecommand{\det}[1]{\abs{#1}}
+\providecommand{\logdet}[1]{\MATHIT{\log\det{#1}}}
+
+% as vector, a column.
+\providecommand{\asvec}[1]{\tr{\wrapBracks{#1}}}
+\providecommand{\vcat}[2]{\asvec{\tr{#1},\tr{#2}}}
+
+\providecommand{\threebythree}[9]{\wrapBracks{\begin{array}{ccc}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\\{#7}&{#8}&{#9}\end{array}}}
+\providecommand{\twotwosys}[6]{\wrapBracks{\begin{array}{cc|c}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\end{array}}}
+\providecommand{\twobytwo}[4]{\wrapBracks{\begin{array}{cc}{#1}&{#2}\\{#3}&{#4}\end{array}}}
+\providecommand{\twobytwosym}[3]{\twobytwo{#1}{#2}{\tr{#2}}{#3}}
+\providecommand{\twobyone}[2]{\wrapBracks{\begin{array}{r}{#1}\\{#2}\end{array}}}
+\providecommand{\twobythree}[6]{\wrapBracks{\begin{array}{ccc}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\end{array}}}
+\providecommand{\threebytwo}[6]{\wrapBracks{\begin{array}{cc}{#1}&{#2}\\{#3}&{#4}\\{#5}&{#6}\end{array}}}
+\providecommand{\threebyone}[3]{\wrapBracks{\begin{array}{r}{#1}\\{#2}\\{#3}\end{array}}}
+\providecommand{\onebytwo}[2]{\wrapBracks{\begin{array}{rr}{#1}&{#2}\end{array}}}
+
+
 % idealized and conditional SNR functions
 \providecommand{\pSNRfoo}[2]{\funcit{\mathSUB{\mbox{SNR}}{#1}}{#2}}
 \providecommand{\sSNRfoo}[2]{\funcit{\mathSUB{\hat{\mbox{SNR}}}{#1}}{#2}}
@@ -130,6 +154,11 @@
 \providecommand{\tr}[1]{\mathSUP{#1}{\top}}
 \providecommand{\minv}[1]{\mathSUP{#1}{-1}}
 \providecommand{\trminv}[1]{\mathSUP{#1}{-\top}}
+% cholesky 
+\providecommand{\chol}[1]{\mathSUP{#1}{1/2}}
+\providecommand{\trchol}[1]{\mathSUP{#1}{\top/2}}
+\providecommand{\ichol}[1]{\mathSUP{#1}{-1/2}}
+\providecommand{\trichol}[1]{\mathSUP{#1}{-\top/2}}
 % null space
 \providecommand{\mnull}[1]{\mathSUP{#1}{C}}
 
@@ -164,7 +193,7 @@
 %\providecommand{\arett}[1][t]{\mathSUB{r}{#1}}
 
 \renewcommand{\exp}[1]{\MATHIT{e^{#1}}}
-\providecommand{\longexp}[1]{\MATHIT{\operatorname{exp}\wrapNeParens{#1}}}
+\providecommand{\longexp}[1]{\funcit{\operatorname{exp}}{#1}}
 
 %scalar returns:
 \providecommand{\reti}[1][]{\mathSUB{\prvsymi}{#1}}
@@ -185,6 +214,10 @@
 \providecommand{\vretv}[1][]{\vectUL{\prvsymv}{}{#1}}
 \providecommand{\vreta}[1][]{\vectUL{\prvsyma}{}{#1}}
 \providecommand{\vretg}[1][]{\vectUL{\prvsymg}{}{#1}}
+
+% augmented
+\providecommand{\avreti}[1][]{\vectUL{\tilde{\prvsymi}}{}{#1}}
+\providecommand{\amreti}[1][]{\MtxUL{\tilde{\MakeUppercase{\prvsymi}}}{}{#1}}
 
 % transpose of same
 \providecommand{\trvreti}[1][]{\vectUL{\prvsymi}{\top}{#1}}
@@ -418,25 +451,32 @@
 
 % make a letter into a distribution 'law'
 \providecommand{\makelaw}[2]{\MATHIT{#1\wrapNeParens{#2}}}
+\providecommand{\FOOpdf}[3]{\funcit{\mathSUB{f}{#1}}{#2;#3}}
 \providecommand{\FOOcdf}[3]{\funcit{\mathSUB{F}{#1}}{#2;#3}}
 \providecommand{\FOOqnt}[3]{\funcit{\mathSUB{#1}{#2}}{#3}}
 
+% normal
+\providecommand{\normpdf}[2]{\FOOpdf{\mathcal{N}}{#1}{#2}}
+\providecommand{\normcdf}[2]{\FOOcdf{\mathcal{N}}{#1}{#2}}
+\providecommand{\normqnt}[2]{\FOOqnt{\mathcal{N}}{#1}{#2}}
 
 %t
 \providecommand{\tcdf}[2]{\FOOcdf{t}{#1}{#2}}
 \providecommand{\tqnt}[2]{\FOOqnt{t}{#1}{#2}}
 \providecommand{\tlaw}[1]{\makelaw{t}{#1}}
 
-\providecommand{\nctcdf}[2]{\FOOcdf{t}{#1}{#2}}
-\providecommand{\nctqnt}[2]{\FOOqnt{t}{#1}{#2}}
+\providecommand{\nctcdf}[3]{\FOOcdf{t}{#1}{#2,#3}}
+\providecommand{\nctqnt}[3]{\FOOqnt{t}{#1}{#2,#3}}
 \providecommand{\nctlaw}[1]{\makelaw{t}{#1}}
 \providecommand{\nctvar}[1][]{\mathSUB{t}{#1}}
 
-%f
+% cdf of F, and non-central F:
 \providecommand{\fcdf}[2]{\FOOcdf{f}{#1}{#2}}
-\providecommand{\ncfcdf}[2]{\FOOcdf{f}{#1}{#2}}
+\providecommand{\ncfcdf}[3]{\FOOcdf{f}{#1}{#2,#3}}
+% quantiles (inverse cdf) of F, noncentral F
 \providecommand{\fqnt}[2]{\FOOqnt{f}{#1}{#2}}
-\providecommand{\ncfqnt}[2]{\FOOqnt{f}{#1}{#2}}
+\providecommand{\ncfqnt}[3]{\FOOqnt{f}{#1}{#2,#3}}
+% as a 'law'
 \providecommand{\flaw}[1]{\makelaw{F}{#1}}
 \providecommand{\ncflaw}[1]{\makelaw{F}{#1}}
 

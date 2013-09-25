@@ -184,7 +184,6 @@
 #' autocorrelation.
 #' \item Tests on Sharpe under positivity constraint. (\emph{c.f.} Silvapulle)
 #' \item Portfolio spanning tests.
-#' \item Tests of hedge restrictions.
 #' \item Tests on portfolio weights.
 #' }
 #' 

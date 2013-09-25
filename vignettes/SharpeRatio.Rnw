@@ -193,21 +193,22 @@ is greater than \tqnt{1-\typeI}{\ssiz - 1}, the $1-\typeI$ quantile of the
 degrees of freedom.
 
 If $\pmu = \pmu[1] > \pmu[0]$, then the power of this test is
-$$1 - \nctcdf{\tqnt{1-\typeI}{\ssiz - 1}}{\nctp[1],\ssiz-1},$$
-where $\nctp[1] = \sqrt{\ssiz}\left(\pmu[1] - \pmu[0]\right)/\psig$ and $\nctcdf{x}{\nctp,\ssiz - 1}$ is
+$$1 - \nctcdf{\tqnt{1-\typeI}{\ssiz - 1}}{\ssiz-1}{\nctp[1]},$$
+where $\nctp[1] = \sqrt{\ssiz}\left(\pmu[1] - \pmu[0]\right)/\psig$ and
+$\nctcdf{x}{\ssiz - 1}{\nctp}$ is
 the cumulative distribution function of the non-central \tstat-distribution with non-centrality parameter
 \nctp and $\ssiz-1$ degrees of freedom.  \cite{scholz07nct}
 
 \item A one-sample test for signal-to-noise ratio (SNR) involves the \tstat-statistic. To test:
 $$H_0 : \psnr = \psnr[0]\quad\mbox{versus}\quad H_1 : \psnr > \psnr[0],$$
 we reject if the statistic $\tstat = \sqrt{\ssiz}\ssr$ is greater than
-\nctqnt{1-\typeI}{\nctp[0],\ssiz - 1}, the $1-\typeI$ quantile of the
+\nctqnt{1-\typeI}{\ssiz - 1}{\nctp[0]}, the $1-\typeI$ quantile of the
 non-central \tstat-distribution with $\ssiz - 1$
 degrees of freedom and non-centrality parameter $\nctp[0] = \sqrt{\ssiz}\psnr[0]$.
 
 If $\psnr = \psnr[1] > \psnr[0]$, then the power of this test is 
-$$1 - \nctcdf{\nctqnt{1-\typeI}{\nctp[0],\ssiz - 1}}{\nctp[1],\ssiz-1},$$
-where $\nctp[1] = \sqrt{\ssiz}\psnr[1]$ and $\nctcdf{x}{\nctp,\ssiz - 1}$ is
+$$1 - \nctcdf{\nctqnt{1-\typeI}{\ssiz - 1}{\nctp[0]}}{\ssiz-1}{\nctp[1]},$$
+where $\nctp[1] = \sqrt{\ssiz}\psnr[1]$ and $\nctcdf{x}{\ssiz - 1}{\nctp}$ is
 the cumulative distribution function of the non-central \tstat-distribution with non-centrality parameter
 \nctp and $\ssiz-1$ degrees of freedom.  \cite{scholz07nct}
 
@@ -328,9 +329,9 @@ normality of \reti. \cite{Johnson:1940} We can find confidence intervals on \psn
 assuming only normality of \reti (or large \ssiz and an appeal to the Central Limit Theorem),
 by inversion of the cumulative distribution of the non-central \tstat-distribution. A $1 - \typeI$ 
 symmetric confidence interval on \psnr has endpoints defined implicitly by
-$$1 - \typeI/2 = \nctcdf{\ssr}{\sqrt{\ssiz}\psnr[l],\ssiz-1},\quad
+$$1 - \typeI/2 = \nctcdf{\ssr}{\ssiz-1}{\sqrt{\ssiz}\psnr[l]},\quad
 \typeI/2 = \nctcdf{\ssr}{\sqrt{\ssiz}\psnr[u],\ssiz-1},$$
-where $\nctcdf{x}{\nctp,\ssiz-1}$ is the CDF of the non-central \tstat-distribution with 
+where $\nctcdf{x}{\ssiz-1}{\nctp}$ is the CDF of the non-central \tstat-distribution with 
 non-centrality parameter \nctp and $\ssiz - 1$ degrees of freedom.
 Computationally, this method requires one to invert the CDF 
 (\eg by Brent's method \cite{Brent:1973}), which is slower than 
@@ -633,7 +634,7 @@ vb_spread <- function(phi,ntrial,nyr,vsr=0,sg=0.01,dpy=253) {
 
 top_phi <- 0.2
 phivals <- seq(-top_phi,top_phi,length.out=7)
-ntrials <- ceiling(8 * mc.resolution)
+ntrials <- ceiling(4 * mc.resolution)
 ny <- 3
 
 empiricals <- sapply(phivals,look_spread,ntrial = ntrials,nyr = ny)
@@ -803,6 +804,7 @@ reason that skew causes the distribution of \txtSR to degrade.
 
 \section{\txtSR and portfolio optimization}%FOLDUP
 
+% intro%FOLDUP
 Let $\vreti[1],\vreti[2],\ldots,\vreti[\ssiz]$ be independent draws from
 a \nstrat-variate normal with population mean \pvmu and population covariance
 \pvsig. Let \svmu be the usual sample estimate of the mean,
@@ -874,6 +876,157 @@ the above expression can be simplified slightly as
 \qform{\minv{\usvsig}}{\svmu} \sim
 \ncflaw{\nstrat,\ssiz-\nstrat,\ssiz\wrapParens{\psnropt + \rdrag}^2}.
 \end{equation*}
+%UNFOLD
+
+\subsection{Tests involving Hotelling's Statistic}%FOLDUP
+
+\label{subsec:HT_tests}
+
+Here I list the classical multivariate analogues to the tests described 
+in \subsecref{SR_tests}:
+\begin{compactenum}
+%%1sample test for mean%FOLDUP
+\item The classical one-sample test for mean of a multivariate random variable uses Hotelling's statistic, just as
+the univariate test uses the \tstat-statistic. Unlike the univariate case, we cannot perform a one-sided test 
+(because $\nlatf > 1$ makes one-sidedness an odd concept), and thus we have the two-sided test:
+$$H_0 : \pvmu = \pvmu[0]\quad\mbox{versus}\quad H_1 : \pvmu \ne \pvmu[0],$$
+we reject at the \typeI level if 
+$$\Tstat[0] = \ssiz \qform{\svsig^{-1}}{\left(\svmu - \pvmu[0]\right)} \ge 
+\frac{\nlatf(\ssiz - 1)}{\ssiz - \nlatf} \fqnt{1-\typeI}{\nlatf,\ssiz - \nlatf},
+$$
+where \fqnt{1-\typeI}{\nlatf,\ssiz - \nlatf} is the $1 - \typeI$ quantile of the 
+(central) \flaw{}-distribution with $\nlatf$ and $\ssiz - \nlatf$ degrees of freedom.
+
+If $\pvmu = \pvmu[1] \ne \pvmu[0]$, then the power of this test is
+$$\powr = 1 - \ncfcdf{\fqnt{1-\typeI}{\nlatf,\ssiz - \nlatf}}{\nlatf,\ssiz - \nlatf}{\ncfp[1]},$$
+where 
+$$\ncfp[1] = \ssiz\qform{\minv{\pvsig}}{\wrapNeParens{\pvmu[1] - \pvmu[0]}}$$
+is the noncentrality parameter, and 
+$\ncfcdf{x}{\nlatf,\ssiz - \nlatf}{\ncfp}$ is 
+the cumulative distribution function of the non-central \flaw{}-distribution with non-centrality parameter
+\ncfp and $\nlatf,\ssiz-\nlatf$ degrees of freedom.  \cite{Bilodeau1999}
+
+Note that the non-centrality parameter is equal to the population analogue of the Hotelling statistic
+itself. One should take care that some references (and perhaps statistical packages) have different
+ideas about how the non-centrality parameter should be communicated. The above formulation matches the
+convention used in the R statistical package and in Matlab's statistics toolbox. It is, however, off by 
+a factor of two with respect to the convention used by Bilodeau and Brenner. \cite{Bilodeau1999}
+%UNFOLD
+
+%%1sample test for SNR%FOLDUP
+\item A one-sample test for optimal signal-to-noise ratio (SNR) involves the Hotelling statistic as follows.
+To test
+$$H_0 : \psnr[*] = \psnr[0]\quad\mbox{versus}\quad H_1 : \psnr[*] > \psnr[0],$$
+we reject if 
+$$\Tstat[0] > \frac{\nlatf(\ssiz-1)}{\ssiz - \nlatf}\ncfqnt{1-\typeI}{\nlatf,\ssiz-\nlatf}{\ncfp[0]},$$
+where \Tstat[0] and \ncfp[0] are defined as above, and where
+\ncfqnt{1-\typeI}{\nlatf,\ssiz-\nlatf}{\ncfp[0]} is the 
+$1 - \typeI$ quantile of the non-central \flaw{}-distribution with non-centrality parameter \ncfp[0] and \nlatf and
+$\ssiz - \nlatf$ degrees of freedom.
+
+If $\psnr[*] > \psnr[0]$, then the power of this test is
+$$\powr = 1 - \ncfcdf{\ncfqnt{1-\typeI}{\nlatf,\ssiz-\nlatf}{\ncfp[0]}}{\nlatf,\ssiz-\nlatf}{\ncfp[*]},$$
+where $\ncfp[*] = \ssiz\psnr[*]^2,$ is the noncentrality parameter, and 
+$\ncfcdf{x}{\nlatf,\ssiz - \nlatf}{\ncfp}$ is the
+the cumulative distribution function of the non-central \flaw{}-distribution with non-centrality parameter
+\ncfp and $\nlatf,\ssiz-\nlatf$ degrees of freedom.  
+
+%UNFOLD
+\end{compactenum}
+%UNFOLD
+
+\subsubsection{Power and Sample Size}%FOLDUP
+
+In \subsecref{SR_power_and_ssize} I outlined the relationship of sample size and effect size 
+for the one-sample t-test, or equivalently, the one-sample test for SNR. Here I extend those results
+to the Hotelling test for zero optimal population SNR, \ie the null $\psnr[0] = 0$. As noted in 
+\subsecref{HT_tests}, the power of this test is 
+$\powr = 1 - \ncfcdf{\ncfqnt{1-\typeI}{\nlatf,\ssiz-\nlatf}{0}}{\nlatf,\ssiz-\nlatf}{\ncfp[*]}.$
+
+This equation implicitly defines a sample size, \ssiz given $\typeI, \typeII, \nlatf$ and \ncfp[*]. As it
+happens, for fixed values of \typeI, \typeII and \nlatf, the sample size relationship is similar to
+that found for the \tstat-test:
+$$\ssiz \approx \frac{c}{\psnr[*]^2},$$
+where the constant $c$ depends on \typeI, \typeII and \nlatf.  For $\typeI = 0.05$, an approximate value of
+the numerator $c$ is given in \tabref{htestpower} for a few different values of the power. 
+Note that for $\nlatf = 1$, we should recover the same sample-size relationship as shown in 
+\tabref{ttestpower} for the two-sided test. This is simply because Hotelling's statistic for $p=1$ is 
+Student's \tstat-statistic squared (and thus side information is lost).
+
+% input{hotelling_ssize}%FOLDUP
+
+%FOLDUP
+
+<<'hot_ssiz_setup',echo=FALSE>>=
+# the power of an f-test 
+f_fpower <- function(df1,df2,ncp,alpha = 0.05) {
+	pf(qf(alpha,df1=df1,df2=df2,ncp=0,lower.tail=FALSE),df1 = df1,df2 = df2,ncp = ncp,lower.tail = FALSE)
+}
+
+# the power of the Hotelling test
+f_hpower <- function(n,p,rhosq,alpha = 0.05) {
+	f_fpower(df1 = p,df2 = n - p,ncp = n * rhosq,alpha = alpha)
+}
+# find the sample size for a given power of the univariate hotelling test
+f_hreqsize <- function(rhosq,p,powr = 0.80,alpha = 0.05) {
+	#2FIX: get a sane upper bound!
+	zz <- uniroot(function(n,p,rhosq,alpha,powr)(f_hpower(n,p,rhosq,alpha) - powr),
+								c(max(8,p+1),2000000 * 10 / (rhosq)),p = p,rhosq = rhosq,powr = powr,alpha = alpha)
+	return(zz$root)
+}
+#run the sample size computation for multiple values of rhosq and p
+f_pows <- function(powr,rhosq,pvals) {
+	ssizes <- sapply(pvals,function(p) {
+									sapply(rhosq,f_hreqsize,p=p,powr=powr,alpha=0.05) } )
+	ssizes <- as.vector(ssizes)
+	allp <- as.vector(kronecker(t(pvals),matrix(1,1,length(rhosq))))
+	allr <- as.vector(kronecker(rhosq,matrix(1,1,length(pvals))))
+	allpow <- as.vector(kronecker(powr,matrix(1,1,length(allr))))
+	retme = list(ssizes,allp,allr,allpow)
+}
+
+#run a regression on the results of such a study;
+f_pow_reg <- function(powr,rhosq,pvals) {
+	all_data <- f_pows(powr,rhosq,pvals)
+	ssizes <- unlist(all_data[1])
+	allp <- unlist(all_data[2])
+	allr <- unlist(all_data[3])
+	lap2 <- log(allp) ^ 2
+	best_model <- lm(log(ssizes) + log(allr) ~ log(allp) + lap2)
+}
+@
+
+<<hot_ssiz_table,echo=FALSE,results='asis'>>=
+rhosq <- seq(0,2.5 / sqrt(dpy),length.out = 100) ^ 2
+rhosq <- rhosq[rhosq != 0]
+rhosq <- lseq(rhosq[1],rhosq[length(rhosq)],length.out = ceiling(1.024 * mc.resolution))
+
+pvals <- lseq(1,512,length.out = ceiling(64 * mc.resolution / 1000))
+
+mod25 <- f_pow_reg(0.25,rhosq,pvals)
+mod50 <- f_pow_reg(0.50,rhosq,pvals)
+mod80 <- f_pow_reg(0.80,rhosq,pvals)
+
+#foo <- data.frame("inter" = c(mod25$coefficients[1],mod50$coefficients[1],mod80$coefficients[1]),
+#									"p" = c(mod25$coefficients[2],mod50$coefficients[2],mod80$coefficients[2]),
+#									"logp" = c(mod25$coefficients[3],mod50$coefficients[3],mod80$coefficients[3]),
+#									row.names = c("power = 0.25","power = 0.50","power = 0.80"))
+foo <- data.frame("numerator" = c(
+														 sprintf('$%.2f p^{%.3f + %.3f \\log p}$',round(exp(mod25$coefficients[1]),digits=2),
+																		 round(mod25$coefficients[2],digits=3),round(mod25$coefficients[3],digits=4)),
+														 sprintf('$%.2f p^{%.3f + %.3f \\log p}$',round(exp(mod50$coefficients[1]),digits=2),
+																		 round(mod50$coefficients[2],digits=3),round(mod50$coefficients[3],digits=4)),
+														 sprintf('$%.2f p^{%.3f + %.3f \\log p}$',round(exp(mod80$coefficients[1]),digits=2),
+																		 round(mod80$coefficients[2],digits=3),round(mod80$coefficients[3],digits=4)) ),
+									row.names = c("power = 0.25","power = 0.50","power = 0.80"))
+xres <- xtable(foo,label="tab:htestpower",caption="The numerator in the sample size relationship required to achieve a fixed power in Hotelling's test is shown. The type I rate is 0.05.")
+print(xres,include.rownames=TRUE,sanitize.text.function=function(x){x})
+@
+
+%UNFOLD
+
+%UNFOLD
+%UNFOLD
 
 \subsection{Asymptotics and Confidence Intervals}%FOLDUP
 
@@ -969,12 +1122,13 @@ A better way to find confidence intervals is implicitly, by solving
 \begin{equation}
 \begin{split}
 1 - \typeI/2 &= \ncfcdf{\wrapNeParens{\frac{\ssiz (\ssiz-\nlatf)}{\nlatf
-(\ssiz - 1)}}\ssrsqopt}{\ssiz\psnr[l]^2,\nlatf,\ssiz - \nlatf},\\
-\typeI/2 &= \ncfcdf{\wrapNeParens{\frac{\ssiz (\ssiz-\nlatf)}{\nlatf (\ssiz - 1)}}\ssrsqopt}{\ssiz\psnr[u]^2,\nlatf,\ssiz - \nlatf},
+(\ssiz - 1)}}\ssrsqopt}{\nlatf,\ssiz - \nlatf}{\ssiz\psnr[l]^2},\\
+\typeI/2 &= \ncfcdf{\wrapNeParens{\frac{\ssiz (\ssiz-\nlatf)}{\nlatf (\ssiz -
+1)}}\ssrsqopt}{\nlatf,\ssiz - \nlatf}{\ssiz\psnr[u]^2},
 \end{split}
 \label{eqn:optsnrcis_I}
 \end{equation}
-where $\ncfcdf{x}{\ncfp,\nlatf,\ssiz-\nlatf}$ is the CDF of the non-central
+where $\ncfcdf{x}{\nlatf,\ssiz-\nlatf}{\ncfp}$ is the CDF of the non-central
 \flaw{}-distribution with 
 non-centrality parameter \ncfp and \nlatf and $\ssiz - \nlatf$ degrees of freedom.
 This method requires computational inversion of the CDF function. Also, there may not be \psnr[l] or \psnr[u] such that
@@ -982,12 +1136,13 @@ the above hold with equality, so one is forced to use the limiting forms:
 
 \begin{equation}
 \begin{split}
-\psnr[l] &= \min \setwo{z}{z \ge 0,\,\,1 - \typeI/2 \ge \ncfcdf{\wrapNeParens{\frac{\ssiz (\ssiz-\nlatf)}{\nlatf (\ssiz - 1)}}\ssrsqopt}{\ssiz z^2,\nlatf,\ssiz - \nlatf}},\\
-\psnr[u] &= \min \setwo{z}{z \ge 0,\,\,\typeI/2 \ge \ncfcdf{\wrapNeParens{\frac{\ssiz (\ssiz-\nlatf)}{\nlatf (\ssiz - 1)}}\ssrsqopt}{\ssiz z^2,\nlatf,\ssiz - \nlatf}}.
+\psnr[l] &= \min \setwo{z}{z \ge 0,\,\,1 - \typeI/2 \ge \ncfcdf{\wrapNeParens{\frac{\ssiz (\ssiz-\nlatf)}{\nlatf (\ssiz - 1)}}\ssrsqopt}{\nlatf,\ssiz - \nlatf}{\ssiz z^2}},\\
+\psnr[u] &= \min \setwo{z}{z \ge 0,\,\,\typeI/2 \ge \ncfcdf{\wrapNeParens{\frac{\ssiz (\ssiz-\nlatf)}{\nlatf (\ssiz - 1)}}\ssrsqopt}{\nlatf,\ssiz - \nlatf}{\ssiz z^2}}.
 \end{split}
 \label{eqn:optsnrcis_II}
 \end{equation}
-Since \ncfcdf{\cdot}{\ssiz z^2,\nlatf,\ssiz - \nlatf} is a decreasing function of $z^2$, and approaches zero in the limit, 
+Since \ncfcdf{\cdot}{\nlatf,\ssiz - \nlatf}{\ssiz z^2} is a 
+decreasing function of $z^2$, and approaches zero in the limit, 
 the above confidence intervals are well defined.
 
 %% input{hotelling_ci_study}%FOLDUP
@@ -1652,6 +1807,35 @@ into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 
 \appendix%FOLDUP
 
+\section{Glossary}%FOLDUP
+
+\begin{description}
+\item[\pmu] The true, or population, mean return of a single asset.
+\item[\psig] The population standard deviation of a single asset.
+\item[\psnr] The population signal-to-noise ratio (SNR), defined as
+$\psnr = \pmu / \psig$.
+
+\item[\nctcdf{x}{\df[1]}{\nctp}] the CDF of the non-central 
+\tlaw{} distribution, with \df[1] degrees of freedom and
+non-centrality parameter \nctp, evaluated at $x$.
+\item[\nctqnt{q}{\df[1]}{\nctp}] the inverse CDF, or $q$-quantile
+of the non-central 
+\tlaw{} distribution, with \df[1] degrees of freedom and
+non-centrality parameter \nctp.
+
+\item[\fcdf{x}{\df[1],\df[2]}] the CDF of the 
+\flaw{} distribution, with degrees of freedom \df[1] and \df[2],
+evaluated at $x$.
+\item[\ncfcdf{x}{\df[1],\df[2]}{\ncfp}] the CDF of the non-central
+\flaw{} distribution, with degrees of freedom \df[1] and \df[2]
+and non-centrality parameter \ncfp, evaluated at $x$.
+\item[\ncfqnt{q}{\df[1],\df[2]}{\ncfp}] the inverse CDF, or $q$-quantile
+of the non-central
+\flaw{} distribution, with degrees of freedom \df[1] and \df[2]
+and non-centrality parameter \ncfp.
+\end{description}
+%UNFOLD
+
 \section{Asymptotic Efficiency of Sharpe Ratio}%FOLDUP
 
 \label{sec:sr_efficiency}
@@ -1744,31 +1928,28 @@ we have the following moments:
 	\E{\ssrsqopt} 
  & = \frac{\ssiz-1}{\ssiz}\frac{\wrapNeParens{\nlatf + \ssiz\psnrsqopt}}{\ssiz-\nlatf-2}
 	= \wrapNeParens{1 - \oneby{\ssiz}} \frac{\wrapNeParens{\arat + \psnrsqopt}}{1 - \arat - \frac{2}{\ssiz}},\\
-	\VAR{\ssrsqopt} & = \wrapNeParens{\frac{\ssiz-1}{\ssiz}}^2 \frac{2}{(\ssiz -
+ \VAR{\ssrsqopt} & = \wrapNeParens{\frac{\ssiz-1}{\ssiz}}^2 \frac{2}{(\ssiz -
 \nlatf - 2)(\ssiz - \nlatf - 4)}\wrapNeParens{\frac{(\ssiz\psnrsqopt +
 \nlatf)^2}{\ssiz - \nlatf - 2} + 2 \ssiz\psnrsqopt + \nlatf},\\
-	& = \wrapNeParens{1 - \oneby{\ssiz}}^2 \oneby{\ssiz}\frac{2}{(1 - \arat -
+ & = \wrapNeParens{1 - \oneby{\ssiz}}^2 \oneby{\ssiz}\frac{2}{(1 - \arat -
 \frac{2}{\ssiz})(1 - \arat - \frac{4}{\ssiz})}\wrapNeParens{\frac{(\psnrsqopt +
 \arat)^2}{1 - \arat - \frac{2}{\ssiz}} + 2 \psnrsqopt + \arat},
 \end{split}
-\label{eqn:Tstatmoms}
+\label{eqn:TstatmomsII}
 \end{equation}
 where $\arat = \fracc{\nlatf}{\ssiz}$ is the aspect ratio, and \psnrsqopt is the maximal SNR achievable
 on a basket of the assets: $\psnrsqopt = \qform{\minv{\pvsig}}{\pvmu}$.
 
 
-%The distribution of Hotelling's statistic is known \cite{Bilodeau1999} for 
-%general \pvmu and \pvsig, and can be expressed in terms of a noncentral
-%\flaw{}-distribution:
-%$$\frac{\ssiz - \nlatf}{\nlatf (\ssiz - 1)} \Tstat = \frac{\ssiz (\ssiz - \nlatf)}{\nlatf (\ssiz - 1)} \ssr[*]^2 \sim F\left(\ncfp,\nlatf,\ssiz - \nlatf\right),$$
-%where the distribution has \nlatf and $\ssiz - \nlatf$ degrees of freedom, and 
-%$$\ncfp = \ssiz \qform{\pvsig^{-1}}{\pvmu} = \ssiz\psnr[*]^2$$
-%is the non-centrality parameter, and \psnr[*] is the population optimal SNR.
+The distribution of Hotelling's statistic is known \cite{Bilodeau1999} for 
+general \pvmu and \pvsig, and can be expressed in terms of a noncentral
+\flaw{}-distribution:
+$$\frac{\ssiz - \nlatf}{\nlatf (\ssiz - 1)} \Tstat = \frac{\ssiz (\ssiz - \nlatf)}{\nlatf (\ssiz - 1)} \ssr[*]^2 \sim F\left(\ncfp,\nlatf,\ssiz - \nlatf\right),$$
+where the distribution has \nlatf and $\ssiz - \nlatf$ degrees of freedom, and 
+$$\ncfp = \ssiz \qform{\pvsig^{-1}}{\pvmu} = \ssiz\psnr[*]^2$$
+is the non-centrality parameter, and \psnr[*] is the population optimal SNR.
 
-
-%UNFOLD
-
-\section{Square Root F}%FOLDUP
+\subsection{Square Root F}%FOLDUP
 
 \label{sec:root_F}
 
@@ -1816,6 +1997,8 @@ Using the Taylor series expansion of the square root gives the approximate mean 
 %the upshot appears to be that the asymptotic variance of the sqrt of optimal sharpe is
 %(rho + \arat) / (2 * n * (1 - \arat)^2), which matches what we expect from the t-statistic!!!
 
+
+%UNFOLD
 
 %UNFOLD
 
@@ -1920,6 +2103,104 @@ Thus, conditional on observing \ssrsqoptG{\hejG}, we have
 
 
 %UNFOLD
+
+\section{Gaussian in Appended Form}%FOLDUP
+
+Let \avreti be the \nlatf-variate vector \vreti appended with a 1:
+$\avreti = \asvec{\tr{\vreti},1}$. Consider the second
+moment of \avreti:
+$$
+\Mtx{L} = \E{\ogram{\avreti}} = \twobytwo{\pvsig + \ogram{\pvmu}}{\pvmu}{\tr{\pvmu}}{1}.
+$$
+By inspection one can confirm that the
+inverse of \Mtx{L} is
+$$
+\minv{\Mtx{L}} 
+= \twobytwo{\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{-\tr{\pvmu}\minv{\pvsig}}{1 + \qform{\minv{\pvsig}}{\pvmu}} 
+= \twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt}.
+$$
+Note that this relationship holds for the sample analogue as well:
+$$
+\minv{\twobytwo{\svsig + \ogram{\svmu}}{\svmu}{\tr{\svmu}}{1}} 
+= \twobytwo{\minv{\svsig}}{-\sportwopt}{-\tr{\sportwopt}}{1 + \ssrsqopt}.
+$$
+The Cholesky factor of \minv{\Mtx{L}} is
+$$
+\ichol{\Mtx{L}} = \twobytwo{\trichol{\pvsig}}{-\trichol{\pvsig}\pvmu}{0}{1}.
+$$
+
+Note that
+$$
+\qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}} = 
+\qform{\minv{\Mtx{L}}}{\avreti} - 1.
+$$
+Using the block determinant formula, we find that \Mtx{L} has the same 
+determinant as \pvsig: $\det{\Mtx{L}} = \det{\pvsig}.$  Then if
+\vreti is multivariate Gaussian, then the density of \vreti can be
+expressed more simply as
+\begin{equation*}
+\begin{split}
+\normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
+\longexp{-\half \qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}}},\\
+ &= \frac{\wrapParens{\det{\pvsig}}^{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
+\longexp{-\half \wrapParens{\qform{\minv{\Mtx{L}}}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\Mtx{L}}}^{-\half}
+\longexp{-\half \wrapParens{\qform{\minv{\Mtx{L}}}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2}
+\longexp{\half - \half \logdet{\Mtx{L}} - \half \trace{\minv{\Mtx{L}}\ogram{\avreti}}},\\
+- \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
+  c_{\nlatf} 
++ \half \logdet{\Mtx{L}} 
++ \half \trace{\minv{\Mtx{L}}\ogram{\avreti}},
+\end{split}
+\end{equation*}
+for the constant 
+$c_{\nlatf} = \exp{\half}-\half[\nlatf]\log\wrapParens{2\pi}.$
+
+Given \ssiz \iid observations of \vreti, let \amreti be the matrix
+whose rows are the vectors \tr{\vreti[i]}. Then the negative log
+density of \amreti is
+\begin{equation*}
+- \log\normpdf{\amreti}{\Mtx{L}} =
+  \ssiz c_{\nlatf} 
++ \half[\ssiz] \logdet{\Mtx{L}} 
++ \half \trace{\minv{\Mtx{L}}\gram{\amreti}}.
+\end{equation*}
+Now note that $\gram{\amreti}/\ssiz$ is a sample estimate of 
+\Mtx{L}, call it \Mtx{\hat{L}}. Then 
+\begin{equation*}
+\frac{- 2\log\normpdf{\amreti}{\Mtx{L}}}{\ssiz} = 
+  c_{\nlatf} 
++ \logdet{\Mtx{L}} 
++ \trace{\minv{\Mtx{L}}\Mtx{\hat{L}}}.
+\end{equation*}
+
+By Lemma (5.1.1) of Press \cite{press2012applied}, this can be expressed
+as a density on \Mtx{\hat{L}}:
+\begin{equation*}
+\begin{split}
+\frac{- 2\log\FOOpdf{}{\Mtx{\hat{L}}}{\Mtx{L}}}{\ssiz} 
+&= \frac{- 2\log\normpdf{\amreti}{\Mtx{L}}}{\ssiz}\\
+&\phantom{=}\,
+	-\frac{2}{\ssiz}\wrapParens{\half[\ssiz-\nlatf-1]\logdet{\Mtx{\hat{L}}} +
+	\half[\nlatf]\wrapParens{\ssiz - \half[\nlatf] + \half} \log\pi -
+	\sum_{j=1}^{\nlatf} \log\funcit{\Gamma}{\half[\ssiz +1-j]}},\\
+&= c_{\nlatf} - \frac{\nlatf}{\ssiz}\wrapParens{\ssiz - \half[\nlatf] + \half} \log\pi 
+	- \frac{2}{\ssiz} \sum_{j=1}^{\nlatf}
+	\log\funcit{\Gamma}{\half[\ssiz +1-j]}\\
+&\phantom{=}\,
+	+ \logdet{\Mtx{L}} - \frac{\ssiz-\nlatf-1}{\ssiz}\logdet{\Mtx{\hat{L}}}
+	+ \trace{\minv{\Mtx{L}}\Mtx{\hat{L}}},\\
+&= c'_{\ssiz,\nlatf} 
+	+ \logdet{\Mtx{L}} - \frac{\ssiz-\nlatf-1}{\ssiz}\logdet{\Mtx{\hat{L}}}
+	+ \trace{\minv{\Mtx{L}}\Mtx{\hat{L}}}.
+\end{split}
+\end{equation*}
+
+
+
+%UNFOLD
+
 %UNFOLD
 \end{document}
 %for vim modeline: (do not edit)
