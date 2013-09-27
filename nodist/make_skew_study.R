@@ -199,8 +199,7 @@ moms_sym_SP500 <- function(mu = 0,sg = 1) {
 dpy <- 253
 nobs <- round(3 * dpy)
 daily.mean <- 1/sqrt(dpy)
-mc.resolution <- 2000
-ntrials <- ceiling(1.0235 * mc.resolution)
+ntrials <- 4096
 
 set.seed(1984)
 
@@ -250,7 +249,7 @@ for (my.h in c(0.1,0.24,0.4)) {
 	res <- merge(res,res.nxt,all=TRUE)
 }
 
-for (my.dl in c(-0.2,-0.4,-0.8,-1.2)) {
+for (my.dl in c(0.4,0.2,-0.2,-0.4,-0.8,-1.2)) {
 	moms <- moms_lambert_w(dl=my.dl,mu=daily.mean)
 	res.nxt <- new.res(name = "Lambert x Gaussian",
 										 param = sprintf("delta = %.1f",my.dl),

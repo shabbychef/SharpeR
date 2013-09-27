@@ -64,14 +64,22 @@ COMMA_IT 					 = $(subst $(space),$(comma),$(strip $(1)))
 
 TEST_DEPS_LIST  	 = $(call COMMA_IT,$(TEST_DEPS))
 
-
 RD_DUMMY 					 = man/$(PKG_NAME).Rd
 
+# do not distribute these!
+NODIST_R_DIR			 = nodist
+NODIST_FILES			 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
+NODIST_FILES			+= rebuildTags.sh .tags .R_tags 
+NODIST_FILES			+= Makefile
+#NODIST_FILES			+= README.md 
+NODIST_DIRS				 = .git man-roxygen m4 $(NODIST_R_DIR)
+NODIST_DIRS				+= $(VIGNETTE_D)/figure 
 
 # extradata
 EXTDATA_D 				 = inst/extdata
-EXTDATA_FILES	 		 = $(EXTDATA_D)/ret_data.rda $(EXTDATA_D)/skew_study.rda
-EXTDATA_FILES	 		+= $(EXTDATA_D)/autocorr_study.rda
+PREMAKE_R 				 = $(wildcard ./$(NODIST_R_DIR)/make_*.R)
+PREMAKE_RDA 			 = $(patsubst ./$(NODIST_R_DIR)/make_%.R,$(EXTDATA_D)/%.rda,$(PREMAKE_R))
+EXTDATA_FILES	 		 = $(PREMAKE_RDA)
 
 # vignette stuff
 VIGNETTE_D 				 = vignettes
@@ -82,14 +90,6 @@ VIGNETTE_PDF   		 = $(VIGNETTE_D)/$(PKG_NAME).pdf
 VIGNETTE_HTML  		 = $(VIGNETTE_D)/index.html
 VIGNETTE_CACHE_SENTINEL = $(VIGNETTE_CACHE)/__$(PKG_NAME).etc
 
-# do not distribute these!
-NODIST_R_DIR			 = nodist
-NODIST_FILES			 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
-NODIST_FILES			+= rebuildTags.sh .tags .R_tags 
-NODIST_FILES			+= Makefile
-#NODIST_FILES			+= README.md 
-NODIST_DIRS				 = .git man-roxygen m4 $(NODIST_R_DIR)
-NODIST_DIRS				+= $(VIGNETTE_D)/figure 
 
 SUPPORT_FILES 		 = ./DESCRIPTION ./NAMESPACE ./ChangeLog $(RD_DUMMY) ./inst/CITATION
 
@@ -111,7 +111,8 @@ INSTALL_FLAGS 		?= --preclean --library=$(LOCAL)
 
 TEST_PRAGMA     	?= release
 
-GIT_BRANCH 				?= master
+#GIT_BRANCH 				?= master
+GIT_BRANCH 				?= dev1310
 
 # for R CMD build
 ifeq ($(TEST_PRAGMA),thorough)
@@ -127,7 +128,7 @@ define \n
 endef
 
 fooz :
-	echo $(patsubst %,%\${\n},$(NODIST_FILES))
+	echo $(PREMAKE_RDA)
 
 STAGING 				?= .staging
 STAGED_PKG 			 = $(STAGING)/$(PKG_NAME)

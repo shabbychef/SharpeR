@@ -358,16 +358,16 @@ se \approx \sqrt{\frac{1 + \frac{2 + \pcmom[4]}{4}\psnr^2 -
 \label{eqn:srse_mertens}
 \end{equation}
 where \pcmom[3] is the skew, and \pcmom[4]
-is the \emph{excess} kurtosis of the returns distribution. These are
-both zero for normally distributed returns, and so Mertens' form reduces
-to Lo's form. \cite{mertens2002comments,Opdyke2007,sref2011}
-These are unknown in practice, and have to be estimated.
+is the \emph{excess} kurtosis of the returns 
+distribution.  \cite{mertens2002comments,Opdyke2007,sref2011}
+These are both zero for normally distributed returns, and so Mertens' form 
+reduces to Lo's form.  These are unknown in practice, and have to be estimated.
 2FIX.
 
 
-In practice these three confidence interval approximations give very similar coverage, with no
-appreciable difference when $\ssiz > 30$ or so. For small sample sizes, the corrected form of
-Lo's approximation is slightly liberal (Lo's original formulation is too conservative). 
+%In practice these three confidence interval approximations give very similar coverage, with no
+%appreciable difference when $\ssiz > 30$ or so. For small sample sizes, the corrected form of
+%Lo's approximation is slightly liberal (Lo's original formulation is too conservative). 
 %The empirical coverage of these three methods at different sample sizes from a Monte Carlo experiment 
 %(assuming normal \reti) is given in \figref{sharpe_ci}.
 
@@ -435,9 +435,9 @@ Lo's approximation is slightly liberal (Lo's original formulation is too conserv
 %%UNFOLD
 %%UNFOLD
 
-There are approaches to estimating the standard error of the \txtSR taking
-into account the third and higher moments of the returns. See
-Opdyke \cite{Opdyke2007} or Baily and Lopez de Prado \cite{sref2011}.
+%There are approaches to estimating the standard error of the \txtSR taking
+%into account the third and higher moments of the returns. See
+%Opdyke \cite{Opdyke2007} or Baily and Lopez de Prado \cite{sref2011}.
 %UNFOLD
 
 \subsection{Power and Sample Size}%FOLDUP
@@ -690,7 +690,11 @@ $$
 $$
 Thus measuring \txtSR without adjusting for heteroskedasticity 
 tends to give underestimates of the `true' \txtSR of the
-returns series, \reti[{}]. However, the deflation is typically modest.
+returns series, \reti[{}]. However, the deflation is typically modest,
+on the order of 10\%. The shrinkage of \txtSR will also
+typically lead to slight deflation of the estimated standard error,
+but for large \ssiz and daily returns, this will not lead to 
+inflated type I rate. (2FIX: is this true? do a study?)
 
 Note that when looking at \eg daily returns, the (non-annualized) \txtSR on the given mark frequency is usually
 on the order of 0.1 or less, thus $\E{\reti}^2 \approx 0.01 \VAR{\reti}$, and so $\E{\reti^2} \approx 1.01 \VAR{\reti}$.
@@ -728,8 +732,6 @@ In this case the correction factor for leverage is fairly small.
 %around \eg a mean value of 1. For example if \levi was uniformly distributed between 1.0 and 2.0, then $\E{\levi}^2 = 2.25$,
 %which is much larger than $\VAR{\levi} = 1/12 \approx 0.083$.
 
-
-
 %UNFOLD
 
 \subsubsection{\txtSR and Non-normality}%FOLDUP
@@ -759,21 +761,33 @@ SPX.start <- time(SPX.rets[1])
 SPX.end <- time(SPX.rets[length(SPX.rets)])
 @
 
-To demonstrate this fact, I look at the empirical type I rate for the hypothesis test: $H_0: \psnr = 1.0$
+To demonstrate this fact, I look at the empirical type I rate for the 
+hypothesis test: $H_0: \psnr = 1.0$
 versus the alternative $H_1: \psnr > 1.0$ for different distributions of returns: 
 I sample from a Gaussian 
 (as the benchmark); a \tstat-distribution with 10 degrees of freedom;
 a Tukey $h$-distribution, with different values of $h$; 
 and a `Lambert W x Gaussian' distribution, with 
-different 2FIX. \cite{2010arXiv1010.2265G,2009arXiv0912.4554G,LambertW} 
+different values of the 
+skew parameter. \cite{2010arXiv1010.2265G,2009arXiv0912.4554G,LambertW} 
 I also draw samples from the daily log returns of 
 the S \& P 500 over the period from \Sexpr{as.character(SPX.start,format="%B %d, %Y")} to 
 \Sexpr{as.character(SPX.end,format="%B %d, %Y")}, affinely transformed 
 to have $\psnr = 1.0$. I also draw from a symmetrized S \& P 500 returns
-series.
+series. 
+
 The \tstat- and Tukey distributions are fairly kurtotic, but have zero
 skew, while the Lambert W x Gaussian is skewed and (therefore) kurtotic.  
-At the nominal $\typeI = 0.05$ level, we expect to get a reject rate around five percent.
+All distributions have been rescaled to have $\psnr = 1.0$; that is,
+I am estimating the empirical type I rate under the null.
+At the nominal $\typeI = 0.05$ level, we expect to get a reject rate 
+around five percent.
+
+I test the empirical type I rate of the test implied by the confidence
+intervals in \eqnref{srci_tinvert}. I also employ Mertens' standard
+errors, \eqnref{srse_mertens}, estimating the skew and kurtosis empirically,
+then comparing to quantiles of the normal distribution. The tests are one-sided
+tests, against the alternative $H_a: \psnr < 1.0$.
 
 % input{skew_study}%FOLDUP
 
@@ -791,13 +805,20 @@ print(xres,include.rownames=FALSE)
 @
 %UNFOLD
 
-The results are given in \tabref{sharpe_skew_robustness}, and indicate that skew is a more serious problem than
-kurtosis. The results from the S \& P 500 data are fairly encouraging: broad market returns are perhaps not as skewed 
-as the Lambert W x Gaussian distributions that we investigate, and the type I rate is near nominal when using three
-years of data. Lumley \etal found similar results for the \tstat-test when looking at sample sizes greater than 
-500. \cite{Lumley:2002} Since the \tstat-test statistic is equivalent to 
-\txtSR (up to scaling), this result
-carries over to the test for SNR.
+The results are given in \tabref{sharpe_skew_robustness}, and indicate that
+skew is a more serious problem than kurtosis. The results from the S \& P 500
+data are fairly encouraging: broad market returns are perhaps not as skewed as
+the Lambert W x Gaussian distributions that we investigate, and the type I rate
+is near nominal when using three years of data. Lumley \etal found similar
+results for the \tstat-test when looking at sample sizes greater than 500.
+\cite{Lumley:2002} Since the \tstat-test statistic is equivalent to \txtSR (up
+to scaling), this result carries over to the test for SNR.
+
+The Mertens' correction appears to be less liberal for the highly skewed
+Lambert distributions, but perhaps more liberal for the Tukey and S \& P 500
+distributions.
+
+2FIX: more.
 
 However, skew is a serious problem when using the \txtSR. 
 A practicioner must be reasonably satisfied that the
@@ -1404,7 +1425,7 @@ greater than one, the MLE of the non-centrality parameter is equal to zero.
 The equivalent fact about the optimal \txtSR is that if
 $\ssrsqopt \le \frac{\arat}{1 - \arat}$,
 then the MLE of \psnropt is zero, where, again, 
-$\arat = \nlatf / \ssiz$ is the `aspect ratio.'
+$\arat = \fracc{\nlatf}{\ssiz}$ is the `aspect ratio.'
 
 Using the expectation of the non-central \flaw{} distribution, we can find an unbiased estimator of \psnrsqopt. It is given
 by $(1-\arat)\ssrsqopt - \arat$.  While this is unbiased for \psnrsqopt, there is no guarantee that it is positive!
