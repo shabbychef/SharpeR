@@ -11,8 +11,8 @@
   Corrections for standard error based on skew, kurtosis
   and autocorrelation. \item Tests on Sharpe under
   positivity constraint. (\emph{c.f.} Silvapulle) \item
-  Portfolio spanning tests. \item Tests of hedge
-  restrictions. \item Tests on portfolio weights. }
+  Portfolio spanning tests. \item Tests on portfolio
+  weights. }
 
   This package is maintained as a hobby.
 }

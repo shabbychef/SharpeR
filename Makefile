@@ -71,6 +71,7 @@ RD_DUMMY 					 = man/$(PKG_NAME).Rd
 # extradata
 EXTDATA_D 				 = inst/extdata
 EXTDATA_FILES	 		 = $(EXTDATA_D)/ret_data.rda $(EXTDATA_D)/skew_study.rda
+EXTDATA_FILES	 		+= $(EXTDATA_D)/autocorr_study.rda
 
 # vignette stuff
 VIGNETTE_D 				 = vignettes
@@ -84,7 +85,9 @@ VIGNETTE_CACHE_SENTINEL = $(VIGNETTE_CACHE)/__$(PKG_NAME).etc
 # do not distribute these!
 NODIST_R_DIR			 = nodist
 NODIST_FILES			 = ./Makefile $(M4_FILES) .gitignore .gitattributes 
-NODIST_FILES			+= rebuildTags.sh .tags .R_tags
+NODIST_FILES			+= rebuildTags.sh .tags .R_tags 
+NODIST_FILES			+= Makefile
+#NODIST_FILES			+= README.md 
 NODIST_DIRS				 = .git man-roxygen m4 $(NODIST_R_DIR)
 NODIST_DIRS				+= $(VIGNETTE_D)/figure 
 
@@ -270,7 +273,7 @@ docs: README.md DESCRIPTION man/$(PKG_NAME).Rd
 RSYNC_FLAGS     = -av --delete 
 
 # a parallel version of this package, but without the support structure
-$(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES) 
+$(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES) $(EXTRA_PKG_DEPS)
 	$(call WARN_DEPS)
 	@-echo clean up first
 	@-rm -rf $(STAGED_PKG)
@@ -280,7 +283,6 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
   --include=man/ --include=man/* \
   --include=NAMESPACE --include=DESCRIPTION \
   --include=$(EXTDATA_D)/ \
-	--exclude=Makefile --exclude=README.md \
   --exclude-from=.gitignore \
  $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_FILES)))  --exclude=$(LOCAL) \
  $(patsubst %, % \${\n},$(patsubst %,--exclude=%,$(NODIST_DIRS)))  --exclude=$(basename $(STAGING)) \
@@ -288,7 +290,7 @@ $(STAGED_PKG)/DESCRIPTION : $(R_FILES) $(SUPPORT_FILES)
   . $(@D)
 	touch $@
 
-staged : $(STAGED_PKG)/DESCRIPTION $(EXTRA_PKG_DEPS)
+staged : $(STAGED_PKG)/DESCRIPTION 
 
 # make the 'package', which is a tar.gz
 $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS) $(EXTRA_PKG_DEPS) 

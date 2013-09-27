@@ -66,6 +66,26 @@ rownames(v.SPX.rets) <- NULL
 f_vsharpe <- function(rets) {
 	return(mean(rets) / sd(rets))
 }
+
+mertens_se <- function(sr,n,skew=0,ex.kurt=0) {
+	se <- sqrt((1 + ((sr^2) * (2 + ex.kurt)/4) - skew * sr) / n)
+	return(se)
+}
+# test if SR == SR0
+mertens_pval <- function(sr0,sr,n,...) {
+	se <- mertens_se(sr,n,...)
+	pv <- pnorm((sr - sr0) / se,lower.tail=FALSE)
+	return(pv)
+}
+test_mertens <- function(x,snr.ann = 1,dpy = 253) {
+	n <- length(x)
+	sr <- f_vsharpe(x)
+	skew <- skewness(x)
+	ex.kurt <- kurtosis(x) - 3
+	sr0 <- snr.ann / sqrt(dpy)
+	return(mertens_pval(sr0,sr,n,skew,ex.kurt))
+}
+
 #see if the nominal 0.05 type I rate is maintained for skewed, kurtotic distributions
 #check for SNR=1, annualized
 ttest_snr <- function(x,snr.ann = 1,dpy = 253) {
@@ -73,9 +93,14 @@ ttest_snr <- function(x,snr.ann = 1,dpy = 253) {
 	myt <- sqrt(n) * f_vsharpe(x)
 	return(pt(myt,df = n-1,ncp = sqrt(n/dpy) * snr.ann,lower.tail = FALSE))
 }
+ttest_both <- function(...) {
+	lo <- ttest_snr(...)
+	mr <- test_mertens(...)
+	return(c(lo,mr))
+}
 multi_test <- function(gen,n,trials=1024) {
-	pvals <- replicate(trials,ttest_snr(gen(n)))
-	mean(pvals < 0.05)
+	pvals <- replicate(trials,ttest_both(gen(n)))
+	rowMeans(pvals < 0.05)
 }
 
 # a bunch of rv generators of fixed mean and sd;#FOLDUP
@@ -174,59 +199,67 @@ moms_sym_SP500 <- function(mu = 0,sg = 1) {
 dpy <- 253
 nobs <- round(3 * dpy)
 daily.mean <- 1/sqrt(dpy)
-mc.resolution <- 1000
+mc.resolution <- 2000
 ntrials <- ceiling(1.0235 * mc.resolution)
 
-set.seed(1977)
+set.seed(1984)
+
+new.res <- function(name,param=" ",moms,gen,nobs,ntrials=100) {
+	errs <- multi_test(gen,nobs,ntrials)
+	res <- data.frame(distribution = name,
+										param = param,
+										skew = moms$skew,
+										kurtosis=moms$kurtosis,
+										typeI = errs[1],
+										cor.typeI = errs[2])
+	return(res)
+}
+
 
 # put them together#FOLDUP
 
 moms <- moms_norm(mu=daily.mean)
-res <- data.frame(distribution = "Gaussian",param = " ",skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_norm(n,mu=daily.mean)),nobs,ntrials))
+res <- new.res(name = "Gaussian",param = " ",moms = moms,
+							 gen = function(n){ gen_norm(n,mu=daily.mean) },
+							 nobs=nobs,ntrials=ntrials)
 
 moms <- moms_t(df=10,mu=daily.mean)
-res.t <- data.frame(distribution = "Student's t",param = "df = 10",skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_t(n,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.t,all=TRUE)
+res.nxt <- new.res(name = "Student's t",param = "df = 10",moms = moms,
+							 gen = function(n){ gen_t(n,mu=daily.mean) },
+							 nobs=nobs,ntrials=ntrials)
+res <- merge(res,res.nxt,all=TRUE)
 
 moms <- moms_SP500(mu=daily.mean)
-res.h1 <- data.frame(distribution = "SP500",param = "",skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_SP500(n,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h1,all=TRUE)
+res.nxt <- new.res(name = "SP500",param = "",moms = moms,
+							 gen = function(n){ gen_SP500(n,mu=daily.mean) },
+							 nobs=nobs,ntrials=ntrials)
+res <- merge(res,res.nxt,all=TRUE)
 
 moms <- moms_sym_SP500(mu=daily.mean)
-res.h1 <- data.frame(distribution = "symmetric SP500",param = "",skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_sym_SP500(n,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h1,all=TRUE)
+res.nxt <- new.res(name = "symmetric SP500",param = "",moms = moms,
+							 gen = function(n){ gen_sym_SP500(n,mu=daily.mean) },
+							 nobs=nobs,ntrials=ntrials)
+res <- merge(res,res.nxt,all=TRUE)
 
-moms <- moms_tukey_h(h=0.1,mu=daily.mean)
-res.h1 <- data.frame(distribution = "Tukey h",param = "h = 0.1",skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_tukey_h(n,h=0.1,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h1,all=TRUE)
+for (my.h in c(0.1,0.24,0.4)) {
+	moms <- moms_tukey_h(h=my.h,mu=daily.mean)
+	res.nxt <- new.res(name = "Tukey h",param = sprintf("h = %.1f",my.h),
+										 moms = moms,
+										 gen = function(n){ gen_tukey_h(n,h=my.h,mu=daily.mean) },
+										 nobs=nobs,ntrials=ntrials)
+	res <- merge(res,res.nxt,all=TRUE)
+}
 
-moms <- moms_tukey_h(h=0.24,mu=daily.mean)
-res.h2 <- data.frame(distribution = "Tukey h",param = "h = 0.24",skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_tukey_h(n,h=0.24,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h2,all=TRUE)
-
-moms <- moms_tukey_h(h=0.4,mu=daily.mean)
-res.h2 <- data.frame(distribution = "Tukey h",param = "h = 0.4",skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_tukey_h(n,h=0.4,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h2,all=TRUE)
-
-dl <- -0.2
-moms <- moms_lambert_w(dl=dl,mu=daily.mean)
-res.h3 <- data.frame(distribution = "Lambert W x Gaussian",param = sprintf("delta = %.1f",dl),skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_lambert_w(n,dl=dl,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h3,all=TRUE)
-
-dl <- -0.4
-moms <- moms_lambert_w(dl=dl,mu=daily.mean)
-res.h3 <- data.frame(distribution = "Lambert W x Gaussian",param = sprintf("delta = %.1f",dl),skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_lambert_w(n,dl=dl,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h3,all=TRUE)
-
-dl <- -0.8
-moms <- moms_lambert_w(dl=dl,mu=daily.mean)
-res.h3 <- data.frame(distribution = "Lambert W x Gaussian",param = sprintf("delta = %.1f",dl),skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_lambert_w(n,dl=dl,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h3,all=TRUE)
-
-dl <- -1.6
-moms <- moms_lambert_w(dl=dl,mu=daily.mean)
-res.h3 <- data.frame(distribution = "Lambert W x Gaussian",param = sprintf("delta = %.1f",dl),skew = moms$skew,ex.kurtosis=moms$kurtosis,typeI = multi_test(function(n)(gen_lambert_w(n,dl=dl,mu=daily.mean)),nobs,ntrials))
-res <- merge(res,res.h3,all=TRUE)
+for (my.dl in c(-0.2,-0.4,-0.8,-1.2)) {
+	moms <- moms_lambert_w(dl=my.dl,mu=daily.mean)
+	res.nxt <- new.res(name = "Lambert x Gaussian",
+										 param = sprintf("delta = %.1f",my.dl),
+										 moms = moms,
+										 gen = function(n){ 
+											gen_lambert_w(n,dl=my.dl,mu=daily.mean) },
+										 nobs=nobs,ntrials=ntrials)
+	res <- merge(res,res.nxt,all=TRUE)
+}
 #UNFOLD
 
 # fix the sigfigs issue?

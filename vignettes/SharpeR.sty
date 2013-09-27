@@ -94,6 +94,7 @@
 \providecommand{\setwo}[2]{\MATHIT{\left\{ #1 \left|\; {#2} \right.\right\}}}
 
 \providecommand{\defeq}{=_{\mbox{df}}}
+\providecommand{\kth}[1]{\MATHIT{#1^{\text{th}}}}
 
 
 % utilities%FOLDUP
@@ -109,6 +110,7 @@
 
 %\providecommand{\argmax}{\MATHIT{\mbox{argmax}}}
 \providecommand{\argmax}{\MATHIT{\mathop{\mathrm{argmax}}}}
+\providecommand{\argmin}{\MATHIT{\mathop{\mathrm{argmin}}}}
 
 
 %UNFOLD
@@ -568,6 +570,10 @@
 \providecommand{\skewness}[1]{\funcit{\mbox{skew}}{#1}}
 \providecommand{\exkurt}[1]{\funcit{\mbox{ex\,kurtosis}}{#1}}
 
+% population centered moment, adjusted?
+\providecommand{\pcmom}[1][{}]{\mathSUB{\xi}{#1}}
+\providecommand{\scmom}[1][{}]{\mathSUB{\hat{\xi}}{#1}}
+
 \providecommand{\sacor}[1][]{\mathSUB{\hat{\nu}}{#1}}
 \providecommand{\pacor}[1][]{\mathSUB{\nu}{#1}}
 \providecommand{\corcor}{\MATHIT{d}}
@@ -601,7 +607,7 @@
 \providecommand{\tpowc}[1][]{\mathSUB{k}{#1}}
 
 %aspect ratio
-\providecommand{\arat}[1][]{\mathSUB{c}{#1}}
+\providecommand{\arat}[1][a]{\mathSUB{c}{#1}}
 
 \providecommand{\portw}[1][{}]{\vectUL{w}{}{#1}}
 \providecommand{\pportw}[1][{}]{\vectUL{\nu}{}{#1}}
@@ -638,6 +644,38 @@
 
 \providecommand{\StockTicker}[1]{{\texttt{#1}}}
 %UNFOLD
+
+% ack;
+\def\@SEPCdiffl{\mathrm{d}}
+\def\@SEPCpartl{\partial}
+%deprecated
+\providecommand{\DIFFERENTIAL}{\mathrm{d}}
+\providecommand{\PARTIAL}{\partial}
+
+\providecommand{\dx}[1][x]{\MATHIT{\,\@SEPCdiffl{#1}}}
+\providecommand{\px}[1][x]{\MATHIT{\@SEPCpartl{#1}}}
+%deprecated:
+\providecommand{\dpx}[1][x]{\MATHIT{\@SEPCpartl{#1}}}
+
+\def\@SEPCtopfrac#1#2#3#4#5{\MATHIT{\frac{\neUL{#1}{#2}{#3} {#4}}{#5}}}
+
+%1 to power 2  3 by 4
+\def\@SEPCrby#1#2#3#4{\@SEPCtopfrac{#1}{#2}{}{#3}{#4}}
+%1 to power 2  3 by (1 4) to power 2
+\def\@SEPCrbyr#1#2#3#4{\@SEPCrby{#1}{#2}{#3}{\neUL{#1 #4}{#2}{}}}
+
+%with differentials d^1 2 / 3
+\providecommand{\drby}[3][{}]{\@SEPCrby{\@SEPCdiffl}{#1}{#2}{#3}}
+%with differentials d^1 2 / (d 3)^1
+\providecommand{\drbydr}[3][{}]{\@SEPCrbyr{\@SEPCdiffl}{#1}{#2}{#3}}
+\providecommand{\dbyd}[3][{}]{\@SEPCrbyr{\@SEPCdiffl}{#1}{#2}{#3}}
+\providecommand{\dydx}{\dbyd{y}{x}}
+
+%with partials d^1 2 / 3
+\providecommand{\prby}[3][{}]{\@SEPCrby{\@SEPCpartl}{#1}{#2}{#3}}
+%with partials d^1 2 / (d 3)^1
+\providecommand{\prbypr}[3][{}]{\@SEPCrbyr{\@SEPCpartl}{#1}{#2}{#3}}
+\providecommand{\pbyp}[3][{}]{\@SEPCrbyr{\@SEPCpartl}{#1}{#2}{#3}}
 %
 %for vim modeline: (do not edit)
 % vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=%%s:syn=latex:ft=latex

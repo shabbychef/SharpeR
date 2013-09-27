@@ -9,6 +9,8 @@
 \usepackage{url}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+% for therefore
+\usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage[square,numbers]{natbib}
 %\usepackage[authoryear]{natbib}
@@ -240,14 +242,6 @@ These can be trivially translated into equivalent facts regarding the \txtSR:
 \label{eqn:sratmoms}
 \end{equation}
 
-The geometric bias term \tbias does not equal one, thus the sample t statistic is a \emph{biased} estimator of
-the non-centrality parameter, \nctp when $\nctp \ne 0$, and the \txtSR is a biased estimator of the signal-to-noise
-ratio when it is nonzero. \cite{CambridgeJournals:4493808} The bias term is a function of sample size only, 
-%and approaches one fairly quickly.
-and approaches one fairly quickly, 
-see \figref{sr_bias}.  
-However, there are situations in which it might be unacceptably large. 
-
 <<'generate_tbias',include=FALSE>>=
 # the bias of the t
 f_tbias <- function(n) { 
@@ -264,22 +258,31 @@ f_apx_tbias2 <- function(n) {
 n <- 12
 tbias <- f_tbias(n)
 @
+
+The geometric bias term \tbias does not equal one, thus the sample t statistic is a \emph{biased} estimator of
+the non-centrality parameter, \nctp when $\nctp \ne 0$, and the \txtSR is a biased estimator of the signal-to-noise
+ratio when it is nonzero. \cite{CambridgeJournals:4493808} The bias term is a function of sample size only, 
+and approaches one fairly quickly.
+%and approaches one fairly quickly, 
+%see \figref{sr_bias}.  
+However, there are situations in which it might be unacceptably large. 
+
+%%<<'sr_beast',echo=FALSE,fig.cap="The approximate percent bias of the \\txtSR, $\\tbias - 1$ is given versus sample size.",cache=FALSE>>=
+%<<'sr_bias',echo=FALSE,fig.cap="The approximate relative bias of the \\txtSR, $\\tbias - 1$ is given versus sample size, shown in black.  In green the approximation given by $\\tbias[\\ssiz+1] \\approx 1 + \\frac{3}{4\\ssiz} + \\frac{25}{32\\ssiz^2}$ is plotted.">>=
+%nvals <- 4:256
+%tbias <- -1 + sapply(nvals, f_tbias)
+%avals <- -1 + sapply(nvals, f_apx_tbias2)
+%plot(nvals,tbias,type="l",log="xy",col="black",axes=F,ylab="bias in Sharpe ratio",xlab="number of samples")
+%lines(nvals,avals,col="green")
+%legend("topright",c("actual value","approximation"),lty=c(1,1),col=c("black","green"))
+%axis(1, at=(c(4,8,16,32,64,128,256)))
+%axis(2, at=(c(0.002,0.004,0.1,0.02,0.04,0.1,0.2,0.4)))
+%@
+
 For example, if one was looking at one year's worth of data with monthly marks, one would have a fairly large bias: 
 $\tbias = \Sexpr{round(tbias,digits=4)}$, \ie almost eight percent.  The bias is multiplicative and larger than one, 
 so the \txtSR will overestimate the SNR when the latter is positive, and underestimate it when it is negative.
 The existence of this bias was first described by Miller and Gehr. \cite{CambridgeJournals:4493808} 
-
-%<<'sr_beast',echo=FALSE,fig.cap="The approximate percent bias of the \\txtSR, $\\tbias - 1$ is given versus sample size.",cache=FALSE>>=
-<<'sr_bias',echo=FALSE,fig.cap="The approximate relative bias of the \\txtSR, $\\tbias - 1$ is given versus sample size, shown in black.  In green the approximation given by $\\tbias[\\ssiz+1] \\approx 1 + \\frac{3}{4\\ssiz} + \\frac{25}{32\\ssiz^2}$ is plotted.">>=
-nvals <- 4:256
-tbias <- -1 + sapply(nvals, f_tbias)
-avals <- -1 + sapply(nvals, f_apx_tbias2)
-plot(nvals,tbias,type="l",log="xy",col="black",axes=F,ylab="bias in Sharpe ratio",xlab="number of samples")
-lines(nvals,avals,col="green")
-legend("topright",c("actual value","approximation"),lty=c(1,1),col=c("black","green"))
-axis(1, at=(c(4,8,16,32,64,128,256)))
-axis(2, at=(c(0.002,0.004,0.1,0.02,0.04,0.1,0.2,0.4)))
-@
 
 A decent asymptotic approximation \cite{dlmf_gammarat} to \tbias is given by
 $$
@@ -291,8 +294,13 @@ $$
 
 \label{subsec:asymptotics_and_ci}
 
-Lo showed that the \txtSR is asymptotically normal in \ssiz with standard deviation 
-$\sqrt{\fracc{(1 + \half[\ssr^2])}{\ssiz}}.$ \cite{lo2002} The equivalent result concerning
+Lo showed that the \txtSR is asymptotically normal in \ssiz with 
+standard deviation \cite{lo2002}
+\begin{equation}
+se \approx \sqrt{\frac{1 + \half[\psnr^2]}{\ssiz}}.
+\label{eqn:srse_lo}
+\end{equation}
+The equivalent result concerning
 the non-central \tstat-distribution (which, again, is the \txtSR up to scaling by $\sqrt{\ssiz}$)
 was published 60 years prior by Johnson and Welch. \cite{Johnson:1940}
 Since the SNR, \ssr, is unknown, Lo suggests approximating it with the \txtSR, giving 
@@ -302,9 +310,10 @@ $$
 $$
 where \qnorm{\typeI/2} is the $\typeI/2$ quantile of the normal distribution. In practice,
 the asymptotically equivalent form 
-$$
+\begin{equation}
 \ssr \pm \qnorm{\typeI/2} \sqrt{\frac{1 + \half[\ssr^2]}{\ssiz - 1}}
-$$
+\label{eqn:srci_lo}
+\end{equation}
 has better small sample coverage, at least for normal returns. 
 
 According to Walck,
@@ -320,22 +329,41 @@ which is the \txtSR up to scaling. \cite{walck:1996}
 %$$
 
 This suggests the following approximate $1 - \typeI$ confidence interval on the SNR:
-$$
+\begin{equation}
 \ssr \left(1 - \frac{1}{4(\ssiz - 1)}\right) \pm \qnorm{\typeI/2} \sqrt{\frac{1}{\ssiz} + \frac{\ssr^2}{2(\ssiz - 1)}}.
-$$
+\label{eqn:srci_walck}
+\end{equation}
 
 The normality results generally hold for large \ssiz, small \psnr, and assume
 normality of \reti. \cite{Johnson:1940} We can find confidence intervals on \psnr 
 assuming only normality of \reti (or large \ssiz and an appeal to the Central Limit Theorem),
 by inversion of the cumulative distribution of the non-central \tstat-distribution. A $1 - \typeI$ 
-symmetric confidence interval on \psnr has endpoints defined implicitly by
-$$1 - \typeI/2 = \nctcdf{\ssr}{\ssiz-1}{\sqrt{\ssiz}\psnr[l]},\quad
-\typeI/2 = \nctcdf{\ssr}{\sqrt{\ssiz}\psnr[u],\ssiz-1},$$
+symmetric confidence interval on \psnr has endpoints
+$\wrapBracks{\psnr[l],\psnr[u]}$ defined implicitly by
+\begin{equation}
+1 - \typeI/2 = \nctcdf{\ssr}{\ssiz-1}{\sqrt{\ssiz}\psnr[l]},\quad
+\typeI/2 = \nctcdf{\ssr}{\ssiz-1}{\sqrt{\ssiz}\psnr[u]},
+\label{eqn:srci_tinvert}
+\end{equation}
 where $\nctcdf{x}{\ssiz-1}{\nctp}$ is the CDF of the non-central \tstat-distribution with 
 non-centrality parameter \nctp and $\ssiz - 1$ degrees of freedom.
 Computationally, this method requires one to invert the CDF 
 (\eg by Brent's method \cite{Brent:1973}), which is slower than 
 approximations based on asymptotic normality.
+
+Mertens gives the form of standard error
+\begin{equation}
+se \approx \sqrt{\frac{1 + \frac{2 + \pcmom[4]}{4}\psnr^2 -
+\pcmom[3]\psnr}{\ssiz}},
+\label{eqn:srse_mertens}
+\end{equation}
+where \pcmom[3] is the skew, and \pcmom[4]
+is the \emph{excess} kurtosis of the returns distribution. These are
+both zero for normally distributed returns, and so Mertens' form reduces
+to Lo's form. \cite{mertens2002comments,Opdyke2007,sref2011}
+These are unknown in practice, and have to be estimated.
+2FIX.
+
 
 In practice these three confidence interval approximations give very similar coverage, with no
 appreciable difference when $\ssiz > 30$ or so. For small sample sizes, the corrected form of
@@ -557,7 +585,8 @@ your chances of `passing' the \tstat-test are less than fifty percent.
 
 \subsection{Deviations from assumptions}%FOLDUP
 
-Van Belle suggests one consider, in priority order, assumptions of independence,
+Van Belle suggests one consider, in priority order, 
+assumptions of independence,
 heteroskedasticity, and normality in statistical tests. \cite{vanBelle2002_STRUTs} 
 
 \subsubsection{\txtSR and Autocorrelation}%FOLDUP
@@ -577,28 +606,18 @@ The 'small angle' approximation for this correction is $1 + \pacor$, which is re
 for $\abs{\pacor} < 0.1$. An alternative expression of this approximation is ``a positive autocorrelation
 of \pacor inflates the Sharpe ratio by about \pacor percent.''
 
-% input{autocorr_study}%FOLDUP
+% autocorr_study %FOLDUP
+% input{autocorr_study}
 
 <<"autocorr_setup",echo=FALSE>>=
-########################################################################
-# AR time series #FOLDUP
-
-#generate an AR(1) series:
-AR1.filter <- function(phi,epsilons) {
-	n <- length(epsilons)
-	series <- numeric(n)
-	series[1] <- epsilons[1] / (1 - phi)
-	for(iii in 2:n) {
-		series[iii] <- phi * series[iii-1] + epsilons[iii]
-	}
-	return(series)
+fname <- system.file('extdata','autocorr_study.rda',package='SharpeR')
+if (fname == "") {
+	fname <- 'autocorr_study.rda'
 }
+# poofs phivals empiricals predicteds ntrials nyr
+load(fname)
 
-AR1.series <- function(n,phi,mu,sd,burn.in=100) {
-	series <- mu + AR1.filter(phi,rnorm(n + burn.in,mean=0,sd = sd))
-	return(series[(burn.in + 1):(burn.in + n)])
-}
-#UNFOLD
+# maybe need these some other time?
 # vanilla Sharpe ratio in terms of whatever input units
 f_vsharpe <- function(rets) {
 	return(mean(rets) / sd(rets))
@@ -611,42 +630,16 @@ f_asharpe <- function(rets, dpy = 253) {
 f_tstat <- function(rets) { 
 	return(sqrt(length(rets)) * f_vsharpe(rets))
 }
-# for phi = -0.15 to 0.15 or so, generate 2048 returns series of length
-# around 3 years and look at the standard deviation of the t-statistic.
-
-# phi is the AR parameter;
-# ntrial is the number of times we run this;
-# nyr is the number of years of data to look at
-# dpy is days per year.
-# vsr is the 'vanilla' Sharpe ratio, daily;
-# sg is the daily volatility
-look_spread <- function(phi,ntrial,nyr,vsr=0,sg=0.01,dpy=253) {
-	n <- ceiling(nyr * dpy)
-	mu <- vsr * sg
-	ssrs <- replicate(ntrial,f_tstat(AR1.series(n,phi,mu,sg)))
-	return(sd(ssrs))
-}
-
-# the value estimated by Van Belle's trick:
-vb_spread <- function(phi,ntrial,nyr,vsr=0,sg=0.01,dpy=253) {
-	sqrt((1 + phi) / (1 - phi))
-}
-
-top_phi <- 0.2
-phivals <- seq(-top_phi,top_phi,length.out=7)
-ntrials <- ceiling(4 * mc.resolution)
-ny <- 3
-
-empiricals <- sapply(phivals,look_spread,ntrial = ntrials,nyr = ny)
-predicteds <- sapply(phivals,vb_spread,ntrial = ntrials,nyr = ny)
 @
 
-%spread as a function of autocorrelation%FOLDUP
-<<'autocorr_spread',echo=FALSE,fig.cap=paste("The empirical standard deviation for the \\tstat-statistic is shown at different values of the autocorrelation, \\pacor. Each point represents",ntrials,"series of approximately",ny,"years of daily data, with each series generated by an AR(1) process with normal innovations.  Each series has actual SNR of zero. The fit line is that suggested by Van Belle's correction for autocorrelation, namely $\\sqrt{(1 + \\pacor) / (1 - \\pacor)}$.")>>=
-plot(phivals,empiricals,pch=1,col="red",ylab="standard deviation of t statistic",
-		 xlab="autocorrelation")
+%spread as a function of autocorrelation %FOLDUP
+<<'autocorr_spread',echo=FALSE,fig.cap=paste("The empirical standard deviation for the \\tstat-statistic is shown at different values of the autocorrelation, \\pacor. Each point represents",ntrials,"series of approximately",nyr,"years of daily data, with each series generated by an AR(1) process with normal innovations.  Each series has actual SNR of zero. The fit line is that suggested by Van Belle's correction for autocorrelation, namely $\\sqrt{(1 + \\pacor) / (1 - \\pacor)}$.")>>=
+plot(phivals,empiricals,pch=1,col="red",
+	ylab="standard deviation of t statistic",
+	xlab="autocorrelation")
 lines(phivals,predicteds,col="black")
-legend("topleft",c("Empirical","Predicted"),lty=c(0,1),pch=c(1,NA_integer_),col=c("red","black"))
+legend("topleft",c("Empirical","Predicted"),
+	lty=c(0,1),pch=c(1,NA_integer_),col=c("red","black"))
 @
 %UNFOLD
 
@@ -666,10 +659,21 @@ for Sharpe ratio is $\ssr[0]' = \corcor \ssr[0]$.
 
 \subsubsection{\txtSR and Heteroskedasticity}%FOLDUP
 
-Here I will consider the case heteroskedastic asset returns with constant
-SNR. That is, both the volatility and expected return are changing over 
-time, with their ratio constant. 
-Suppose that \levi[i] and \reti[i] are independent random variables with
+The term `heteroskedasticity' typically applies to situations where
+one is performing inference on the mean effect, and the magnitude
+of error varies in the sample. This idea does not naturally translate
+to performing inference on the SNR, since SNR incorporates volatility,
+and would vary under the traditional definition. Depending
+on the asset, the SNR might increase or decrease with volatility, an
+effect further complicated by the risk-free rate, which is assumed
+to be constant.
+
+Here I will consider the case of asset returns with constant SNR, and
+fluctuating volatility. 
+That is, both the volatility and expected return are changing over 
+time, with their ratio constant. One can imagine this as some `latent'
+return stream which one observes polluted with a varying `leverage'.
+So suppose that \levi[i] and \reti[i] are independent random variables with
 $\levi[i] > 0$. One observes period returns of 
 $\levi[i]\reti[i]$ on period $i$. We have assumed that the SNR of \reti[{}]
 is a constant which we are trying to estimate.
@@ -743,7 +747,7 @@ type event. \cite{0812979184} We need not make any fabulous conjectures about th
 return series, or the failure of models or our ability to predict: skew is a property of the distribution, 
 and we do not have enough evidence to detect the skew.
 
-<<'skewstudy_prelim',echo=FALSE>>=
+<<'skewstudy_prelim',echo=FALSE,cache=FALSE>>=
 fname <- system.file('extdata','skew_study.rda',package='SharpeR')
 if (fname == "") {
 	fname <- 'skew_study.rda'
@@ -760,25 +764,29 @@ versus the alternative $H_1: \psnr > 1.0$ for different distributions of returns
 I sample from a Gaussian 
 (as the benchmark); a \tstat-distribution with 10 degrees of freedom;
 a Tukey $h$-distribution, with different values of $h$; 
-and a `Lambert W x Gaussian' distribution, with different .  \cite{2010arXiv1010.2265G,2009arXiv0912.4554G,LambertW} 
+and a `Lambert W x Gaussian' distribution, with 
+different 2FIX. \cite{2010arXiv1010.2265G,2009arXiv0912.4554G,LambertW} 
 I also draw samples from the daily log returns of 
 the S \& P 500 over the period from \Sexpr{as.character(SPX.start,format="%B %d, %Y")} to 
 \Sexpr{as.character(SPX.end,format="%B %d, %Y")}, affinely transformed 
-to have $\psnr = 1.0$.  
+to have $\psnr = 1.0$. I also draw from a symmetrized S \& P 500 returns
+series.
 The \tstat- and Tukey distributions are fairly kurtotic, but have zero
 skew, while the Lambert W x Gaussian is skewed and (therefore) kurtotic.  
 At the nominal $\typeI = 0.05$ level, we expect to get a reject rate around five percent.
 
 % input{skew_study}%FOLDUP
 
-<<'skewstudy',echo=FALSE,results='asis'>>=
+<<'skewstudy',echo=FALSE,results='asis',cache=FALSE>>=
 # res, ntrials are poofed above.
 #digits=c(0,0,0,2,2,2),
 xres <- xtable(res,label="tab:sharpe_skew_robustness",
-							 display=c('s','s','s','g','g','fg'),
+							 display=c('s','s','s','g','g','fg','fg'),
 							 caption=paste("Empirical type I rates of the test for $\\psnr = 1.0$ via distribution of the Sharpe ratio are given for various distributions of returns.  The empirical rates are based on ", 
 														 ntrials, 
-														 " simulations of three years of daily returns, with a nominal rate of $\\typeI = 0.05$. Skew appears to have a much more adverse effect than kurtosis alone."))
+														 " simulations of three years of daily returns,
+with a nominal rate of $\\typeI = 0.05$. The 'corrected' type I rates refer to
+a normal approximation using Mertens' correction. Skew appears to have a much more adverse effect than kurtosis alone."))
 print(xres,include.rownames=FALSE)
 @
 %UNFOLD
@@ -800,6 +808,183 @@ reason that skew causes the distribution of \txtSR to degrade.
 %UNFOLD
 %UNFOLD
 
+\subsection{Linear Attribution Models}%FOLDUP
+
+\label{subsec:attribution_models}
+
+The \txtSR and \tstat-test as described previously can be more generally described in terms of 
+linear regression. Namely one models the returns of interest as $\reti[t] = \pregco[0] 1 + \perr[t],$ where 
+\perr[t] are modeled as \iid zero-mean innovations with standard deviation \psig.
+Performing a linear regression, one gets the estimates \sregco[0] and \ssig, and can test the null
+hypothesis $H_0: \fracc{\pregco[0]}{\psig} = 0$ via a \tstat-test.
+To see that this is the case, one only need recognize that the
+sample mean is indeed the least-squares estimator, \ie 
+$\smu = \argmin_{a} \sum_t \wrapParens{a - \reti[t]}^2$.
+
+More generally, we might want to model returns as the linear combination of \nattf factor returns:
+\begin{equation}
+\reti[t] = \pregco[0] 1 + \sum_i^{\nattf - 1} \pregco[i] \retk[i,t] + \perr[t],
+\label{eqn:factormodel}
+\end{equation}
+where $\retk[i,t]$ are the returns of some \kth{i} `factor` at time $t$.  There are numerous candidates
+for the factors, and their choice should depend on the return series being modeled. For example, one
+would choose different factors when modeling the returns of a single company versus those of a broad-market
+mutual fund versus those of a market-neutral hedge fund, \etc.
+Moreover, the choice of factors might depend on the type of analysis being performed. For example, one
+might be trying to `explain away' the returns of one investment as the returns of another investment 
+(presumably one with smaller fees) plus noise. Alternatively, one might be trying to establish that a given
+investment has idiosyncratic `alpha' (\ie \pregco[0]) without significant exposure to other factors.
+
+Typically factor models are justified by some hypotheses about
+2FIX
+\cite{GVK322224764}
+
+\subsubsection{Examples of linear attribution models}%FOLDUP
+
+\label{subsec:linreg_models}
+
+\begin{compactitem}
+\item As noted above, the \txtSR implies a trivial factor model, namely
+$\reti[t] = \pregco[0] 1 + \perr[t].$
+This simple model is generally a poor one for describing stock returns;
+one is more likely to see it applied to the returns of mutual funds, hedge funds, \etc
+
+\item The simple model does not take into account the influence of `the market' on the returns of stocks.
+This suggests a factor model equivalent to the Capital Asset Pricing Model (CAPM), namely
+$\reti[t] = \pregco[0] 1 + \pregco[M] \retk[M,t] + \perr[t],$ where \retk[M,t] is the return of `the market`
+at time $t$.  \cite{Black_Jensen_Scholes_1972}
+(Note that the term `CAPM' usually encompasses a number of assumptions used to justify the validity of this 
+model for stock returns.)
+
+This is clearly a superior model for stocks and portfolios with a long bias 
+(\eg typical mutual funds), but might seem inappropriate for a long-short balanced hedge fund, say.  In this
+case, however, the loss of power in including a market term is typically very small, while the possibility of
+reducing type I errors is quite valuable. For example, one might discover that a seemingly long-short balanced
+fund actually has some market exposure, but no significant idiosyncratic returns 
+(one cannot reject $H_0: \pregco[0] = 0$, say); this is valuable information, since a hedge-fund investor might
+balk at paying high fees for a return stream that replicates a (much less expensive) ETF plus noise.
+
+%\cite{Ross_APT_1976} 
+%2FIX: mention APT
+\item Generalizations of the CAPM factor model abound.  For example, the Fama-French 3-factor model 
+(I drop the risk-free rate for simplicity):
+$$\reti[t] = \pregco[0] 1 + \pregco[\smbox{M}] \retk[\smbox{M},t] + \pregco[\smbox{SMB}] \retk[\smbox{SMB},t] + \pregco[\smbox{HML}] \retk[\smbox{HML},t] + \perr[t],$$ 
+where \retk[\smbox{M},t] is the return of `the market`, \retk[\smbox{SMB},t] is the return of `small minus big cap` stocks 
+(the difference in returns of these two groups), and \retk[\smbox{HML},t] is the return of `high minus low book value` 
+stocks.  \cite{Fama_French_1992}
+Carhart adds a momentum factor:
+$$\reti[t] = \pregco[0] 1 + \pregco[\smbox{M}] \retk[\smbox{M},t] + \pregco[\smbox{SMB}] \retk[\smbox{SMB},t] + \pregco[\smbox{HML}] \retk[\smbox{HML},t] + \pregco[\smbox{UMD}] \retk[\smbox{UMD},t] + \perr[t],$$ 
+where \retk[\smbox{UMD},t] is the return of `ups minus downs`, \ie the returns of the previous period winners minus the
+returns of previous period losers.  \cite{Carhart_1997}
+
+\item Henriksson and Merton describe a technique for detecting market-timing ability in a portfolio.
+One can cast this model as 
+$$\reti[t] = \pregco[0] 1 + \pregco[\smbox{HM}] \abs{\retk[\smbox{M},t]} + \perr[t],$$ 
+where \retk[\smbox{M},t] are the returns of `the market' the portfolio is putatively timing. \cite{Henriksson_Merton_1981}
+Actually, one or several factor timing terms can be added to any factor model.
+Note that unlike the factor returns in models discussed above, one expects $\abs{\retk[\smbox{M}]}$ to have 
+significantly non-zero mean. This will cause some decrease in power when testing \pregco[0] for significance. Also note
+that while Henriksson and Merton intend this model as a positive test for \pregco[\smbox{HM}], one could treat the timing
+component as a factor which one seeks to ignore entirely, or downweight its importance. 
+
+(2FIX: is this really the H-M model?)
+
+\item Often the linear factor model is used with a `benchmark' 
+(mutual fund, index, ETF, \etc) used as the factor returns. In this case, the process generating \reti[t] may or may
+not be posited to have zero exposure to the benchmark, but usually one is testing for significant idiosyncratic term.
+
+\item Any of the above models can be augmented by splitting the idiosyncratic term into a constant term and some
+time-based term. For example, it is often argued that a certain strategy `worked in the past' but does no longer. 
+This implies a splitting of the constant term as
+$$\reti[t] = \pregco[0] 1 + \pregco[0]' \retk[0,t] + \sum_i \pregco[i] \retk[i,t] + \perr[t],$$
+where $\retk[0,t] = (\ssiz - t)/\ssiz$, given \ssiz observations. In this case the idiosyncratic part is an affine
+function of time, and one can test for \pregco[0] independently of the time-based trend 
+(one can also test whether $\pregco[0]' > 0$ to see if the `alpha' is truly decaying).
+One can also imagine time-based factors which attempt to address seasonality or `regimes'.
+
+\end{compactitem}
+
+%UNFOLD
+
+\subsubsection{Tests involving the linear attribution model}%FOLDUP
+
+Given \ssiz observations of the
+returns and the factors, let \vreti be the vector of returns and let \mretk be the $\ssiz \times \nattf$ 
+matrix consisting of the returns of the \nattf factors and a column of all ones.
+The ordinary least squares estimator for the regression coefficients is expressed by the 
+'normal equations':
+$$\sregvec = \minv{\left(\gram{\mretk}\right)}\tr{\mretk}\vreti.$$
+The estimated variance of the error term is
+$\ssig^2 = \gram{\left(\vreti - \mretk\sregvec\right)} / (\ssiz - \nattf)$.
+
+%2FIX: take care with the DOF: $\ssiz - \nattf - 1$ or $\ssiz - \nattf - 2$?
+
+\label{subsec:linreg_tests}
+
+\begin{compactenum}
+\item The classical \tstat-test for regression coefficients tests the null hypothesis:
+$$H_0 : \tr{\pregco}\convec = \contar\quad\mbox{versus}\quad H_1 : \tr{\pregco}\convec > \contar,$$
+for some conformable vector \convec and constant \contar. To perform this test, we construct the
+regression \tstat-statistic
+\begin{equation}
+\tstat = \frac{\tr{\sregco}\convec - \contar}{\ssig \sqrt{\qform{\minv{\left(\gram{\mretk}\right)}}{\convec}}}.
+\end{equation}
+This statistic should be distributed as a non-central \tstat-distribution with non-centrality parameter
+$$
+\nctp = \frac{\tr{\pregco}\convec - \contar}{\psig \sqrt{\qform{\minv{\left(\gram{\mretk}\right)}}{\convec}}},
+$$
+and $\ssiz - \nattf$ degrees of freedom. Thus we reject the null if \tstat is greater than 
+\tqnt{1-\typeI}{\ssiz - \nattf}, the $1-\typeI$ quantile of the (central) 
+\tstat-distribution with $\ssiz - \nattf$ degrees of freedom.
+
+\item To test the null hypothesis:
+$$H_0 : \tr{\pregco}\convec = \psig\contar\quad\mbox{versus}\quad H_1 : \tr{\pregco}\convec > \psig\contar,$$
+for given \convec and \contar, one constructs the \tstat-statistic
+\begin{equation}
+\tstat = \frac{\tr{\sregco}\convec}{\ssig \sqrt{\qform{\minv{\left(\gram{\mretk}\right)}}{\convec}}}.
+\end{equation}
+This statistic should be distributed as a non-central \tstat-distribution with non-centrality parameter
+$$
+\nctp = \frac{\contar}{\sqrt{\qform{\minv{\left(\gram{\mretk}\right)}}{\convec}}},
+$$
+and $\ssiz - \nattf$ degrees of freedom. Thus we reject the null if \tstat is greater than 
+\nctqnt{1-\typeI}{\ssiz - \nattf}{\nctp}, the $1-\typeI$ quantile of the non-central 
+\tstat-distribution with $\ssiz - \nattf$ degrees of freedom and non-centrality parameter \nctp.
+
+Note that the statistic $\sregco[0] / \ssig$ is the equivalent to the \txtSR in the general
+factor model (and $\pregco[0] / \psig$ is the population analogue).
+
+
+2FIX: 2 sample test for SNR of independent groups?
+\end{compactenum}
+
+%UNFOLD
+
+\subsubsection{Deviations from the model}%FOLDUP
+
+The advantage of viewing Sharpe ratio as a least squares regression problem 
+(or of using the more general factor model for attribution), is that 
+regression is a well-studied problem. Indeed, numerous books and articles have 
+been written about the topic and how to test for, and deal with, deviations from the 
+model: autocorrelation, heteroskedasticity, non-normality, outliers, \etc  
+\cite{rao2010linear,linmod2007,Kutner2004Applied,BDReg1993,kennedy2008guide}
+
+%Here I outline only a few results and refer the interested reader to the literature.
+
+%\subsubsection{Autocorrelation}
+
+%\subsubsection{Heteroskedasticity}
+
+%The tests outlined in \subsecref{linreg_tests} technically require that the error terms, \perr[t]
+%have the same variance, \psig. When this condition is violated, the OLS estimator \sregco is 
+%\emph{not} biased. However, it is not the best linear unbiased estimator (\cf the Gauss Markov theorem),
+%and the OLS estimator of \psig is biased, leading to possibly incorrect inference. 
+
+
+%UNFOLD
+
+
+%UNFOLD
 %UNFOLD
 
 \section{\txtSR and portfolio optimization}%FOLDUP
@@ -2106,16 +2291,19 @@ Thus, conditional on observing \ssrsqoptG{\hejG}, we have
 
 \section{Gaussian in Appended Form}%FOLDUP
 
+\providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
+\providecommand{\svsm}[1][{}]{\mathSUB{\Mtx{\hat{\Theta}}}{#1}}
+
 Let \avreti be the \nlatf-variate vector \vreti appended with a 1:
 $\avreti = \asvec{\tr{\vreti},1}$. Consider the second
 moment of \avreti:
 $$
-\Mtx{L} = \E{\ogram{\avreti}} = \twobytwo{\pvsig + \ogram{\pvmu}}{\pvmu}{\tr{\pvmu}}{1}.
+\pvsm = \E{\ogram{\avreti}} = \twobytwo{\pvsig + \ogram{\pvmu}}{\pvmu}{\tr{\pvmu}}{1}.
 $$
 By inspection one can confirm that the
-inverse of \Mtx{L} is
+inverse of \pvsm is
 $$
-\minv{\Mtx{L}} 
+\minv{\pvsm} 
 = \twobytwo{\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{-\tr{\pvmu}\minv{\pvsig}}{1 + \qform{\minv{\pvsig}}{\pvmu}} 
 = \twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt}.
 $$
@@ -2124,18 +2312,18 @@ $$
 \minv{\twobytwo{\svsig + \ogram{\svmu}}{\svmu}{\tr{\svmu}}{1}} 
 = \twobytwo{\minv{\svsig}}{-\sportwopt}{-\tr{\sportwopt}}{1 + \ssrsqopt}.
 $$
-The Cholesky factor of \minv{\Mtx{L}} is
+The Cholesky factor of \minv{\pvsm} is
 $$
-\ichol{\Mtx{L}} = \twobytwo{\trichol{\pvsig}}{-\trichol{\pvsig}\pvmu}{0}{1}.
+\ichol{\pvsm} = \twobytwo{\trichol{\pvsig}}{-\trichol{\pvsig}\pvmu}{0}{1}.
 $$
 
 Note that
 $$
 \qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}} = 
-\qform{\minv{\Mtx{L}}}{\avreti} - 1.
+\qform{\minv{\pvsm}}{\avreti} - 1.
 $$
-Using the block determinant formula, we find that \Mtx{L} has the same 
-determinant as \pvsig: $\det{\Mtx{L}} = \det{\pvsig}.$  Then if
+Using the block determinant formula, we find that \pvsm has the same 
+determinant as \pvsig: $\det{\pvsm} = \det{\pvsig}.$  Then if
 \vreti is multivariate Gaussian, then the density of \vreti can be
 expressed more simply as
 \begin{equation*}
@@ -2143,15 +2331,15 @@ expressed more simply as
 \normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
 \longexp{-\half \qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}}},\\
  &= \frac{\wrapParens{\det{\pvsig}}^{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
-\longexp{-\half \wrapParens{\qform{\minv{\Mtx{L}}}{\avreti} - 1}},\\
- &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\Mtx{L}}}^{-\half}
-\longexp{-\half \wrapParens{\qform{\minv{\Mtx{L}}}{\avreti} - 1}},\\
+\longexp{-\half \wrapParens{\qform{\minv{\pvsm}}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\pvsm}}^{-\half}
+\longexp{-\half \wrapParens{\qform{\minv{\pvsm}}{\avreti} - 1}},\\
  &= \wrapParens{2\pi}^{-\nlatf/2}
-\longexp{\half - \half \logdet{\Mtx{L}} - \half \trace{\minv{\Mtx{L}}\ogram{\avreti}}},\\
+\longexp{\half - \half \logdet{\pvsm} - \half \trace{\minv{\pvsm}\ogram{\avreti}}},\\
 - \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
   c_{\nlatf} 
-+ \half \logdet{\Mtx{L}} 
-+ \half \trace{\minv{\Mtx{L}}\ogram{\avreti}},
++ \half \logdet{\pvsm} 
++ \half \trace{\minv{\pvsm}\ogram{\avreti}},
 \end{split}
 \end{equation*}
 for the constant 
@@ -2161,41 +2349,119 @@ Given \ssiz \iid observations of \vreti, let \amreti be the matrix
 whose rows are the vectors \tr{\vreti[i]}. Then the negative log
 density of \amreti is
 \begin{equation*}
-- \log\normpdf{\amreti}{\Mtx{L}} =
+- \log\normpdf{\amreti}{\pvsm} =
   \ssiz c_{\nlatf} 
-+ \half[\ssiz] \logdet{\Mtx{L}} 
-+ \half \trace{\minv{\Mtx{L}}\gram{\amreti}}.
++ \half[\ssiz] \logdet{\pvsm} 
++ \half \trace{\minv{\pvsm}\gram{\amreti}}.
 \end{equation*}
 Now note that $\gram{\amreti}/\ssiz$ is a sample estimate of 
-\Mtx{L}, call it \Mtx{\hat{L}}. Then 
+\pvsm, call it \svsm. Then 
 \begin{equation*}
-\frac{- 2\log\normpdf{\amreti}{\Mtx{L}}}{\ssiz} = 
+\frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz} = 
   c_{\nlatf} 
-+ \logdet{\Mtx{L}} 
-+ \trace{\minv{\Mtx{L}}\Mtx{\hat{L}}}.
++ \logdet{\pvsm} 
++ \trace{\minv{\pvsm}\svsm}.
 \end{equation*}
 
 By Lemma (5.1.1) of Press \cite{press2012applied}, this can be expressed
-as a density on \Mtx{\hat{L}}:
+as a density on \svsm, which is a sufficient statistic:
 \begin{equation*}
 \begin{split}
-\frac{- 2\log\FOOpdf{}{\Mtx{\hat{L}}}{\Mtx{L}}}{\ssiz} 
-&= \frac{- 2\log\normpdf{\amreti}{\Mtx{L}}}{\ssiz}\\
+\frac{- 2\log\FOOpdf{}{\svsm}{\pvsm}}{\ssiz} 
+&= \frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz}\\
 &\phantom{=}\,
-	-\frac{2}{\ssiz}\wrapParens{\half[\ssiz-\nlatf-1]\logdet{\Mtx{\hat{L}}} +
-	\half[\nlatf]\wrapParens{\ssiz - \half[\nlatf] + \half} \log\pi -
-	\sum_{j=1}^{\nlatf} \log\funcit{\Gamma}{\half[\ssiz +1-j]}},\\
-&= c_{\nlatf} - \frac{\nlatf}{\ssiz}\wrapParens{\ssiz - \half[\nlatf] + \half} \log\pi 
-	- \frac{2}{\ssiz} \sum_{j=1}^{\nlatf}
+	-\frac{2}{\ssiz}\wrapParens{\half[\ssiz-\nlatf-2]\logdet{\svsm} +
+	\half[\nlatf+1]\wrapParens{\ssiz - \half[\nlatf]} \log\pi -
+	\sum_{j=1}^{\nlatf+1} \log\funcit{\Gamma}{\half[\ssiz +1-j]}},\\
+&= c_{\nlatf} - \frac{\nlatf+1}{\ssiz}\wrapParens{\ssiz - \half[\nlatf]} \log\pi 
+	- \frac{2}{\ssiz} \sum_{j=1}^{\nlatf+1}
 	\log\funcit{\Gamma}{\half[\ssiz +1-j]}\\
 &\phantom{=}\,
-	+ \logdet{\Mtx{L}} - \frac{\ssiz-\nlatf-1}{\ssiz}\logdet{\Mtx{\hat{L}}}
-	+ \trace{\minv{\Mtx{L}}\Mtx{\hat{L}}},\\
+	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm},\\
 &= c'_{\ssiz,\nlatf} 
-	+ \logdet{\Mtx{L}} - \frac{\ssiz-\nlatf-1}{\ssiz}\logdet{\Mtx{\hat{L}}}
-	+ \trace{\minv{\Mtx{L}}\Mtx{\hat{L}}}.
+	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm},\\
+&= c'_{\ssiz,\nlatf} 
+	- \logdet{\minv{\pvsm}} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm}.
 \end{split}
 \end{equation*}
+
+\subsection{Maximum Likelihood Estimator}%FOLDUP
+
+%The maximum likelihood estimator of \ichol{\pvsm} is found by 
+%taking the derivative of the (log) likelihood and finding a root.
+%That is,
+%\begin{equation*}
+%\begin{split}
+%0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\ichol{\pvsm}},\\
+  %&= -2 \trminv{\wrapParens{\ichol{\pvsm[m]}}} + \ichol{\pvsm[m]}2\svsm,
+%\end{split}
+%\end{equation*}
+%leaning heavily on the Matrix Cookbook for 
+%the derivatives. \cite{petersen2006matrix}
+%This is solved by $\ichol{\pvsm[m]} = \ichol{\svsm}$, and thus the
+%na\"{i}ve sample estimate is the MLE.
+
+The maximum likelihood estimator of \pvsm is found by 
+taking the derivative of the (log) likelihood with respect to
+\pvsm and finding a root.
+That is,
+\begin{equation*}
+\begin{split}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm},\\
+	&= - \tr{\pvsm[m]} + \tr{\svsm},
+\end{split}
+\end{equation*}
+leaning heavily on the Matrix Cookbook for 
+the derivatives. \cite{petersen2006matrix}
+This is solved by $\pvsm[m] = \svsm$, and thus the
+na\"{i}ve sample estimate is the MLE.
+%UNFOLD
+
+\subsection{Likelihood Ratio Test}%FOLDUP
+
+Now suppose you wish to compare two possible values of the population
+parameter, \pvsm[1] and \pvsm[2], based on their likelihoods. The
+difference in log likelihoods is
+\begin{equation}
+\begin{split}
+\log\wrapParens{\frac{\FOOpdf{}{\svsm}{\pvsm[1]}}{\FOOpdf{}{\svsm}{\pvsm[2]}}}
+&= -\half[\ssiz] \wrapParens{\logdet{\pvsm[1]} - \logdet{\pvsm[2]} +
+\trace{\minv{\pvsm[1]}\svsm} - \trace{\minv{\pvsm[2]}\svsm}},\\
+&= -\half[\ssiz] \wrapParens{\logdet{\pvsm[1]\minv{\pvsm[2]}} + 
+\trace{\wrapBracks{\minv{\pvsm[1]} - \minv{\pvsm[2]}}\svsm}}.
+\end{split}
+\end{equation}
+
+\providecommand{\lrtA}[1][i]{\mathSUB{\Mtx{A}}{#1}}
+\providecommand{\lrta}[1][i]{\mathSUB{a}{#1}}
+
+For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
+consider the null hypothesis
+\begin{equation}
+H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i], i=1,\ldots,m.
+\end{equation}
+The constraints have to be sensible. For example, they cannot
+violate the positive definiteness of 
+\minv{\pvsm}. \cite{dempster1972}
+
+Employing the Lagrange multiplier technique, the maximum likelihood
+estimator under the null hypothesis satisfies
+\begin{equation*}
+\begin{split}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm}
+- \sum_i \lambda_i
+\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
+&= - \tr{\pvsm[m]} + \tr{\wrapParens{\svsm - \sum_i \lambda_i \lrtA[i]}},\\
+\therefore \pvsm[m] &= \svsm - \sum_i \lambda_i \lrtA[i].
+\end{split}
+\end{equation*}
+The maximum likelihood estimator under the constraints has to be
+found numerically by solving for the $\lambda_i$.
+
+%UNFOLD
 
 
 

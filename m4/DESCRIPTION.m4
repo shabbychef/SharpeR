@@ -11,6 +11,7 @@ Version: VERSION()
 Date: DATE()
 License: LGPL-3
 Title: Statistical significance of Sharpe ratio
+BugReports: https://github.com/shabbychef/SharpeR/issues
 Description: a collection of tools for analyzing significance of trading 
     strategies, based on the Sharpe ratio and overfit of the same.
 Depends: 
