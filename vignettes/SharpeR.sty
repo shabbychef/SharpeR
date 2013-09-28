@@ -127,6 +127,8 @@
 \providecommand{\asvec}[1]{\tr{\wrapBracks{#1}}}
 \providecommand{\vcat}[2]{\asvec{\tr{#1},\tr{#2}}}
 
+\providecommand{\diag}[1]{\funcit{\operatorname{diag}}{#1}}
+
 \providecommand{\threebythree}[9]{\wrapBracks{\begin{array}{ccc}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\\{#7}&{#8}&{#9}\end{array}}}
 \providecommand{\twotwosys}[6]{\wrapBracks{\begin{array}{cc|c}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\end{array}}}
 \providecommand{\twobytwo}[4]{\wrapBracks{\begin{array}{cc}{#1}&{#2}\\{#3}&{#4}\end{array}}}
@@ -368,6 +370,8 @@
 \providecommand{\ssrsqopt}{\ssrsq[*]}
 \providecommand{\ssrsqoptG}[1]{\ssrsq[*,#1]}
 
+\providecommand{\svsr}[1][]{\vectUL{\hat{\prvSNR}}{}{#1}}
+
 % using the unbiased sigma: 
 \providecommand{\ussrUL}[2]{\mathUL{\tilde{\prvSNR}}{#1}{#2}}
 \providecommand{\ussr}[1][]{\ussrUL{}{#1}}
@@ -381,6 +385,9 @@
 %\providecommand{\svsig}[1][]{\MATHIT{S_{#1}}}
 \providecommand{\svmu}[1][]{\vectUL{\hat{\mu}}{}{#1}}
 \providecommand{\svsig}[1][]{\MtxUL{\hat{\Sigma}}{}{#1}}
+\providecommand{\svvar}[1][]{\MtxUL{\hat{\Omega}}{}{#1}}
+\providecommand{\svmom}[1][{}]{\vectUL{\hat{\xi}}{}{#1}}
+
 
 \providecommand{\usvsig}[1][]{\MtxUL{\tilde{\Sigma}}{}{#1}}
 
@@ -416,9 +423,13 @@
 
 %population vector mean and covariance
 \providecommand{\pvmu}[1][]{\vectUL{\mu}{}{#1}}
+\providecommand{\pvmom}[1][{}]{\vectUL{\xi}{}{#1}}
 \providecommand{\pvsig}[1][]{\MtxUL{\Sigma}{}{#1}}
 \providecommand{\pvschol}[1][]{\MtxUL{C}{}{#1}}
 
+\providecommand{\pvsnr}[1][]{\vectUL{\prvSNR}{}{#1}}
+
+\providecommand{\pvvar}[1][]{\MtxUL{\Omega}{}{#1}}
 %UNFOLD
 
 % haircut
@@ -461,6 +472,7 @@
 \providecommand{\normpdf}[2]{\FOOpdf{\mathcal{N}}{#1}{#2}}
 \providecommand{\normcdf}[2]{\FOOcdf{\mathcal{N}}{#1}{#2}}
 \providecommand{\normqnt}[2]{\FOOqnt{\mathcal{N}}{#1}{#2}}
+\providecommand{\normlaw}[1]{\makelaw{\mathcal{N}}{#1}}
 
 %t
 \providecommand{\tcdf}[2]{\FOOcdf{t}{#1}{#2}}
@@ -676,6 +688,8 @@
 %with partials d^1 2 / (d 3)^1
 \providecommand{\prbypr}[3][{}]{\@SEPCrbyr{\@SEPCpartl}{#1}{#2}{#3}}
 \providecommand{\pbyp}[3][{}]{\@SEPCrbyr{\@SEPCpartl}{#1}{#2}{#3}}
+
+\providecommand{\pospart}[1]{\MATHIT{{#1}^{+}}}
 %
 %for vim modeline: (do not edit)
 % vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=%%s:syn=latex:ft=latex

@@ -217,7 +217,7 @@ the cumulative distribution function of the non-central \tstat-distribution with
 \end{compactenum}
 %UNFOLD
 
-\subsection{Moments of the Sharpe Ratio}%FOLDUP
+\subsection{Moments of the \txtSR}%FOLDUP
 
 Based on the moments of the non-central \tstat-distribution, the expected value of the \txtSR is 
 \emph{not} the signal-to-noise ratio (SNR), rather there is a systematic geometric bias.  
@@ -231,8 +231,10 @@ non-central \tstat-distribution with parameter \nctp and $\ssiz-1$ degrees of fr
 \end{split}
 \label{eqn:tstatmoms}
 \end{equation}
-Here $\tbias = \sqrt{\frac{\ssiz-1}{2}} \GAM{(\ssiz-2)/2}/\GAM{(\ssiz-1)/2}$, is the
-'bias term'. 
+Here $\tbias = \sqrt{\frac{\ssiz-1}{2}} \GAM{(\ssiz-2)/2}/\GAM{(\ssiz-1)/2}$, 
+is the 'bias term'.
+% 2FIX: ?? 
+% which is often referred to as $c_4\wrapParens{\ssiz}$ in the statistical control literature.
 These can be trivially translated into equivalent facts regarding the \txtSR:
 \begin{equation}
 \begin{split}
@@ -290,7 +292,7 @@ $$
 $$
 %UNFOLD
 
-\subsection{Asymptotics and Confidence Intervals}%FOLDUP
+\subsection{Asymptotics and confidence intervals}%FOLDUP
 
 \label{subsec:asymptotics_and_ci}
 
@@ -314,7 +316,7 @@ the asymptotically equivalent form
 \ssr \pm \qnorm{\typeI/2} \sqrt{\frac{1 + \half[\ssr^2]}{\ssiz - 1}}
 \label{eqn:srci_lo}
 \end{equation}
-has better small sample coverage, at least for normal returns. 
+has better small sample coverage for normal returns. 
 
 According to Walck,
 $$
@@ -361,9 +363,9 @@ where \pcmom[3] is the skew, and \pcmom[4]
 is the \emph{excess} kurtosis of the returns 
 distribution.  \cite{mertens2002comments,Opdyke2007,sref2011}
 These are both zero for normally distributed returns, and so Mertens' form 
-reduces to Lo's form.  These are unknown in practice, and have to be estimated.
-2FIX.
-
+reduces to Lo's form.  These are unknown in practice, and 
+have to be estimated from the data, which results in 
+some mis-estimation of the standard error when skew is extreme.
 
 %In practice these three confidence interval approximations give very similar coverage, with no
 %appreciable difference when $\ssiz > 30$ or so. For small sample sizes, the corrected form of
@@ -440,7 +442,93 @@ reduces to Lo's form.  These are unknown in practice, and have to be estimated.
 %Opdyke \cite{Opdyke2007} or Baily and Lopez de Prado \cite{sref2011}.
 %UNFOLD
 
-\subsection{Power and Sample Size}%FOLDUP
+\subsection{Asymptotic Distribution of \txtSR}%FOLDUP
+
+Here I derive the asymptotic distribution of \txtSR, following
+Lo \emph{inter alia}. \cite{lo2002,mertens2002comments,Ledoit2008850,Leung2008,Wright2012} 
+Consider the case of \nlatf possibly correlated returns streams,
+with each observation denoted by \vreti.
+Let \pvmu be the \nlatf-vector of population means, and let
+\pvmom[2] be the \nlatf-vector of the uncentered second moments.
+Let \pvsnr be the vector of SNR of the assets. We have
+$$
+\pvsnr[i] = \frac{\pvmu[i]}{\sqrt{\pvmom[2,i] - \pvmu[i]^2}}.
+$$
+
+Consider the $2\nlatf$ vector of \vreti, `stacked' with
+\vreti (elementwise) squared, \vcat{\vreti}{\vreti^2}.
+The expected value of this vector is \vcat{\pvmu}{\pvmom[2]};
+let \pvvar be the variance of this vector (assuming it exists!)
+
+Given \ssiz observations of \vreti, consider the simple
+sample estimate
+$$
+\vcat{\svmu}{\svmom[2]} \defeq
+\frac{1}{\ssiz}\sum_{i}^{\ssiz} \vcat{\vreti}{\vreti^2}.
+$$
+Under the multivariate central limit theorem \cite{wasserman2004all}
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\vcat{\svmu}{\svmom[2]} - \vcat{\pvmu}{\pvmom[2]}}
+\rightsquigarrow 
+\normlaw{0,\pvvar}.
+\label{eqn:mvclt}
+\end{equation}
+
+Let \svsr be the sample \txtSR computed from the estimates \svmu and
+\svmom[2]: 
+$\svsr[i] = \fracc{\svmu[i]}{\sqrt{\svmom[2,i] - \svmu[i]^2}}.
+$
+By the multivariate Delta method, 
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\svsr - \pvsnr} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\wrapParens{\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}.
+\label{eqn:delmethod}
+\end{equation}
+Here the derivative takes the form of two $\nlatf \times \nlatf$
+diagonal matrices pasted together side by side:
+\begin{equation}
+\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}} = 
+\onebytwo{\diag{\frac{\pvmom[2]}{\wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}}{ 
+\diag{\frac{-\pvmu}{2 \wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}}.
+\label{eqn:sr_deriv}
+\end{equation}
+where $\diag{\vect{z}}$ is the matrix with vector \vect{z} on its diagonal,
+and where the vector operations above are all performed elementwise.
+
+In practice, the population values, \pvmu, \pvmom[2], \pvvar
+are all unknown, and so the asymptotic variance has to be estimated,
+using the sample. Letting \svvar be some sample estimate of \pvvar,
+we have the approximation
+\begin{equation}
+\svsr \approx 
+\normlaw{\pvsnr,\oneby{\ssiz}\qoform{\svvar}{\wrapParens{\dbyd{\svsr}{\vcat{\svmu}{\svmom[2]}}}}},
+\label{eqn:apx_srdist}
+\end{equation}
+where the derivatives are formed by plugging in the sample estimates
+into \eqnref{sr_deriv}.  \cite{lo2002,mertens2002comments}
+
+2FIX: these need to be filled out.
+
+For the $\nlatf=1$ case, when the returns are assumed to be normal,
+the matrix \pvvar is diagonal. This reduces to Lo's form of the
+standard error, \eqnref{srse_lo}.
+For the $\nlatf=1$ case when returns are not assumed to be normal,
+if one takes the vanilla sample estimate of \pvvar, one arrives
+at Mertens' form of the standard error,
+\eqnref{srse_mertens}. 2FIX: verify these are true!
+
+
+
+%UNFOLD
+
+\subsection{Tests of equality of multiple \txtSR}%FOLDUP
+
+
+\cite{Ledoit2008850,Leung2008,Wright2012} 
+%UNFOLD
+
+\subsection{Power and sample size}%FOLDUP
 
 \label{subsec:SR_power_and_ssize}
 
@@ -829,7 +917,7 @@ reason that skew causes the distribution of \txtSR to degrade.
 %UNFOLD
 %UNFOLD
 
-\subsection{Linear Attribution Models}%FOLDUP
+\subsection{Linear attribution models}%FOLDUP
 
 \label{subsec:attribution_models}
 
@@ -900,10 +988,16 @@ returns of previous period losers.  \cite{Carhart_1997}
 
 \item Henriksson and Merton describe a technique for detecting market-timing ability in a portfolio.
 One can cast this model as 
-$$\reti[t] = \pregco[0] 1 + \pregco[\smbox{HM}] \abs{\retk[\smbox{M},t]} + \perr[t],$$ 
-where \retk[\smbox{M},t] are the returns of `the market' the portfolio is putatively timing. \cite{Henriksson_Merton_1981}
+$$
+\reti[t] = \pregco[0] 1 
++ \pregco[\smbox{M}] \retk[\smbox{M},t]
++ \pregco[\smbox{HM}] \pospart{\wrapParens{- \retk[\smbox{M},t]}} + \perr[t],$$ 
+where \retk[\smbox{M},t] are the returns of `the market' the 
+portfolio is putatively timing, and $\pospart{x}$ is the positive
+part of $x$. \cite{Henriksson_Merton_1981}
 Actually, one or several factor timing terms can be added to any factor model.
-Note that unlike the factor returns in models discussed above, one expects $\abs{\retk[\smbox{M}]}$ to have 
+Note that unlike the factor returns in models discussed above, one expects
+$\pospart{\wrapParens{-\retk[\smbox{M}]}}$ to have 
 significantly non-zero mean. This will cause some decrease in power when testing \pregco[0] for significance. Also note
 that while Henriksson and Merton intend this model as a positive test for \pregco[\smbox{HM}], one could treat the timing
 component as a factor which one seeks to ignore entirely, or downweight its importance. 
@@ -1765,7 +1859,7 @@ opt.pos.T2 <- function(mu1,mu2,sig1,sig12,sig2) {
 
 \section{Miscellanea}%FOLDUP
 
-\subsection{Which Returns?}%FOLDUP
+\subsection{Which returns?}%FOLDUP
 
 There is often some confusion regarding the form of returns (\ie log returns or `relative' returns)
 to be used in computation of the \txtSR.  Usually log returns are recommended because they aggregate
@@ -1791,7 +1885,7 @@ where \ssr[r] is the Sharpe measured using relative returns and \ssr uses log re
 is most accurate for daily returns, and for the modest values of \txtSR one expects to see for real funds.
 %UNFOLD
 
-\subsection{Sharpe Tricks}%FOLDUP
+\subsection{Sharpe tricks}%FOLDUP
 
 \subsubsection{\txtSR bounds probability of a loss}
 
@@ -2042,7 +2136,7 @@ and non-centrality parameter \ncfp.
 \end{description}
 %UNFOLD
 
-\section{Asymptotic Efficiency of Sharpe Ratio}%FOLDUP
+\section{Asymptotic efficiency of sharpe ratio}%FOLDUP
 
 \label{sec:sr_efficiency}
 
@@ -2097,7 +2191,7 @@ $\tr{\wrapNeBracks{\susr, \ssig^2}}$ is asymptotically \emph{efficient}, \ie it 
 asymptotically.
 %UNFOLD
 
-\section{Some Moments}%FOLDUP
+\section{Some moments}%FOLDUP
 
 \label{sec:some_moments}
 
@@ -2310,7 +2404,7 @@ Thus, conditional on observing \ssrsqoptG{\hejG}, we have
 
 %UNFOLD
 
-\section{Gaussian in Appended Form}%FOLDUP
+\section{Gaussian in appended form}%FOLDUP
 
 \providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
 \providecommand{\svsm}[1][{}]{\mathSUB{\Mtx{\hat{\Theta}}}{#1}}
