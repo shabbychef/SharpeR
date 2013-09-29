@@ -450,15 +450,19 @@ Consider the case of \nlatf possibly correlated returns streams,
 with each observation denoted by \vreti.
 Let \pvmu be the \nlatf-vector of population means, and let
 \pvmom[2] be the \nlatf-vector of the uncentered second moments.
-Let \pvsnr be the vector of SNR of the assets. We have
+Let \pvsnr be the vector of SNR of the assets. Let \rfr be the
+`risk free rate'. We have
 $$
-\pvsnr[i] = \frac{\pvmu[i]}{\sqrt{\pvmom[2,i] - \pvmu[i]^2}}.
+\pvsnr[i] = \frac{\pvmu[i] - \rfr}{\sqrt{\pvmom[2,i] - \pvmu[i]^2}}.
 $$
 
 Consider the $2\nlatf$ vector of \vreti, `stacked' with
 \vreti (elementwise) squared, \vcat{\vreti}{\vreti^2}.
 The expected value of this vector is \vcat{\pvmu}{\pvmom[2]};
-let \pvvar be the variance of this vector (assuming it exists!)
+let \pvvar be the variance of this vector, assuming it exists.
+
+
+
 
 Given \ssiz observations of \vreti, consider the simple
 sample estimate
@@ -476,7 +480,7 @@ Under the multivariate central limit theorem \cite{wasserman2004all}
 
 Let \svsr be the sample \txtSR computed from the estimates \svmu and
 \svmom[2]: 
-$\svsr[i] = \fracc{\svmu[i]}{\sqrt{\svmom[2,i] - \svmu[i]^2}}.
+$\svsr[i] = \fracc{\wrapParens{\svmu[i]-\rfr}}{\sqrt{\svmom[2,i] - \svmu[i]^2}}.
 $
 By the multivariate Delta method, 
 \begin{equation}
@@ -489,8 +493,8 @@ Here the derivative takes the form of two $\nlatf \times \nlatf$
 diagonal matrices pasted together side by side:
 \begin{equation}
 \dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}} = 
-\onebytwo{\diag{\frac{\pvmom[2]}{\wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}}{ 
-\diag{\frac{-\pvmu}{2 \wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}}.
+\onebytwo{\diag{\frac{\pvmom[2] - \pvmu\rfr}{\wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}}{ 
+\diag{\frac{\rfr-\pvmu}{2 \wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}}.
 \label{eqn:sr_deriv}
 \end{equation}
 where $\diag{\vect{z}}$ is the matrix with vector \vect{z} on its diagonal,
@@ -508,10 +512,25 @@ we have the approximation
 where the derivatives are formed by plugging in the sample estimates
 into \eqnref{sr_deriv}.  \cite{lo2002,mertens2002comments}
 
-2FIX: these need to be filled out.
+\subsubsection{Scalar case}
 
-For the $\nlatf=1$ case, when the returns are assumed to be normal,
-the matrix \pvvar is diagonal. This reduces to Lo's form of the
+For the $\nlatf=1$ case, \pvvar 
+takes the form
+\begin{equation}
+\label{eqn:pvvar_def}
+\pvvar = \twobytwossym{\pvmom[2] - \pvmu^2}{\pvmom[3] - \mu\pvmom[2]}{\pvmom[4] - \pvmom[2]^2},
+\end{equation}
+where \pvmom[i] is the uncentered \kth{i} moment of \reti.
+
+When returns are assumed to be normal,
+the skew and excess kurtosis are known to be zero, so \pvvar takes
+the form
+$$
+\pvvar = \twobytwossym{\pvmom[2] -
+\pvmu^2}{2\mu\wrapParens{\pvmom[2]-\pvmu^2}}{2\wrapParens{\pvmom[2]^2 -
+\pvmu^4}}.
+$$
+This reduces to Lo's form of the
 standard error, \eqnref{srse_lo}.
 For the $\nlatf=1$ case when returns are not assumed to be normal,
 if one takes the vanilla sample estimate of \pvvar, one arrives
