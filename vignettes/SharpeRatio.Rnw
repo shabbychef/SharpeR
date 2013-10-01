@@ -232,7 +232,9 @@ non-central \tstat-distribution with parameter \nctp and $\ssiz-1$ degrees of fr
 \label{eqn:tstatmoms}
 \end{equation}
 Here $\tbias = \sqrt{\frac{\ssiz-1}{2}} \GAM{(\ssiz-2)/2}/\GAM{(\ssiz-1)/2}$, 
-is the 'bias term'.
+is the 'bias term'. The geometric bias term is related to the constant
+$c_4$ from the statistical control literature via 
+$\tbias[\ssiz] = \frac{\ssiz-1}{\ssiz-2}c_4\wrapParens{\ssiz}.$
 % 2FIX: ?? 
 % which is often referred to as $c_4\wrapParens{\ssiz}$ in the statistical control literature.
 These can be trivially translated into equivalent facts regarding the \txtSR:
@@ -520,31 +522,60 @@ takes the form
 \label{eqn:pvvar_def}
 \pvvar = \twobytwossym{\pvmom[2] - \pvmu^2}{\pvmom[3] - \mu\pvmom[2]}{\pvmom[4] - \pvmom[2]^2},
 \end{equation}
-where \pvmom[i] is the uncentered \kth{i} moment of \reti.
+where \pvmom[i] is the uncentered \kth{i} moment of \reti. After much
+algebraic simplification, the asymptotic variance of \txtSR is given
+by Mertens' formula, \eqnref{srse_mertens}:
+\begin{equation}
+\svsr \approx 
+\normlaw{\pvsnr,\oneby{\ssiz}\wrapParens{1 - \svsr \pcmom[3] + \frac{\pcmom[4]
++ 2}{4} \svsr^2}}.
+\label{eqn:apx_scalar_srdist}
+\end{equation}
+Note that Mertens' equation applies even though our 
+definition of \txtSR includes a risk-free rate, \rfr.
 
-When returns are assumed to be normal,
-the skew and excess kurtosis are known to be zero, so \pvvar takes
-the form
+\subsubsection{Tests of equality of multiple \txtSR}%FOLDUP
+
+Now let $g$ be some vector valued function of the vector \pvsnr.
+Applying the Delta method,
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\funcit{g}{\svsr} - \funcit{g}{\pvsnr}} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\qoform{\pvvar}{\wrapParens{\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}{\dbyd{g}{\pvsnr}}}.
+\label{eqn:delmethod_II}
+\end{equation}
+
+To compare whether the \txtSR of \nlatf assets are equal,
+given \ssiz contemporaneous observations of their returns,
+let $g$ be the function which constructs the $\nlatf-1$
+contrasts: 
 $$
-\pvvar = \twobytwossym{\pvmom[2] -
-\pvmu^2}{2\mu\wrapParens{\pvmom[2]-\pvmu^2}}{2\wrapParens{\pvmom[2]^2 -
-\pvmu^4}}.
+\funcit{g}{\pvsnr} = 
+\asvec{\pvsnr[1] - \pvsnr[2],\ldots,\pvsnr[\nlatf-1] - \pvsnr[\nlatf]}.
 $$
-This reduces to Lo's form of the
-standard error, \eqnref{srse_lo}.
-For the $\nlatf=1$ case when returns are not assumed to be normal,
-if one takes the vanilla sample estimate of \pvvar, one arrives
-at Mertens' form of the standard error,
-\eqnref{srse_mertens}. 2FIX: verify these are true!
+One is then testing the null hypothesis $H_0: \funcit{g}{\pvsnr} = 0$.
+Asymptotically, under the null, 
+$$
+\ssiz \qform{\minv{\wrapParens{\qoform{\qoform{\svvar}{\wrapParens{\dbyd{\svsr}{\vcat{\svmu}{\svmom[2]}}}}}{\dbyd{g}{\svsr}}}}}{\funcit{g}{\svsr}} \sim \chisqlaw{\nlatf-1}.
+$$
 
+There are a number of modifications of this basic method: 
+Leung and Wong described the basic method.  \cite{Leung2008}
+Wright \etal suggest that the test statistic be approximated by an
+\flaw{}-distribution. \cite{Wright2012} 
+Ledoit and Wolf propose
+using HAC estimators or bootstrapping to construct \svvar. 
+\cite{Ledoit2008850} 
 
-
+For the case of scalar-valued $g$ (\eg for comparing $\nlatf=2$
+strategies), one can construct a two-sided test via an asymptotic
+\tstat-approximation:
+$$
+\frac{\sqrt{\ssiz}\funcit{g}{\svsr}}{\sqrt{\qform{\minv{\wrapParens{\qoform{\qoform{\svvar}{\wrapParens{\dbyd{\svsr}{\vcat{\svmu}{\svmom[2]}}}}}}}{\dbyd{g}{\svsr}}}}}
+\sim \tlaw{\ssiz-1}.
+$$
 %UNFOLD
 
-\subsection{Tests of equality of multiple \txtSR}%FOLDUP
-
-
-\cite{Ledoit2008850,Leung2008,Wright2012} 
 %UNFOLD
 
 \subsection{Power and sample size}%FOLDUP

@@ -357,9 +357,18 @@
 \providecommand{\Rbuj}[1][]{\mathSUB{R}{#1}}
 \providecommand{\rdrag}[1][0]{\MATHIT{\frac{\rfr[#1]}{\Rbuj}}}
 
-% the symbol for SNR/SR
+% raw symbols for stuff
 %\providecommand{\prvSNR}[0]{\psi}
 \providecommand{\prvSNR}[0]{\zeta}
+\providecommand{\prvMean}[0]{\mu}
+\providecommand{\prvStd}[0]{\sigma}
+\providecommand{\prvCov}[0]{\Sigma}
+
+% raw, zero-centered moment.
+\providecommand{\prvRawMom}[0]{\kappa}
+% standardized moment.
+\providecommand{\prvStnMom}[0]{\gamma}
+
 
 % sample sharpe ratio
 \providecommand{\ssrUL}[2]{\mathUL{\hat{\prvSNR}}{#1}{#2}}
@@ -381,16 +390,12 @@
 \providecommand{\ussrsqopt}{\ussrsq[*]}
 
 
-
-%\providecommand{\svmu}[1][]{\smean{\vreti[#1]}}
-%\providecommand{\svsig}[1][]{\MATHIT{S_{#1}}}
-\providecommand{\svmu}[1][]{\vectUL{\hat{\mu}}{}{#1}}
-\providecommand{\svsig}[1][]{\MtxUL{\hat{\Sigma}}{}{#1}}
+\providecommand{\svmu}[1][]{\vectUL{\hat{\prvMean}}{}{#1}}
+\providecommand{\svsig}[1][]{\MtxUL{\hat{\prvCov}}{}{#1}}
 \providecommand{\svvar}[1][]{\MtxUL{\hat{\Omega}}{}{#1}}
-\providecommand{\svmom}[1][{}]{\vectUL{\hat{\xi}}{}{#1}}
+\providecommand{\svmom}[1][{}]{\vectUL{\hat{\prvRawMom}}{}{#1}}
 
-
-\providecommand{\usvsig}[1][]{\MtxUL{\tilde{\Sigma}}{}{#1}}
+\providecommand{\usvsig}[1][]{\MtxUL{\tilde{\prvCov}}{}{#1}}
 
 \providecommand{\sfvmu}[1][]{\smean{\vreti[#1]^{*}}}
 \providecommand{\sfse}{\kappa}
@@ -400,9 +405,9 @@
 \providecommand{\sgossz}[1][]{\mathSUB{z}{#1}}
 %UNFOLD
 %population parameters%FOLDUP
-\providecommand{\pmu}[1][]{\mathSUB{\mu}{#1}}
-\providecommand{\psig}[1][]{\mathSUB{\sigma}{#1}}
-\providecommand{\psigsq}[1][]{\mathUL{\sigma}{2}{#1}}
+\providecommand{\pmu}[1][]{\mathSUB{\prvMean}{#1}}
+\providecommand{\psig}[1][]{\mathSUB{\prvStd}{#1}}
+\providecommand{\psigsq}[1][]{\mathUL{\prvStd}{2}{#1}}
 
 \providecommand{\psrUL}[2]{\mathUL{\prvSNR}{#1}{#2}}
 
@@ -423,13 +428,12 @@
 \providecommand{\psnrsopt}{\psnr[s,*]}
 
 %population vector mean and covariance
-\providecommand{\pvmu}[1][]{\vectUL{\mu}{}{#1}}
-\providecommand{\pvmom}[1][{}]{\vectUL{\xi}{}{#1}}
-\providecommand{\pvsig}[1][]{\MtxUL{\Sigma}{}{#1}}
+\providecommand{\pvmu}[1][]{\vectUL{\prvMean}{}{#1}}
+\providecommand{\pvmom}[1][{}]{\vectUL{\prvRawMom}{}{#1}}
+\providecommand{\pvsig}[1][]{\MtxUL{\prvCov}{}{#1}}
 \providecommand{\pvschol}[1][]{\MtxUL{C}{}{#1}}
 
 \providecommand{\pvsnr}[1][]{\vectUL{\prvSNR}{}{#1}}
-
 \providecommand{\pvvar}[1][]{\MtxUL{\Omega}{}{#1}}
 %UNFOLD
 
@@ -567,7 +571,7 @@
 \providecommand{\Fstat}[1][]{\mathSUB{F}{#1}}
 \providecommand{\Tstat}[1][]{\mathUL{T}{2}{#1}}
 %\providecommand{\tbias}[1][\ssiz]{\MATHIT{\eta_{#1}}}
-\providecommand{\tbias}[1][\ssiz]{\mathSUB{c}{#1}}
+\providecommand{\tbias}[1][\ssiz]{\mathSUB{d}{#1}}
 
 % delta hotelling
 \providecommand{\DTstat}[1][]{\MATHIT{\Delta\Tstat[#1]}}
@@ -584,8 +588,8 @@
 \providecommand{\exkurt}[1]{\funcit{\mbox{ex\,kurtosis}}{#1}}
 
 % population centered moment, adjusted?
-\providecommand{\pcmom}[1][{}]{\mathSUB{\xi}{#1}}
-\providecommand{\scmom}[1][{}]{\mathSUB{\hat{\xi}}{#1}}
+\providecommand{\pcmom}[1][{}]{\mathSUB{\prvStnMom}{#1}}
+\providecommand{\scmom}[1][{}]{\mathSUB{\hat{\prvStnMom}}{#1}}
 
 \providecommand{\sacor}[1][]{\mathSUB{\hat{\nu}}{#1}}
 \providecommand{\pacor}[1][]{\mathSUB{\nu}{#1}}
