@@ -342,21 +342,6 @@
 %\providecommand{\svmean}[1]{\smean{\vect{#1}}}
 %\providecommand{\svstd}[1]{\MtxUL{S}{}{#1}}
 
-%sample statistics.
-%\providecommand{\smu}[1][]{\smean{\reti[#1]}}
-%\providecommand{\ssig}[1][]{\MATHIT{s_{#1}}}
-%\providecommand{\smu}[1][]{\smean{\reti[#1]}}
-\providecommand{\smu}[1][]{\mathSUB{\hat{\mu}}{#1}}
-\providecommand{\ssig}[1][]{\mathSUB{\hat{\sigma}}{#1}}
-\providecommand{\ssigu}[1][]{\mathSUB{\tilde{\sigma}}{#1}}
-\providecommand{\ssds}[1][]{\MATHIT{{s_N}_{#1}}}
-
-% risk free
-\providecommand{\rfr}[1][0]{\mathSUB{r}{#1}}
-% risk budget
-\providecommand{\Rbuj}[1][]{\mathSUB{R}{#1}}
-\providecommand{\rdrag}[1][0]{\MATHIT{\frac{\rfr[#1]}{\Rbuj}}}
-
 % raw symbols for stuff
 %\providecommand{\prvSNR}[0]{\psi}
 \providecommand{\prvSNR}[0]{\zeta}
@@ -370,6 +355,24 @@
 \providecommand{\prvStnMom}[0]{\gamma}
 
 
+%sample statistics.
+%\providecommand{\smu}[1][]{\smean{\reti[#1]}}
+%\providecommand{\ssig}[1][]{\MATHIT{s_{#1}}}
+%\providecommand{\smu}[1][]{\smean{\reti[#1]}}
+\providecommand{\smu}[1][]{\mathSUB{\hat{\prvMean}}{#1}}
+\providecommand{\ssig}[1][]{\mathSUB{\hat{\prvStd}}{#1}}
+\providecommand{\ssigu}[1][]{\mathSUB{\tilde{\prvStd}}{#1}}
+\providecommand{\ssds}[1][]{\MATHIT{{s_N}_{#1}}}
+\providecommand{\smom}[1][{}]{\mathSUB{\hat{\prvRawMom}}{#1}}
+
+% risk free
+\providecommand{\rfr}[1][0]{\mathSUB{r}{#1}}
+% risk budget
+\providecommand{\Rbuj}[1][]{\mathSUB{R}{#1}}
+\providecommand{\rdrag}[1][0]{\MATHIT{\frac{\rfr[#1]}{\Rbuj}}}
+
+
+
 % sample sharpe ratio
 \providecommand{\ssrUL}[2]{\mathUL{\hat{\prvSNR}}{#1}{#2}}
 %\providecommand{\ssrUL}[2]{\mathUL{r}{#1}{#2}}
@@ -380,6 +383,7 @@
 \providecommand{\ssrsqopt}{\ssrsq[*]}
 \providecommand{\ssrsqoptG}[1]{\ssrsq[*,#1]}
 
+\providecommand{\svsigma}[1][]{\vectUL{\hat{\prvStd}}{}{#1}}
 \providecommand{\svsr}[1][]{\vectUL{\hat{\prvSNR}}{}{#1}}
 
 % using the unbiased sigma: 
@@ -408,6 +412,7 @@
 \providecommand{\pmu}[1][]{\mathSUB{\prvMean}{#1}}
 \providecommand{\psig}[1][]{\mathSUB{\prvStd}{#1}}
 \providecommand{\psigsq}[1][]{\mathUL{\prvStd}{2}{#1}}
+\providecommand{\pmom}[1][{}]{\mathSUB{\prvRawMom}{#1}}
 
 \providecommand{\psrUL}[2]{\mathUL{\prvSNR}{#1}{#2}}
 
@@ -433,6 +438,7 @@
 \providecommand{\pvsig}[1][]{\MtxUL{\prvCov}{}{#1}}
 \providecommand{\pvschol}[1][]{\MtxUL{C}{}{#1}}
 
+\providecommand{\pvsigma}[1][]{\vectUL{\prvStd}{}{#1}}
 \providecommand{\pvsnr}[1][]{\vectUL{\prvSNR}{}{#1}}
 \providecommand{\pvvar}[1][]{\MtxUL{\Omega}{}{#1}}
 %UNFOLD
@@ -589,7 +595,9 @@
 
 % population centered moment, adjusted?
 \providecommand{\pcmom}[1][{}]{\mathSUB{\prvStnMom}{#1}}
+\providecommand{\pvcmom}[1][{}]{\vectUL{\prvStnMom}{}{#1}}
 \providecommand{\scmom}[1][{}]{\mathSUB{\hat{\prvStnMom}}{#1}}
+\providecommand{\svcmom}[1][{}]{\vectUL{\hat{\prvStnMom}}{}{#1}}
 
 \providecommand{\sacor}[1][]{\mathSUB{\hat{\nu}}{#1}}
 \providecommand{\pacor}[1][]{\mathSUB{\nu}{#1}}

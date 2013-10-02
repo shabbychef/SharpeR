@@ -494,9 +494,15 @@ By the multivariate Delta method,
 Here the derivative takes the form of two $\nlatf \times \nlatf$
 diagonal matrices pasted together side by side:
 \begin{equation}
-\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}} = 
+\begin{split}
+\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}} 
+&= 
 \onebytwo{\diag{\frac{\pvmom[2] - \pvmu\rfr}{\wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}}{ 
-\diag{\frac{\rfr-\pvmu}{2 \wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}}.
+\diag{\frac{\rfr-\pvmu}{2 \wrapParens{\pvmom[2] - \pvmu^2}^{3/2}}}},\\
+&=  
+\onebytwo{\diag{\frac{\pvsigma + \pvmu\pvsnr}{\pvsigma^2}}}
+{\diag{\frac{- \pvsnr}{2 \pvsigma^2}}}.
+\end{split}
 \label{eqn:sr_deriv}
 \end{equation}
 where $\diag{\vect{z}}$ is the matrix with vector \vect{z} on its diagonal,
@@ -520,7 +526,16 @@ For the $\nlatf=1$ case, \pvvar
 takes the form
 \begin{equation}
 \label{eqn:pvvar_def}
-\pvvar = \twobytwossym{\pvmom[2] - \pvmu^2}{\pvmom[3] - \mu\pvmom[2]}{\pvmom[4] - \pvmom[2]^2},
+\begin{split}
+\pvvar &= 
+\twobytwossym{\pvmom[2] - \pvmu^2}{\pvmom[3] - \mu\pvmom[2]}{\pvmom[4] - \pvmom[2]^2},\\
+&= \twobytwossym{\pvsigma^2}{\pvsigma^2\wrapParens{\pvsigma\pvcmom[3] +
+2\pvmu}}{\pvsigma^4\wrapParens{\pvcmom[4] + 2} + 4 \pvsigma^3 \pvmu\pvcmom[3] +
+4 \pvsigma^2\pvmu^2},\\
+&= \pvsigma^2 \twobytwossym{1}{\pvsigma\pvcmom[3] +
+2\pvmu}{\pvsigma^2\wrapParens{\pvcmom[4] + 2} + 4 \pvsigma \pvmu\pvcmom[3] + 4
+\pvmu^2}.
+\end{split}
 \end{equation}
 where \pvmom[i] is the uncentered \kth{i} moment of \reti. After much
 algebraic simplification, the asymptotic variance of \txtSR is given
@@ -536,28 +551,32 @@ definition of \txtSR includes a risk-free rate, \rfr.
 
 \subsubsection{Tests of equality of multiple \txtSR}%FOLDUP
 
-Now let $g$ be some vector valued function of the vector \pvsnr.
+Now let $\vect{g}$ be some vector valued function of the vector \pvsnr.
 Applying the Delta method,
 \begin{equation}
-\sqrt{\ssiz}\wrapParens{\funcit{g}{\svsr} - \funcit{g}{\pvsnr}} 
+\sqrt{\ssiz}\wrapParens{\funcit{\vect{g}}{\svsr} - \funcit{\vect{g}}{\pvsnr}} 
 \rightsquigarrow 
-\normlaw{0,\qoform{\qoform{\pvvar}{\wrapParens{\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}{\dbyd{g}{\pvsnr}}}.
+\normlaw{0,\qoform{\pvvar}{\wrapParens{\dbyd{\vect{g}}{\pvsnr}\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}
 \label{eqn:delmethod_II}
 \end{equation}
 
 To compare whether the \txtSR of \nlatf assets are equal,
 given \ssiz contemporaneous observations of their returns,
-let $g$ be the function which constructs the $\nlatf-1$
+let $\vect{g}$ be the function which constructs the $\nlatf-1$
 contrasts: 
 $$
-\funcit{g}{\pvsnr} = 
+\funcit{\vect{g}}{\pvsnr} = 
 \asvec{\pvsnr[1] - \pvsnr[2],\ldots,\pvsnr[\nlatf-1] - \pvsnr[\nlatf]}.
 $$
-One is then testing the null hypothesis $H_0: \funcit{g}{\pvsnr} = 0$.
+One is then testing the null hypothesis $H_0: \funcit{\vect{g}}{\pvsnr} = 0$.
 Asymptotically, under the null, 
 $$
-\ssiz \qform{\minv{\wrapParens{\qoform{\qoform{\svvar}{\wrapParens{\dbyd{\svsr}{\vcat{\svmu}{\svmom[2]}}}}}{\dbyd{g}{\svsr}}}}}{\funcit{g}{\svsr}} \sim \chisqlaw{\nlatf-1}.
+\ssiz
+\qform{\minv{\wrapParens{\qoform{\pvvar}{\wrapParens{\dbyd{\vect{g}}{\pvsnr}\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}}}{\funcit{\vect{g}}{\svsr}}
+\sim \chisqlaw{\nlatf-1}.
 $$
+For the more general case, where \vect{g} need not be the vanilla contrasts,
+the chi-square degrees of freedom is the rank of \dbyd{\vect{g}}{\pvsnr}.
 
 There are a number of modifications of this basic method: 
 Leung and Wong described the basic method.  \cite{Leung2008}
@@ -571,7 +590,7 @@ For the case of scalar-valued $g$ (\eg for comparing $\nlatf=2$
 strategies), one can construct a two-sided test via an asymptotic
 \tstat-approximation:
 $$
-\frac{\sqrt{\ssiz}\funcit{g}{\svsr}}{\sqrt{\qform{\minv{\wrapParens{\qoform{\qoform{\svvar}{\wrapParens{\dbyd{\svsr}{\vcat{\svmu}{\svmom[2]}}}}}}}{\dbyd{g}{\svsr}}}}}
+\sqrt{\ssiz}\funcit{g}{\svsr}{\wrapParens{\qoform{\pvvar}{\wrapParens{\dbyd{{g}}{\pvsnr}\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}}^{-\half}
 \sim \tlaw{\ssiz-1}.
 $$
 %UNFOLD
@@ -1132,7 +1151,7 @@ The advantage of viewing Sharpe ratio as a least squares regression problem
 regression is a well-studied problem. Indeed, numerous books and articles have 
 been written about the topic and how to test for, and deal with, deviations from the 
 model: autocorrelation, heteroskedasticity, non-normality, outliers, \etc  
-\cite{rao2010linear,linmod2007,Kutner2004Applied,BDReg1993,kennedy2008guide}
+\cite{rao2010linear,Kutner2004Applied,BDReg1993,kennedy2008guide}
 
 %Here I outline only a few results and refer the interested reader to the literature.
 
@@ -2146,6 +2165,8 @@ into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 
 % bibliography%FOLDUP
 \nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850,sref2011}
+\nocite{rekkas2012inference}
+\nocite{geary1936distribution}
 
 %\bibliographystyle{jss}
 %\bibliographystyle{siam}
@@ -2183,6 +2204,11 @@ and non-centrality parameter \ncfp, evaluated at $x$.
 of the non-central
 \flaw{} distribution, with degrees of freedom \df[1] and \df[2]
 and non-centrality parameter \ncfp.
+\item[{\pcmom[3]}] the skew of a random variable.
+\item[{\pcmom[4]}] the excess kurtosis of a random variable.
+
+\item[{\pmom[i]}] the \kth{i} uncentered moment of a random variable.
+\item[{\smom[i]}] the \kth{i} uncentered sample moment of a sample.
 \end{description}
 %UNFOLD
 
@@ -2587,7 +2613,8 @@ na\"{i}ve sample estimate is the MLE.
 
 \subsection{Likelihood Ratio Test}%FOLDUP
 
-Now suppose you wish to compare two possible values of the population
+This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
+Suppose you wish to compare two possible values of the population
 parameter, \pvsm[1] and \pvsm[2], based on their likelihoods. The
 difference in log likelihoods is
 \begin{equation}
@@ -2607,6 +2634,7 @@ For some conformable symmetric matrices \lrtA, and given scalars \lrta,
 consider the null hypothesis
 \begin{equation}
 H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i], i=1,\ldots,m.
+\label{eqn:lrt_null}
 \end{equation}
 The constraints have to be sensible. For example, they cannot
 violate the positive definiteness of 
@@ -2624,7 +2652,8 @@ estimator under the null hypothesis satisfies
 \end{split}
 \end{equation*}
 The maximum likelihood estimator under the constraints has to be
-found numerically by solving for the $\lambda_i$.
+found numerically by solving for the $\lambda_i$, subject
+to the constraints in \eqnref{lrt_null}.
 
 %UNFOLD
 
