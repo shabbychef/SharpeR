@@ -286,7 +286,8 @@ However, there are situations in which it might be unacceptably large.
 For example, if one was looking at one year's worth of data with monthly marks, one would have a fairly large bias: 
 $\tbias = \Sexpr{round(tbias,digits=4)}$, \ie almost eight percent.  The bias is multiplicative and larger than one, 
 so the \txtSR will overestimate the SNR when the latter is positive, and underestimate it when it is negative.
-The existence of this bias was first described by Miller and Gehr. \cite{CambridgeJournals:4493808} 
+The existence of this bias was first described by Miller 
+and Gehr. \cite{CambridgeJournals:4493808,jobsonkorkie1981} 
 
 A decent asymptotic approximation \cite{dlmf_gammarat} to \tbias is given by
 $$
@@ -447,7 +448,8 @@ some mis-estimation of the standard error when skew is extreme.
 \subsection{Asymptotic Distribution of \txtSR}%FOLDUP
 
 Here I derive the asymptotic distribution of \txtSR, following
-Lo \emph{inter alia}. \cite{lo2002,mertens2002comments,Ledoit2008850,Leung2008,Wright2012} 
+Jobson and Korkie 
+\emph{inter alia}. \cite{jobsonkorkie1981,lo2002,mertens2002comments,Ledoit2008850,Leung2008,Wright2012} 
 Consider the case of \nlatf possibly correlated returns streams,
 with each observation denoted by \vreti.
 Let \pvmu be the \nlatf-vector of population means, and let
@@ -528,16 +530,17 @@ takes the form
 \label{eqn:pvvar_def}
 \begin{split}
 \pvvar &= 
-\twobytwossym{\pvmom[2] - \pvmu^2}{\pvmom[3] - \mu\pvmom[2]}{\pvmom[4] - \pvmom[2]^2},\\
-&= \twobytwossym{\pvsigma^2}{\pvsigma^2\wrapParens{\pvsigma\pvcmom[3] +
-2\pvmu}}{\pvsigma^4\wrapParens{\pvcmom[4] + 2} + 4 \pvsigma^3 \pvmu\pvcmom[3] +
-4 \pvsigma^2\pvmu^2},\\
-&= \pvsigma^2 \twobytwossym{1}{\pvsigma\pvcmom[3] +
-2\pvmu}{\pvsigma^2\wrapParens{\pvcmom[4] + 2} + 4 \pvsigma \pvmu\pvcmom[3] + 4
-\pvmu^2}.
+\twobytwossym{\pmom[2] - \pmu^2}{\pmom[3] - \pmu\pmom[2]}{\pmom[4] - \pmom[2]^2},\\
+&= \twobytwossym{\psigma^2}{\psigma^2\wrapParens{\psigma\pcmom[3] +
+2\pmu}}{\psigma^4\wrapParens{\pcmom[4] + 2} + 4 \psigma^3 \pmu\pcmom[3] +
+4 \psigma^2\pmu^2},\\
+&= \psigma^2 \twobytwossym{1}{\psigma\pcmom[3] +
+2\pmu}{\psigma^2\wrapParens{\pcmom[4] + 2} + 4 \psigma \pmu\pcmom[3] + 4
+\pmu^2}.
 \end{split}
 \end{equation}
-where \pvmom[i] is the uncentered \kth{i} moment of \reti. After much
+where \pmom[i] is the uncentered \kth{i} moment of \reti, \pcmom[3] is the
+skew, and \pcmom[4] is the excess kurtosis. After much
 algebraic simplification, the asymptotic variance of \txtSR is given
 by Mertens' formula, \eqnref{srse_mertens}:
 \begin{equation}
@@ -580,8 +583,8 @@ the chi-square degrees of freedom is the rank of \dbyd{\vect{g}}{\pvsnr}.
 
 There are a number of modifications of this basic method: 
 Leung and Wong described the basic method.  \cite{Leung2008}
-Wright \etal suggest that the test statistic be approximated by an
-\flaw{}-distribution. \cite{Wright2012} 
+Wright \etal suggest that the test statistic be transformed to an
+approximate \flaw{}-statistic. \cite{Wright2012} 
 Ledoit and Wolf propose
 using HAC estimators or bootstrapping to construct \svvar. 
 \cite{Ledoit2008850} 
@@ -593,6 +596,10 @@ $$
 \sqrt{\ssiz}\funcit{g}{\svsr}{\wrapParens{\qoform{\pvvar}{\wrapParens{\dbyd{{g}}{\pvsnr}\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}}^{-\half}
 \sim \tlaw{\ssiz-1}.
 $$
+
+In all the above, one can construct asymptotic approximations of
+the test statistics under the alternative, allowing power analysis
+or computation of confidence regions on \funcit{\vect{g}}{\pvsnr}.
 %UNFOLD
 
 %UNFOLD
