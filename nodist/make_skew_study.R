@@ -82,6 +82,9 @@ test_mertens <- function(x,snr.ann = 1,dpy = 253) {
 	sr <- f_vsharpe(x)
 	skew <- skewness(x)
 	ex.kurt <- kurtosis(x) - 3
+	# lottery process gives nonsensical results sometimes ...
+	skew[is.nan(skew)] <- 0
+	ex.kurt[is.nan(ex.kurt)] <- 0
 	sr0 <- snr.ann / sqrt(dpy)
 	return(mertens_pval(sr0,sr,n,skew,ex.kurt))
 }
@@ -100,7 +103,7 @@ ttest_both <- function(...) {
 }
 multi_test <- function(gen,n,trials=1024) {
 	pvals <- replicate(trials,ttest_both(gen(n)))
-	rowMeans(pvals < 0.05)
+	rowMeans(pvals < 0.05,na.rm=TRUE)
 }
 
 # a bunch of rv generators of fixed mean and sd;#FOLDUP
@@ -152,6 +155,21 @@ gen_sym_SP500 <- function(n,mu = 0,sg = 1) {
 	samp <- sample(Z,n,replace=TRUE)
 }
 
+# problem with lottery process is sometimes, for small p,
+# you get no winning tickets. In this case, the
+# SR is undefined!? and the sample skew and kurtosis
+# come back as NaN
+
+# sample from a lottery process
+# a + m * bernoulli
+gen_lottery <- function(n,p = 0.01,mu = 0,sg = 1) {
+	q <- 1 - p
+	m <- sg / sqrt(p * q)
+	a <- mu - m * p
+	Z <- rbinom(n, size=1, prob=p)
+	samp <- a + m * Z
+}
+
 #now the moments of these things
 moms_norm <- function(mu = 0,sg = 1) {
 	moms <- list(skew=0,kurtosis=0,mean=mu,sd=sg)
@@ -188,8 +206,15 @@ moms_SP500 <- function(mu = 0,sg = 1) {
 }
 moms_sym_SP500 <- function(mu = 0,sg = 1) {
 	Z <- c(v.SPX.rets,-v.SPX.rets)
-	moms <- NULL
-	moms <- list(skew=0,kurtosis=kurtosis(Z) - 3,mean=mu,sd=sg)
+	moms <- list(skew=0,kurtosis=kurtosis(Z) - 3,
+							 mean=mu,sd=sg)
+	return(moms)
+}
+moms_lottery <- function(p = 0.01,mu = 0,sg = 1) {
+	q <- 1 - p
+	pq <- p * q
+	moms <- list(skew=(q-p) / sqrt(pq),kurtosis=(1 - 6*pq) / pq,
+							 mean=mu,sd=sg)
 	return(moms)
 }
 
@@ -199,7 +224,7 @@ moms_sym_SP500 <- function(mu = 0,sg = 1) {
 dpy <- 253
 nobs <- round(3 * dpy)
 daily.mean <- 1/sqrt(dpy)
-ntrials <- 4096
+ntrials <- 2*4096
 
 set.seed(1984)
 
@@ -249,7 +274,16 @@ for (my.h in c(0.1,0.24,0.4)) {
 	res <- merge(res,res.nxt,all=TRUE)
 }
 
-for (my.dl in c(0.4,0.2,-0.2,-0.4,-0.8,-1.2)) {
+for (my.p in c(0.02,0.01,0.005)) {
+	moms <- moms_lottery(p=my.p,mu=daily.mean)
+	res.nxt <- new.res(name = "Lottery",param = sprintf("p = %.3f",my.p),
+										 moms = moms,
+										 gen = function(n){ gen_lottery(n,p=my.p,mu=daily.mean) },
+										 nobs=nobs,ntrials=ntrials)
+	res <- merge(res,res.nxt,all=TRUE)
+}
+
+for (my.dl in c(0.4,0.2,-0.2,-0.4,-0.8)) {
 	moms <- moms_lambert_w(dl=my.dl,mu=daily.mean)
 	res.nxt <- new.res(name = "Lambert x Gaussian",
 										 param = sprintf("delta = %.1f",my.dl),
@@ -266,7 +300,7 @@ res[,3] = signif(res[,3],digits=2)
 res[,4] = signif(res[,4],digits=2)
 res[,5] = signif(res[,5],digits=2)
 
-save(res,ntrials,SPX.rets,file='skew_study.rda',compress='bzip2')
+save(res,ntrials,SPX.rets,dpy,file='skew_study.rda',compress='bzip2')
 
 #for vim modeline: (do not edit)
 # vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r

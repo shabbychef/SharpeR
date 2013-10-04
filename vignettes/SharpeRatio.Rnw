@@ -918,7 +918,7 @@ fname <- system.file('extdata','skew_study.rda',package='SharpeR')
 if (fname == "") {
 	fname <- 'skew_study.rda'
 }
-# poofs res, ntrials, SPX.rets
+# poofs res, ntrials, SPX.rets, dpy
 load(fname)
 
 SPX.start <- time(SPX.rets[1])
@@ -927,22 +927,27 @@ SPX.end <- time(SPX.rets[length(SPX.rets)])
 
 To demonstrate this fact, I look at the empirical type I rate for the 
 hypothesis test: $H_0: \psnr = 1.0$
-versus the alternative $H_1: \psnr > 1.0$ for different distributions of returns: 
+versus the alternative $H_1: \psnr > 1.0$ for different 
+distributions of returns: 
 I sample from a Gaussian 
 (as the benchmark); a \tstat-distribution with 10 degrees of freedom;
 a Tukey $h$-distribution, with different values of $h$; 
+a `lottery' process which is a shifted, rescaled Bernoulli random
+variable;
 and a `Lambert W x Gaussian' distribution, with 
 different values of the 
 skew parameter. \cite{2010arXiv1010.2265G,2009arXiv0912.4554G,LambertW} 
 I also draw samples from the daily log returns of 
 the S \& P 500 over the period from \Sexpr{as.character(SPX.start,format="%B %d, %Y")} to 
 \Sexpr{as.character(SPX.end,format="%B %d, %Y")}, affinely transformed 
-to have $\psnr = 1.0$. I also draw from a symmetrized S \& P 500 returns
+to have $\psnr = 1.0\yrto{-1/2}$. I also draw from a symmetrized S \& P 500 returns
 series. 
 
 The \tstat- and Tukey distributions are fairly kurtotic, but have zero
-skew, while the Lambert W x Gaussian is skewed and (therefore) kurtotic.  
-All distributions have been rescaled to have $\psnr = 1.0$; that is,
+skew, while the lottery and Lambert W x Gaussian distributions are 
+skewed and (therefore) kurtotic.  
+All distributions have been rescaled to have $\psnr = 1.0\yrto{-1/2}$; 
+that is,
 I am estimating the empirical type I rate under the null.
 At the nominal $\typeI = 0.05$ level, we expect to get a reject rate 
 around five percent.
@@ -951,7 +956,7 @@ I test the empirical type I rate of the test implied by the confidence
 intervals in \eqnref{srci_tinvert}. I also employ Mertens' standard
 errors, \eqnref{srse_mertens}, estimating the skew and kurtosis empirically,
 then comparing to quantiles of the normal distribution. The tests are one-sided
-tests, against the alternative $H_a: \psnr < 1.0$.
+tests, against the alternative $H_a: \psnr < 1.0\yrto{-1/2}$.
 
 % input{skew_study}%FOLDUP
 
@@ -960,12 +965,11 @@ tests, against the alternative $H_a: \psnr < 1.0$.
 #digits=c(0,0,0,2,2,2),
 xres <- xtable(res,label="tab:sharpe_skew_robustness",
 							 display=c('s','s','s','g','g','fg','fg'),
-							 caption=paste("Empirical type I rates of the test for $\\psnr = 1.0$ via distribution of the Sharpe ratio are given for various distributions of returns.  The empirical rates are based on ", 
+							 align="ll|lrr|rr",
+							 caption=paste("Empirical type I rates of the test for $\\psnr = 1.0\\yrto{-1/2}$ via distribution of the \\txtSR are given for various distributions of returns.  The empirical rates are based on ", 
 														 ntrials, 
-														 " simulations of three years of daily returns,
-with a nominal rate of $\\typeI = 0.05$. The 'corrected' type I rates refer to
-a normal approximation using Mertens' correction. Skew appears to have a much more adverse effect than kurtosis alone."))
-print(xres,include.rownames=FALSE)
+														 " simulations of three years of daily returns, with a nominal rate of $\\typeI = 0.05$. The 'corrected' type I rates refer to a normal approximation using Mertens' correction. Skew appears to have a much more adverse effect than kurtosis alone."))
+print(xres,include.rownames=FALSE,hline.after=c(0,0,2,4,7,10,dim(res)[1]))
 @
 %UNFOLD
 
