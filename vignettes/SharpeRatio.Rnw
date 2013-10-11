@@ -818,6 +818,8 @@ where \corcor is the correction factor for autocorrelation \cite{vanBelle2002_ST
 for Sharpe ratio is $\ssr[0]' = \corcor \ssr[0]$.
 
 2FIX: mention Lo's approximation
+2FIX: perform tests and find empirical type I rate. is there a correction?
+2FIX: this section is weak.
 
 %UNFOLD
 
@@ -995,6 +997,37 @@ Moreover, one can \emph{not} use historical data to detect skew, for the same
 reason that skew causes the distribution of \txtSR to degrade.
 
 %UNFOLD
+%UNFOLD
+
+\subsection{A Bayesian view}%FOLDUP
+
+This section is cribbed from Murphy, adapted for inference on 
+the SNR. \cite{murphybayes}
+Let $\reti[1], \reti[2], \ldots, \reti[\ssiz]$ be \iid draws from 
+a normal distribution \normdist[\pmu,\psig], where \pmu and \psig
+are unknown. A commonly used conjugate prior is the `Normal-Gamma
+prior,' which is a prior on \pmu and $\psig^{-2}$, known as the
+\emph{precision}.  
+
+Under the Normal-Gamma formulation, one has an unconditional 
+gamma prior distribution on 
+$\psig^{-2}$ (this is a chisquare up to scaling), and, conditional
+on \psig, a normal prior on \pmu. This conditional prior is stated
+as
+$$
+\condtwo{\pmu}{\psig^{-2}} \sim \normlaw{\pmu[0],\psig^2 / \kappa_0},
+$$
+where $\pmu[0]$ and $\kappa_0$ are the hyper-parameters.
+Note, however, that this can be simply restated as
+$$
+\condtwo{\psnr}{\psig^{-2}} \sim \normlaw{\frac{\pmu[0]}{\psig},1 / \kappa_0}.
+$$
+One can then mechanically replace ... 
+2FIX: start here.
+
+
+
+
 %UNFOLD
 
 \subsection{Linear attribution models}%FOLDUP
