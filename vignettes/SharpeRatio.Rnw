@@ -2646,6 +2646,18 @@ as a density on \svsm, which is a sufficient statistic:
 \end{split}
 \end{equation*}
 
+The density of \svsm is thus
+\begin{equation}
+\FOOpdf{}{\svsm}{\pvsm} =
+c''_{\ssiz,\nlatf}\frac{\det{\svsm}^{\half[\ssiz-\nlatf-2]}}{\det{\pvsm}^{\half[\ssiz]}}
+\longexp{-\half[\ssiz]\trace{\minv{\pvsm}\svsm}}.
+\end{equation}
+Thus $\ssiz\pvsm$ has the same density, up to the leading constant, as a 
+$\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
+and scale matrix \pvsm. In fact, $\ssiz\pvsm$ is a \emph{conditional} Wishart,
+conditional on $\pvsm_{\nlatf+1,\nlatf+1} = 1$.
+
+
 \subsection{Maximum Likelihood Estimator}%FOLDUP
 
 %The maximum likelihood estimator of \ichol{\pvsm} is found by 
