@@ -347,6 +347,7 @@
 \providecommand{\prvSNR}[0]{\zeta}
 \providecommand{\prvMean}[0]{\mu}
 \providecommand{\prvStd}[0]{\sigma}
+\providecommand{\prvPrec}[0]{\lambda}
 \providecommand{\prvCov}[0]{\Sigma}
 
 % raw, zero-centered moment.
@@ -411,6 +412,7 @@
 %population parameters%FOLDUP
 \providecommand{\pmu}[1][]{\mathSUB{\prvMean}{#1}}
 \providecommand{\psig}[1][]{\mathSUB{\prvStd}{#1}}
+\providecommand{\pprec}[1][]{\mathSUB{\prvPrec}{#1}}
 \providecommand{\psigma}[1][]{\mathSUB{\prvStd}{#1}}
 \providecommand{\psigsq}[1][]{\mathUL{\prvStd}{2}{#1}}
 \providecommand{\pmom}[1][{}]{\mathSUB{\prvRawMom}{#1}}
@@ -491,6 +493,7 @@
 \providecommand{\tqnt}[2]{\FOOqnt{t}{#1}{#2}}
 \providecommand{\tlaw}[1]{\makelaw{t}{#1}}
 
+% noncentral t
 \providecommand{\nctcdf}[3]{\FOOcdf{t}{#1}{#2,#3}}
 \providecommand{\nctqnt}[3]{\FOOqnt{t}{#1}{#2,#3}}
 \providecommand{\nctlaw}[1]{\makelaw{t}{#1}}
@@ -512,7 +515,12 @@
 \providecommand{\chisqqnt}[2]{\FOOqnt{\prvchisq}{#1}{#2}}
 \providecommand{\chisqlaw}[1]{\makelaw{\prvchisq}{#1}}
 
-\providecommand{\gausslaw}[1]{\makelaw{\mathcal{N}}{#1}}
+% gamma
+\providecommand{\prvgamma}{\Gamma}
+\providecommand{\gammacdf}[2]{\FOOcdf{\prvgamma}{#1}{#2}}
+\providecommand{\gammaqnt}[2]{\FOOqnt{\prvgamma}{#1}{#2}}
+\providecommand{\gammalaw}[1]{\makelaw{\prvgamma}{#1}}
+
 
 %beta
 \providecommand{\betacdf}[2]{\MATHIT{F_{\beta}\wrapNeParens{#1;#2}}}
@@ -521,7 +529,7 @@
 
 % instantiations of laws with default parameters filled in?
 % overkill?
-\providecommand{\normdist}[1][0,1]{\gausslaw{#1}}
+\providecommand{\normdist}[1][0,1]{\normlaw{#1}}
 \providecommand{\tdist}[1][n]{\MATHIT{\mathcal{t}\wrapNeParens{#1}}}
 \providecommand{\hotdist}[1][n,p]{\MATHIT{\mathcal{T^2}\wrapNeParens{#1}}}
 

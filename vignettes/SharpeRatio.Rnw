@@ -1001,8 +1001,12 @@ reason that skew causes the distribution of \txtSR to degrade.
 
 \subsection{A Bayesian view}%FOLDUP
 
-This section is cribbed from Murphy, adapted for inference on 
-the SNR. \cite{murphybayes}
+\providecommand{\bhysnr}[1][0]{\psnr[{#1}]}
+\providecommand{\bhysnrdof}[1][0]{\ssiz[#1]}
+\providecommand{\bhyprec}[1][0]{\pprec[{#1}]}
+\providecommand{\bhyprecdof}[1][0]{\mathSUB{m}{#1}}
+\providecommand{\prior}[2]{\funcit{f}{\condtwo{#1}{#2}}}
+
 Let $\reti[1], \reti[2], \ldots, \reti[\ssiz]$ be \iid draws from 
 a normal distribution \normdist[\pmu,\psig], where \pmu and \psig
 are unknown. A commonly used conjugate prior is the `Normal-Gamma
@@ -1012,20 +1016,39 @@ prior,' which is a prior on \pmu and $\psig^{-2}$, known as the
 Under the Normal-Gamma formulation, one has an unconditional 
 gamma prior distribution on 
 $\psig^{-2}$ (this is a chisquare up to scaling), and, conditional
-on \psig, a normal prior on \pmu. This conditional prior is stated
+on \psig, a normal prior on \pmu. The latter is stated
 as
 $$
 \condtwo{\pmu}{\psig^{-2}} \sim \normlaw{\pmu[0],\psig^2 / \kappa_0},
 $$
 where $\pmu[0]$ and $\kappa_0$ are the hyper-parameters.
-Note, however, that this can be simply restated as
+Note this can be simply restated as
 $$
 \condtwo{\psnr}{\psig^{-2}} \sim \normlaw{\frac{\pmu[0]}{\psig},1 / \kappa_0}.
 $$
-One can then mechanically replace ... 
-2FIX: start here.
+One could rewrite this as a prior on the signal-noise ratio that is
+independent of \psig.
+
+It then becomes a mechanical exercise to replace the prior on 
+\pmu with a prior on \psnr. I perform that exercise here, leaning
+heavily on Murphy's notes. \cite{murphybayes}
+
+The prior can be stated as
+\begin{equation*}
+\begin{split}
+\prior{\psnr,\pprec}{\bhysnr,\bhysnrdof,\bhyprec,\bhyprecdof} 
+&= \normlaw{\condtwo{\psnr}{\bhysnr,\fracc{1}{\bhysnrdof}}} 
+\gammalaw{\condtwo{\pprec}{\bhyprec/2,2\bhyprecdof}},\\
+&=
+\wrapBracks{\sqrt{\frac{\bhysnrdof}{2\pi}}\longexp{-\frac{\bhysnrdof\wrapParens{\psnr
+- \bhysnr}^2}{2}}} 
+\wrapBracks{\frac{\pprec^{\bhyprecdof/2 - 1}}{\GAM{\bhyprecdof/2}\wrapParens{2\bhyprec}^{\bhyprecdof/2}} \longexp{-\frac{\pprec}{2\bhyprec}}},\\
+&= 23
+\end{split}
+\end{equation*}
 
 
+2FIX: keep going.
 
 
 %UNFOLD
