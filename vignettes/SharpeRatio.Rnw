@@ -2230,6 +2230,228 @@ into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 %UNFOLD
 %UNFOLD
 
+\section{Gaussian in appended form}%FOLDUP
+
+\providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
+\providecommand{\svsm}[1][{}]{\mathSUB{\Mtx{\hat{\Theta}}}{#1}}
+
+Let \avreti be the \nlatf-variate vector \vreti appended with a 1:
+$\avreti = \asvec{\tr{\vreti},1}$. Consider the second
+moment of \avreti:
+$$
+\pvsm = \E{\ogram{\avreti}} = \twobytwo{\pvsig + \ogram{\pvmu}}{\pvmu}{\tr{\pvmu}}{1}.
+$$
+By inspection one can confirm that the
+inverse of \pvsm is
+$$
+\minv{\pvsm} 
+= \twobytwo{\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{-\tr{\pvmu}\minv{\pvsig}}{1 + \qform{\minv{\pvsig}}{\pvmu}} 
+= \twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt}.
+$$
+Note that this relationship holds for the sample analogue as well:
+$$
+\minv{\twobytwo{\svsig + \ogram{\svmu}}{\svmu}{\tr{\svmu}}{1}} 
+= \twobytwo{\minv{\svsig}}{-\sportwopt}{-\tr{\sportwopt}}{1 + \ssrsqopt}.
+$$
+The Cholesky factor of \minv{\pvsm} is
+$$
+\ichol{\pvsm} = \twobytwo{\trichol{\pvsig}}{-\trichol{\pvsig}\pvmu}{0}{1}.
+$$
+
+Note that
+$$
+\qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}} = 
+\qform{\minv{\pvsm}}{\avreti} - 1.
+$$
+Using the block determinant formula, we find that \pvsm has the same 
+determinant as \pvsig: $\det{\pvsm} = \det{\pvsig}.$  Then if
+\vreti is multivariate Gaussian, then the density of \vreti can be
+expressed more simply as
+\begin{equation*}
+\begin{split}
+\normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
+\longexp{-\half \qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}}},\\
+ &= \frac{\wrapParens{\det{\pvsig}}^{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
+\longexp{-\half \wrapParens{\qform{\minv{\pvsm}}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\pvsm}}^{-\half}
+\longexp{-\half \wrapParens{\qform{\minv{\pvsm}}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2}
+\longexp{\half - \half \logdet{\pvsm} - \half \trace{\minv{\pvsm}\ogram{\avreti}}},\\
+- \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
+  c_{\nlatf} 
++ \half \logdet{\pvsm} 
++ \half \trace{\minv{\pvsm}\ogram{\avreti}},
+\end{split}
+\end{equation*}
+for the constant 
+$c_{\nlatf} = \exp{\half}-\half[\nlatf]\log\wrapParens{2\pi}.$
+
+Given \ssiz \iid observations of \vreti, let \amreti be the matrix
+whose rows are the vectors \tr{\vreti[i]}. Then the negative log
+density of \amreti is
+\begin{equation*}
+- \log\normpdf{\amreti}{\pvsm} =
+  \ssiz c_{\nlatf} 
++ \half[\ssiz] \logdet{\pvsm} 
++ \half \trace{\minv{\pvsm}\gram{\amreti}}.
+\end{equation*}
+Now note that $\gram{\amreti}/\ssiz$ is a sample estimate of 
+\pvsm, call it \svsm. Then 
+\begin{equation*}
+\frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz} = 
+  c_{\nlatf} 
++ \logdet{\pvsm} 
++ \trace{\minv{\pvsm}\svsm}.
+\end{equation*}
+
+By Lemma (5.1.1) of Press \cite{press2012applied}, this can be expressed
+as a density on \svsm, which is a sufficient statistic:
+\begin{equation*}
+\begin{split}
+\frac{- 2\log\FOOpdf{}{\svsm}{\pvsm}}{\ssiz} 
+&= \frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz}\\
+&\phantom{=}\,
+	-\frac{2}{\ssiz}\wrapParens{\half[\ssiz-\nlatf-2]\logdet{\svsm} +
+	\half[\nlatf+1]\wrapParens{\ssiz - \half[\nlatf]} \log\pi -
+	\sum_{j=1}^{\nlatf+1} \log\funcit{\Gamma}{\half[\ssiz +1-j]}},\\
+&= c_{\nlatf} - \frac{\nlatf+1}{\ssiz}\wrapParens{\ssiz - \half[\nlatf]} \log\pi 
+	- \frac{2}{\ssiz} \sum_{j=1}^{\nlatf+1}
+	\log\funcit{\Gamma}{\half[\ssiz +1-j]}\\
+&\phantom{=}\,
+	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm},\\
+&= c'_{\ssiz,\nlatf} 
+	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm},\\
+&= c'_{\ssiz,\nlatf} 
+	- \logdet{\minv{\pvsm}} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm}.
+\end{split}
+\end{equation*}
+
+The density of \svsm is thus
+\begin{equation}
+\FOOpdf{}{\svsm}{\pvsm} =
+c''_{\ssiz,\nlatf}\frac{\det{\svsm}^{\half[\ssiz-\nlatf-2]}}{\det{\pvsm}^{\half[\ssiz]}}
+\longexp{-\half[\ssiz]\trace{\minv{\pvsm}\svsm}}.
+\end{equation}
+Thus $\ssiz\svsm$ has the same density, up to the leading constant, as a 
+$\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
+and scale matrix \pvsm. In fact, $\ssiz\svsm$ is a \emph{conditional} Wishart,
+conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.
+
+\subsection{Maximum Likelihood Estimator}%FOLDUP
+
+%The maximum likelihood estimator of \ichol{\pvsm} is found by 
+%taking the derivative of the (log) likelihood and finding a root.
+%That is,
+%\begin{equation*}
+%\begin{split}
+%0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\ichol{\pvsm}},\\
+  %&= -2 \trminv{\wrapParens{\ichol{\pvsm[m]}}} + \ichol{\pvsm[m]}2\svsm,
+%\end{split}
+%\end{equation*}
+%leaning heavily on the Matrix Cookbook for 
+%the derivatives. \cite{petersen2006matrix}
+%This is solved by $\ichol{\pvsm[m]} = \ichol{\svsm}$, and thus the
+%na\"{i}ve sample estimate is the MLE.
+\providecommand{\txtMLE}{\mbox{MLE}}
+
+The maximum likelihood estimator of \pvsm is found by 
+taking the derivative of the (log) likelihood with respect to
+\pvsm and finding a root.
+That is,
+\begin{equation*}
+\begin{split}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm},\\
+	&= - \tr{\pvsm[\txtMLE]} + \tr{\svsm},
+\end{split}
+\end{equation*}
+leaning heavily on the Matrix Cookbook for 
+the derivatives. \cite{petersen2006matrix}
+This is solved by $\pvsm[\txtMLE] = \svsm$, and thus the
+na\"{i}ve sample estimate is the MLE.
+%UNFOLD
+
+\subsection{Likelihood Ratio Test}%FOLDUP
+
+This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
+Suppose you wish to compare two possible values of the population
+parameter, \pvsm[1] and \pvsm[2], based on their likelihoods. The
+difference in log likelihoods is
+\begin{equation}
+\begin{split}
+\log\wrapParens{\frac{\FOOpdf{}{\svsm}{\pvsm[1]}}{\FOOpdf{}{\svsm}{\pvsm[2]}}}
+&= -\half[\ssiz] \wrapParens{\logdet{\pvsm[1]} - \logdet{\pvsm[2]} +
+\trace{\minv{\pvsm[1]}\svsm} - \trace{\minv{\pvsm[2]}\svsm}},\\
+&= -\half[\ssiz] \wrapParens{\logdet{\pvsm[1]\minv{\pvsm[2]}} + 
+\trace{\wrapBracks{\minv{\pvsm[1]} - \minv{\pvsm[2]}}\svsm}}.
+\end{split}
+\end{equation}
+
+\providecommand{\lrtA}[1][i]{\mathSUB{\Mtx{A}}{#1}}
+\providecommand{\lrta}[1][i]{\mathSUB{a}{#1}}
+
+For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
+consider the null hypothesis
+\begin{equation}
+H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
+\label{eqn:lrt_null}
+\end{equation}
+The constraints have to be sensible. For example, they cannot
+violate the positive definiteness of 
+\minv{\pvsm}, \etc.
+
+Employing the Lagrange multiplier technique, the maximum likelihood
+estimator under the null hypothesis satisfies
+\begin{equation*}
+\begin{split}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm}
+- \sum_i \lambda_i
+\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
+&= - \tr{\pvsm[\txtMLE]} + \tr{\wrapParens{\svsm - \sum_i \lambda_i \lrtA[i]}},\\
+\therefore \pvsm[\txtMLE] &= \svsm - \sum_i \lambda_i \lrtA[i].
+\end{split}
+\end{equation*}
+The maximum likelihood estimator under the constraints has to be
+found numerically by solving for the $\lambda_i$, subject
+to the constraints in \eqnref{lrt_null}.
+
+\providecommand{\vitrlam}[2]{\vectUL{\lambda}{\wrapNeParens{#1}}{#2}}
+\providecommand{\sitrlam}[2]{\mathUL{\lambda}{\wrapNeParens{#1}}{#2}}
+\providecommand{\vitrerr}[2]{\vectUL{\epsilon}{\wrapNeParens{#1}}{#2}}
+\providecommand{\sitrerr}[2]{\mathUL{\epsilon}{\wrapNeParens{#1}}{#2}}
+
+An iterative technique for finding the MLE based on a Newton step would
+proceed as follows. Let \vitrlam{0}{} be some initial estimate of the
+vector of $\lambda_i$. The residual of the \kth{k} estimate, \vitrlam{k}{} is
+\begin{equation}
+\vitrerr{k}{i} \defeq 
+\trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}} - \lrta[i].
+\end{equation}
+The Jacobian of this residual with respect to the \kth{l} element of \vitrlam{k}
+is
+\begin{equation}
+\drbydr{\vitrerr{k}{i}}{\sitrlam{k}{l}} = 
+\trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}
+\lrtA[l] \minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}}.
+\end{equation}
+
+Newton's method is then the iterative scheme
+\begin{equation}
+\vitrlam{k+1}{} \leftarrow \vitrlam{k} -
+\minv{\wrapParens{\drbydr{\vitrerr{k}{}}{\vitrlam{k}{}}}} \vitrerr{k}.
+\end{equation}
+
+
+
+%UNFOLD
+
+\subsection{Bayesian View}
+
+
+%UNFOLD
+
 % bibliography%FOLDUP
 \nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850,sref2011}
 \nocite{rekkas2012inference}
@@ -2547,198 +2769,6 @@ Thus, conditional on observing \ssrsqoptG{\hejG}, we have
 
 %UNFOLD
 
-\section{Gaussian in appended form}%FOLDUP
-
-\providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
-\providecommand{\svsm}[1][{}]{\mathSUB{\Mtx{\hat{\Theta}}}{#1}}
-
-Let \avreti be the \nlatf-variate vector \vreti appended with a 1:
-$\avreti = \asvec{\tr{\vreti},1}$. Consider the second
-moment of \avreti:
-$$
-\pvsm = \E{\ogram{\avreti}} = \twobytwo{\pvsig + \ogram{\pvmu}}{\pvmu}{\tr{\pvmu}}{1}.
-$$
-By inspection one can confirm that the
-inverse of \pvsm is
-$$
-\minv{\pvsm} 
-= \twobytwo{\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{-\tr{\pvmu}\minv{\pvsig}}{1 + \qform{\minv{\pvsig}}{\pvmu}} 
-= \twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt}.
-$$
-Note that this relationship holds for the sample analogue as well:
-$$
-\minv{\twobytwo{\svsig + \ogram{\svmu}}{\svmu}{\tr{\svmu}}{1}} 
-= \twobytwo{\minv{\svsig}}{-\sportwopt}{-\tr{\sportwopt}}{1 + \ssrsqopt}.
-$$
-The Cholesky factor of \minv{\pvsm} is
-$$
-\ichol{\pvsm} = \twobytwo{\trichol{\pvsig}}{-\trichol{\pvsig}\pvmu}{0}{1}.
-$$
-
-Note that
-$$
-\qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}} = 
-\qform{\minv{\pvsm}}{\avreti} - 1.
-$$
-Using the block determinant formula, we find that \pvsm has the same 
-determinant as \pvsig: $\det{\pvsm} = \det{\pvsig}.$  Then if
-\vreti is multivariate Gaussian, then the density of \vreti can be
-expressed more simply as
-\begin{equation*}
-\begin{split}
-\normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
-\longexp{-\half \qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}}},\\
- &= \frac{\wrapParens{\det{\pvsig}}^{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
-\longexp{-\half \wrapParens{\qform{\minv{\pvsm}}{\avreti} - 1}},\\
- &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\pvsm}}^{-\half}
-\longexp{-\half \wrapParens{\qform{\minv{\pvsm}}{\avreti} - 1}},\\
- &= \wrapParens{2\pi}^{-\nlatf/2}
-\longexp{\half - \half \logdet{\pvsm} - \half \trace{\minv{\pvsm}\ogram{\avreti}}},\\
-- \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
-  c_{\nlatf} 
-+ \half \logdet{\pvsm} 
-+ \half \trace{\minv{\pvsm}\ogram{\avreti}},
-\end{split}
-\end{equation*}
-for the constant 
-$c_{\nlatf} = \exp{\half}-\half[\nlatf]\log\wrapParens{2\pi}.$
-
-Given \ssiz \iid observations of \vreti, let \amreti be the matrix
-whose rows are the vectors \tr{\vreti[i]}. Then the negative log
-density of \amreti is
-\begin{equation*}
-- \log\normpdf{\amreti}{\pvsm} =
-  \ssiz c_{\nlatf} 
-+ \half[\ssiz] \logdet{\pvsm} 
-+ \half \trace{\minv{\pvsm}\gram{\amreti}}.
-\end{equation*}
-Now note that $\gram{\amreti}/\ssiz$ is a sample estimate of 
-\pvsm, call it \svsm. Then 
-\begin{equation*}
-\frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz} = 
-  c_{\nlatf} 
-+ \logdet{\pvsm} 
-+ \trace{\minv{\pvsm}\svsm}.
-\end{equation*}
-
-By Lemma (5.1.1) of Press \cite{press2012applied}, this can be expressed
-as a density on \svsm, which is a sufficient statistic:
-\begin{equation*}
-\begin{split}
-\frac{- 2\log\FOOpdf{}{\svsm}{\pvsm}}{\ssiz} 
-&= \frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz}\\
-&\phantom{=}\,
-	-\frac{2}{\ssiz}\wrapParens{\half[\ssiz-\nlatf-2]\logdet{\svsm} +
-	\half[\nlatf+1]\wrapParens{\ssiz - \half[\nlatf]} \log\pi -
-	\sum_{j=1}^{\nlatf+1} \log\funcit{\Gamma}{\half[\ssiz +1-j]}},\\
-&= c_{\nlatf} - \frac{\nlatf+1}{\ssiz}\wrapParens{\ssiz - \half[\nlatf]} \log\pi 
-	- \frac{2}{\ssiz} \sum_{j=1}^{\nlatf+1}
-	\log\funcit{\Gamma}{\half[\ssiz +1-j]}\\
-&\phantom{=}\,
-	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
-	+ \trace{\minv{\pvsm}\svsm},\\
-&= c'_{\ssiz,\nlatf} 
-	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
-	+ \trace{\minv{\pvsm}\svsm},\\
-&= c'_{\ssiz,\nlatf} 
-	- \logdet{\minv{\pvsm}} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
-	+ \trace{\minv{\pvsm}\svsm}.
-\end{split}
-\end{equation*}
-
-The density of \svsm is thus
-\begin{equation}
-\FOOpdf{}{\svsm}{\pvsm} =
-c''_{\ssiz,\nlatf}\frac{\det{\svsm}^{\half[\ssiz-\nlatf-2]}}{\det{\pvsm}^{\half[\ssiz]}}
-\longexp{-\half[\ssiz]\trace{\minv{\pvsm}\svsm}}.
-\end{equation}
-Thus $\ssiz\pvsm$ has the same density, up to the leading constant, as a 
-$\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
-and scale matrix \pvsm. In fact, $\ssiz\pvsm$ is a \emph{conditional} Wishart,
-conditional on $\pvsm_{\nlatf+1,\nlatf+1} = 1$.
-
-
-\subsection{Maximum Likelihood Estimator}%FOLDUP
-
-%The maximum likelihood estimator of \ichol{\pvsm} is found by 
-%taking the derivative of the (log) likelihood and finding a root.
-%That is,
-%\begin{equation*}
-%\begin{split}
-%0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\ichol{\pvsm}},\\
-  %&= -2 \trminv{\wrapParens{\ichol{\pvsm[m]}}} + \ichol{\pvsm[m]}2\svsm,
-%\end{split}
-%\end{equation*}
-%leaning heavily on the Matrix Cookbook for 
-%the derivatives. \cite{petersen2006matrix}
-%This is solved by $\ichol{\pvsm[m]} = \ichol{\svsm}$, and thus the
-%na\"{i}ve sample estimate is the MLE.
-
-The maximum likelihood estimator of \pvsm is found by 
-taking the derivative of the (log) likelihood with respect to
-\pvsm and finding a root.
-That is,
-\begin{equation*}
-\begin{split}
-0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm},\\
-	&= - \tr{\pvsm[m]} + \tr{\svsm},
-\end{split}
-\end{equation*}
-leaning heavily on the Matrix Cookbook for 
-the derivatives. \cite{petersen2006matrix}
-This is solved by $\pvsm[m] = \svsm$, and thus the
-na\"{i}ve sample estimate is the MLE.
-%UNFOLD
-
-\subsection{Likelihood Ratio Test}%FOLDUP
-
-This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
-Suppose you wish to compare two possible values of the population
-parameter, \pvsm[1] and \pvsm[2], based on their likelihoods. The
-difference in log likelihoods is
-\begin{equation}
-\begin{split}
-\log\wrapParens{\frac{\FOOpdf{}{\svsm}{\pvsm[1]}}{\FOOpdf{}{\svsm}{\pvsm[2]}}}
-&= -\half[\ssiz] \wrapParens{\logdet{\pvsm[1]} - \logdet{\pvsm[2]} +
-\trace{\minv{\pvsm[1]}\svsm} - \trace{\minv{\pvsm[2]}\svsm}},\\
-&= -\half[\ssiz] \wrapParens{\logdet{\pvsm[1]\minv{\pvsm[2]}} + 
-\trace{\wrapBracks{\minv{\pvsm[1]} - \minv{\pvsm[2]}}\svsm}}.
-\end{split}
-\end{equation}
-
-\providecommand{\lrtA}[1][i]{\mathSUB{\Mtx{A}}{#1}}
-\providecommand{\lrta}[1][i]{\mathSUB{a}{#1}}
-
-For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
-consider the null hypothesis
-\begin{equation}
-H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i], i=1,\ldots,m.
-\label{eqn:lrt_null}
-\end{equation}
-The constraints have to be sensible. For example, they cannot
-violate the positive definiteness of 
-\minv{\pvsm}. \cite{dempster1972}
-
-Employing the Lagrange multiplier technique, the maximum likelihood
-estimator under the null hypothesis satisfies
-\begin{equation*}
-\begin{split}
-0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm}
-- \sum_i \lambda_i
-\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
-&= - \tr{\pvsm[m]} + \tr{\wrapParens{\svsm - \sum_i \lambda_i \lrtA[i]}},\\
-\therefore \pvsm[m] &= \svsm - \sum_i \lambda_i \lrtA[i].
-\end{split}
-\end{equation*}
-The maximum likelihood estimator under the constraints has to be
-found numerically by solving for the $\lambda_i$, subject
-to the constraints in \eqnref{lrt_null}.
-
-%UNFOLD
-
-
-
-%UNFOLD
 
 %UNFOLD
 \end{document}
