@@ -2400,7 +2400,12 @@ H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
 \end{equation}
 The constraints have to be sensible. For example, they cannot
 violate the positive definiteness of 
-\minv{\pvsm}, \etc.
+\minv{\pvsm}, \etc. Without loss of generality, we can assume
+that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
+symmetric \Mtx{G} and square \Mtx{H}, 
+$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
+\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
+$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
 
 Employing the Lagrange multiplier technique, the maximum likelihood
 estimator under the null hypothesis satisfies
