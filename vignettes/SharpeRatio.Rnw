@@ -2345,6 +2345,7 @@ statistic is
 &= \ssiz\wrapParens{\logdet{\pvsm[0]\minv{\svsm}} + 
 \trace{\minv{\pvsm[0]}\svsm} - \wrapBracks{\nlatf + 1}}.
 \end{split}
+\label{eqn:wilks_lambda_def}
 \end{equation}
 
 
@@ -2410,12 +2411,11 @@ Newton's method is then the iterative scheme
 \vitrlam{k+1}{} \leftarrow \vitrlam{k}{} -
 \minv{\wrapParens{\drbydr{\vitrerr{k}{}}{\vitrlam{k}{}}}} \vitrerr{k}.
 \end{equation}
-Once the optimum is found, one can compute the difference in log
-likelihoods under the null..
-
-one can employ Wilks' Theorem ...
-\cite{anderson2003introduction,Bilodeau1999}
-
+When (if?) the iterative scheme converges on the optimum, one can 
+compute the likelihood ratio statistic $-2\log\Lambda$, as defined
+in \eqnref{wilks_lambda_def}. By Wilks' Theorem, under the null 
+hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as 
+a chi-square with $m$ degrees of freedom. \cite{anderson2003introduction,Bilodeau1999}
 
 %UNFOLD
 

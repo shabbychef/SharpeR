@@ -19,7 +19,7 @@
 # * Sun Oct 13 2013 08:51:52 PM Steven E. Pav <steven@cerebellumcapital.com>
 # pre-run the hotelling study b/c it takes too damn long.
 
-mc.resolution <- 300
+mc.resolution <- 500
 dpy <- 253
 lseq <- function(from,to,length.out) { 
 	exp(seq(log(from),log(to),length.out = length.out))
