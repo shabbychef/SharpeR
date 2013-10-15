@@ -615,13 +615,13 @@ type I and type II rates.  Some example use cases:
 
 \begin{compactenum}
 \item Suppose you wanted to estimate the mean return of a pairs trade, but the stocks have only
-existed for two years. Is this enough data assuming the SNR is 2.0 \yrto{-1/2}?
+existed for two years. Is this enough data assuming the SNR is 2.0 \yrtomhalf?
 \item Suppose investors in a fund you manage want to `see some returns' within a year otherwise
 they will withdraw their investment.
 What SNR should you be hunting for so that, with probability one half,
 the actual returns will `look good' over the next year?
 \item Suppose you observe three months of a fund's returns, and you fail to reject the null under the
-one sample \tstat-test.  Assuming the SNR of the process is 1.5 \yrto{-1/2}, what is the probability of a type II error?
+one sample \tstat-test.  Assuming the SNR of the process is 1.5 \yrtomhalf, what is the probability of a type II error?
 \end{compactenum}
 
 <<'f_tpower',echo=FALSE>>=
@@ -726,7 +726,7 @@ foo.power <- power.sr_test(n=253,zeta=NULL,sig.level=0.05,power=0.5,ope=253)
 The power rules are sobering indeed. Suppose you were a hedge fund manager
 whose investors threatened to perform a one-sided \tstat-test after one year.
 If your strategy's signal-to-noise ratio is less than
-\Sexpr{foo.power$zeta}\yrto{-1/2} (a value which 
+\Sexpr{foo.power$zeta}\yrtomhalf (a value which 
 should be considered ``very good''), 
 your chances of `passing' the \tstat-test are less than fifty percent.
 
@@ -740,8 +740,8 @@ your chances of `passing' the \tstat-test are less than fifty percent.
 %Note that the relationship between sample size and SNR indicates that the proper units of 
 %SNR (and Sharpe ratio)
 %is inverse square root time, \eg ``we speculate the annualized SNR of this
-%fund is around $0.8\,\mbox{years}^{-0.5}$,'' or ``the Sharpe ratio of this stock over the past year is
-%$0.4\,\mbox{months}^{-0.5}$.''
+%fund is around $0.8\,\yrtomhalf$,'' or ``the Sharpe ratio of this stock over the past year is
+%$0.4\,\moto{-\halff}$.''
 %%(Reporting Sharpe ratios with units would remove many operational ambiguities.)
 %For this reason, it may be more natural to consider the Sharpe ratio \emph{squared}. 
 
@@ -942,13 +942,13 @@ skew parameter. \cite{2010arXiv1010.2265G,2009arXiv0912.4554G,LambertW}
 I also draw samples from the daily log returns of 
 the S \& P 500 over the period from \Sexpr{as.character(SPX.start,format="%B %d, %Y")} to 
 \Sexpr{as.character(SPX.end,format="%B %d, %Y")}, affinely transformed 
-to have $\psnr = 1.0\yrto{-1/2}$. I also draw from a symmetrized S \& P 500 returns
+to have $\psnr = 1.0\yrtomhalf$. I also draw from a symmetrized S \& P 500 returns
 series. 
 
 The \tstat- and Tukey distributions are fairly kurtotic, but have zero
 skew, while the lottery and Lambert W x Gaussian distributions are 
 skewed and (therefore) kurtotic.  
-All distributions have been rescaled to have $\psnr = 1.0\yrto{-1/2}$; 
+All distributions have been rescaled to have $\psnr = 1.0\yrtomhalf$; 
 that is,
 I am estimating the empirical type I rate under the null.
 At the nominal $\typeI = 0.05$ level, we expect to get a reject rate 
@@ -958,7 +958,7 @@ I test the empirical type I rate of the test implied by the confidence
 intervals in \eqnref{srci_tinvert}. I also employ Mertens' standard
 errors, \eqnref{srse_mertens}, estimating the skew and kurtosis empirically,
 then comparing to quantiles of the normal distribution. The tests are one-sided
-tests, against the alternative $H_a: \psnr < 1.0\yrto{-1/2}$.
+tests, against the alternative $H_a: \psnr < 1.0\yrtomhalf$.
 
 % input{skew_study}%FOLDUP
 
@@ -968,7 +968,7 @@ tests, against the alternative $H_a: \psnr < 1.0\yrto{-1/2}$.
 xres <- xtable(res,label="tab:sharpe_skew_robustness",
 							 display=c('s','s','s','g','g','fg','fg'),
 							 align="ll|lrr|rr",
-							 caption=paste("Empirical type I rates of the test for $\\psnr = 1.0\\yrto{-1/2}$ via distribution of the \\txtSR are given for various distributions of returns.  The empirical rates are based on ", 
+							 caption=paste("Empirical type I rates of the test for $\\psnr = 1.0\\yrtomhalf$ via distribution of the \\txtSR are given for various distributions of returns.  The empirical rates are based on ", 
 														 ntrials, 
 														 " simulations of three years of daily returns, with a nominal rate of $\\typeI = 0.05$. The 'corrected' type I rates refer to a normal approximation using Mertens' correction. Skew appears to have a much more adverse effect than kurtosis alone."))
 print(xres,include.rownames=FALSE,hline.after=c(0,0,2,4,7,10,dim(res)[1]))
@@ -1482,8 +1482,8 @@ stdv <- sqrt((1 / ex_n) * (ex_snr_d ** 4 + 2 * ex_snr_d ** 2 + c) / (2 * cplus *
 %stdv <- sqrt(1 / n) * sqrt(1 + (c / (2 * cplus)) + (cplus / (2 * (1 - c))))
 
 Consider as an example, the case where $\nlatf = \Sexpr{ex_p}$, $\ssiz = \Sexpr{ex_n}\,\mbox{days},$ and 
-$\psnropt = \Sexpr{ex_snr}\,\mbox{years}^{-0.5}$.  Assuming \Sexpr{dpy} days per year, the expected value 
-of \ssr[*] is approximately $\Sexpr{round(sqrt(dpy) * meanv,2)}\,\mbox{years}^{-0.5}$, with standard
+$\psnropt = \Sexpr{ex_snr}\,\yrtomhalf$.  Assuming \Sexpr{dpy} days per year, the expected value 
+of \ssr[*] is approximately $\Sexpr{round(sqrt(dpy) * meanv,2)}\,\yrtomhalf$, with standard
 error around \Sexpr{round(sqrt(dpy) * stdv,2)}. This is a very serious bias. The problem is that the
 `aspect ratio,' $\arat = \nlatf / \ssiz$, is quite
 a bit larger than $\psnrsqopt$, and so it dominates the expectation. 
@@ -2122,7 +2122,7 @@ med.snr.true <- zeta.s * (1 - medv.true)
 I check the quality of the approximation given in \eqnref{hcut_apx} by a Q-Q 
 plot in \figref{haircutting}.  For the case where
 $\ssiz=\Sexpr{n.obs}$ (\Sexpr{n.yr} years of daily observations), 
-$\nlatf=\Sexpr{n.stok}$ and $\psnropt=\Sexpr{zeta.s * sqrt(ope)}\yrto{-1/2}$, 
+$\nlatf=\Sexpr{n.stok}$ and $\psnropt=\Sexpr{zeta.s * sqrt(ope)}\yrtomhalf$, 
 the t-approximation is very good indeed. 
 %Note that computing prediction
 %intervals for this unobserved, random quantity using this equation is not
@@ -2146,11 +2146,11 @@ the t-approximation is very good indeed.
 %Continuing, 
 %In this case, where we optimize over \Sexpr{n.stok} assets given \Sexpr{n.yr} 
 %years of daily observations, and a population SNR of 
-%\Sexpr{zeta.s * sqrt(ope)} \yrto{-1/2}, 
+%\Sexpr{zeta.s * sqrt(ope)} \yrtomhalf, 
 The median value of the haircut is on the 
 order of \Sexpr{signif(100 * medv.true,2)}\%, meaning that the median
 population SNR of the sample portfolios is around \Sexpr{med.snr.true *
-sqrt(ope)}\yrto{-1/2}.  The maximum value of the haircut over the
+sqrt(ope)}\yrtomhalf.  The maximum value of the haircut over the
 \Sexpr{n.sim} simulations, however is \Sexpr{max(hcuts)}, which is larger than
 one; this happens if and only if the sample portfolio has negative expected
 return: $\trAB{\sportwopt}{\pvmu} < 0$. In this case the Markowitz portfolio

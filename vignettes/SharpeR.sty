@@ -549,12 +549,15 @@
 
 \providecommand{\bigo}[1]{\MATHIT{\mathcal{O}\wrapParens{#1}}}
 \providecommand{\half}[1][1]{\MATHIT{\frac{#1}{2}}}
+\providecommand{\halff}[1][1]{\fracc{#1}{2}}
 
 % time commands; change the default!?
 \providecommand{\yrto}[1]{\mathSUP{\mbox{yr}}{#1}}
 \providecommand{\moto}[1]{\mathSUP{\mbox{mo.}}{#1}}
 \providecommand{\qto}[1]{\mathSUP{\mbox{Q}}{#1}}
 \providecommand{\dayto}[1]{\mathSUP{\mbox{day}}{#1}}
+
+\providecommand{\yrtomhalf}{\yrto{-\halff}}
 
 %linear regression: population and sample%FOLDUP
 \providecommand{\pregco}[1][]{\mathSUB{\beta}{#1}}
