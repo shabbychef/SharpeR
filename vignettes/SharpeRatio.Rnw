@@ -2181,6 +2181,14 @@ into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 \providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
 \providecommand{\svsm}[1][{}]{\mathSUB{\Mtx{\hat{\Theta}}}{#1}}
 
+Here I describe a way to think about the multivariate Gaussian
+distribution that eliminates, to some degree, the 
+distinction between mean and covariance, in order to simplify
+calculations and exposition. The basic idea is to append a 
+deterministic 1 to the end of the random vector, then perform
+inference on the uncentered second moment matrix of the appended
+Gaussian.
+
 Let \avreti be the \nlatf-variate vector \vreti appended with a 1:
 $\avreti = \asvec{\tr{\vreti},1}$. Consider the second
 moment of \avreti:
@@ -2194,15 +2202,18 @@ $$
 = \twobytwo{\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{-\tr{\pvmu}\minv{\pvsig}}{1 + \qform{\minv{\pvsig}}{\pvmu}} 
 = \twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt}.
 $$
-Note that this relationship holds for the sample analogue as well:
+This relationship holds for the sample analogue as well:
 $$
 \minv{\twobytwo{\svsig + \ogram{\svmu}}{\svmu}{\tr{\svmu}}{1}} 
 = \twobytwo{\minv{\svsig}}{-\sportwopt}{-\tr{\sportwopt}}{1 + \ssrsqopt}.
 $$
 The Cholesky factor of \minv{\pvsm} is
-$$
-\ichol{\pvsm} = \twobytwo{\trichol{\pvsig}}{-\trichol{\pvsig}\pvmu}{0}{1}.
-$$
+\begin{equation}
+\ichol{\pvsm} = \twobytwo{\ichol{\pvsig}}{-\ichol{\pvsig}\pvmu}{0}{1},
+\label{eqn:ichol_pvsm_nb}
+\end{equation}
+where $\ichol{\Mtx{A}}$ is the (upper triangular) Cholesky factor of the
+inverse of \Mtx{A}.
 
 Note that
 $$
@@ -2210,9 +2221,12 @@ $$
 \qform{\minv{\pvsm}}{\avreti} - 1.
 $$
 Using the block determinant formula, we find that \pvsm has the same 
-determinant as \pvsig: $\det{\pvsm} = \det{\pvsig}.$  Then if
-\vreti is multivariate Gaussian, then the density of \vreti can be
-expressed more simply as
+determinant as \pvsig, that is $\det{\pvsm} = \det{\pvsig}.$  These
+relationships hold without assuming a particular distribution for 
+\vreti. 
+
+Assume, now, that \vreti is multivariate Gaussian. 
+Then the density of \vreti can be expressed more simply as
 \begin{equation*}
 \begin{split}
 \normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
@@ -2386,6 +2400,13 @@ The maximum likelihood estimator under the constraints has to be
 found numerically by solving for the $\lambda_i$, subject
 to the constraints in \eqnref{lrt_null}.
 
+This framework slightly generalizes Dempster's 
+``Covariance Selection.'' \cite{dempster1972} Covariance selection
+reduces to the case where each \lrta[i] is zero, and
+each \lrtA[i] is a matrix of all zeros except two (symmetric) ones 
+somewhere in the upper left $\nlatf \times \nlatf$ sub matrix. In
+all other respects, however, the solution here follows Dempster.
+
 \providecommand{\vitrlam}[2]{\vectUL{\lambda}{\wrapNeParens{#1}}{#2}}
 \providecommand{\sitrlam}[2]{\mathUL{\lambda}{\wrapNeParens{#1}}{#2}}
 \providecommand{\vitrerr}[2]{\vectUL{\epsilon}{\wrapNeParens{#1}}{#2}}
@@ -2415,12 +2436,51 @@ When (if?) the iterative scheme converges on the optimum, one can
 compute the likelihood ratio statistic $-2\log\Lambda$, as defined
 in \eqnref{wilks_lambda_def}. By Wilks' Theorem, under the null 
 hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as 
-a chi-square with $m$ degrees of freedom. \cite{anderson2003introduction,Bilodeau1999}
+a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
 
 %UNFOLD
 
 \subsection{Bayesian View}
+\providecommand{\bhyvprec}[1][0]{\mathSUB{\Mtx{\Lambda}}{#1}}
+\providecommand{\bhyprecdof}[1][0]{\mathSUB{m}{#1}}
 
+A commonly used conjugate prior for the multivariate Gaussian
+distribution is the ``Normal-Wishart'' prior, which is a Wishart
+prior on \minv{\pvsig}, and, conditional on knowing \pvsig, a 
+Normal prior on \pvmu. \cite{murphybayes}
+
+The natural translation of the Normal-Wishart prior to the appended
+form considered here is a (conditional) Wishart prior on the
+inverse second moment, \minv{\pvsm}.  Note that the form of
+\minv{\pvsm} is constrained by the definition of the appended Gaussian.
+Teasing out the dependence is tricky. 
+
+A simpler approach is to fix the prior on the Cholesky factor of
+\minv{\pvsm}. As noted in \eqnref{ichol_pvsm_nb}, \ichol{\pvsm} has
+a simple structure. Moreover, we can abuse the Bartlett decomposition
+of a Wishart to compute densities.  \cite{anderson2003introduction}
+Let \bhyvprec and \bhyprecdof be the Bayesian hyper-parameters for the
+`precision' and degrees of freedom. The prior distribution is 
+\ichol{\pvsm} is equal to $T\chol{\bhyvprec}$, where $T$ is an upper
+triangular matrix satisfying
+\begin{compactenum}
+\item $T_{ii} = 1$ for $i = \nlatf + 1$,
+\item $T_{ii}^2 \sim \chisqlaw{\bhyprecdof - i + 1}$ for $i \le \nlatf$,
+\item $T_{ij} \sim \normlaw{0,1}$ for $i < j$,
+\item the $T_{ij}$ are independently distributed.
+\end{compactenum}
+Together, these imply that \ogram{T} takes a Wishart distribution
+with identity scale matrix and \bhyprecdof degrees of freedom, 
+conditional on $T_{\nlatf+1,\nlatf+1} = 1$.
+
+Thus the prior is 
+\begin{equation*}
+\prior{\ichol{\pvsm}}{\chol{\bhyvprec},\bhyprecdof} \propto 
+\frac{\prod_{i=1}^{\nlatf} \wrapParens{\ichol{\pvsm}}_{ii}^{\bhyprecdof - i} 
+\longexp{-\half
+\trace{\minv{\bhyvprec}\pvsm}}}{\det{\bhyvprec}^{\half[\ssiz]}}.
+\end{equation*}
+2FIX: is this exactly so? problems within the trace? not obviously so.
 
 %UNFOLD
 

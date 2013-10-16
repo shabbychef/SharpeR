@@ -318,17 +318,17 @@
 
 %generic combination of matrices
 \providecommand{\ABA}[2]{#1 #2 #1}
-\providecommand{\ABCBA}[3]{#1 #2 #3 #2 #1}
-\providecommand{\trAB}[2]{\tr{#1}#2}
+\providecommand{\ABCBA}[3]{{#1 #2 #3 #2 #1}}
+\providecommand{\trAB}[2]{\MATHIT{\tr{#1}#2}}
 
 %gram matrix
 \providecommand{\gram}[1]{\trAB{#1}{#1}}
 %outer gram
-\providecommand{\ogram}[1]{#1 \tr{#1}}
+\providecommand{\ogram}[1]{\MATHIT{#1 \tr{#1}}}
 %quadratic form
-\providecommand{\qform}[2]{\tr{#2} #1 #2}
+\providecommand{\qform}[2]{\MATHIT{\tr{#2} #1 #2}}
 %quadratic outer form
-\providecommand{\qoform}[2]{#2 #1 \tr{#2}}
+\providecommand{\qoform}[2]{\MATHIT{#2 #1 \tr{#2}}}
 \providecommand{\crossp}[1]{\gram{\wrapNeParens{#1}}}
 
 % a conditional on b
