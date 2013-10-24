@@ -447,6 +447,8 @@ some mis-estimation of the standard error when skew is extreme.
 
 \subsection{Asymptotic Distribution of \txtSR}%FOLDUP
 
+\label{subsec:asymptotic_sr}
+
 Here I derive the asymptotic distribution of \txtSR, following
 Jobson and Korkie 
 \emph{inter alia}. \cite{jobsonkorkie1981,lo2002,mertens2002comments,Ledoit2008850,Leung2008,Wright2012} 
@@ -464,9 +466,6 @@ Consider the $2\nlatf$ vector of \vreti, `stacked' with
 \vreti (elementwise) squared, \vcat{\vreti}{\vreti^2}.
 The expected value of this vector is \vcat{\pvmu}{\pvmom[2]};
 let \pvvar be the variance of this vector, assuming it exists.
-
-
-
 
 Given \ssiz observations of \vreti, consider the simple
 sample estimate
@@ -575,7 +574,7 @@ One is then testing the null hypothesis $H_0: \funcit{\vect{g}}{\pvsnr} = 0$.
 Asymptotically, under the null, 
 $$
 \ssiz
-\qform{\minv{\wrapParens{\qoform{\pvvar}{\wrapParens{\dbyd{\vect{g}}{\pvsnr}\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}}}{\funcit{\vect{g}}{\svsr}}
+\qiform{\wrapParens{\qoform{\pvvar}{\wrapParens{\dbyd{\vect{g}}{\pvsnr}\dbyd{\pvsnr}{\vcat{\pvmu}{\pvmom[2]}}}}}}{\funcit{\vect{g}}{\svsr}}
 \sim \chisqlaw{\nlatf-1}.
 $$
 For the more general case, where \vect{g} need not be the vanilla contrasts,
@@ -1178,11 +1177,11 @@ $$H_0 : \tr{\pregco}\convec = \contar\quad\mbox{versus}\quad H_1 : \tr{\pregco}\
 for some conformable vector \convec and constant \contar. To perform this test, we construct the
 regression \tstat-statistic
 \begin{equation}
-\tstat = \frac{\tr{\sregco}\convec - \contar}{\ssig \sqrt{\qform{\minv{\left(\gram{\mretk}\right)}}{\convec}}}.
+\tstat = \frac{\tr{\sregco}\convec - \contar}{\ssig \sqrt{\qiform{\wrapParens{\gram{\mretk}}}{\convec}}}.
 \end{equation}
 This statistic should be distributed as a non-central \tstat-distribution with non-centrality parameter
 $$
-\nctp = \frac{\tr{\pregco}\convec - \contar}{\psig \sqrt{\qform{\minv{\left(\gram{\mretk}\right)}}{\convec}}},
+\nctp = \frac{\tr{\pregco}\convec - \contar}{\psig \sqrt{\qiform{\wrapParens{\gram{\mretk}}}{\convec}}},
 $$
 and $\ssiz - \nattf$ degrees of freedom. Thus we reject the null if \tstat is greater than 
 \tqnt{1-\typeI}{\ssiz - \nattf}, the $1-\typeI$ quantile of the (central) 
@@ -1192,11 +1191,11 @@ and $\ssiz - \nattf$ degrees of freedom. Thus we reject the null if \tstat is gr
 $$H_0 : \tr{\pregco}\convec = \psig\contar\quad\mbox{versus}\quad H_1 : \tr{\pregco}\convec > \psig\contar,$$
 for given \convec and \contar, one constructs the \tstat-statistic
 \begin{equation}
-\tstat = \frac{\tr{\sregco}\convec}{\ssig \sqrt{\qform{\minv{\left(\gram{\mretk}\right)}}{\convec}}}.
+\tstat = \frac{\tr{\sregco}\convec}{\ssig \sqrt{\qiform{\wrapParens{\gram{\mretk}}}{\convec}}}.
 \end{equation}
 This statistic should be distributed as a non-central \tstat-distribution with non-centrality parameter
 $$
-\nctp = \frac{\contar}{\sqrt{\qform{\minv{\left(\gram{\mretk}\right)}}{\convec}}},
+\nctp = \frac{\contar}{\sqrt{\qiform{\wrapParens{\gram{\mretk}}}{\convec}}},
 $$
 and $\ssiz - \nattf$ degrees of freedom. Thus we reject the null if \tstat is greater than 
 \nctqnt{1-\typeI}{\ssiz - \nattf}{\nctp}, the $1-\typeI$ quantile of the non-central 
@@ -1267,13 +1266,13 @@ where the constant $c$ is chosen to maximize return under the given risk
 budget:
 $$
 c =
-\frac{\Rbuj}{\sqrt{\qform{\minv{\svsig}}{\svmu}}}.
+\frac{\Rbuj}{\sqrt{\qiform{\svsig}{\svmu}}}.
 $$
 The \txtSR of this portfolio is
 \begin{equation}
 \ssropt
 \defeq \frac{\trAB{\sportwopt}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwopt}}}
- = \sqrt{\qform{\minv{\svsig}}{\svmu}}
+ = \sqrt{\qiform{\svsig}{\svmu}}
 - \rdrag.
 \end{equation}
 The term $\rdrag$ is deterministic; we can treat it as an annoying
@@ -1281,13 +1280,13 @@ additive constant that has to be minded. Define the population analogue of
 this quantity as
 \begin{equation}
 \psnropt 
-\defeq \sqrt{\qform{\minv{\pvsig}}{\pvmu}}
+\defeq \sqrt{\qiform{\pvsig}{\pvmu}}
 - \rdrag.
 \end{equation}
 
 
 The random term,
-$\ssiz \wrapParens{\qform{\minv{\svsig}}{\svmu}}^2$,
+$\ssiz \wrapParens{\qiform{\svsig}{\svmu}}^2$,
 is a Hotelling \Tstat, which follows a non-central \flaw{} distribution, up to
 scaling:
 \begin{equation*}
@@ -1309,7 +1308,7 @@ $$
 the above expression can be simplified slightly as 
 \begin{equation*}
 \frac{\ssiz-\nstrat}{\nstrat}
-\qform{\minv{\usvsig}}{\svmu} \sim
+\qiform{\usvsig}{\svmu} \sim
 \ncflaw{\nstrat,\ssiz-\nstrat,\ssiz\wrapParens{\psnropt + \rdrag}^2}.
 \end{equation*}
 %UNFOLD
@@ -1336,7 +1335,7 @@ where \fqnt{1-\typeI}{\nlatf,\ssiz - \nlatf} is the $1 - \typeI$ quantile of the
 If $\pvmu = \pvmu[1] \ne \pvmu[0]$, then the power of this test is
 $$\powr = 1 - \ncfcdf{\fqnt{1-\typeI}{\nlatf,\ssiz - \nlatf}}{\nlatf,\ssiz - \nlatf}{\ncfp[1]},$$
 where 
-$$\ncfp[1] = \ssiz\qform{\minv{\pvsig}}{\wrapNeParens{\pvmu[1] - \pvmu[0]}}$$
+$$\ncfp[1] = \ssiz\qiform{\pvsig}{\wrapNeParens{\pvmu[1] - \pvmu[0]}}$$
 is the noncentrality parameter, and 
 $\ncfcdf{x}{\nlatf,\ssiz - \nlatf}{\ncfp}$ is 
 the cumulative distribution function of the non-central \flaw{}-distribution with non-centrality parameter
@@ -1646,13 +1645,13 @@ where the constant $c$ is chosen to maximize return under the given risk
 budget, as in the unconstrained case.
 %$$
 %c =
-%\frac{\Rbuj}{\sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}}.
+%\frac{\Rbuj}{\sqrt{\qiform{\wrapParens{\qoform{\svsig}{\hejG}}}{\wrapParens{\hejG\svmu}}}}.
 %$$
 The \txtSR of this portfolio is
 \begin{equation}
 \ssroptG{\hejG} 
 \defeq \frac{\trAB{\sportwoptG{\hejG}}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportwoptG{\hejG}}}}
- = \sqrt{\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}}
+ = \sqrt{\qiform{\wrapParens{\qoform{\svsig}{\hejG}}}{\wrapParens{\hejG\svmu}}}
 - \frac{\rfr}{\Rbuj}.
 \end{equation}
 Again, for purposes of estimating the population analogue, we can largely
@@ -1700,11 +1699,11 @@ is
 \begin{equation}
 	\begin{split}
 	\sportwopt &= c\wrapParens{\minv{\svsig}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\hejG}\svmu} +
+	\qiform{\wrapParens{\qoform{\svsig}{\hejG}}}{\hejG}\svmu} +
 	\tr{\hejG}{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}\hejg,\,\\
 	c^2 &= \frac{\Rbuj^2 - \qform{\wrapParens{\qoform{\svsig}{\hejG}}}{\hejg}}{
-	\qform{\minv{\svsig}}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}},
+	\qiform{\svsig}{\svmu} -
+	\qiform{\wrapParens{\qoform{\svsig}{\hejG}}}{\wrapParens{\hejG\svmu}}},
 	\end{split}
 \end{equation}
 where the numerator in the last equation need be positive for the problem
@@ -1718,7 +1717,7 @@ portfolio is
 \begin{equation*}
 \sportwopt 
 = c \wrapParens{\minv{\svsig}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\hejG}\svmu}
+	\qiform{\wrapParens{\qoform{\svsig}{\hejG}}}{\hejG}\svmu}
 = c_1 \sportwoptG{\eye} - c_2 \sportwoptG{\hejG},
 \end{equation*}
 using the notation from \subsecref{basic_conpo}.
@@ -1733,8 +1732,8 @@ changes in the leading constant to satisfy the risk budget).
 The squared \txtSR of the optimal portfolio is
 \begin{equation}
 \ssrsqopt 
-= \qform{\minv{\svsig}}{\svmu} -
-	\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}
+= \qiform{\svsig}{\svmu} -
+	\qiform{\wrapParens{\qoform{\svsig}{\hejG}}}{\wrapParens{\hejG\svmu}}
 = \ssrsqoptG{\eye} - \ssrsqoptG{\hejG},
 \label{eqn:ssr_Gcons}
 \end{equation}
@@ -1769,7 +1768,7 @@ of the \nstrathej rows of the identity matrix corresponding to the
 \nstrathej assets to be tested for spanning, then the term
 $$
 \ssrsqoptG{\hejG} = 
-\qform{\minv{\wrapParens{\qoform{\svsig}{\hejG}}}}{\wrapParens{\hejG\svmu}}
+\qiform{\wrapParens{\qoform{\svsig}{\hejG}}}{\wrapParens{\hejG\svmu}}
 $$
 is the squared \txtSR of the optimal portfolio on only the \nstrathej spanning
 assets. A spanning test is then a test of
@@ -2167,7 +2166,7 @@ parameters \pvmu and \pvsig, but does not make use of the observed quantities
 producing prediction intervals on \hcut when planning a trading strategy 
 (\ie balancing \ssiz and \nlatf). A more practical problem is that of 
 estimating confidence intervals on 
-$\trAB{\sportw}{\pvmu} / \sqrt{\qform{\minv{\pvsig}}{\sportw}}$ having 
+$\trAB{\sportw}{\pvmu} / \sqrt{\qiform{\pvsig}{\sportw}}$ having 
 observed \svmu and \svsig. In this case one \emph{cannot} simply 
 plug-in some estimate of \psnropt computed from \ssropt (via MLE, KRS, \etc)
 into \eqnref{hcut_apx}. The reason is that the error in the approximation of
@@ -2176,49 +2175,142 @@ into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 %UNFOLD
 %UNFOLD
 
-\section{Gaussian in appended form}%FOLDUP
+\section{Multivariate inference in unified form}%FOLDUP
 
 \providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
 \providecommand{\svsm}[1][{}]{\mathSUB{\Mtx{\hat{\Theta}}}{#1}}
 
-Here I describe a way to think about the multivariate Gaussian
-distribution that eliminates, to some degree, the 
+Here I describe a way to think about multivariate 
+distributions that eliminates, to some degree, the 
 distinction between mean and covariance, in order to simplify
-calculations and exposition. The basic idea is to append a 
-deterministic 1 to the end of the random vector, then perform
-inference on the uncentered second moment matrix of the appended
-Gaussian.
+calculations and exposition. The basic idea is to prepend a 
+deterministic 1 to the random vector, then perform
+inference on the \emph{uncentered} second moment matrix.
 
-Let \avreti be the \nlatf-variate vector \vreti appended with a 1:
-$\avreti = \asvec{\tr{\vreti},1}$. Consider the second
+Let \avreti be the \nlatf-variate vector \vreti prepended with a 1:
+$\avreti = \asvec{1,\tr{\vreti}}$. Consider the second
 moment of \avreti:
-$$
-\pvsm = \E{\ogram{\avreti}} = \twobytwo{\pvsig + \ogram{\pvmu}}{\pvmu}{\tr{\pvmu}}{1}.
-$$
+\begin{equation}
+\pvsm \defeq \E{\ogram{\avreti}} = 
+	\twobytwo{1}{\tr{\pvmu}}{\pvmu}{\pvsig + \ogram{\pvmu}}.
+\label{eqn:pvsm_def}
+\end{equation}
 By inspection one can confirm that the
 inverse of \pvsm is
 $$
 \minv{\pvsm} 
-= \twobytwo{\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{-\tr{\pvmu}\minv{\pvsig}}{1 + \qform{\minv{\pvsig}}{\pvmu}} 
-= \twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt}.
+= \twobytwo{1 + \qiform{\pvsig}{\pvmu}}{-\tr{\pvmu}\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{\minv{\pvsig}}
+= \twobytwo{1 + \psnrsqopt}{-\tr{\pportwopt}}{-\pportwopt}{\minv{\pvsig}}.
 $$
-This relationship holds for the sample analogue as well:
-$$
-\minv{\twobytwo{\svsig + \ogram{\svmu}}{\svmu}{\tr{\svmu}}{1}} 
-= \twobytwo{\minv{\svsig}}{-\sportwopt}{-\tr{\sportwopt}}{1 + \ssrsqopt}.
-$$
-The Cholesky factor of \minv{\pvsm} is
+The (upper) Cholesky factor of \pvsm is
+\begin{equation*}
+\chol{\pvsm} = \twobytwo{1}{\tr{\pvmu}}{0}{\chol{\pvsig}}.
+\end{equation*}
+
+In some situations, the Cholesky factor of \minv{\pvsm} might be 
+of interest.  In this situation, one can \emph{append} a 1 to
+\vreti instead of prepending it. When \pvsm is defined in this
+way, the Cholesky factor of \minv{\pvsm} (but not that of \pvsm) 
+has a nice form:
 \begin{equation}
-\ichol{\pvsm} = \twobytwo{\ichol{\pvsig}}{-\ichol{\pvsig}\pvmu}{0}{1},
+\gram{\twobytwo{\ichol{\pvsig}}{-\ichol{\pvsig}\pvmu}{0}{1}} =
+\twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt},
 \label{eqn:ichol_pvsm_nb}
 \end{equation}
-where $\ichol{\Mtx{A}}$ is the (upper triangular) Cholesky factor of the
-inverse of \Mtx{A}.
+where the latter is \minv{\pvsm} when defined by appending a 1.
+
+The relationships above are merely facts of linear algebra, and so
+hold for the sample estimates as well:
+\begin{equation*}
+\minv{\twobytwo{1 + \ssrsqopt}{-\tr{\sportwopt}}{-\sportwopt}{\minv{\svsig}}}
+= \twobytwo{1}{\tr{\svmu}}{\svmu}{\svsig + \ogram{\svmu}}
+= \gram{\twobytwo{1}{\tr{\svmu}}{0}{\chol{\svsig}}}.
+\end{equation*}
+
+Given \ssiz \iid observations of \vreti, let \amreti be the matrix
+whose rows are the vectors \tr{\avreti[i]}. The na\"{i}ve sample estimator
+\begin{equation}
+\svsm \defeq \oneby{\ssiz}\gram{\amreti}
+\end{equation}
+is an unbiased since $\pvsm = \E{\gram{\avreti}}$.
+
+\subsection{Asymptotic distribution of the Markowitz portfolio}%FOLDUP
+
+\label{sec:dist_markoport}
+\nocite{BrittenJones1999}
+
+Collecting the mean and covariance into the second moment matrix as
+we have done gives the asymptotic distribution of the sample Markowitz
+portfolio without much work. This computation
+generalizes the `standard' asymptotic analysis of Sharpe ratio of
+multiple assets, as in \subsecref{asymptotic_sr}.
+
+Let \fvec{\Mtx{A}}, and \fvech{\Mtx{A}} be the vector and half-space
+vector operators.  The former turns an $\nlatf\times\nlatf$ matrix into
+an $\nlatf^2$ vector of its columns stacked on top of each other; the 
+latter vectorizes a symmetric (or lower triangular) matrix into a vector
+of the non-redundant elements. \cite{magnus1980elimination} 
+
+Define, as we have above, \svsm to be the unbiased sample estimate
+of \pvsm, based on \ssiz \iid samples of \avreti.
+Under the multivariate central limit theorem \cite{wasserman2004all}
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
+\rightsquigarrow 
+\normlaw{0,\pvvar},
+\label{eqn:mvclt_svsm}
+\end{equation}
+where \pvvar is the variance of \fvech{\svsm}, which, in general, 
+is unknown.
+
+The Markowitz portfolio appears in $-\minv{\svsm}$. Let \Elim
+be the `Elimination Matrix,' a matrix of zeros and ones with the
+property that $\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$  
+\cite{magnus1980elimination} We can find the asymptotic distribution
+of $\minv{\svsm}$ via the Delta method. The derivative of the matrix
+inverse is given by
+\begin{equation}
+\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
+= - \minv{\Mtx{A}} \kron \minv{\Mtx{A}},
+\end{equation}
+for symmetric \Mtx{A}.  \cite{magnus1980elimination,facklernotes}
+We can reduce this to the non-redundant parts via the Elimination matrix:
+\begin{equation}
+\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
+= \qoform{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}{\Elim}
+= - \qoform{\wrapParens{\minv{\Mtx{A}} \kron \minv{\Mtx{A}}}}{\Elim}.
+\end{equation}
+
+Then we have, via the Delta method, 
+%\begin{equation}
+\begin{multline}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\rightsquigarrow \\
+\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\minv{\svsm} \kron
+\minv{\svsm}}}{\Elim}}}}.
+\label{eqn:mvclt_isvsm}
+\end{multline}
+%\end{equation}
+It only remains to estimate \pvvar by some consistent estimator, call
+it \svvar. 
+%Rather, one must estimate $\qform{\pvvar}{\Elim}$.
+The simple sample estimate can be had by computing the sample covariance
+of the vectors $\fvech{\ogram{\avreti[i]}} =
+\asvec{1,\tr{\vreti[i]},\tr{\fvech{\ogram{\vreti[i]}}}}$. 
+More elaborate covariance estimators can also be used to deal with
+violations of the \iid assumptions.
+
+\nocite{magnus1999matrix,magnus1980elimination}
+\nocite{BrittenJones1999}
+
+%UNFOLD
+
+\subsection{Unified Multivariate Gaussian}%FOLDUP
 
 Note that
 $$
-\qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}} = 
-\qform{\minv{\pvsm}}{\avreti} - 1.
+\qiform{\pvsig}{\wrapParens{\vreti - \pvmu}} = 
+\qiform{\pvsm}{\avreti} - 1.
 $$
 Using the block determinant formula, we find that \pvsm has the same 
 determinant as \pvsig, that is $\det{\pvsm} = \det{\pvsig}.$  These
@@ -2230,14 +2322,14 @@ Then the density of \vreti can be expressed more simply as
 \begin{equation*}
 \begin{split}
 \normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
-\longexp{-\half \qform{\minv{\pvsig}}{\wrapParens{\vreti - \pvmu}}},\\
+\longexp{-\half \qiform{\pvsig}{\wrapParens{\vreti - \pvmu}}},\\
  &= \frac{\wrapParens{\det{\pvsig}}^{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
-\longexp{-\half \wrapParens{\qform{\minv{\pvsm}}{\avreti} - 1}},\\
+\longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
  &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\pvsm}}^{-\half}
-\longexp{-\half \wrapParens{\qform{\minv{\pvsm}}{\avreti} - 1}},\\
+\longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
  &= \wrapParens{2\pi}^{-\nlatf/2}
 \longexp{\half - \half \logdet{\pvsm} - \half \trace{\minv{\pvsm}\ogram{\avreti}}},\\
-- \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
+\therefore - \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
   c_{\nlatf} 
 + \half \logdet{\pvsm} 
 + \half \trace{\minv{\pvsm}\ogram{\avreti}},
@@ -2255,8 +2347,8 @@ density of \amreti is
 + \half[\ssiz] \logdet{\pvsm} 
 + \half \trace{\minv{\pvsm}\gram{\amreti}}.
 \end{equation*}
-Now note that $\gram{\amreti}/\ssiz$ is a sample estimate of 
-\pvsm, call it \svsm. Then 
+Now note that $\gram{\amreti}/\ssiz$ is an unbiased
+sample estimate of \pvsm, call it \svsm. Then 
 \begin{equation*}
 \frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz} = 
   c_{\nlatf} 
@@ -2299,6 +2391,7 @@ Thus $\ssiz\svsm$ has the same density, up to the leading constant, as a
 $\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
 and scale matrix \pvsm. In fact, $\ssiz\svsm$ is a \emph{conditional} Wishart,
 conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.
+%UNFOLD
 
 \subsection{Maximum Likelihood Estimator}%FOLDUP
 
@@ -2319,18 +2412,20 @@ conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.
 
 The maximum likelihood estimator of \pvsm is found by 
 taking the derivative of the (log) likelihood with respect to
-\pvsm and finding a root.
+\minv{\pvsm} and finding a root.
 That is,
 \begin{equation*}
 \begin{split}
-0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm},\\
-	&= - \tr{\pvsm[\txtMLE]} + \tr{\svsm},
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}},\\
+	&= \half[\ssiz]\drbydr{\logdet{\minv{\pvsm}}}{\minv{\pvsm}} -
+\half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\minv{\pvsm}},\\
+	&= \half[\ssiz]\wrapParens{\pvsm - \svsm},
 \end{split}
 \end{equation*}
 leaning heavily on the Matrix Cookbook for 
-the derivatives. \cite{petersen2006matrix}
+the derivatives. \cite{petersen2006matrix,magnus1999matrix}
 This is solved by $\pvsm[\txtMLE] = \svsm$, and thus the
-na\"{i}ve sample estimate is the MLE.
+unbiased sample estimator is also the MLE.
 
 Since $\pvsm[\txtMLE] = \svsm$, the log likelihood of the MLE is 
 \begin{equation}
@@ -2362,22 +2457,20 @@ statistic is
 \label{eqn:wilks_lambda_def}
 \end{equation}
 
-
-
-%This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
-
 \providecommand{\lrtA}[1][i]{\mathSUB{\Mtx{A}}{#1}}
 \providecommand{\lrta}[1][i]{\mathSUB{a}{#1}}
+
+\subsubsection{Tests on the Mean and Covariance Matrix}%FOLDUP
 
 For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
 consider the null hypothesis
 \begin{equation}
-H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
-\label{eqn:lrt_null}
+H_0: \trace{\lrtA[i]{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
+\label{eqn:lrt_null_forw}
 \end{equation}
 The constraints have to be sensible. For example, they cannot
 violate the positive definiteness of 
-\minv{\pvsm}, \etc Without loss of generality, we can assume
+\pvsm, \etc  Without loss of generality, we can assume
 that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
 symmetric \Mtx{G} and square \Mtx{H}, 
 $\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
@@ -2388,17 +2481,57 @@ Employing the Lagrange multiplier technique, the maximum likelihood
 estimator under the null hypothesis satisfies
 \begin{equation*}
 \begin{split}
-0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
 - \sum_i \lambda_i
 %\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
-\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\pvsm},\\
-&= - \tr{\pvsm[\txtMLE]} + \tr{\wrapParens{\svsm - \sum_i \lambda_i \lrtA[i]}},\\
+\drbydr{\trace{\lrtA[i]{\pvsm}}}{\minv{\pvsm}},\\
+&= - \pvsm + \svsm + \sum_i \lambda_i \pvsm \lrtA[i] \pvsm,\\
+\therefore \pvsm[\txtMLE] &= ???.
+\end{split}
+\end{equation*}
+The maximum likelihood estimator under the constraints has to be
+found numerically by solving for the $\lambda_i$, subject
+to the constraints in \eqnref{lrt_null_back}.
+
+
+%UNFOLD
+
+\subsubsection{Tests on the Precision and Markowitz Portfolio}%FOLDUP
+
+%This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
+
+
+For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
+consider the null hypothesis
+\begin{equation}
+H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
+\label{eqn:lrt_null_back}
+\end{equation}
+The constraints have to be sensible. 
+%For example, they cannot
+%violate the positive definiteness of 
+%\minv{\pvsm}, \etc Without loss of generality, we can assume
+%that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
+%symmetric \Mtx{G} and square \Mtx{H}, 
+%$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
+%\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
+%$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
+
+Employing the Lagrange multiplier technique, the maximum likelihood
+estimator under the null hypothesis satisfies
+\begin{equation*}
+\begin{split}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+- \sum_i \lambda_i
+%\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
+\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\minv{\pvsm}},\\
+&= - \pvsm + \svsm - \sum_i \lambda_i \lrtA[i],\\
 \therefore \pvsm[\txtMLE] &= \svsm - \sum_i \lambda_i \lrtA[i].
 \end{split}
 \end{equation*}
 The maximum likelihood estimator under the constraints has to be
 found numerically by solving for the $\lambda_i$, subject
-to the constraints in \eqnref{lrt_null}.
+to the constraints in \eqnref{lrt_null_back}.
 
 This framework slightly generalizes Dempster's 
 ``Covariance Selection.'' \cite{dempster1972} Covariance selection
@@ -2437,10 +2570,10 @@ compute the likelihood ratio statistic $-2\log\Lambda$, as defined
 in \eqnref{wilks_lambda_def}. By Wilks' Theorem, under the null 
 hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as 
 a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
-
+%UNFOLD
 %UNFOLD
 
-\subsection{Bayesian View}
+\subsection{Bayesian View}%FOLDUP
 \providecommand{\bhyvprec}[1][0]{\mathSUB{\Mtx{\Lambda}}{#1}}
 \providecommand{\bhyprecdof}[1][0]{\mathSUB{m}{#1}}
 
@@ -2481,7 +2614,7 @@ Thus the prior is
 \trace{\minv{\bhyvprec}\pvsm}}}{\det{\bhyvprec}^{\half[\ssiz]}}.
 \end{equation*}
 2FIX: is this exactly so? problems within the trace? not obviously so.
-
+%UNFOLD
 %UNFOLD
 
 % bibliography%FOLDUP
@@ -2635,7 +2768,7 @@ we have the following moments:
 \label{eqn:TstatmomsII}
 \end{equation}
 where $\arat = \fracc{\nlatf}{\ssiz}$ is the aspect ratio, and \psnrsqopt is the maximal SNR achievable
-on a basket of the assets: $\psnrsqopt = \qform{\minv{\pvsig}}{\pvmu}$.
+on a basket of the assets: $\psnrsqopt = \qiform{\pvsig}{\pvmu}$.
 
 
 The distribution of Hotelling's statistic is known \cite{Bilodeau1999} for 
@@ -2707,12 +2840,12 @@ Using the Taylor series expansion of the square root gives the approximate mean 
 \providecommand{\GN}{\MATHIT{N}}
 \providecommand{\GXgram}[1]{\ogram{\GXb{#1}}}
 \providecommand{\Gins}[1]{\GS{#1} + \GN\GXgram{#1}}
-\providecommand{\GSR}[1]{\qform{\minv{\GS{#1}}}{\GXb{#1}}}
-\providecommand{\Gform}[1]{\GN\qform{\minv{\wrapParens{\Gins{#1}}}}{\GXb{#1}}}
+\providecommand{\GSR}[1]{\qiform{\GS{#1}}{\GXb{#1}}}
+\providecommand{\Gform}[1]{\GN\qiform{\wrapParens{\Gins{#1}}}{\GXb{#1}}}
 
 \providecommand{\Gpvmu}[1][{}]{\mathSUB{\xi}{\wrapNeBracks{#1}}}
 \providecommand{\Gpvsig}[1][{}]{\mathSUB{\Sigma}{#1#1}}
-\providecommand{\GSNR}[1][{}]{\qform{\minv{\Gpvsig[#1]}}{\Gpvmu[#1]}}
+\providecommand{\GSNR}[1][{}]{\qiform{\Gpvsig[#1]}{\Gpvmu[#1]}}
 
 
 Here I translate Giri's work on Rao's LRT into the terminology used in the rest

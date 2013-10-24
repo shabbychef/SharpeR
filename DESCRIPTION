@@ -4,7 +4,7 @@ Author: Steven E. Pav
 Authors@R: c(person(c("Steven", "E."), "Pav", role=c("aut","cre"),
     email="shabbychef@gmail.com"))
 Version: 0.1310
-Date: 2013-09-29
+Date: 2013-10-23
 License: LGPL-3
 Title: Statistical significance of Sharpe ratio
 BugReports: https://github.com/shabbychef/SharpeR/issues
@@ -25,7 +25,8 @@ VignetteBuilder: knitr
 Collate:
     'utils.r'
     'distributions.r'
-    'sr.r'
     'estimation.r'
+    'sr.r'
     'SharpeR.r'
     'tests.r'
+    'unified.r'

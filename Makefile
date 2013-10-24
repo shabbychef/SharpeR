@@ -498,5 +498,11 @@ mactex :
 		texlive-generic-recommended texlive-latex texlive-latex-extra \
 		texlive-latex-recommended texlive-math-extra 
 
+# cheesy checkin:
+#
+# sleep `jot -r 1 5 55` && git commit -a -m 'working on vignette'
+# git push origin dev1310
+
+
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:tags=tags;:syntax=make:filetype=make:ai:si:cin:nu:fo=croqt:cino=p0t0c5(0:
