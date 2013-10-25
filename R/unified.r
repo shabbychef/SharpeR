@@ -145,7 +145,7 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #' with a one prepended. Then let 
 #' \eqn{\Theta = E\left(y y^{\top}\right)}{Theta = E[yy']},
 #' the uncentered second moment matrix. The inverse of
-#' \eqn{\Theta}{Theta} contains the negative Markowitz portfolio 
+#' \eqn{\Theta}{Theta} contains the (negative) Markowitz portfolio 
 #' and the precision matrix. 
 #'
 #' Given \eqn{n} contemporaneous observations of \eqn{p}-vectors,
@@ -176,6 +176,14 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #' @rdname ism_vcov
 #' @export 
 #' @template etc
+#'
+#' @note
+#'
+#' By flipping the sign of \eqn{X}, the inverse of 
+#' \eqn{\Theta}{Theta} contains the \emph{positive} Markowitz
+#' portfolio and the precision matrix on \eqn{X}. Performing
+#' this transform before passing the data to this function
+#' should be considered idiomatic.
 #'
 #' @examples 
 #' X <- matrix(rnorm(1000*3),ncol=3)

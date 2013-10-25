@@ -30,7 +30,7 @@
   with a one prepended. Then let \eqn{\Theta = E\left(y
   y^{\top}\right)}{Theta = E[yy']}, the uncentered second
   moment matrix. The inverse of \eqn{\Theta}{Theta}
-  contains the negative Markowitz portfolio and the
+  contains the (negative) Markowitz portfolio and the
   precision matrix.
 
   Given \eqn{n} contemporaneous observations of
@@ -43,6 +43,13 @@
   via the \code{\link{vcov}} function, or via a 'fancy'
   estimator, like \code{sandwich:vcovHAC},
   \code{sandwich:vcovHC}, \emph{etc.}
+}
+\note{
+  By flipping the sign of \eqn{X}, the inverse of
+  \eqn{\Theta}{Theta} contains the \emph{positive}
+  Markowitz portfolio and the precision matrix on \eqn{X}.
+  Performing this transform before passing the data to this
+  function should be considered idiomatic.
 }
 \examples{
 X <- matrix(rnorm(1000*3),ncol=3)

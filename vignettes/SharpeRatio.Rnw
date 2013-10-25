@@ -93,7 +93,8 @@ lseq <- function(from,to,length.out) {
 
 \title{Notes on the \txtSR}
 \author{Steven E. Pav %
-\thanks{\email{shabbychef@gmail.com}}}
+\thanks{\email{shabbychef@gmail.com} This document is a bit of a hodgepodge at
+the moment, and is in a constant state of flux.}}
 %\date{\today, \currenttime}
 
 \maketitle
@@ -2236,7 +2237,7 @@ is an unbiased since $\pvsm = \E{\gram{\avreti}}$.
 
 \subsection{Asymptotic distribution of the Markowitz portfolio}%FOLDUP
 
-\label{sec:dist_markoport}
+\label{subsec:dist_markoport}
 \nocite{BrittenJones1999}
 
 Collecting the mean and covariance into the second moment matrix as
@@ -2303,6 +2304,57 @@ violations of the \iid assumptions.
 \nocite{magnus1999matrix,magnus1980elimination}
 \nocite{BrittenJones1999}
 
+Empirically, the implicit tests for significance based on this computation
+give results nearly identical to the procedure 
+of Britten-Jones, as shown below. \cite{BrittenJones1999} 
+What differences exist are likely
+due to differences in degrees of freedom accounting.
+
+<<'me_vs_bjones',echo=TRUE>>=
+nday <- 1024
+nstk <- 5
+
+# under the null: all returns are zero mean;
+set.seed(as.integer(charToRaw("7fbb2a84-aa4c-4977-8301-539e48355a35")))
+rets <- matrix(rnorm(nday * nstk),nrow=nday)
+
+# t-stat via Britten-Jones procedure
+bjones.ts <- function(rets) {
+	ones.vec <- matrix(1,nrow=dim(rets)[1],ncol=1)
+	bjones.mod <- lm(ones.vec ~ rets - 1)
+	bjones.sum <- summary(bjones.mod)
+	retval <- bjones.sum$coefficients[,3]
+}
+# t-stat via inverse second moment trick
+ism.ts <- function(rets) {
+# flipping the sign on returns is idiomatic,
+	asymv <- ism_vcov(- rets)
+	asymv.mu <- asymv$mu[1:asymv$p]
+	asymv.Sg <- asymv$Ohat[1:asymv$p,1:asymv$p]
+	retval <- asymv.mu / sqrt(diag(asymv.Sg))
+}
+
+bjones.tstat <- bjones.ts(rets)
+ism.tstat <- ism.ts(rets)
+
+# compare them:
+print(bjones.tstat)
+print(ism.tstat)
+
+# repeat under the alternative;
+set.seed(as.integer(charToRaw("a5f17b28-436b-4d01-a883-85b3e5b7c218")))
+zero.rets <- t(matrix(rnorm(nday * nstk),nrow=nday))
+mu.vals <- (1/sqrt(253)) * seq(-1,1,length.out=nstk) 
+rets <- t(zero.rets + mu.vals)
+
+bjones.tstat <- bjones.ts(rets)
+ism.tstat <- ism.ts(rets)
+
+# compare them:
+print(bjones.tstat)
+print(ism.tstat)
+@
+
 %UNFOLD
 
 \subsection{Unified Multivariate Gaussian}%FOLDUP
@@ -2347,8 +2399,8 @@ density of \amreti is
 + \half[\ssiz] \logdet{\pvsm} 
 + \half \trace{\minv{\pvsm}\gram{\amreti}}.
 \end{equation*}
-Now note that $\gram{\amreti}/\ssiz$ is an unbiased
-sample estimate of \pvsm, call it \svsm. Then 
+Again let $\svsm = \gram{\amreti}/\ssiz$, the unbiased
+sample estimate of \pvsm. Then 
 \begin{equation*}
 \frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz} = 
   c_{\nlatf} 
@@ -2390,7 +2442,8 @@ c''_{\ssiz,\nlatf}\frac{\det{\svsm}^{\half[\ssiz-\nlatf-2]}}{\det{\pvsm}^{\half[
 Thus $\ssiz\svsm$ has the same density, up to the leading constant, as a 
 $\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
 and scale matrix \pvsm. In fact, $\ssiz\svsm$ is a \emph{conditional} Wishart,
-conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.
+conditional on $\svsm_{1,1} = 1$.
+%conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.  % for the other form.
 %UNFOLD
 
 \subsection{Maximum Likelihood Estimator}%FOLDUP
@@ -2460,41 +2513,6 @@ statistic is
 \providecommand{\lrtA}[1][i]{\mathSUB{\Mtx{A}}{#1}}
 \providecommand{\lrta}[1][i]{\mathSUB{a}{#1}}
 
-\subsubsection{Tests on the Mean and Covariance Matrix}%FOLDUP
-
-For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
-consider the null hypothesis
-\begin{equation}
-H_0: \trace{\lrtA[i]{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
-\label{eqn:lrt_null_forw}
-\end{equation}
-The constraints have to be sensible. For example, they cannot
-violate the positive definiteness of 
-\pvsm, \etc  Without loss of generality, we can assume
-that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
-symmetric \Mtx{G} and square \Mtx{H}, 
-$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
-\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
-$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
-
-Employing the Lagrange multiplier technique, the maximum likelihood
-estimator under the null hypothesis satisfies
-\begin{equation*}
-\begin{split}
-0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
-- \sum_i \lambda_i
-%\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
-\drbydr{\trace{\lrtA[i]{\pvsm}}}{\minv{\pvsm}},\\
-&= - \pvsm + \svsm + \sum_i \lambda_i \pvsm \lrtA[i] \pvsm,\\
-\therefore \pvsm[\txtMLE] &= ???.
-\end{split}
-\end{equation*}
-The maximum likelihood estimator under the constraints has to be
-found numerically by solving for the $\lambda_i$, subject
-to the constraints in \eqnref{lrt_null_back}.
-
-
-%UNFOLD
 
 \subsubsection{Tests on the Precision and Markowitz Portfolio}%FOLDUP
 
@@ -2547,7 +2565,10 @@ all other respects, however, the solution here follows Dempster.
 
 An iterative technique for finding the MLE based on a Newton step would
 proceed as follows. Let \vitrlam{0}{} be some initial estimate of the
-vector of $\lambda_i$. The residual of the \kth{k} estimate, \vitrlam{k}{} is
+vector of $\lambda_i$. (A good initial estimate can likely be had 
+by abusing the asymptotic normality 
+result from \subsecref{dist_markoport}.)
+The residual of the \kth{k} estimate, \vitrlam{k}{} is
 \begin{equation}
 \vitrerr{k}{i} \defeq 
 \trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}} - \lrta[i].
@@ -2570,6 +2591,42 @@ compute the likelihood ratio statistic $-2\log\Lambda$, as defined
 in \eqnref{wilks_lambda_def}. By Wilks' Theorem, under the null 
 hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as 
 a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
+%UNFOLD
+
+\subsubsection{Tests on the Mean and Covariance Matrix}%FOLDUP
+
+For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
+consider the null hypothesis
+\begin{equation}
+H_0: \trace{\lrtA[i]{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
+\label{eqn:lrt_null_forw}
+\end{equation}
+The constraints have to be sensible. For example, they cannot
+violate the positive definiteness of 
+\pvsm, \etc  Without loss of generality, we can assume
+that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
+symmetric \Mtx{G} and square \Mtx{H}, 
+$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
+\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
+$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
+
+Employing the Lagrange multiplier technique, the maximum likelihood
+estimator under the null hypothesis satisfies
+\begin{equation*}
+\begin{split}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+- \sum_i \lambda_i
+%\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
+\drbydr{\trace{\lrtA[i]{\pvsm}}}{\minv{\pvsm}},\\
+&= - \pvsm + \svsm + \sum_i \lambda_i \pvsm \lrtA[i] \pvsm,\\
+\therefore \pvsm[\txtMLE] &= ???.
+\end{split}
+\end{equation*}
+The maximum likelihood estimator under the constraints has to be
+found numerically by solving for the $\lambda_i$, subject
+to the constraints in \eqnref{lrt_null_back}.
+
+
 %UNFOLD
 %UNFOLD
 
@@ -2621,6 +2678,8 @@ Thus the prior is
 \nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850,sref2011}
 \nocite{rekkas2012inference}
 \nocite{geary1936distribution}
+\nocite{doi:10.1080/13518470802423478,SJOS:SJOS729}
+\nocite{okhrin2006distributional,okhrin2008estimation,schmidzabo2008}
 
 %\bibliographystyle{jss}
 %\bibliographystyle{siam}
@@ -2638,7 +2697,34 @@ Thus the prior is
 \item[\pmu] The true, or population, mean return of a single asset.
 \item[\psig] The population standard deviation of a single asset.
 \item[\psnr] The population signal-to-noise ratio (SNR), defined as
-$\psnr = \pmu / \psig$.
+$\psnr \defeq \fracc{\pmu}{\psig}$.
+
+\item[\smu] The unbiased sample mean return of a single asset.
+\item[\ssig] The sample standard deviation of returns of a single asset.
+\item[\ssr] The sample \txtSR, defined as
+$\ssr \defeq \fracc{\smu}{\ssig}$.
+
+\item[{\ssiz}] Typically the sample size, the number of observations
+of the return of an asset or collection of assets.
+
+\item[\rfr] The risk-free, or disastrous rate of return.
+
+\item[\nlatf] Typically the number of assets in the multiple asset case.
+\item[\pvmu] The population mean return vector of \nlatf assets.
+\item[\pvsig] The population covariance matrix of \nlatf assets.
+
+\item[\pportwopt] The maximal SNR portfolio, constructed using population
+data: $\pportwopt\defeq\minv{\pvsig}\pvmu.$
+\item[\psnropt] The SNR of \pportwopt.
+
+\item[\svmu] The Sample mean return vector of \nlatf assets.
+\item[\svsig] The sample covariance matrix of \nlatf assets.
+
+\item[\sportw] A portfolio, built on sample data.
+\item[\sportwopt] The maximal \txtSR portfolio, constructed using 
+sample data: $\sportwopt\defeq\minv{\svsig}\svmu.$
+\item[\ssropt] The \txtSR of \sportwopt.
+
 
 \item[\nctcdf{x}{\df[1]}{\nctp}] the CDF of the non-central 
 \tlaw{} distribution, with \df[1] degrees of freedom and
