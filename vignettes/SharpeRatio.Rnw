@@ -2272,14 +2272,16 @@ of $\minv{\svsm}$ via the Delta method. The derivative of the matrix
 inverse is given by
 \begin{equation}
 \dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
-= - \minv{\Mtx{A}} \kron \minv{\Mtx{A}},
+= - \AkronA{\minv{\Mtx{A}}},
+\label{eqn:deriv_matrix_inverse}
 \end{equation}
 for symmetric \Mtx{A}.  \cite{magnus1980elimination,facklernotes}
 We can reduce this to the non-redundant parts via the Elimination matrix:
 \begin{equation}
 \dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
 = \qoform{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}{\Elim}
-= - \qoform{\wrapParens{\minv{\Mtx{A}} \kron \minv{\Mtx{A}}}}{\Elim}.
+= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
+\label{eqn:deriv_vech_matrix_inverse}
 \end{equation}
 
 Then we have, via the Delta method, 
@@ -2287,28 +2289,28 @@ Then we have, via the Delta method,
 \begin{multline}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow \\
-\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\minv{\svsm} \kron
-\minv{\svsm}}}{\Elim}}}}.
+\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\AkronA{\minv{\pvsm}}}}{\Elim}}}}.
 \label{eqn:mvclt_isvsm}
 \end{multline}
 %\end{equation}
-It only remains to estimate \pvvar by some consistent estimator, call
+To estimate the covariance of $\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}$,
+plug in \svsm for \pvsm in the covariance computation, and use some
+consistent estimator for \pvvar, call 
 it \svvar. 
 %Rather, one must estimate $\qform{\pvvar}{\Elim}$.
 The simple sample estimate can be had by computing the sample covariance
 of the vectors $\fvech{\ogram{\avreti[i]}} =
 \asvec{1,\tr{\vreti[i]},\tr{\fvech{\ogram{\vreti[i]}}}}$. 
-More elaborate covariance estimators can also be used to deal with
+More elaborate covariance estimators can be used, for example, to deal with
 violations of the \iid assumptions.
 
 \nocite{magnus1999matrix,magnus1980elimination}
 \nocite{BrittenJones1999}
 
-Empirically, the implicit tests for significance based on this computation
-give results nearly identical to the procedure 
+Empirically, the marginal Wald test for zero weighting in the 
+Markowitz portfolio based on this approximation are nearly
+identical to the \tstat-statistics produced by the procedure
 of Britten-Jones, as shown below. \cite{BrittenJones1999} 
-What differences exist are likely
-due to differences in degrees of freedom accounting.
 
 <<'me_vs_bjones',echo=TRUE>>=
 nday <- 1024
@@ -2325,8 +2327,8 @@ bjones.ts <- function(rets) {
 	bjones.sum <- summary(bjones.mod)
 	retval <- bjones.sum$coefficients[,3]
 }
-# t-stat via inverse second moment trick
-ism.ts <- function(rets) {
+# wald stat via inverse second moment trick
+ism.ws <- function(rets) {
 # flipping the sign on returns is idiomatic,
 	asymv <- ism_vcov(- rets)
 	asymv.mu <- asymv$mu[1:asymv$p]
@@ -2335,11 +2337,11 @@ ism.ts <- function(rets) {
 }
 
 bjones.tstat <- bjones.ts(rets)
-ism.tstat <- ism.ts(rets)
+ism.wald <- ism.ws(rets)
 
 # compare them:
 print(bjones.tstat)
-print(ism.tstat)
+print(ism.wald)
 
 # repeat under the alternative;
 set.seed(as.integer(charToRaw("a5f17b28-436b-4d01-a883-85b3e5b7c218")))
@@ -2348,11 +2350,11 @@ mu.vals <- (1/sqrt(253)) * seq(-1,1,length.out=nstk)
 rets <- t(zero.rets + mu.vals)
 
 bjones.tstat <- bjones.ts(rets)
-ism.tstat <- ism.ts(rets)
+ism.wald <- ism.ws(rets)
 
 # compare them:
 print(bjones.tstat)
-print(ism.tstat)
+print(ism.wald)
 @
 
 %UNFOLD
@@ -2465,20 +2467,33 @@ conditional on $\svsm_{1,1} = 1$.
 
 The maximum likelihood estimator of \pvsm is found by 
 taking the derivative of the (log) likelihood with respect to
-\minv{\pvsm} and finding a root.
-That is,
-\begin{equation*}
+\pvsm and finding a root. However, the derivative of log likelihood
+with respect to \pvsm is mildly unpleasant:
+\begin{equation}
 \begin{split}
-0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}},\\
-	&= \half[\ssiz]\drbydr{\logdet{\minv{\pvsm}}}{\minv{\pvsm}} -
-\half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\minv{\pvsm}},\\
-	&= \half[\ssiz]\wrapParens{\pvsm - \svsm},
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm} 
+	&= - \half[\ssiz]\drbydr{\logdet{\pvsm}}{\pvsm} 
+	- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\pvsm},\\
+	&= - \half[\ssiz]\minv{\pvsm}
+	+ \half[\ssiz]\minv{\pvsm}\svsm\minv{\pvsm},
 \end{split}
-\end{equation*}
-leaning heavily on the Matrix Cookbook for 
-the derivatives. \cite{petersen2006matrix,magnus1999matrix}
-This is solved by $\pvsm[\txtMLE] = \svsm$, and thus the
-unbiased sample estimator is also the MLE.
+\label{eqn:mle_deadend}
+\end{equation}
+However, the derivative with respect to \minv{\pvsm} is a bit
+simpler:
+\begin{equation}
+\begin{split}
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}} 
+	&= \half[\ssiz]\drbydr{\logdet{\minv{\pvsm}}}{\minv{\pvsm}} 
+	- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\minv{\pvsm}},\\
+  &= \half[\ssiz]\wrapParens{\pvsm - \svsm}.
+\end{split}
+\end{equation}
+(See Magnus and Neudecker or the Matrix Cookbook for a refresher
+on matrix derivatives. \cite{magnus1999matrix,petersen2006matrix})
+Thus the likelihood is maximized by 
+$\pvsm[\txtMLE] = \svsm$, \ie the unbiased sample estimator is also
+the MLE. Note that this is also a root of \eqnref{mle_deadend}.
 
 Since $\pvsm[\txtMLE] = \svsm$, the log likelihood of the MLE is 
 \begin{equation}
@@ -2491,6 +2506,46 @@ Since $\pvsm[\txtMLE] = \svsm$, the log likelihood of the MLE is
  - \half[\nlatf+2]\logdet{\svsm} + \wrapParens{\nlatf+1}.
 \end{split}
 \end{equation}
+
+\subsubsection{Fisher Information}
+
+\providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
+\providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
+\providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
+\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+
+To compute the Fisher Information, first compute
+the Hessian of $\log\FOOpdf{}{\svsm}{\pvsm}$ with
+respect to $\fvech{\minv{\pvsm}}$. From above we know that
+\begin{equation*}
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+ = \half[\ssiz]\wrapParens{\pvsm - \svsm}.
+\end{equation*}
+So
+\begin{equation*}
+\begin{split}
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+ & \defeq
+\drbydr{\fvech{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvech{\minv{\pvsm}}},\\
+ &= - \half[\ssiz] \qoElim{\wrapParens{\AkronA{\pvsm}}},
+\end{split}
+\end{equation*}
+via \eqnref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
+`Elimination Matrix.' \cite{magnus1980elimination}
+
+Thus 
+\begin{equation}
+\FishIf[\ssiz]{\minv{\pvsm}} = \half[\ssiz]
+\qoElim{\wrapParens{\AkronA{\pvsm}}}.
+\end{equation}
+By change of variables, and again using \eqnref{deriv_vech_matrix_inverse}, 
+the Fisher Information with respect to \pvsm is
+\begin{equation}
+\FishIf[\ssiz]{\pvsm} = \half[\ssiz]
+\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}.
+\end{equation}
+
 %UNFOLD
 
 \subsection{Likelihood Ratio Test}%FOLDUP

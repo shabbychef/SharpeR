@@ -17,7 +17,8 @@
   \eqn{q = p(p+3)/2} vector of the mean, then the vech'd
   second moment of the sample data} \item{Ohat}{the \eqn{q
   \times q}{q x q} estimated variance covariance matrix.}
-  \item{p}{the number of assets.}
+  \item{n}{the number of rows in \code{X}.} \item{p}{the
+  number of assets.}
 }
 \description{
   Computes the variance covariance matrix of sample mean

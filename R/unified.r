@@ -27,6 +27,19 @@
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
+# note to self on why one need not explicitly multiply the Ohat
+# covariance by '1/n' :
+# the vcov function, and its workalikes, computes variance-covariance
+# of the estimate, and thus have the proper d.f. adjustments in
+# their output, as shown by this code:
+# test some code;
+# set.seed(as.integer(charToRaw("c3e1e960-2926-4278-9ed3-5fc2f41e7b9e")))
+# X <- matrix(rnorm(1000*5),ncol=5)
+# foomod <- lm(X ~ 1)
+# print(vcov(foomod))
+# print(1000*vcov(foomod))
+# print(cov(X))
+
 # variance covariance#FOLDUP
 #' @title Compute variance covariance of 'Unified' Second Moment 
 #'
@@ -61,6 +74,7 @@
 #' \item{mu}{a \eqn{q = p(p+3)/2} vector of the mean, then the vech'd second
 #' moment of the sample data}
 #' \item{Ohat}{the \eqn{q \times q}{q x q} estimated variance covariance matrix.}
+#' \item{n}{the number of rows in \code{X}.}
 #' \item{p}{the number of assets.}
 #' @seealso \code{\link{ism_vcov}}, \code{\link{sr_vcov}}
 #' @rdname sm_vcov
@@ -90,6 +104,7 @@
 #'
 sm_vcov <- function(X,vcov.func=vcov) {
 	X <- na.omit(X)
+	n <- dim(X)[1]
 	p <- dim(X)[2]
 	q <- p * (p+3) / 2
 	# fill in Y
@@ -127,7 +142,7 @@ sm_vcov <- function(X,vcov.func=vcov) {
 	rownames(mu) <- strnames
 	rownames(Ohat) <- strnames
 	colnames(Ohat) <- strnames
-	retval <- list(mu=mu,Ohat=Ohat,p=p)
+	retval <- list(mu=mu,Ohat=Ohat,n=n,p=p)
 	return(retval)
 }
 
@@ -171,6 +186,7 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #' portfolio, then the vech'd precision matrix of the sample data}
 #' \item{Ohat}{the \eqn{q \times q}{q x q} estimated variance 
 #' covariance matrix.}
+#' \item{n}{the number of rows in \code{X}.}
 #' \item{p}{the number of assets.}
 #' @seealso \code{\link{sm_vcov}}, \code{\link{sr_vcov}}
 #' @rdname ism_vcov
@@ -187,22 +203,32 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #'
 #' @examples 
 #' X <- matrix(rnorm(1000*3),ncol=3)
-#' Sigmas <- ism_vcov(X)
+#' # putting in -X is idiomatic:
+#' ism <- ism_vcov(-X)
+#' # compute the marginal Wald test statistics:
+#' ism.mu <- ism$mu[1:ism$p]
+#' ism.Sg <- ism$Ohat[1:ism$p,1:ism$p]
+#' wald.stats <- ism.mu / sqrt(diag(ism.Sg))
+#'
 #' # make it fat tailed:
 #' X <- matrix(rt(1000*3,df=5),ncol=3)
-#' Sigmas <- ism_vcov(X)
+#' ism <- ism_vcov(X)
+#' wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
 #' \dontrun{
 #' if (require(sandwich)) {
-#'  Sigmas <- ism_vcov(X,vcov.func=vcovHC)
+#'  ism <- ism_vcov(X,vcov.func=vcovHC)
+#'  wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
 #' }
 #' }
 #' # add some autocorrelation to X
 #' Xf <- filter(X,c(0.2),"recursive")
 #' colnames(Xf) <- colnames(X)
-#' Sigmas <- ism_vcov(Xf)
+#' ism <- ism_vcov(Xf)
+#' wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
 #' \dontrun{
 #' if (require(sandwich)) {
-#'	Sigmas <- ism_vcov(Xf,vcov.func=vcovHAC)
+#'	ism <- ism_vcov(Xf,vcov.func=vcovHAC)
+#'  wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
 #' }
 #' }
 #'
@@ -237,7 +263,7 @@ ism_vcov <- function(X,vcov.func=vcov) {
 	rownames(mu) <- strnames
 	rownames(Ohat) <- strnames
 	colnames(Ohat) <- strnames
-	retval <- list(mu=mu,Ohat=Ohat,p=p)
+	retval <- list(mu=mu,Ohat=Ohat,n=sm_est$n,p=p)
 	return(retval)
 }
 #UNFOLD

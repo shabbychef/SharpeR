@@ -17,8 +17,8 @@
   \eqn{q = p(p+3)/2} vector of the negative Markowitz
   portfolio, then the vech'd precision matrix of the sample
   data} \item{Ohat}{the \eqn{q \times q}{q x q} estimated
-  variance covariance matrix.} \item{p}{the number of
-  assets.}
+  variance covariance matrix.} \item{n}{the number of rows
+  in \code{X}.} \item{p}{the number of assets.}
 }
 \description{
   Computes the variance covariance matrix of the inverse
@@ -53,22 +53,32 @@
 }
 \examples{
 X <- matrix(rnorm(1000*3),ncol=3)
-Sigmas <- ism_vcov(X)
+# putting in -X is idiomatic:
+ism <- ism_vcov(-X)
+# compute the marginal Wald test statistics:
+ism.mu <- ism$mu[1:ism$p]
+ism.Sg <- ism$Ohat[1:ism$p,1:ism$p]
+wald.stats <- ism.mu / sqrt(diag(ism.Sg))
+
 # make it fat tailed:
 X <- matrix(rt(1000*3,df=5),ncol=3)
-Sigmas <- ism_vcov(X)
+ism <- ism_vcov(X)
+wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
 \dontrun{
 if (require(sandwich)) {
- Sigmas <- ism_vcov(X,vcov.func=vcovHC)
+ ism <- ism_vcov(X,vcov.func=vcovHC)
+ wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
 }
 }
 # add some autocorrelation to X
 Xf <- filter(X,c(0.2),"recursive")
 colnames(Xf) <- colnames(X)
-Sigmas <- ism_vcov(Xf)
+ism <- ism_vcov(Xf)
+wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
 \dontrun{
 if (require(sandwich)) {
-	Sigmas <- ism_vcov(Xf,vcov.func=vcovHAC)
+	ism <- ism_vcov(Xf,vcov.func=vcovHAC)
+ wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
 }
 }
 }
