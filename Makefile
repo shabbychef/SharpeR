@@ -27,7 +27,7 @@ GS_QUALITY 				?= 'ebook'
 
 M4_FILES					?= $(wildcard m4/*.m4)
 
-VERSION 					 = 0.1310
+VERSION 					 = 0.1311
 TODAY 						:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 					:= SharpeR
@@ -114,7 +114,7 @@ INSTALL_FLAGS 		?= --preclean --library=$(LOCAL)
 TEST_PRAGMA     	?= release
 
 #GIT_BRANCH 				?= master
-GIT_BRANCH 				?= dev1310
+GIT_BRANCH 				?= dev1311
 
 # for R CMD build
 ifeq ($(TEST_PRAGMA),thorough)
@@ -503,7 +503,7 @@ mactex :
 # cheesy checkin:
 #
 # sleep `jot -r 1 5 55` && git commit -a -m 'working on vignette'
-# git push origin dev1310
+# git push origin dev1311
 
 
 #for vim modeline: (do not edit)
