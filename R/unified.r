@@ -234,7 +234,7 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #'
 ism_vcov <- function(X,vcov.func=vcov) {
 	# delegate
-	sm_est <- sm_vcov(X,vcov.func=vcov)
+	sm_est <- sm_vcov(X,vcov.func=vcov.func)
 	# interpret
 	p <- sm_est$p
 	q <- p * (p + 3) /2
@@ -258,7 +258,7 @@ ism_vcov <- function(X,vcov.func=vcov) {
 	Ohat <- t(sub.deriv) %*% sm_est$Ohat %*% sub.deriv
 
 	mu <- iTheta[elim.idx]
-	strnames <- colnames(sm_est$mu)
+	strnames <- rownames(sm_est$mu)
 	dim(mu) <- c(q,1)
 	rownames(mu) <- strnames
 	rownames(Ohat) <- strnames

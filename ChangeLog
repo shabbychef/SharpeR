@@ -1,4 +1,8 @@
 
+2013-10-30 Steven E. Pav <shabbychef@gmail.com>
+* ism_vcov for variance/covariance on Markowitz portfolio
+* expanding vignettes
+
 2013-09-20 Steven E. Pav <shabbychef@gmail.com>
 * add spanning tests
 * split vignette in two

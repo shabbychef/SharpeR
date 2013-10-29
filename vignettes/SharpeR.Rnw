@@ -805,7 +805,7 @@ if (require(sandwich)) {
 
 %UNFOLD
 
-\section{Miscellanea}%FOLDUP
+\section{Asymptotics}%FOLDUP
 
 \subsection{Variance Covariance of the \txtSR}%FOLDUP
 
@@ -845,6 +845,73 @@ if (require(sandwich)) {
 @
 
 %UNFOLD
+
+\subsection{Variance Covariance of the Markowitz Portfolio}%FOLDUP
+
+Given a vector of returns, \vreti, prepending a one and taking the
+uncentered moment gives a `unified' parameter:
+$$
+\pvsm \defeq \E{\ogram{\avreti}} = 
+	\twobytwo{1}{\tr{\pvmu}}{\pvmu}{\pvsig + \ogram{\pvmu}},
+$$
+where $\avreti = \asvec{1,\tr{\vreti}}$. The inverse of \pvsm contains
+the (negative) Markowitz portfolio:
+$$
+\minv{\pvsm} 
+= \twobytwo{1 + \qiform{\pvsig}{\pvmu}}{-\tr{\pvmu}\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{\minv{\pvsig}}
+= \twobytwo{1 + \psnrsqopt}{-\tr{\pportwopt}}{-\pportwopt}{\minv{\pvsig}}.
+$$
+These computations hold for the sample estimator 
+$\svsm \defeq \oneby{\ssiz}\gram{\amreti}$, where \amreti is the matrix
+whose rows are the \ssiz vectors \tr{\avreti[i]}. 
+
+By the multivariate Central Limit Theorem, \cite{wasserman2004all}
+$$
+\sqrt{\ssiz}\wrapParens{\fvech{{\svsm}} - \fvech{{\pvsm}}} 
+\rightsquigarrow 
+\normlaw{0,\pvvar},
+$$
+for some \pvvar which can be estimated from the data. Via the delta method
+the asymptotic distribution of \fvech{\minv{\svsm}}, which contains 
+$-\minv{\svsig}\svmu$, can be found. See the other vignette for more details.
+
+This functionality is available via the \Rcode{ism\_vcov} function. This 
+function returns the sample estimate and estimated asymptotic variance of 
+\fvech{\minv{\svsm}} (with the leading one removed).  This function
+also allows one to pass in a callback to perform the covariance estimation.
+The default is the \Rcode{vcov} function; other
+sensible choices include \Rcode{sandwich:vcovHC} and \Rcode{sandwich:vcovHAC}.
+
+<<'marko_vcov'>>=
+# get returns
+some.rets <- get.rets(c("IBM","AAPL","XOM"),
+	from="2007-01-01",to="2013-01-01")
+
+ism.wald <- function(X,vcov.func=vcov) {
+	# negating returns is idiomatic to get + Markowitz
+	ism <- ism_vcov(- as.matrix(X),vcov.func=vcov.func)
+	ism.mu <- ism$mu[1:ism$p]
+	ism.Sg <- ism$Ohat[1:ism$p,1:ism$p]
+	retval <- ism.mu / sqrt(diag(ism.Sg))
+	dim(retval) <- c(ism$p,1)
+	rownames(retval) <- rownames(ism$mu)[1:ism$p]
+	return(retval)
+}
+
+wald.stats <- ism.wald(some.rets)
+print(t(wald.stats))
+
+if (require(sandwich)) {
+	wald.stats <- ism.wald(some.rets,vcov.func=sandwich::vcovHAC)
+	print(t(wald.stats))
+}
+@
+
+%UNFOLD
+
+%UNFOLD
+
+\section{Miscellanea}%FOLDUP
 
 \subsection{Distribution Functions}%FOLDUP
 

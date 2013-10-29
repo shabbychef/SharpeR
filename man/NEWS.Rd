@@ -10,6 +10,11 @@
   \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
   \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 }
+\section{Changes in \SharpeR{} Version 0.1310 (2013-10-30) }{
+  \itemize{ \item inverse second moment asymptotic
+  covariance. }
+}
+
 \section{Changes in \SharpeR{} Version 0.1309 (2013-09-20) }{
   \itemize{ \item spanning/hedging tests. \item sr equality
   test via callback variance covariance computation. \item

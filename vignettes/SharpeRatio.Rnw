@@ -106,7 +106,11 @@ Herein is an incomplete collection of facts about the \txtSR, and the
 the \txtSR and the \tstat-test, and between the Markowitz portfolio and
 the Hotelling \Tstat statistic are explored. Many classical results 
 for testing means can be easily translated into tests on assets and
-portfolios.
+portfolios. A `unified' framework is described which combines the mean
+and covariance parameters of a multivariate distribution into the
+uncentered second moment of a related random variable. This trick
+streamlines some multivariate computations, and gives the asymptotic
+distribution of the sample Markowitz portfolio.
 \end{abstract}%UNFOLD
 
 \tableofcontents
@@ -486,7 +490,7 @@ Let \svsr be the sample \txtSR computed from the estimates \svmu and
 \svmom[2]: 
 $\svsr[i] = \fracc{\wrapParens{\svmu[i]-\rfr}}{\sqrt{\svmom[2,i] - \svmu[i]^2}}.
 $
-By the multivariate Delta method, 
+By the multivariate delta method, 
 \begin{equation}
 \sqrt{\ssiz}\wrapParens{\svsr - \pvsnr} 
 \rightsquigarrow 
@@ -555,7 +559,7 @@ definition of \txtSR includes a risk-free rate, \rfr.
 \subsubsection{Tests of equality of multiple \txtSR}%FOLDUP
 
 Now let $\vect{g}$ be some vector valued function of the vector \pvsnr.
-Applying the Delta method,
+Applying the delta method,
 \begin{equation}
 \sqrt{\ssiz}\wrapParens{\funcit{\vect{g}}{\svsr} - \funcit{\vect{g}}{\pvsnr}} 
 \rightsquigarrow 
@@ -817,9 +821,9 @@ The corrected \tstat-statistic has the form:
 where \corcor is the correction factor for autocorrelation \cite{vanBelle2002_STRUTs}. The equivalent correction
 for Sharpe ratio is $\ssr[0]' = \corcor \ssr[0]$.
 
-2FIX: mention Lo's approximation
-2FIX: perform tests and find empirical type I rate. is there a correction?
-2FIX: this section is weak.
+%2FIX: mention Lo's approximation
+%2FIX: perform tests and find empirical type I rate. is there a correction?
+%2FIX: this section is weak.
 
 %UNFOLD
 
@@ -860,7 +864,8 @@ returns series, \reti[{}]. However, the deflation is typically modest,
 on the order of 10\%. The shrinkage of \txtSR will also
 typically lead to slight deflation of the estimated standard error,
 but for large \ssiz and daily returns, this will not lead to 
-inflated type I rate. (2FIX: is this true? do a study?)
+inflated type I rate. 
+%2FIX: is this true? do a study?
 
 Note that when looking at \eg daily returns, the (non-annualized) \txtSR on the given mark frequency is usually
 on the order of 0.1 or less, thus $\E{\reti}^2 \approx 0.01 \VAR{\reti}$, and so $\E{\reti^2} \approx 1.01 \VAR{\reti}$.
@@ -988,7 +993,7 @@ The Mertens' correction appears to be less liberal for the highly skewed
 Lambert distributions, but perhaps more liberal for the Tukey and S \& P 500
 distributions.
 
-2FIX: more.
+%2FIX: more.
 
 However, skew is a serious problem when using the \txtSR. 
 A practicioner must be reasonably satisfied that the
@@ -999,59 +1004,59 @@ reason that skew causes the distribution of \txtSR to degrade.
 %UNFOLD
 %UNFOLD
 
-\subsection{A Bayesian view}%FOLDUP
+%\subsection{A Bayesian view}%FOLDUP
 
-\providecommand{\bhysnr}[1][0]{\psnr[{#1}]}
-\providecommand{\bhysnrdof}[1][0]{\ssiz[#1]}
-\providecommand{\bhyprec}[1][0]{\pprec[{#1}]}
-\providecommand{\bhyprecdof}[1][0]{\mathSUB{m}{#1}}
-\providecommand{\prior}[2]{\funcit{f}{\condtwo{#1}{#2}}}
+%\providecommand{\bhysnr}[1][0]{\psnr[{#1}]}
+%\providecommand{\bhysnrdof}[1][0]{\ssiz[#1]}
+%\providecommand{\bhyprec}[1][0]{\pprec[{#1}]}
+%\providecommand{\bhyprecdof}[1][0]{\mathSUB{m}{#1}}
+%\providecommand{\prior}[2]{\funcit{f}{\condtwo{#1}{#2}}}
 
-Let $\reti[1], \reti[2], \ldots, \reti[\ssiz]$ be \iid draws from 
-a normal distribution \normdist[\pmu,\psig], where \pmu and \psig
-are unknown. A commonly used conjugate prior is the `Normal-Gamma
-prior,' which is a prior on \pmu and $\psig^{-2}$, known as the
-\emph{precision}.  
+%Let $\reti[1], \reti[2], \ldots, \reti[\ssiz]$ be \iid draws from 
+%a normal distribution \normdist[\pmu,\psig], where \pmu and \psig
+%are unknown. A commonly used conjugate prior is the `Normal-Gamma
+%prior,' which is a prior on \pmu and $\psig^{-2}$, known as the
+%\emph{precision}.  
 
-Under the Normal-Gamma formulation, one has an unconditional 
-gamma prior distribution on 
-$\psig^{-2}$ (this is a chisquare up to scaling), and, conditional
-on \psig, a normal prior on \pmu. The latter is stated
-as
-$$
-\condtwo{\pmu}{\psig^{-2}} \sim \normlaw{\pmu[0],\psig^2 / \kappa_0},
-$$
-where $\pmu[0]$ and $\kappa_0$ are the hyper-parameters.
-Note this can be simply restated as
-$$
-\condtwo{\psnr}{\psig^{-2}} \sim \normlaw{\frac{\pmu[0]}{\psig},1 / \kappa_0}.
-$$
-One could rewrite this as a prior on the signal-noise ratio that is
-independent of \psig.
+%Under the Normal-Gamma formulation, one has an unconditional 
+%gamma prior distribution on 
+%$\psig^{-2}$ (this is a chisquare up to scaling), and, conditional
+%on \psig, a normal prior on \pmu. The latter is stated
+%as
+%$$
+%\condtwo{\pmu}{\psig^{-2}} \sim \normlaw{\pmu[0],\psig^2 / \kappa_0},
+%$$
+%where $\pmu[0]$ and $\kappa_0$ are the hyper-parameters.
+%Note this can be simply restated as
+%$$
+%\condtwo{\psnr}{\psig^{-2}} \sim \normlaw{\frac{\pmu[0]}{\psig},1 / \kappa_0}.
+%$$
+%One could rewrite this as a prior on the signal-noise ratio that is
+%independent of \psig.
 
-It then becomes a mechanical exercise to replace the prior on 
-\pmu with a prior on \psnr. I perform that exercise here, leaning
-heavily on Murphy's notes. \cite{murphybayes}
+%It then becomes a mechanical exercise to replace the prior on 
+%\pmu with a prior on \psnr. I perform that exercise here, leaning
+%heavily on Murphy's notes. \cite{murphybayes}
 
-The prior can be stated as
-\begin{equation*}
-\begin{split}
-\prior{\psnr,\pprec}{\bhysnr,\bhysnrdof,\bhyprec,\bhyprecdof} 
-&= \normlaw{\condtwo{\psnr}{\bhysnr,\fracc{1}{\bhysnrdof}}} 
-\gammalaw{\condtwo{\pprec}{\bhyprec/2,2\bhyprecdof}},\\
-&=
-\wrapBracks{\sqrt{\frac{\bhysnrdof}{2\pi}}\longexp{-\frac{\bhysnrdof\wrapParens{\psnr
-- \bhysnr}^2}{2}}} 
-\wrapBracks{\frac{\pprec^{\bhyprecdof/2 - 1}}{\GAM{\bhyprecdof/2}\wrapParens{2\bhyprec}^{\bhyprecdof/2}} \longexp{-\frac{\pprec}{2\bhyprec}}},\\
-&= 23
-\end{split}
-\end{equation*}
-
-
-2FIX: keep going.
+%The prior can be stated as
+%\begin{equation*}
+%\begin{split}
+%\prior{\psnr,\pprec}{\bhysnr,\bhysnrdof,\bhyprec,\bhyprecdof} 
+%&= \normlaw{\condtwo{\psnr}{\bhysnr,\fracc{1}{\bhysnrdof}}} 
+%\gammalaw{\condtwo{\pprec}{\bhyprec/2,2\bhyprecdof}},\\
+%&=
+%\wrapBracks{\sqrt{\frac{\bhysnrdof}{2\pi}}\longexp{-\frac{\bhysnrdof\wrapParens{\psnr
+%- \bhysnr}^2}{2}}} 
+%\wrapBracks{\frac{\pprec^{\bhyprecdof/2 - 1}}{\GAM{\bhyprecdof/2}\wrapParens{2\bhyprec}^{\bhyprecdof/2}} \longexp{-\frac{\pprec}{2\bhyprec}}},\\
+%&= 23
+%\end{split}
+%\end{equation*}
 
 
-%UNFOLD
+%2FIX: keep going.
+
+
+%%UNFOLD
 
 \subsection{Linear attribution models}%FOLDUP
 
@@ -1080,9 +1085,10 @@ might be trying to `explain away' the returns of one investment as the returns o
 (presumably one with smaller fees) plus noise. Alternatively, one might be trying to establish that a given
 investment has idiosyncratic `alpha' (\ie \pregco[0]) without significant exposure to other factors.
 
-Typically factor models are justified by some hypotheses about
-2FIX
-\cite{GVK322224764}
+%Typically factor models are justified by some hypotheses about
+%2FIX
+%\cite{GVK322224764}
+\nocite{GVK322224764}
 
 \subsubsection{Examples of linear attribution models}%FOLDUP
 
@@ -1137,8 +1143,7 @@ $\pospart{\wrapParens{-\retk[\smbox{M}]}}$ to have
 significantly non-zero mean. This will cause some decrease in power when testing \pregco[0] for significance. Also note
 that while Henriksson and Merton intend this model as a positive test for \pregco[\smbox{HM}], one could treat the timing
 component as a factor which one seeks to ignore entirely, or downweight its importance. 
-
-(2FIX: is this really the H-M model?)
+%2FIX: is this really the H-M model?
 
 \item Often the linear factor model is used with a `benchmark' 
 (mutual fund, index, ETF, \etc) used as the factor returns. In this case, the process generating \reti[t] may or may
@@ -1939,6 +1944,583 @@ opt.pos.T2 <- function(mu1,mu2,sig1,sig12,sig2) {
 %UNFOLD
 %UNFOLD
 
+\section{Multivariate inference in unified form}%FOLDUP
+
+Here I describe a way to think about multivariate 
+distributions that eliminates, to some degree, the 
+distinction between mean and covariance, in order to simplify
+calculations and exposition. The basic idea is to prepend a 
+deterministic 1 to the random vector, then perform
+inference on the \emph{uncentered} second moment matrix.
+
+Let \avreti be the \nlatf-variate vector \vreti prepended with a 1:
+$\avreti = \asvec{1,\tr{\vreti}}$. Consider the second
+moment of \avreti:
+\begin{equation}
+\pvsm \defeq \E{\ogram{\avreti}} = 
+	\twobytwo{1}{\tr{\pvmu}}{\pvmu}{\pvsig + \ogram{\pvmu}}.
+\label{eqn:pvsm_def}
+\end{equation}
+By inspection one can confirm that the
+inverse of \pvsm is
+$$
+\minv{\pvsm} 
+= \twobytwo{1 + \qiform{\pvsig}{\pvmu}}{-\tr{\pvmu}\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{\minv{\pvsig}}
+= \twobytwo{1 + \psnrsqopt}{-\tr{\pportwopt}}{-\pportwopt}{\minv{\pvsig}}.
+$$
+The (upper) Cholesky factor of \pvsm is
+\begin{equation*}
+\chol{\pvsm} = \twobytwo{1}{\tr{\pvmu}}{0}{\chol{\pvsig}}.
+\end{equation*}
+
+In some situations, the Cholesky factor of \minv{\pvsm} might be 
+of interest.  In this situation, one can \emph{append} a 1 to
+\vreti instead of prepending it. When \pvsm is defined in this
+way, the Cholesky factor of \minv{\pvsm} (but not that of \pvsm) 
+has a nice form:
+\begin{equation}
+\gram{\twobytwo{\ichol{\pvsig}}{-\ichol{\pvsig}\pvmu}{0}{1}} =
+\twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt},
+\label{eqn:ichol_pvsm_nb}
+\end{equation}
+where the latter is \minv{\pvsm} when defined by appending a 1.
+
+The relationships above are merely facts of linear algebra, and so
+hold for the sample estimates as well:
+\begin{equation*}
+\minv{\twobytwo{1 + \ssrsqopt}{-\tr{\sportwopt}}{-\sportwopt}{\minv{\svsig}}}
+= \twobytwo{1}{\tr{\svmu}}{\svmu}{\svsig + \ogram{\svmu}}
+= \gram{\twobytwo{1}{\tr{\svmu}}{0}{\chol{\svsig}}}.
+\end{equation*}
+
+Given \ssiz \iid observations of \vreti, let \amreti be the matrix
+whose rows are the vectors \tr{\avreti[i]}. The na\"{i}ve sample estimator
+\begin{equation}
+\svsm \defeq \oneby{\ssiz}\gram{\amreti}
+\end{equation}
+is an unbiased estimator since $\pvsm = \E{\gram{\avreti}}$.
+
+\subsection{Asymptotic distribution of the Markowitz portfolio}%FOLDUP
+
+\label{subsec:dist_markoport}
+\nocite{BrittenJones1999}
+
+Collecting the mean and covariance into the second moment matrix as
+we have done gives the asymptotic distribution of the sample Markowitz
+portfolio without much work. This computation
+generalizes the `standard' asymptotic analysis of Sharpe ratio of
+multiple assets, as in \subsecref{asymptotic_sr}.
+
+Let \fvec{\Mtx{A}}, and \fvech{\Mtx{A}} be the vector and half-space
+vector operators.  The former turns an $\nlatf\times\nlatf$ matrix into
+an $\nlatf^2$ vector of its columns stacked on top of each other; the 
+latter vectorizes a symmetric (or lower triangular) matrix into a vector
+of the non-redundant elements. \cite{magnus1980elimination} 
+
+Define, as we have above, \svsm to be the unbiased sample estimate
+of \pvsm, based on \ssiz \iid samples of \avreti.
+Under the multivariate central limit theorem \cite{wasserman2004all}
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
+\rightsquigarrow 
+\normlaw{0,\pvvar},
+\label{eqn:mvclt_svsm}
+\end{equation}
+where \pvvar is the variance of \fvech{\svsm}, which, in general, 
+is unknown. For the case where \vreti is multivariate Gaussian,
+\pvvar is known; see \subsecref{gaussian_fisher_inf}.
+
+The Markowitz portfolio appears in $-\minv{\svsm}$. Let \Elim
+be the `Elimination Matrix,' a matrix of zeros and ones with the
+property that $\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$  
+\cite{magnus1980elimination} We can find the asymptotic distribution
+of $\minv{\svsm}$ via the delta method. The derivative of the matrix
+inverse is given by
+\begin{equation}
+\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
+= - \AkronA{\minv{\Mtx{A}}},
+\label{eqn:deriv_matrix_inverse}
+\end{equation}
+for symmetric \Mtx{A}.  \cite{magnus1980elimination,facklernotes}
+We can reduce this to the non-redundant parts via the Elimination matrix:
+\begin{equation}
+\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
+= \qoform{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}{\Elim}
+= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
+\label{eqn:deriv_vech_matrix_inverse}
+\end{equation}
+
+Then we have, via the delta method, 
+%\begin{equation}
+\begin{multline}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\rightsquigarrow \\
+\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\AkronA{\minv{\pvsm}}}}{\Elim}}}}.
+\label{eqn:mvclt_isvsm}
+\end{multline}
+%\end{equation}
+To estimate the covariance of $\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}$,
+plug in \svsm for \pvsm in the covariance computation, and use some
+consistent estimator for \pvvar, call 
+it \svvar. 
+%Rather, one must estimate $\qform{\pvvar}{\Elim}$.
+The simple sample estimate can be had by computing the sample covariance
+of the vectors $\fvech{\ogram{\avreti[i]}} =
+\asvec{1,\tr{\vreti[i]},\tr{\fvech{\ogram{\vreti[i]}}}}$. 
+More elaborate covariance estimators can be used, for example, to deal with
+violations of the \iid assumptions.
+
+\nocite{magnus1999matrix,magnus1980elimination}
+\nocite{BrittenJones1999}
+
+Empirically, the marginal Wald test for zero weighting in the 
+Markowitz portfolio based on this approximation are nearly
+identical to the \tstat-statistics produced by the procedure
+of Britten-Jones, as shown below. \cite{BrittenJones1999} 
+
+<<'me_vs_bjones',echo=TRUE>>=
+nday <- 1024
+nstk <- 5
+
+# under the null: all returns are zero mean;
+set.seed(as.integer(charToRaw("7fbb2a84-aa4c-4977-8301-539e48355a35")))
+rets <- matrix(rnorm(nday * nstk),nrow=nday)
+
+# t-stat via Britten-Jones procedure
+bjones.ts <- function(rets) {
+	ones.vec <- matrix(1,nrow=dim(rets)[1],ncol=1)
+	bjones.mod <- lm(ones.vec ~ rets - 1)
+	bjones.sum <- summary(bjones.mod)
+	retval <- bjones.sum$coefficients[,3]
+}
+# wald stat via inverse second moment trick
+ism.ws <- function(rets) {
+# flipping the sign on returns is idiomatic,
+	asymv <- ism_vcov(- rets)
+	asymv.mu <- asymv$mu[1:asymv$p]
+	asymv.Sg <- asymv$Ohat[1:asymv$p,1:asymv$p]
+	retval <- asymv.mu / sqrt(diag(asymv.Sg))
+}
+
+bjones.tstat <- bjones.ts(rets)
+ism.wald <- ism.ws(rets)
+
+# compare them:
+print(bjones.tstat)
+print(ism.wald)
+
+# repeat under the alternative;
+set.seed(as.integer(charToRaw("a5f17b28-436b-4d01-a883-85b3e5b7c218")))
+zero.rets <- t(matrix(rnorm(nday * nstk),nrow=nday))
+mu.vals <- (1/sqrt(253)) * seq(-1,1,length.out=nstk) 
+rets <- t(zero.rets + mu.vals)
+
+bjones.tstat <- bjones.ts(rets)
+ism.wald <- ism.ws(rets)
+
+# compare them:
+print(bjones.tstat)
+print(ism.wald)
+@
+
+%UNFOLD
+
+\subsection{Unified Multivariate Gaussian}%FOLDUP
+
+Note that
+$$
+\qiform{\pvsig}{\wrapParens{\vreti - \pvmu}} = 
+\qiform{\pvsm}{\avreti} - 1.
+$$
+Using the block determinant formula, we find that \pvsm has the same 
+determinant as \pvsig, that is $\det{\pvsm} = \det{\pvsig}.$  These
+relationships hold without assuming a particular distribution for 
+\vreti. 
+
+Assume, now, that \vreti is multivariate Gaussian. 
+Then the density of \vreti can be expressed more simply as
+\begin{equation*}
+\begin{split}
+\normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
+\longexp{-\half \qiform{\pvsig}{\wrapParens{\vreti - \pvmu}}},\\
+ &= \frac{\wrapParens{\det{\pvsig}}^{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
+\longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\pvsm}}^{-\half}
+\longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2}
+\longexp{\half - \half \logdet{\pvsm} - \half \trace{\minv{\pvsm}\ogram{\avreti}}},\\
+\therefore - \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
+  c_{\nlatf} 
++ \half \logdet{\pvsm} 
++ \half \trace{\minv{\pvsm}\ogram{\avreti}},
+\end{split}
+\end{equation*}
+for the constant 
+$c_{\nlatf} = \exp{\half}-\half[\nlatf]\log\wrapParens{2\pi}.$
+
+Given \ssiz \iid observations of \vreti, let \amreti be the matrix
+whose rows are the vectors \tr{\vreti[i]}. Then the negative log
+density of \amreti is
+\begin{equation*}
+- \log\normpdf{\amreti}{\pvsm} =
+  \ssiz c_{\nlatf} 
++ \half[\ssiz] \logdet{\pvsm} 
++ \half \trace{\minv{\pvsm}\gram{\amreti}}.
+\end{equation*}
+Again let $\svsm = \gram{\amreti}/\ssiz$, the unbiased
+sample estimate of \pvsm. Then 
+\begin{equation*}
+\frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz} = 
+  c_{\nlatf} 
++ \logdet{\pvsm} 
++ \trace{\minv{\pvsm}\svsm}.
+\end{equation*}
+
+By Lemma (5.1.1) of Press \cite{press2012applied}, this can be expressed
+as a density on \svsm, which is a sufficient statistic:
+\begin{equation*}
+\begin{split}
+\frac{- 2\log\FOOpdf{}{\svsm}{\pvsm}}{\ssiz} 
+&= \frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz}
+	-\frac{2}{\ssiz}\wrapParens{\half[\ssiz-\nlatf-2]\logdet{\svsm}}\\
+&\phantom{=}\,
+	-\frac{2}{\ssiz}\wrapParens{\half[\nlatf+1]\wrapParens{\ssiz - \half[\nlatf]} \log\pi -
+	\sum_{j=1}^{\nlatf+1} \log\funcit{\Gamma}{\half[\ssiz +1-j]}},\\
+&= c_{\nlatf} - \frac{\nlatf+1}{\ssiz}\wrapParens{\ssiz - \half[\nlatf]} \log\pi 
+	- \frac{2}{\ssiz} \sum_{j=1}^{\nlatf+1}
+	\log\funcit{\Gamma}{\half[\ssiz +1-j]}\\
+&\phantom{=}\,
+	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm},\\
+&= c'_{\ssiz,\nlatf} 
+	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm},\\
+&= c'_{\ssiz,\nlatf} 
+	- \logdet{\minv{\pvsm}} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm}.
+\end{split}
+\end{equation*}
+
+The density of \svsm is thus
+\begin{equation}
+\FOOpdf{}{\svsm}{\pvsm} =
+c''_{\ssiz,\nlatf}\frac{\det{\svsm}^{\half[\ssiz-\nlatf-2]}}{\det{\pvsm}^{\half[\ssiz]}}
+\longexp{-\half[\ssiz]\trace{\minv{\pvsm}\svsm}}.
+\end{equation}
+Thus $\ssiz\svsm$ has the same density, up to the leading constant, as a 
+$\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
+and scale matrix \pvsm. In fact, $\ssiz\svsm$ is a \emph{conditional} Wishart,
+conditional on $\svsm_{1,1} = 1$.
+%conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.  % for the other form.
+%UNFOLD
+
+\subsection{Maximum Likelihood Estimator}%FOLDUP
+
+%The maximum likelihood estimator of \ichol{\pvsm} is found by 
+%taking the derivative of the (log) likelihood and finding a root.
+%That is,
+%\begin{equation*}
+%\begin{split}
+%0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\ichol{\pvsm}},\\
+  %&= -2 \trminv{\wrapParens{\ichol{\pvsm[m]}}} + \ichol{\pvsm[m]}2\svsm,
+%\end{split}
+%\end{equation*}
+%leaning heavily on the Matrix Cookbook for 
+%the derivatives. \cite{petersen2006matrix}
+%This is solved by $\ichol{\pvsm[m]} = \ichol{\svsm}$, and thus the
+%na\"{i}ve sample estimate is the MLE.
+\providecommand{\txtMLE}{\mbox{MLE}}
+
+The maximum likelihood estimator of \pvsm is found by 
+taking the derivative of the (log) likelihood with respect to
+\pvsm and finding a root. However, the derivative of log likelihood
+with respect to \pvsm is mildly unpleasant:
+\begin{equation}
+\begin{split}
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm} 
+	&= - \half[\ssiz]\drbydr{\logdet{\pvsm}}{\pvsm} 
+	- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\pvsm},\\
+	&= - \half[\ssiz]\minv{\pvsm}
+	+ \half[\ssiz]\minv{\pvsm}\svsm\minv{\pvsm},
+\end{split}
+\label{eqn:mle_deadend}
+\end{equation}
+However, the derivative with respect to \minv{\pvsm} is a bit
+simpler:
+\begin{equation}
+\begin{split}
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}} 
+	&= \half[\ssiz]\drbydr{\logdet{\minv{\pvsm}}}{\minv{\pvsm}} 
+	- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\minv{\pvsm}},\\
+  &= \half[\ssiz]\wrapParens{\pvsm - \svsm}.
+\end{split}
+\end{equation}
+(See Magnus and Neudecker or the Matrix Cookbook for a refresher
+on matrix derivatives. \cite{magnus1999matrix,petersen2006matrix})
+Thus the likelihood is maximized by 
+$\pvsm[\txtMLE] = \svsm$, \ie the unbiased sample estimator is also
+the MLE. Note that this is also a root of \eqnref{mle_deadend}.
+
+Since $\pvsm[\txtMLE] = \svsm$, the log likelihood of the MLE is 
+\begin{equation}
+\begin{split}
+\log\FOOlik{}{\svsm}{\pvsm[\txtMLE]} 
+ &= - \half[\ssiz] c'_{\ssiz,\nlatf} - \half[\ssiz] \logdet{\pvsm[\txtMLE]} +
+ \half[\ssiz-\nlatf-2]\logdet{\svsm}\\
+&\phantom{=}\,+ \trace{\minv{\pvsm[\txtMLE]}\svsm},\\
+ &= -\half[\ssiz] c'_{\ssiz,\nlatf} 
+ - \half[\nlatf+2]\logdet{\svsm} + \wrapParens{\nlatf+1}.
+\end{split}
+\end{equation}
+
+\subsubsection{Fisher Information}
+
+\label{subsec:gaussian_fisher_inf}
+
+\providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
+\providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
+\providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
+\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+
+To compute the Fisher Information, first compute
+the Hessian of $\log\FOOpdf{}{\svsm}{\pvsm}$ with
+respect to $\fvech{\minv{\pvsm}}$. From above we know that
+\begin{equation*}
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+ = \half[\ssiz]\wrapParens{\pvsm - \svsm}.
+\end{equation*}
+So
+\begin{equation*}
+\begin{split}
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+ & \defeq
+\drbydr{\fvech{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvech{\minv{\pvsm}}},\\
+ &= - \half[\ssiz] \qoElim{\wrapParens{\AkronA{\pvsm}}},
+\end{split}
+\end{equation*}
+via \eqnref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
+`Elimination Matrix.' \cite{magnus1980elimination}
+
+Thus 
+\begin{equation}
+\FishIf[\ssiz]{\minv{\pvsm}} = \half[\ssiz]
+\qoElim{\wrapParens{\AkronA{\pvsm}}}.
+\end{equation}
+By change of variables, and again using \eqnref{deriv_vech_matrix_inverse}, 
+the Fisher Information with respect to \pvsm is
+\begin{equation}
+\FishIf[\ssiz]{\pvsm} = \half[\ssiz]
+\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}.
+\end{equation}
+
+Under `the appropriate regularity conditions,' \cite{wasserman2004all}
+\begin{equation}
+\label{eqn:converge_theta}
+\begin{split}
+\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+& \rightsquigarrow 
+\normlaw{0,\minv{\wrapParens{\FishIf[\ssiz]{\minv{\pvsm}}}}},\\
+\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
+& \rightsquigarrow 
+\normlaw{0,\minv{\wrapParens{\FishIf[\ssiz]{{\pvsm}}}}}.
+\end{split}
+\end{equation}
+Thus for the case of multivariate Gaussian returns, the term \pvvar
+from \eqnref{mvclt_svsm} is identified as
+\begin{equation}
+\begin{split}
+\label{eqn:pvvar_identity}
+\pvvar &= \ssiz\minv{\wrapParens{\FishIf[\ssiz]{{\pvsm}}}},\\
+ &= 2
+\minv{\wrapParens{\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}}.
+\end{split}
+\end{equation}
+
+%UNFOLD
+
+\subsection{Likelihood Ratio Test}%FOLDUP
+
+Suppose that $\pvsm[0]$ is the maximum likelihood estimate of \pvsm under
+some null hypothesis under consideration. The likelihood ratio test
+statistic is 
+\begin{equation}
+\begin{split}
+-2\log\Lambda &\defeq
+-2\log\wrapParens{\frac{\FOOlik{}{\svsm}{\pvsm[0]}}{\FOOlik{}{\svsm}{\pvsm[\txtMLE]}}},\\
+&= \ssiz\wrapParens{\logdet{\pvsm[0]\minv{\pvsm[\txtMLE]}} + 
+\trace{\wrapBracks{\minv{\pvsm[0]} - \minv{\pvsm[\txtMLE]}}\svsm}},\\
+&= \ssiz\wrapParens{\logdet{\pvsm[0]\minv{\svsm}} + 
+\trace{\minv{\pvsm[0]}\svsm} - \wrapBracks{\nlatf + 1}}.
+\end{split}
+\label{eqn:wilks_lambda_def}
+\end{equation}
+
+\providecommand{\lrtA}[1][i]{\mathSUB{\Mtx{A}}{#1}}
+\providecommand{\lrta}[1][i]{\mathSUB{a}{#1}}
+
+
+\subsubsection{Tests on the Precision and Markowitz Portfolio}%FOLDUP
+
+%This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
+
+
+For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
+consider the null hypothesis
+\begin{equation}
+H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
+\label{eqn:lrt_null_back}
+\end{equation}
+The constraints have to be sensible. 
+For example, they cannot
+violate the positive definiteness of 
+\minv{\pvsm}, \etc Without loss of generality, we can assume
+that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
+symmetric \Mtx{G} and square \Mtx{H}, 
+$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
+\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
+$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
+
+Employing the Lagrange multiplier technique, the maximum likelihood
+estimator under the null hypothesis satisfies
+\begin{equation*}
+\begin{split}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+- \sum_i \lambda_i
+%\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
+\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\minv{\pvsm}},\\
+&= - \pvsm + \svsm - \sum_i \lambda_i \lrtA[i],\\
+\therefore \pvsm[\txtMLE] &= \svsm - \sum_i \lambda_i \lrtA[i].
+\end{split}
+\end{equation*}
+The maximum likelihood estimator under the constraints has to be
+found numerically by solving for the $\lambda_i$, subject
+to the constraints in \eqnref{lrt_null_back}.
+
+This framework slightly generalizes Dempster's 
+``Covariance Selection.'' \cite{dempster1972} Covariance selection
+reduces to the case where each \lrta[i] is zero, and
+each \lrtA[i] is a matrix of all zeros except two (symmetric) ones 
+somewhere in the upper left $\nlatf \times \nlatf$ sub matrix. In
+all other respects, however, the solution here follows Dempster.
+
+\providecommand{\vitrlam}[2]{\vectUL{\lambda}{\wrapNeParens{#1}}{#2}}
+\providecommand{\sitrlam}[2]{\mathUL{\lambda}{\wrapNeParens{#1}}{#2}}
+\providecommand{\vitrerr}[2]{\vectUL{\epsilon}{\wrapNeParens{#1}}{#2}}
+\providecommand{\sitrerr}[2]{\mathUL{\epsilon}{\wrapNeParens{#1}}{#2}}
+
+An iterative technique for finding the MLE based on a Newton step would
+proceed as follows. Let \vitrlam{0}{} be some initial estimate of the
+vector of $\lambda_i$. (A good initial estimate can likely be had 
+by abusing the asymptotic normality 
+result from \subsecref{dist_markoport}.)
+The residual of the \kth{k} estimate, \vitrlam{k}{} is
+\begin{equation}
+\vitrerr{k}{i} \defeq 
+\trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}} - \lrta[i].
+\end{equation}
+The Jacobian of this residual with respect to the \kth{l} element of \vitrlam{k}
+is
+\begin{equation}
+\drbydr{\vitrerr{k}{i}}{\sitrlam{k}{l}} = 
+\trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}
+\lrtA[l] \minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}}.
+\end{equation}
+
+Newton's method is then the iterative scheme
+\begin{equation}
+\vitrlam{k+1}{} \leftarrow \vitrlam{k}{} -
+\minv{\wrapParens{\drbydr{\vitrerr{k}{}}{\vitrlam{k}{}}}} \vitrerr{k}.
+\end{equation}
+When (if?) the iterative scheme converges on the optimum, one can 
+compute the likelihood ratio statistic $-2\log\Lambda$, as defined
+in \eqnref{wilks_lambda_def}. By Wilks' Theorem, under the null 
+hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as 
+a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
+%UNFOLD
+
+%\subsubsection{Tests on the Mean and Covariance Matrix}%FOLDUP
+
+%For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
+%consider the null hypothesis
+%\begin{equation}
+%H_0: \trace{\lrtA[i]{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
+%\label{eqn:lrt_null_forw}
+%\end{equation}
+%The constraints have to be sensible. For example, they cannot
+%violate the positive definiteness of 
+%\pvsm, \etc  Without loss of generality, we can assume
+%that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
+%symmetric \Mtx{G} and square \Mtx{H}, 
+%$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
+%\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
+%$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
+
+%Employing the Lagrange multiplier technique, the maximum likelihood
+%estimator under the null hypothesis satisfies
+%\begin{equation*}
+%\begin{split}
+%0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+%- \sum_i \lambda_i
+%%\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
+%\drbydr{\trace{\lrtA[i]{\pvsm}}}{\minv{\pvsm}},\\
+%&= - \pvsm + \svsm + \sum_i \lambda_i \pvsm \lrtA[i] \pvsm,\\
+%\therefore \pvsm[\txtMLE] &= ???.
+%\end{split}
+%\end{equation*}
+%The maximum likelihood estimator under the constraints has to be
+%found numerically by solving for the $\lambda_i$, subject
+%to the constraints in \eqnref{lrt_null_back}.
+
+
+%%UNFOLD
+%UNFOLD
+
+%\subsection{Bayesian View}%FOLDUP
+
+%\providecommand{\bhyvprec}[1][0]{\mathSUB{\Mtx{\Lambda}}{#1}}
+%\providecommand{\bhyprecdof}[1][0]{\mathSUB{m}{#1}}
+
+%A commonly used conjugate prior for the multivariate Gaussian
+%distribution is the ``Normal-Wishart'' prior, which is a Wishart
+%prior on \minv{\pvsig}, and, conditional on knowing \pvsig, a 
+%Normal prior on \pvmu. \cite{murphybayes}
+
+%The natural translation of the Normal-Wishart prior to the appended
+%form considered here is a (conditional) Wishart prior on the
+%inverse second moment, \minv{\pvsm}.  Note that the form of
+%\minv{\pvsm} is constrained by the definition of the appended Gaussian.
+%Teasing out the dependence is tricky. 
+
+%A simpler approach is to fix the prior on the Cholesky factor of
+%\minv{\pvsm}. As noted in \eqnref{ichol_pvsm_nb}, \ichol{\pvsm} has
+%a simple structure. Moreover, we can abuse the Bartlett decomposition
+%of a Wishart to compute densities.  \cite{anderson2003introduction}
+%Let \bhyvprec and \bhyprecdof be the Bayesian hyper-parameters for the
+%`precision' and degrees of freedom. The prior distribution is 
+%\ichol{\pvsm} is equal to $T\chol{\bhyvprec}$, where $T$ is an upper
+%triangular matrix satisfying
+%\begin{compactenum}
+%\item $T_{ii} = 1$ for $i = \nlatf + 1$,
+%\item $T_{ii}^2 \sim \chisqlaw{\bhyprecdof - i + 1}$ for $i \le \nlatf$,
+%\item $T_{ij} \sim \normlaw{0,1}$ for $i < j$,
+%\item the $T_{ij}$ are independently distributed.
+%\end{compactenum}
+%Together, these imply that \ogram{T} takes a Wishart distribution
+%with identity scale matrix and \bhyprecdof degrees of freedom, 
+%conditional on $T_{\nlatf+1,\nlatf+1} = 1$.
+
+%Thus the prior is 
+%\begin{equation*}
+%\prior{\ichol{\pvsm}}{\chol{\bhyvprec},\bhyprecdof} \propto 
+%\frac{\prod_{i=1}^{\nlatf} \wrapParens{\ichol{\pvsm}}_{ii}^{\bhyprecdof - i} 
+%\longexp{-\half
+%\trace{\minv{\bhyvprec}\pvsm}}}{\det{\bhyvprec}^{\half[\ssiz]}}.
+%\end{equation*}
+%2FIX: is this exactly so? problems within the trace? not obviously so.
+%%UNFOLD
+%UNFOLD
+
 \section{Miscellanea}%FOLDUP
 
 \subsection{Which returns?}%FOLDUP
@@ -1980,10 +2562,9 @@ $$
 This is a \emph{very} loose upper bound on the probability of a loss, and is fairly useless on any timescale
 for which the SNR is less than one.
 
-\subsubsection{\txtSR and drawdowns}
+%\subsubsection{\txtSR and drawdowns}
 
 %UNFOLD
-
 
 \subsection{The `haircut'}%FOLDUP
 
@@ -2173,559 +2754,6 @@ plug-in some estimate of \psnropt computed from \ssropt (via MLE, KRS, \etc)
 into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 \psnropt is not independent of the modeling error that causes the haircut.
 
-%UNFOLD
-%UNFOLD
-
-\section{Multivariate inference in unified form}%FOLDUP
-
-\providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
-\providecommand{\svsm}[1][{}]{\mathSUB{\Mtx{\hat{\Theta}}}{#1}}
-
-Here I describe a way to think about multivariate 
-distributions that eliminates, to some degree, the 
-distinction between mean and covariance, in order to simplify
-calculations and exposition. The basic idea is to prepend a 
-deterministic 1 to the random vector, then perform
-inference on the \emph{uncentered} second moment matrix.
-
-Let \avreti be the \nlatf-variate vector \vreti prepended with a 1:
-$\avreti = \asvec{1,\tr{\vreti}}$. Consider the second
-moment of \avreti:
-\begin{equation}
-\pvsm \defeq \E{\ogram{\avreti}} = 
-	\twobytwo{1}{\tr{\pvmu}}{\pvmu}{\pvsig + \ogram{\pvmu}}.
-\label{eqn:pvsm_def}
-\end{equation}
-By inspection one can confirm that the
-inverse of \pvsm is
-$$
-\minv{\pvsm} 
-= \twobytwo{1 + \qiform{\pvsig}{\pvmu}}{-\tr{\pvmu}\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{\minv{\pvsig}}
-= \twobytwo{1 + \psnrsqopt}{-\tr{\pportwopt}}{-\pportwopt}{\minv{\pvsig}}.
-$$
-The (upper) Cholesky factor of \pvsm is
-\begin{equation*}
-\chol{\pvsm} = \twobytwo{1}{\tr{\pvmu}}{0}{\chol{\pvsig}}.
-\end{equation*}
-
-In some situations, the Cholesky factor of \minv{\pvsm} might be 
-of interest.  In this situation, one can \emph{append} a 1 to
-\vreti instead of prepending it. When \pvsm is defined in this
-way, the Cholesky factor of \minv{\pvsm} (but not that of \pvsm) 
-has a nice form:
-\begin{equation}
-\gram{\twobytwo{\ichol{\pvsig}}{-\ichol{\pvsig}\pvmu}{0}{1}} =
-\twobytwo{\minv{\pvsig}}{-\pportwopt}{-\tr{\pportwopt}}{1 + \psnrsqopt},
-\label{eqn:ichol_pvsm_nb}
-\end{equation}
-where the latter is \minv{\pvsm} when defined by appending a 1.
-
-The relationships above are merely facts of linear algebra, and so
-hold for the sample estimates as well:
-\begin{equation*}
-\minv{\twobytwo{1 + \ssrsqopt}{-\tr{\sportwopt}}{-\sportwopt}{\minv{\svsig}}}
-= \twobytwo{1}{\tr{\svmu}}{\svmu}{\svsig + \ogram{\svmu}}
-= \gram{\twobytwo{1}{\tr{\svmu}}{0}{\chol{\svsig}}}.
-\end{equation*}
-
-Given \ssiz \iid observations of \vreti, let \amreti be the matrix
-whose rows are the vectors \tr{\avreti[i]}. The na\"{i}ve sample estimator
-\begin{equation}
-\svsm \defeq \oneby{\ssiz}\gram{\amreti}
-\end{equation}
-is an unbiased since $\pvsm = \E{\gram{\avreti}}$.
-
-\subsection{Asymptotic distribution of the Markowitz portfolio}%FOLDUP
-
-\label{subsec:dist_markoport}
-\nocite{BrittenJones1999}
-
-Collecting the mean and covariance into the second moment matrix as
-we have done gives the asymptotic distribution of the sample Markowitz
-portfolio without much work. This computation
-generalizes the `standard' asymptotic analysis of Sharpe ratio of
-multiple assets, as in \subsecref{asymptotic_sr}.
-
-Let \fvec{\Mtx{A}}, and \fvech{\Mtx{A}} be the vector and half-space
-vector operators.  The former turns an $\nlatf\times\nlatf$ matrix into
-an $\nlatf^2$ vector of its columns stacked on top of each other; the 
-latter vectorizes a symmetric (or lower triangular) matrix into a vector
-of the non-redundant elements. \cite{magnus1980elimination} 
-
-Define, as we have above, \svsm to be the unbiased sample estimate
-of \pvsm, based on \ssiz \iid samples of \avreti.
-Under the multivariate central limit theorem \cite{wasserman2004all}
-\begin{equation}
-\sqrt{\ssiz}\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
-\rightsquigarrow 
-\normlaw{0,\pvvar},
-\label{eqn:mvclt_svsm}
-\end{equation}
-where \pvvar is the variance of \fvech{\svsm}, which, in general, 
-is unknown.
-
-The Markowitz portfolio appears in $-\minv{\svsm}$. Let \Elim
-be the `Elimination Matrix,' a matrix of zeros and ones with the
-property that $\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$  
-\cite{magnus1980elimination} We can find the asymptotic distribution
-of $\minv{\svsm}$ via the Delta method. The derivative of the matrix
-inverse is given by
-\begin{equation}
-\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
-= - \AkronA{\minv{\Mtx{A}}},
-\label{eqn:deriv_matrix_inverse}
-\end{equation}
-for symmetric \Mtx{A}.  \cite{magnus1980elimination,facklernotes}
-We can reduce this to the non-redundant parts via the Elimination matrix:
-\begin{equation}
-\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
-= \qoform{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}{\Elim}
-= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
-\label{eqn:deriv_vech_matrix_inverse}
-\end{equation}
-
-Then we have, via the Delta method, 
-%\begin{equation}
-\begin{multline}
-\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
-\rightsquigarrow \\
-\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\AkronA{\minv{\pvsm}}}}{\Elim}}}}.
-\label{eqn:mvclt_isvsm}
-\end{multline}
-%\end{equation}
-To estimate the covariance of $\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}$,
-plug in \svsm for \pvsm in the covariance computation, and use some
-consistent estimator for \pvvar, call 
-it \svvar. 
-%Rather, one must estimate $\qform{\pvvar}{\Elim}$.
-The simple sample estimate can be had by computing the sample covariance
-of the vectors $\fvech{\ogram{\avreti[i]}} =
-\asvec{1,\tr{\vreti[i]},\tr{\fvech{\ogram{\vreti[i]}}}}$. 
-More elaborate covariance estimators can be used, for example, to deal with
-violations of the \iid assumptions.
-
-\nocite{magnus1999matrix,magnus1980elimination}
-\nocite{BrittenJones1999}
-
-Empirically, the marginal Wald test for zero weighting in the 
-Markowitz portfolio based on this approximation are nearly
-identical to the \tstat-statistics produced by the procedure
-of Britten-Jones, as shown below. \cite{BrittenJones1999} 
-
-<<'me_vs_bjones',echo=TRUE>>=
-nday <- 1024
-nstk <- 5
-
-# under the null: all returns are zero mean;
-set.seed(as.integer(charToRaw("7fbb2a84-aa4c-4977-8301-539e48355a35")))
-rets <- matrix(rnorm(nday * nstk),nrow=nday)
-
-# t-stat via Britten-Jones procedure
-bjones.ts <- function(rets) {
-	ones.vec <- matrix(1,nrow=dim(rets)[1],ncol=1)
-	bjones.mod <- lm(ones.vec ~ rets - 1)
-	bjones.sum <- summary(bjones.mod)
-	retval <- bjones.sum$coefficients[,3]
-}
-# wald stat via inverse second moment trick
-ism.ws <- function(rets) {
-# flipping the sign on returns is idiomatic,
-	asymv <- ism_vcov(- rets)
-	asymv.mu <- asymv$mu[1:asymv$p]
-	asymv.Sg <- asymv$Ohat[1:asymv$p,1:asymv$p]
-	retval <- asymv.mu / sqrt(diag(asymv.Sg))
-}
-
-bjones.tstat <- bjones.ts(rets)
-ism.wald <- ism.ws(rets)
-
-# compare them:
-print(bjones.tstat)
-print(ism.wald)
-
-# repeat under the alternative;
-set.seed(as.integer(charToRaw("a5f17b28-436b-4d01-a883-85b3e5b7c218")))
-zero.rets <- t(matrix(rnorm(nday * nstk),nrow=nday))
-mu.vals <- (1/sqrt(253)) * seq(-1,1,length.out=nstk) 
-rets <- t(zero.rets + mu.vals)
-
-bjones.tstat <- bjones.ts(rets)
-ism.wald <- ism.ws(rets)
-
-# compare them:
-print(bjones.tstat)
-print(ism.wald)
-@
-
-%UNFOLD
-
-\subsection{Unified Multivariate Gaussian}%FOLDUP
-
-Note that
-$$
-\qiform{\pvsig}{\wrapParens{\vreti - \pvmu}} = 
-\qiform{\pvsm}{\avreti} - 1.
-$$
-Using the block determinant formula, we find that \pvsm has the same 
-determinant as \pvsig, that is $\det{\pvsm} = \det{\pvsig}.$  These
-relationships hold without assuming a particular distribution for 
-\vreti. 
-
-Assume, now, that \vreti is multivariate Gaussian. 
-Then the density of \vreti can be expressed more simply as
-\begin{equation*}
-\begin{split}
-\normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
-\longexp{-\half \qiform{\pvsig}{\wrapParens{\vreti - \pvmu}}},\\
- &= \frac{\wrapParens{\det{\pvsig}}^{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
-\longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
- &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\pvsm}}^{-\half}
-\longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
- &= \wrapParens{2\pi}^{-\nlatf/2}
-\longexp{\half - \half \logdet{\pvsm} - \half \trace{\minv{\pvsm}\ogram{\avreti}}},\\
-\therefore - \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
-  c_{\nlatf} 
-+ \half \logdet{\pvsm} 
-+ \half \trace{\minv{\pvsm}\ogram{\avreti}},
-\end{split}
-\end{equation*}
-for the constant 
-$c_{\nlatf} = \exp{\half}-\half[\nlatf]\log\wrapParens{2\pi}.$
-
-Given \ssiz \iid observations of \vreti, let \amreti be the matrix
-whose rows are the vectors \tr{\vreti[i]}. Then the negative log
-density of \amreti is
-\begin{equation*}
-- \log\normpdf{\amreti}{\pvsm} =
-  \ssiz c_{\nlatf} 
-+ \half[\ssiz] \logdet{\pvsm} 
-+ \half \trace{\minv{\pvsm}\gram{\amreti}}.
-\end{equation*}
-Again let $\svsm = \gram{\amreti}/\ssiz$, the unbiased
-sample estimate of \pvsm. Then 
-\begin{equation*}
-\frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz} = 
-  c_{\nlatf} 
-+ \logdet{\pvsm} 
-+ \trace{\minv{\pvsm}\svsm}.
-\end{equation*}
-
-By Lemma (5.1.1) of Press \cite{press2012applied}, this can be expressed
-as a density on \svsm, which is a sufficient statistic:
-\begin{equation*}
-\begin{split}
-\frac{- 2\log\FOOpdf{}{\svsm}{\pvsm}}{\ssiz} 
-&= \frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz}\\
-&\phantom{=}\,
-	-\frac{2}{\ssiz}\wrapParens{\half[\ssiz-\nlatf-2]\logdet{\svsm} +
-	\half[\nlatf+1]\wrapParens{\ssiz - \half[\nlatf]} \log\pi -
-	\sum_{j=1}^{\nlatf+1} \log\funcit{\Gamma}{\half[\ssiz +1-j]}},\\
-&= c_{\nlatf} - \frac{\nlatf+1}{\ssiz}\wrapParens{\ssiz - \half[\nlatf]} \log\pi 
-	- \frac{2}{\ssiz} \sum_{j=1}^{\nlatf+1}
-	\log\funcit{\Gamma}{\half[\ssiz +1-j]}\\
-&\phantom{=}\,
-	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
-	+ \trace{\minv{\pvsm}\svsm},\\
-&= c'_{\ssiz,\nlatf} 
-	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
-	+ \trace{\minv{\pvsm}\svsm},\\
-&= c'_{\ssiz,\nlatf} 
-	- \logdet{\minv{\pvsm}} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
-	+ \trace{\minv{\pvsm}\svsm}.
-\end{split}
-\end{equation*}
-
-The density of \svsm is thus
-\begin{equation}
-\FOOpdf{}{\svsm}{\pvsm} =
-c''_{\ssiz,\nlatf}\frac{\det{\svsm}^{\half[\ssiz-\nlatf-2]}}{\det{\pvsm}^{\half[\ssiz]}}
-\longexp{-\half[\ssiz]\trace{\minv{\pvsm}\svsm}}.
-\end{equation}
-Thus $\ssiz\svsm$ has the same density, up to the leading constant, as a 
-$\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
-and scale matrix \pvsm. In fact, $\ssiz\svsm$ is a \emph{conditional} Wishart,
-conditional on $\svsm_{1,1} = 1$.
-%conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.  % for the other form.
-%UNFOLD
-
-\subsection{Maximum Likelihood Estimator}%FOLDUP
-
-%The maximum likelihood estimator of \ichol{\pvsm} is found by 
-%taking the derivative of the (log) likelihood and finding a root.
-%That is,
-%\begin{equation*}
-%\begin{split}
-%0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\ichol{\pvsm}},\\
-  %&= -2 \trminv{\wrapParens{\ichol{\pvsm[m]}}} + \ichol{\pvsm[m]}2\svsm,
-%\end{split}
-%\end{equation*}
-%leaning heavily on the Matrix Cookbook for 
-%the derivatives. \cite{petersen2006matrix}
-%This is solved by $\ichol{\pvsm[m]} = \ichol{\svsm}$, and thus the
-%na\"{i}ve sample estimate is the MLE.
-\providecommand{\txtMLE}{\mbox{MLE}}
-
-The maximum likelihood estimator of \pvsm is found by 
-taking the derivative of the (log) likelihood with respect to
-\pvsm and finding a root. However, the derivative of log likelihood
-with respect to \pvsm is mildly unpleasant:
-\begin{equation}
-\begin{split}
-\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm} 
-	&= - \half[\ssiz]\drbydr{\logdet{\pvsm}}{\pvsm} 
-	- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\pvsm},\\
-	&= - \half[\ssiz]\minv{\pvsm}
-	+ \half[\ssiz]\minv{\pvsm}\svsm\minv{\pvsm},
-\end{split}
-\label{eqn:mle_deadend}
-\end{equation}
-However, the derivative with respect to \minv{\pvsm} is a bit
-simpler:
-\begin{equation}
-\begin{split}
-\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}} 
-	&= \half[\ssiz]\drbydr{\logdet{\minv{\pvsm}}}{\minv{\pvsm}} 
-	- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\minv{\pvsm}},\\
-  &= \half[\ssiz]\wrapParens{\pvsm - \svsm}.
-\end{split}
-\end{equation}
-(See Magnus and Neudecker or the Matrix Cookbook for a refresher
-on matrix derivatives. \cite{magnus1999matrix,petersen2006matrix})
-Thus the likelihood is maximized by 
-$\pvsm[\txtMLE] = \svsm$, \ie the unbiased sample estimator is also
-the MLE. Note that this is also a root of \eqnref{mle_deadend}.
-
-Since $\pvsm[\txtMLE] = \svsm$, the log likelihood of the MLE is 
-\begin{equation}
-\begin{split}
-\log\FOOlik{}{\svsm}{\pvsm[\txtMLE]} 
- &= - \half[\ssiz] c'_{\ssiz,\nlatf} - \half[\ssiz] \logdet{\pvsm[\txtMLE]} +
- \half[\ssiz-\nlatf-2]\logdet{\svsm}\\
-&\phantom{=}\,+ \trace{\minv{\pvsm[\txtMLE]}\svsm},\\
- &= -\half[\ssiz] c'_{\ssiz,\nlatf} 
- - \half[\nlatf+2]\logdet{\svsm} + \wrapParens{\nlatf+1}.
-\end{split}
-\end{equation}
-
-\subsubsection{Fisher Information}
-
-\providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
-\providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
-\providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
-\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
-\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
-
-To compute the Fisher Information, first compute
-the Hessian of $\log\FOOpdf{}{\svsm}{\pvsm}$ with
-respect to $\fvech{\minv{\pvsm}}$. From above we know that
-\begin{equation*}
-\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
- = \half[\ssiz]\wrapParens{\pvsm - \svsm}.
-\end{equation*}
-So
-\begin{equation*}
-\begin{split}
-\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
- & \defeq
-\drbydr{\fvech{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvech{\minv{\pvsm}}},\\
- &= - \half[\ssiz] \qoElim{\wrapParens{\AkronA{\pvsm}}},
-\end{split}
-\end{equation*}
-via \eqnref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
-`Elimination Matrix.' \cite{magnus1980elimination}
-
-Thus 
-\begin{equation}
-\FishIf[\ssiz]{\minv{\pvsm}} = \half[\ssiz]
-\qoElim{\wrapParens{\AkronA{\pvsm}}}.
-\end{equation}
-By change of variables, and again using \eqnref{deriv_vech_matrix_inverse}, 
-the Fisher Information with respect to \pvsm is
-\begin{equation}
-\FishIf[\ssiz]{\pvsm} = \half[\ssiz]
-\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}.
-\end{equation}
-
-%UNFOLD
-
-\subsection{Likelihood Ratio Test}%FOLDUP
-
-Suppose that $\pvsm[0]$ is the maximum likelihood estimate of \pvsm under
-some null hypothesis under consideration. The likelihood ratio test
-statistic is 
-\begin{equation}
-\begin{split}
--2\log\Lambda &\defeq
--2\log\wrapParens{\frac{\FOOlik{}{\svsm}{\pvsm[0]}}{\FOOlik{}{\svsm}{\pvsm[\txtMLE]}}},\\
-&= \ssiz\wrapParens{\logdet{\pvsm[0]\minv{\pvsm[\txtMLE]}} + 
-\trace{\wrapBracks{\minv{\pvsm[0]} - \minv{\pvsm[\txtMLE]}}\svsm}},\\
-&= \ssiz\wrapParens{\logdet{\pvsm[0]\minv{\svsm}} + 
-\trace{\minv{\pvsm[0]}\svsm} - \wrapBracks{\nlatf + 1}}.
-\end{split}
-\label{eqn:wilks_lambda_def}
-\end{equation}
-
-\providecommand{\lrtA}[1][i]{\mathSUB{\Mtx{A}}{#1}}
-\providecommand{\lrta}[1][i]{\mathSUB{a}{#1}}
-
-
-\subsubsection{Tests on the Precision and Markowitz Portfolio}%FOLDUP
-
-%This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
-
-
-For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
-consider the null hypothesis
-\begin{equation}
-H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
-\label{eqn:lrt_null_back}
-\end{equation}
-The constraints have to be sensible. 
-%For example, they cannot
-%violate the positive definiteness of 
-%\minv{\pvsm}, \etc Without loss of generality, we can assume
-%that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
-%symmetric \Mtx{G} and square \Mtx{H}, 
-%$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
-%\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
-%$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
-
-Employing the Lagrange multiplier technique, the maximum likelihood
-estimator under the null hypothesis satisfies
-\begin{equation*}
-\begin{split}
-0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
-- \sum_i \lambda_i
-%\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
-\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\minv{\pvsm}},\\
-&= - \pvsm + \svsm - \sum_i \lambda_i \lrtA[i],\\
-\therefore \pvsm[\txtMLE] &= \svsm - \sum_i \lambda_i \lrtA[i].
-\end{split}
-\end{equation*}
-The maximum likelihood estimator under the constraints has to be
-found numerically by solving for the $\lambda_i$, subject
-to the constraints in \eqnref{lrt_null_back}.
-
-This framework slightly generalizes Dempster's 
-``Covariance Selection.'' \cite{dempster1972} Covariance selection
-reduces to the case where each \lrta[i] is zero, and
-each \lrtA[i] is a matrix of all zeros except two (symmetric) ones 
-somewhere in the upper left $\nlatf \times \nlatf$ sub matrix. In
-all other respects, however, the solution here follows Dempster.
-
-\providecommand{\vitrlam}[2]{\vectUL{\lambda}{\wrapNeParens{#1}}{#2}}
-\providecommand{\sitrlam}[2]{\mathUL{\lambda}{\wrapNeParens{#1}}{#2}}
-\providecommand{\vitrerr}[2]{\vectUL{\epsilon}{\wrapNeParens{#1}}{#2}}
-\providecommand{\sitrerr}[2]{\mathUL{\epsilon}{\wrapNeParens{#1}}{#2}}
-
-An iterative technique for finding the MLE based on a Newton step would
-proceed as follows. Let \vitrlam{0}{} be some initial estimate of the
-vector of $\lambda_i$. (A good initial estimate can likely be had 
-by abusing the asymptotic normality 
-result from \subsecref{dist_markoport}.)
-The residual of the \kth{k} estimate, \vitrlam{k}{} is
-\begin{equation}
-\vitrerr{k}{i} \defeq 
-\trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}} - \lrta[i].
-\end{equation}
-The Jacobian of this residual with respect to the \kth{l} element of \vitrlam{k}
-is
-\begin{equation}
-\drbydr{\vitrerr{k}{i}}{\sitrlam{k}{l}} = 
-\trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}
-\lrtA[l] \minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}}.
-\end{equation}
-
-Newton's method is then the iterative scheme
-\begin{equation}
-\vitrlam{k+1}{} \leftarrow \vitrlam{k}{} -
-\minv{\wrapParens{\drbydr{\vitrerr{k}{}}{\vitrlam{k}{}}}} \vitrerr{k}.
-\end{equation}
-When (if?) the iterative scheme converges on the optimum, one can 
-compute the likelihood ratio statistic $-2\log\Lambda$, as defined
-in \eqnref{wilks_lambda_def}. By Wilks' Theorem, under the null 
-hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as 
-a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
-%UNFOLD
-
-\subsubsection{Tests on the Mean and Covariance Matrix}%FOLDUP
-
-For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
-consider the null hypothesis
-\begin{equation}
-H_0: \trace{\lrtA[i]{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
-\label{eqn:lrt_null_forw}
-\end{equation}
-The constraints have to be sensible. For example, they cannot
-violate the positive definiteness of 
-\pvsm, \etc  Without loss of generality, we can assume
-that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
-symmetric \Mtx{G} and square \Mtx{H}, 
-$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
-\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
-$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
-
-Employing the Lagrange multiplier technique, the maximum likelihood
-estimator under the null hypothesis satisfies
-\begin{equation*}
-\begin{split}
-0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
-- \sum_i \lambda_i
-%\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\ichol{\pvsm}},\\
-\drbydr{\trace{\lrtA[i]{\pvsm}}}{\minv{\pvsm}},\\
-&= - \pvsm + \svsm + \sum_i \lambda_i \pvsm \lrtA[i] \pvsm,\\
-\therefore \pvsm[\txtMLE] &= ???.
-\end{split}
-\end{equation*}
-The maximum likelihood estimator under the constraints has to be
-found numerically by solving for the $\lambda_i$, subject
-to the constraints in \eqnref{lrt_null_back}.
-
-
-%UNFOLD
-%UNFOLD
-
-\subsection{Bayesian View}%FOLDUP
-\providecommand{\bhyvprec}[1][0]{\mathSUB{\Mtx{\Lambda}}{#1}}
-\providecommand{\bhyprecdof}[1][0]{\mathSUB{m}{#1}}
-
-A commonly used conjugate prior for the multivariate Gaussian
-distribution is the ``Normal-Wishart'' prior, which is a Wishart
-prior on \minv{\pvsig}, and, conditional on knowing \pvsig, a 
-Normal prior on \pvmu. \cite{murphybayes}
-
-The natural translation of the Normal-Wishart prior to the appended
-form considered here is a (conditional) Wishart prior on the
-inverse second moment, \minv{\pvsm}.  Note that the form of
-\minv{\pvsm} is constrained by the definition of the appended Gaussian.
-Teasing out the dependence is tricky. 
-
-A simpler approach is to fix the prior on the Cholesky factor of
-\minv{\pvsm}. As noted in \eqnref{ichol_pvsm_nb}, \ichol{\pvsm} has
-a simple structure. Moreover, we can abuse the Bartlett decomposition
-of a Wishart to compute densities.  \cite{anderson2003introduction}
-Let \bhyvprec and \bhyprecdof be the Bayesian hyper-parameters for the
-`precision' and degrees of freedom. The prior distribution is 
-\ichol{\pvsm} is equal to $T\chol{\bhyvprec}$, where $T$ is an upper
-triangular matrix satisfying
-\begin{compactenum}
-\item $T_{ii} = 1$ for $i = \nlatf + 1$,
-\item $T_{ii}^2 \sim \chisqlaw{\bhyprecdof - i + 1}$ for $i \le \nlatf$,
-\item $T_{ij} \sim \normlaw{0,1}$ for $i < j$,
-\item the $T_{ij}$ are independently distributed.
-\end{compactenum}
-Together, these imply that \ogram{T} takes a Wishart distribution
-with identity scale matrix and \bhyprecdof degrees of freedom, 
-conditional on $T_{\nlatf+1,\nlatf+1} = 1$.
-
-Thus the prior is 
-\begin{equation*}
-\prior{\ichol{\pvsm}}{\chol{\bhyvprec},\bhyprecdof} \propto 
-\frac{\prod_{i=1}^{\nlatf} \wrapParens{\ichol{\pvsm}}_{ii}^{\bhyprecdof - i} 
-\longexp{-\half
-\trace{\minv{\bhyvprec}\pvsm}}}{\det{\bhyvprec}^{\half[\ssiz]}}.
-\end{equation*}
-2FIX: is this exactly so? problems within the trace? not obviously so.
 %UNFOLD
 %UNFOLD
 
@@ -3026,7 +3054,8 @@ parameter $\delta_2\wrapParens{1-R_1}$.
 From inspection, it is a 'type II' non-central beta, which can be
 transformed into a noncentral \flaw{}:
 \begin{equation}
-\frac{N-p}{p-q} \frac{1-Z}{Z} = \frac{N-p}{p-q} \frac{\GN\GSR{2} - \GN\GSR{1}}{1 + \GN\GSR{1}}.
+\frac{N-p}{p-q} \frac{1-Z}{Z} = 
+\frac{N-p}{p-q} \frac{\GN\GSR{2} - \GN\GSR{1}}{1 + \GN\GSR{1}}.
 \end{equation}
 
 Giri defines $R_1$ in equation (2.2). It is equivalent to
@@ -3039,10 +3068,12 @@ $$
 $$
 Taking this all together, we have, conditional on observing
 $\GSR{1}$, 
-\begin{equation}
-\frac{N-p}{p-q} \frac{\GN\GSR{2} - \GN\GSR{1}}{1 + \GN\GSR{1}} \sim
+%\begin{equation}
+\begin{multline}
+\frac{N-p}{p-q} \frac{\GN\GSR{2} - \GN\GSR{1}}{1 + \GN\GSR{1}} \sim\\
 \ncflaw{p-q,N-p,\frac{\GN\wrapParens{\GSNR - \GSNR[1]}}{1 + \GN\GSR{1}}}.
-\end{equation}
+\end{multline}
+%\end{equation}
 
 Now note that \GS{1} refers to the sample Gram matrix, and thus
 $\GS{1}/N$ is the biased covariance estimate, \usvsig on the subset
