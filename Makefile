@@ -13,6 +13,8 @@
 
 SHELL 						 = /bin/bash
 
+BIN_TIME          ?= $(shell which time)
+
 R_DEV_FILES 			?= $(wildcard ./R/*.r)
 R_FILES 					?= $(R_DEV_FILES)
 R_FILES 					+= $(wildcard ./inst/tests/*.r)
@@ -241,7 +243,7 @@ README.md : $(NODIST_R_DIR)/README.md
 
 # macro for local R
 R_LOCALLY  						= R_LIBS=$(LOCAL) $(R) $(R_FLAGS)
-R_TIME_LOCALLY  			= R_LIBS=$(LOCAL) time --verbose $(R) $(R_FLAGS)
+R_TIME_LOCALLY  			= R_LIBS=$(LOCAL) $(BIN_TIME) --verbose $(R) $(R_FLAGS)
 
 # make directories
 local_d :
