@@ -49,7 +49,7 @@ if (require(devtools)) {
 	# latest greatest
 	install_github(repo='SharpeR',username='shabbychef',ref='master')
 	# last release:
-	install_github(repo='SharpeR',username='shabbychef',ref='r0.1309')
+	install_github(repo='SharpeR',username='shabbychef',ref='r0.1310')
 }
 ```
 

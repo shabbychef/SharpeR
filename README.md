@@ -23,7 +23,7 @@ if (require(devtools)) {
         ref = "master")
     # last release:
     install_github(repo = "SharpeR", username = "shabbychef", 
-        ref = "r0.1309")
+        ref = "r0.1310")
 }
 ```
 
