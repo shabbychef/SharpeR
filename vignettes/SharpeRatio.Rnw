@@ -26,6 +26,8 @@
 %\input{sr_defs.tex}
 \usepackage{SharpeR}
 
+\providecommand{\sideWarning}[1][0.5]{\marginpar{\hfill\includegraphics[width=#1\marginparwidth]{warning}}}
+
 % knitr setup%FOLDUP
 
 <<'preamble', include=FALSE, warning=FALSE, message=FALSE>>=
@@ -1942,6 +1944,283 @@ opt.pos.T2 <- function(mu1,mu2,sig1,sig12,sig2) {
 
 
 %UNFOLD
+
+\subsection{The `haircut'}%FOLDUP
+
+Care must be taken interpreting the confidence intervals and the estimated
+optimal SNR of a portfolio.
+This is because \psnropt is the \emph{maximal} population 
+SNR achieved by any portfolio; it is at least equal to, and potentially much
+larger than, the SNR achieved by the portfolio based on sample statistics,
+\sportwopt.
+There is a gap or `haircut' due to mis-estimation of the optimal
+portfolio. One would suspect that this gap is worse when the true effect size
+(\ie \psnropt) is smaller, when there are fewer observations (\ssiz), and when
+there are more assets (\nlatf).
+
+Assuming \pvmu is not all zeros, the achieved SNR is defined as
+\begin{equation}
+\psnrsopt \defeq \frac{\trAB{\pvmu}{\sportwopt}}{\sqrt{\qform{\pvsig}{\sportwopt}}}.
+\end{equation}
+The haircut is then the quantity,
+\begin{equation}
+\hcut\defeq 1 - \frac{\psnrsopt}{\psnropt} 
+= 1 - \wrapParens{\frac{\trAB{\sportwopt}{\pvmu}}{\trAB{\pportwopt}{\pvmu}}}
+\wrapParens{\frac{\sqrt{\qform{\pvsig}{\pportwopt}}}{\sqrt{\qform{\pvsig}{\sportwopt}}}},
+\label{eqn:hcut_def}
+\end{equation}
+where \pportwopt is the population optimal portfolio, positively proportional
+to $\minv{\pvsig}{\pvmu}.$ Thus the haircut is one minus the ratio of 
+population SNR achieved by the sample Markowitz portfolio to the 
+optimal population SNR (which is achieved by the population Markowitz
+portfolio). A smaller value means that the sample portfolio achieves
+a larger proportion of possible SNR, or, equivalently, a larger value of
+the haircut means greater mis-estimation of the optimal portfolio.
+The haircut takes values in $\wrapBracks{0,2}$.
+When the haircut is larger than 1, the portfolio 
+\sportwopt has \emph{negative} expected returns.
+
+Modeling the haircut is not straightforward
+because it is a random quantity which is not observed. That is, it mixes the
+unknown population parameters \pvsig and \pvmu with the sample quantity
+\sportwopt, which is random. 
+
+
+Let \pvschol be a Cholesky factor of \pvsig: $\pvsig = \ogram{\pvschol}$. We can rewrite
+\begin{equation*}
+\begin{split}
+\frac{\psnrsopt}{\psnropt} 
+&=
+\frac{\trAB{\pvmu}{\sportwopt}}{\sqrt{\qform{\pvsig}{\sportwopt}\qform{\minv{\pvsig}}{\pvmu}}},\\
+&=
+\frac{\trAB{\wrapNeParens{\minv{\pvschol}\pvmu}}{\tr{\pvschol}\sportwopt}}{\sqrt{\gram{\wrapNeParens{\tr{\pvschol}\sportwopt}}\gram{\wrapNeParens{\minv{\pvschol}\pvmu}}}},\\
+&= \frac{\trAB{\wrapNeParens{\minv{\pvschol}\pvmu}}{\tr{\pvschol}\sportwopt}}{\norm{\minv{\pvschol}\pvmu}\norm{\tr{\pvschol}\sportwopt}}.
+\end{split}
+\end{equation*}
+
+Now let \Pmat be an orthogonal matrix which rotates $\minv{\pvschol}\pvmu$ onto the first coordinate:
+$\Pmat\minv{\pvschol}\pvmu = \norm{\minv{\pvschol}\pvmu}\basev[1]$. 
+Insert $\tr{\Pmat}\trminv{\Pmat}$ into the numerator:
+\begin{equation*}
+\begin{split}
+1-\hcut = \frac{\psnrsopt}{\psnropt} 
+&= \frac{\trAB{\wrapNeParens{\Pmat\minv{\pvschol}\pvmu}}{\trminv{\Pmat}\tr{\pvschol}\sportwopt}}{\norm{\minv{\pvschol}\pvmu}\norm{\tr{\pvschol}\sportwopt}},\\
+&= \frac{\trAB{\wrapNeParens{\norm{\minv{\pvschol}\pvmu}\basev[1]}}{\trminv{\Pmat}\tr{\pvschol}\sportwopt}}{\norm{\minv{\pvschol}\pvmu}\norm{\trminv{\Pmat}\tr{\pvschol}\sportwopt}},\\
+&= \frac{\trAB{\basev[1]}{\trminv{\Pmat}\tr{\pvschol}\sportwopt}}{\norm{\trminv{\Pmat}\tr{\pvschol}\sportwopt}}.
+\end{split}
+\end{equation*}
+
+Now suppose that instead of observing \vreti, one had observed 
+$\vretj = \Pmat\minv{\pvschol}\vreti$.  The mean and covariance of
+\vreti are \pvmu and \pvsig; the mean and covariance of \vretj are
+$\norm{\minv{\pvschol}\pvmu}\basev[1]$ and 
+$\qoform{\pvsig}{\wrapNeParens{\Pmat\minv{\pvschol}}}$.
+Recall that \pvschol is the Cholesky factor of \pvsig, so
+$\qoform{\pvsig}{\minv{\pvschol}} = \eye$ and
+$$
+\norm{\minv{\pvschol}\pvmu} =
+\sqrt{\qform{\trminv{\pvschol}\minv{\pvschol}}{\pvmu}} =
+\sqrt{\qform{\minv{\pvsig}}{\pvmu}} = \psnropt.$$
+Thus the mean and covariance of \vretj are 
+$\psnropt\basev[1]$ and $\eye$.
+
+The (sample) optimal portfolio on the observations of \vretj corresponding to
+those of \vreti is
+$$
+\sportw[y,*] = \minv{\wrapNeParens{\Pmat\minv{\pvschol}\svsig\trminv{\pvschol}\tr{\Pmat}}}\Pmat\minv{\pvschol}\svmu 
+= \trminv{\Pmat}\tr{\pvschol}\minv{\svsig}\svmu 
+= \trminv{\Pmat}\tr{\pvschol}\sportw[*].
+$$
+So we can rewrite the haircut (in terms of \vreti) as 
+\begin{equation}
+1-\hcut = \frac{\trAB{\basev[1]}{\sportw[y,*]}}{\norm{\sportw[y,*]}}.
+\end{equation}
+
+So \WLOG it suffices to study the case where one observes \vretj, forms the Markowitz portfolio and experiences
+some haircut.  But the population parameters associated with 
+\vretj are simpler to deal with.
+
+\subsubsection{A Simple Approximation for Gaussian Returns}
+
+A simple approximation to the haircut can be had by supposing that
+$\sportw[y,*] \approx \svmu[y]$. That is, since the population covariance of \vretj is the identity,
+ignore the contribution of the sample covariance to the Markowitz portfolio. Thus we are treating the
+elements of \sportw[y,*] as independent Gaussians, each zero mean except the first 
+element which has mean \psnropt, and each with variance \oneby{\ssiz}. We can then untangle 
+the contribution of the first element of \sportw[y,*] from the denominator by making some trigonometric transforms:
+%\begin{equation}
+\begin{multline}
+\funcit{\tan}{\funcit{\arcsin}{1-\hcut}} 
+\sim \frac{\normlaw{\psnropt,1/\ssiz}}{\sqrt{\chisqlaw{\nlatf - 1} / \ssiz}}
+\sim \frac{\normlaw{\sqrt{\ssiz}\psnropt,1}}{\sqrt{\chisqlaw{\nlatf - 1}}}\\
+\sim \oneby{\sqrt{\nlatf - 1}}\nctlaw{\sqrt{\ssiz}\psnropt,\nlatf-1}.
+\label{eqn:hcut_apx}
+\end{multline}
+%\end{equation}
+%Because this approximation ignores the `noise' contributed by the sample covariance, I would guess that this
+%is a stochastic lower bound on the true haircut, though a proof is not forthcoming.  
+Here \nctlaw{x,y} is a non-central \tstat-distribution with non-centrality
+parameter $x$ and $y$ degrees of freedom.
+
+%When $\ssiz/\nlatf$ is large, the following is a reasonable approximation to
+%the distribution of \hcut:
+%\begin{equation}  
+%\sqrt{\nlatf - 1} \ftan{\farcsin{1-\hcut}} \approx
+%\nctlaw{\sqrt{\ssiz}\psnropt,\nlatf-1},
+%\label{eqn:hcut_apx}
+%\end{equation}
+%where \nctlaw{x,y} is a non-central \tstat-distribution with non-centrality
+%parameter $x$ and $y$ degrees of freedom.
+%This approximation can be found by ignoring all variability in the sample
+%estimate of the covariance matrix, that is by assuming that the sample optimal
+%portfolio was computed with the \emph{population} covariance:
+%$\sportwopt \propto \minv{\pvsig}{\svmu}$. 
+Because mis-estimation of the
+covariance matrix should contribute some error, I expect that this
+approximation is a `stochastic lower bound' on the true haircut. Numerical
+simulations, however, suggest it is a fairly tight bound for large $\ssiz/\nlatf$.
+(I suspect that the true distribution involves a non-central
+\flaw{}-distribution, but the proof is beyond me at the moment.)
+\sideWarning
+
+
+%Numerical experiments support the following as an approximation to
+%the median value of the haircut distribution:
+%$$
+%1 - \fsin{\farctan{\frac{\sqrt{\ssiz}\psnropt}{\sqrt{\nlatf-1}}}}.
+%$$
+
+Here I look at the haircut via Monte Carlo simulations:
+
+<<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
+require(MASS)
+
+# simple markowitz.
+simple.marko <- function(rets) {
+	mu.hat <- as.vector(apply(rets,MARGIN=2,mean,na.rm=TRUE))
+	Sig.hat <- cov(rets)
+	w.opt <- solve(Sig.hat,mu.hat)
+	retval <- list('mu'=mu.hat,'sig'=Sig.hat,'w'=w.opt)
+	return(retval)
+}
+# make multivariate pop. & sample w/ given zeta.star
+gen.pop <- function(n,p,zeta.s=0) {
+	true.mu <- matrix(rnorm(p),ncol=p)
+	#generate an SPD population covariance. a hack.
+	xser <- matrix(rnorm(p*(p + 100)),ncol=p)
+	true.Sig <- t(xser) %*% xser
+	pre.sr <- sqrt(true.mu %*% solve(true.Sig,t(true.mu)))
+	#scale down the sample mean to match the zeta.s
+	true.mu <- (zeta.s/pre.sr[1]) * true.mu 
+  X <- mvrnorm(n=n,mu=true.mu,Sigma=true.Sig)
+	retval = list('X'=X,'mu'=true.mu,'sig'=true.Sig,'SNR'=zeta.s)
+	return(retval)
+}
+# a single simulation
+sample.haircut <- function(n,p,...) {
+	popX <- gen.pop(n,p,...)
+	smeas <- simple.marko(popX$X)
+	# I have got to figure out how to deal with vectors...
+	ssnr <- (t(smeas$w) %*% t(popX$mu)) / sqrt(t(smeas$w) %*% popX$sig %*% smeas$w)
+	hcut <- 1 - (ssnr / popX$SNR)
+	# for plugin estimator, estimate zeta.star
+	asro <- sropt(z.s=sqrt(t(smeas$w) %*% smeas$mu),df1=p,df2=n)
+	zeta.hat.s <- inference(asro,type="KRS")  # or 'MLE', 'unbiased'
+	return(c(hcut,zeta.hat.s))
+}
+
+# set everything up
+set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
+ope <- 253
+LONG.FORM <- FALSE
+n.sim <- if (LONG.FORM) 2048 else 512
+n.stok <- if (LONG.FORM) 8 else 6
+n.yr <- 4
+n.obs <- ceiling(ope * n.yr)
+zeta.s <- 1.20 / sqrt(ope)   # optimal SNR, in daily units
+
+# run some experiments
+system.time(experiments <- replicate(n.sim,sample.haircut(n.obs,n.stok,zeta.s)))
+hcuts <- experiments[1,]
+print(summary(hcuts))
+# haircut approximation in the equation above
+qhcut <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
+	1 - sin(atan((1/sqrt(df1-1)) * qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail)))
+}
+# if you wanted to look at how bad the plug-in estimator is, then
+# uncomment the following (you are warned):
+# zeta.hat.s <- experiments[2,];                                   
+# qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.hat.s),hcuts,
+# 			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles");
+# qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.hat.s) },
+# 			 col=2)
+
+# qqplot;
+qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
+			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles")
+qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.s) },
+			 col=2)
+@
+<<'hcut_med',include=FALSE>>=
+medv.true <- median(hcuts)
+med.snr.true <- zeta.s * (1 - medv.true)
+@
+
+I check the quality of the approximation given in \eqnref{hcut_apx} by a Q-Q 
+plot in \figref{haircutting}.  For the case where
+$\ssiz=\Sexpr{n.obs}$ (\Sexpr{n.yr} years of daily observations), 
+$\nlatf=\Sexpr{n.stok}$ and $\psnropt=\Sexpr{zeta.s * sqrt(ope)}\yrtomhalf$, 
+the t-approximation is very good indeed. 
+%Note that computing prediction
+%intervals for this unobserved, random quantity using this equation is not
+%feasible because it relies on the unobserved \psnropt.  Using a plugin
+%estimate, based on debiasing \ssropt, or the MLE, \etc, do not give satisfactory
+%results either.
+%, as illustrated in \figref{hcut_plugin}.
+%<<'hcut_plugin',fig.cap="Empirical p-values using \\eqnref{hcut_apx} and a (feasible) plug-in estimate of \\psnropt are shown. The plug-in approach does not give good estimates, and is not suggested.">>=
+%# and the plugin approximation:
+%plot(ecdf(plugin.p))
+%abline(a=0,b=1,col=2)
+%@
+%Let's look at the range of haircuts and the approximate median value:
+%<<'hcut_continued'>>=
+%# now check the median approximation
+%print(summary(hcuts))
+%medv.apx <- 1 - sin(atan(sqrt((n.obs * zeta.s^2) / (n.stok - 1))))
+%cat(sprintf("modeled median is %2.2f\n",medv.apx))
+%@
+
+%Continuing, 
+%In this case, where we optimize over \Sexpr{n.stok} assets given \Sexpr{n.yr} 
+%years of daily observations, and a population SNR of 
+%\Sexpr{zeta.s * sqrt(ope)} \yrtomhalf, 
+The median value of the haircut is on the 
+order of \Sexpr{signif(100 * medv.true,2)}\%, meaning that the median
+population SNR of the sample portfolios is around \Sexpr{med.snr.true *
+sqrt(ope)}\yrtomhalf.  The maximum value of the haircut over the
+\Sexpr{n.sim} simulations, however is \Sexpr{max(hcuts)}, which is larger than
+one; this happens if and only if the sample portfolio has negative expected
+return: $\trAB{\sportwopt}{\pvmu} < 0$. In this case the Markowitz portfolio
+is actually \emph{destroying value} because of modeling error: the mean return
+of the selected portfolio is negative, even though positive mean is achievable.
+
+%Again, it is not clear how to estimate the haircut given the observed
+%statistics \svmu and \svsig, other than lamely `plugging in' the sample
+%estimate in place of \psnropt.
+
+The approximation in \eqnref{hcut_apx} involves the unknown population
+parameters \pvmu and \pvsig, but does not make use of the observed quantities
+\svmu and \svsig. It seems mostly of theoretical interest, perhaps for
+producing prediction intervals on \hcut when planning a trading strategy 
+(\ie balancing \ssiz and \nlatf). A more practical problem is that of 
+estimating confidence intervals on 
+$\trAB{\sportw}{\pvmu} / \sqrt{\qiform{\pvsig}{\sportw}}$ having 
+observed \svmu and \svsig. In this case one \emph{cannot} simply 
+plug-in some estimate of \psnropt computed from \ssropt (via MLE, KRS, \etc)
+into \eqnref{hcut_apx}. The reason is that the error in the approximation of
+\psnropt is not independent of the modeling error that causes the haircut.
+
+%UNFOLD
 %UNFOLD
 
 \section{Multivariate inference in unified form}%FOLDUP
@@ -2401,7 +2680,7 @@ This framework slightly generalizes Dempster's
 ``Covariance Selection.'' \cite{dempster1972} Covariance selection
 reduces to the case where each \lrta[i] is zero, and
 each \lrtA[i] is a matrix of all zeros except two (symmetric) ones 
-somewhere in the upper left $\nlatf \times \nlatf$ sub matrix. In
+somewhere in the lower right $\nlatf \times \nlatf$ sub matrix. In
 all other respects, however, the solution here follows Dempster.
 
 \providecommand{\vitrlam}[2]{\vectUL{\lambda}{\wrapNeParens{#1}}{#2}}
@@ -2409,8 +2688,9 @@ all other respects, however, the solution here follows Dempster.
 \providecommand{\vitrerr}[2]{\vectUL{\epsilon}{\wrapNeParens{#1}}{#2}}
 \providecommand{\sitrerr}[2]{\mathUL{\epsilon}{\wrapNeParens{#1}}{#2}}
 
-An iterative technique for finding the MLE based on a Newton step would
-proceed as follows. Let \vitrlam{0}{} be some initial estimate of the
+An iterative technique for finding the MLE based on a Newton step 
+would proceed as follow.  \cite{nocedal2006numerical} 
+Let \vitrlam{0}{} be some initial estimate of the
 vector of $\lambda_i$. (A good initial estimate can likely be had 
 by abusing the asymptotic normality 
 result from \subsecref{dist_markoport}.)
@@ -2422,9 +2702,13 @@ The residual of the \kth{k} estimate, \vitrlam{k}{} is
 The Jacobian of this residual with respect to the \kth{l} element of \vitrlam{k}
 is
 \begin{equation}
-\drbydr{\vitrerr{k}{i}}{\sitrlam{k}{l}} = 
+\begin{split}
+\drbydr{\vitrerr{k}{i}}{\sitrlam{k}{l}} &= 
 \trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}
-\lrtA[l] \minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}}.
+\lrtA[l] \minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}},\\
+&= \tr{\fvec{\lrtA[i]}} \wrapParens{\AkronA{\minv{\wrapBracks{\svsm - \sum_j
+\sitrlam{k}{j}\lrtA[j]}}}} \fvec{\lrtA[l]}.
+\end{split}
 \end{equation}
 
 Newton's method is then the iterative scheme
@@ -2563,196 +2847,6 @@ This is a \emph{very} loose upper bound on the probability of a loss, and is fai
 for which the SNR is less than one.
 
 %\subsubsection{\txtSR and drawdowns}
-
-%UNFOLD
-
-\subsection{The `haircut'}%FOLDUP
-
-Care must be taken interpreting the confidence intervals and the estimated
-optimal SNR of a portfolio.
-This is because \psnropt is the \emph{maximal} population 
-SNR achieved by any portfolio; it is at least equal to, and potentially much
-larger than, the SNR achieved by the portfolio based on sample statistics,
-\sportwopt. There is a gap or `haircut' due to mis-estimation of the optimal
-portfolio. One would suspect that this gap is worse when the true effect size
-(\ie \psnropt) is smaller, when there are fewer observations (\ssiz), and when
-there are more assets (\nlatf).
-
-Assuming \pvmu is not all zeros, define the haircut as the quantity
-\begin{equation}
-\hcut \defeq 1 - \frac{1}{\psnropt}\frac{\trAB{\sportwopt}{\pvmu}}{\sqrt{\qform{\pvsig}{\sportwopt}}}
-= 1 - \wrapParens{\frac{\trAB{\sportwopt}{\pvmu}}{\trAB{\pportwopt}{\pvmu}}}
-\wrapParens{\frac{\sqrt{\qform{\pvsig}{\pportwopt}}}{\sqrt{\qform{\pvsig}{\sportwopt}}}},
-\label{eqn:hcut_def}
-\end{equation}
-where \pportwopt is the population optimal portfolio, positively proportional
-to $\minv{\pvsig}{\pvmu}.$ Thus the haircut is one minus the ratio of 
-population SNR achieved by the sample Markowitz portfolio to the 
-optimal population SNR (which is achieved by the population Markowitz
-portfolio). A smaller value means that the sample portfolio achieves
-a larger proportion of possible SNR, or, equivalently, a larger value of
-the haircut means greater mis-estimation of the optimal portfolio.
-The haircut takes values in $\wrapBracks{0,2}$.
-
-Modeling the haircut is not straightforward
-because it is a random quantity which is not observed. That is, it mixes the
-unknown population parameters \pvsig and \pvmu with the sample quantity
-\sportwopt, which is random. 
-
-When $\ssiz/\nlatf$ is large, the following is a reasonable approximation to
-the distribution of \hcut:
-\begin{equation}  
-\sqrt{\nlatf - 1} \ftan{\farcsin{1-\hcut}} \approx
-\nctlaw{\sqrt{\ssiz}\psnropt,\nlatf-1},
-\label{eqn:hcut_apx}
-\end{equation}
-where \nctlaw{x,y} is a non-central \tstat-distribution with non-centrality
-parameter $x$ and $y$ degrees of freedom.
-This approximation can be found by ignoring all variability in the sample
-estimate of the covariance matrix, that is by assuming that the sample optimal
-portfolio was computed with the \emph{population} covariance:
-$\sportwopt \propto \minv{\pvsig}{\svmu}$. Because mis-estimation of the
-covariance matrix should contribute some error, I expect that this
-approximation is a `stochastic lower bound' on the true haircut. Numerical
-simulations, however, suggest it is a fairly tight bound for large $\ssiz/\nlatf$.
-(I would be willing to guess that the true distribution involves a non-central
-\flaw{}-distribution, but the proof is beyond me at the moment.)
-
-%Numerical experiments support the following as an approximation to
-%the median value of the haircut distribution:
-%$$
-%1 - \fsin{\farctan{\frac{\sqrt{\ssiz}\psnropt}{\sqrt{\nlatf-1}}}}.
-%$$
-
-Here I look at the haircut via Monte Carlo simulations:
-
-<<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
-require(MASS)
-
-# simple markowitz.
-simple.marko <- function(rets) {
-	mu.hat <- as.vector(apply(rets,MARGIN=2,mean,na.rm=TRUE))
-	Sig.hat <- cov(rets)
-	w.opt <- solve(Sig.hat,mu.hat)
-	retval <- list('mu'=mu.hat,'sig'=Sig.hat,'w'=w.opt)
-	return(retval)
-}
-# make multivariate pop. & sample w/ given zeta.star
-gen.pop <- function(n,p,zeta.s=0) {
-	true.mu <- matrix(rnorm(p),ncol=p)
-	#generate an SPD population covariance. a hack.
-	xser <- matrix(rnorm(p*(p + 100)),ncol=p)
-	true.Sig <- t(xser) %*% xser
-	pre.sr <- sqrt(true.mu %*% solve(true.Sig,t(true.mu)))
-	#scale down the sample mean to match the zeta.s
-	true.mu <- (zeta.s/pre.sr[1]) * true.mu 
-  X <- mvrnorm(n=n,mu=true.mu,Sigma=true.Sig)
-	retval = list('X'=X,'mu'=true.mu,'sig'=true.Sig,'SNR'=zeta.s)
-	return(retval)
-}
-# a single simulation
-sample.haircut <- function(n,p,...) {
-	popX <- gen.pop(n,p,...)
-	smeas <- simple.marko(popX$X)
-	# I have got to figure out how to deal with vectors...
-	ssnr <- (t(smeas$w) %*% t(popX$mu)) / sqrt(t(smeas$w) %*% popX$sig %*% smeas$w)
-	hcut <- 1 - (ssnr / popX$SNR)
-	# for plugin estimator, estimate zeta.star
-	asro <- sropt(z.s=sqrt(t(smeas$w) %*% smeas$mu),df1=p,df2=n)
-	zeta.hat.s <- inference(asro,type="KRS")  # or 'MLE', 'unbiased'
-	return(c(hcut,zeta.hat.s))
-}
-
-# set everything up
-set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
-ope <- 253
-LONG.FORM <- FALSE
-n.sim <- if (LONG.FORM) 2048 else 512
-n.stok <- if (LONG.FORM) 8 else 6
-n.yr <- 4
-n.obs <- ceiling(ope * n.yr)
-zeta.s <- 1.20 / sqrt(ope)   # optimal SNR, in daily units
-
-# run some experiments
-system.time(experiments <- replicate(n.sim,sample.haircut(n.obs,n.stok,zeta.s)))
-hcuts <- experiments[1,]
-print(summary(hcuts))
-# haircut approximation in the equation above
-qhcut <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
-	1 - sin(atan((1/sqrt(df1-1)) * qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail)))
-}
-# if you wanted to look at how bad the plug-in estimator is, then
-# uncomment the following (you are warned):
-# zeta.hat.s <- experiments[2,];                                   
-# qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.hat.s),hcuts,
-# 			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles");
-# qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.hat.s) },
-# 			 col=2)
-
-# qqplot;
-qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
-			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles")
-qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.s) },
-			 col=2)
-@
-<<'hcut_med',include=FALSE>>=
-medv.true <- median(hcuts)
-med.snr.true <- zeta.s * (1 - medv.true)
-@
-
-I check the quality of the approximation given in \eqnref{hcut_apx} by a Q-Q 
-plot in \figref{haircutting}.  For the case where
-$\ssiz=\Sexpr{n.obs}$ (\Sexpr{n.yr} years of daily observations), 
-$\nlatf=\Sexpr{n.stok}$ and $\psnropt=\Sexpr{zeta.s * sqrt(ope)}\yrtomhalf$, 
-the t-approximation is very good indeed. 
-%Note that computing prediction
-%intervals for this unobserved, random quantity using this equation is not
-%feasible because it relies on the unobserved \psnropt.  Using a plugin
-%estimate, based on debiasing \ssropt, or the MLE, \etc, do not give satisfactory
-%results either.
-%, as illustrated in \figref{hcut_plugin}.
-%<<'hcut_plugin',fig.cap="Empirical p-values using \\eqnref{hcut_apx} and a (feasible) plug-in estimate of \\psnropt are shown. The plug-in approach does not give good estimates, and is not suggested.">>=
-%# and the plugin approximation:
-%plot(ecdf(plugin.p))
-%abline(a=0,b=1,col=2)
-%@
-%Let's look at the range of haircuts and the approximate median value:
-%<<'hcut_continued'>>=
-%# now check the median approximation
-%print(summary(hcuts))
-%medv.apx <- 1 - sin(atan(sqrt((n.obs * zeta.s^2) / (n.stok - 1))))
-%cat(sprintf("modeled median is %2.2f\n",medv.apx))
-%@
-
-%Continuing, 
-%In this case, where we optimize over \Sexpr{n.stok} assets given \Sexpr{n.yr} 
-%years of daily observations, and a population SNR of 
-%\Sexpr{zeta.s * sqrt(ope)} \yrtomhalf, 
-The median value of the haircut is on the 
-order of \Sexpr{signif(100 * medv.true,2)}\%, meaning that the median
-population SNR of the sample portfolios is around \Sexpr{med.snr.true *
-sqrt(ope)}\yrtomhalf.  The maximum value of the haircut over the
-\Sexpr{n.sim} simulations, however is \Sexpr{max(hcuts)}, which is larger than
-one; this happens if and only if the sample portfolio has negative expected
-return: $\trAB{\sportwopt}{\pvmu} < 0$. In this case the Markowitz portfolio
-is actually \emph{destroying value} because of modeling error: the mean return
-of the selected portfolio is negative, even though positive mean is achievable.
-
-%Again, it is not clear how to estimate the haircut given the observed
-%statistics \svmu and \svsig, other than lamely `plugging in' the sample
-%estimate in place of \psnropt.
-
-The approximation in \eqnref{hcut_apx} involves the unknown population
-parameters \pvmu and \pvsig, but does not make use of the observed quantities
-\svmu and \svsig. It seems mostly of theoretical interest, perhaps for
-producing prediction intervals on \hcut when planning a trading strategy 
-(\ie balancing \ssiz and \nlatf). A more practical problem is that of 
-estimating confidence intervals on 
-$\trAB{\sportw}{\pvmu} / \sqrt{\qiform{\pvsig}{\sportw}}$ having 
-observed \svmu and \svsig. In this case one \emph{cannot} simply 
-plug-in some estimate of \psnropt computed from \ssropt (via MLE, KRS, \etc)
-into \eqnref{hcut_apx}. The reason is that the error in the approximation of
-\psnropt is not independent of the modeling error that causes the haircut.
 
 %UNFOLD
 %UNFOLD

@@ -89,6 +89,7 @@
 \providecommand{\etc}{\myabrv{etc.}}
 \providecommand{\etal}{\myabrv{et al.}}
 \providecommand{\cf}{\myabrv{cf.}}
+\providecommand{\WLOG}{without loss of generality, }
 
 
 \providecommand{\setwo}[2]{\MATHIT{\left\{ #1 \left|\; {#2} \right.\right\}}}
@@ -737,6 +738,9 @@
 % conditional on
 \providecommand{\condl}[1]{\MATHIT{\left|{#1}\right.}}
 \providecommand{\condtwo}[2]{\MATHIT{{#1}\condl{#2}}}
+
+\providecommand{\NORMM}[2]{\ensuremath{\left\|{#2}\right\|_{#1}}\xspace}
+\providecommand{\norm}[2][2]{\NORMM{#1}{#2}}
 
 %
 %for vim modeline: (do not edit)
