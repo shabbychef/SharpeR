@@ -1985,60 +1985,39 @@ because it is a random quantity which is not observed. That is, it mixes the
 unknown population parameters \pvsig and \pvmu with the sample quantity
 \sportwopt, which is random. 
 
-
-Let \pvschol be a Cholesky factor of \pvsig: $\pvsig = \ogram{\pvschol}$. We can rewrite
-\begin{equation*}
-\begin{split}
-\frac{\psnrsopt}{\psnropt} 
-&=
-\frac{\trAB{\pvmu}{\sportwopt}}{\sqrt{\qform{\pvsig}{\sportwopt}\qform{\minv{\pvsig}}{\pvmu}}},\\
-&=
-\frac{\trAB{\wrapNeParens{\minv{\pvschol}\pvmu}}{\tr{\pvschol}\sportwopt}}{\sqrt{\gram{\wrapNeParens{\tr{\pvschol}\sportwopt}}\gram{\wrapNeParens{\minv{\pvschol}\pvmu}}}},\\
-&= \frac{\trAB{\wrapNeParens{\minv{\pvschol}\pvmu}}{\tr{\pvschol}\sportwopt}}{\norm{\minv{\pvschol}\pvmu}\norm{\tr{\pvschol}\sportwopt}}.
-\end{split}
-\end{equation*}
-
-Now let \Pmat be an orthogonal matrix which rotates $\minv{\pvschol}\pvmu$ onto the first coordinate:
-$\Pmat\minv{\pvschol}\pvmu = \norm{\minv{\pvschol}\pvmu}\basev[1]$. 
-Insert $\tr{\Pmat}\trminv{\Pmat}$ into the numerator:
-\begin{equation*}
-\begin{split}
-1-\hcut = \frac{\psnrsopt}{\psnropt} 
-&= \frac{\trAB{\wrapNeParens{\Pmat\minv{\pvschol}\pvmu}}{\trminv{\Pmat}\tr{\pvschol}\sportwopt}}{\norm{\minv{\pvschol}\pvmu}\norm{\tr{\pvschol}\sportwopt}},\\
-&= \frac{\trAB{\wrapNeParens{\norm{\minv{\pvschol}\pvmu}\basev[1]}}{\trminv{\Pmat}\tr{\pvschol}\sportwopt}}{\norm{\minv{\pvschol}\pvmu}\norm{\trminv{\Pmat}\tr{\pvschol}\sportwopt}},\\
-&= \frac{\trAB{\basev[1]}{\trminv{\Pmat}\tr{\pvschol}\sportwopt}}{\norm{\trminv{\Pmat}\tr{\pvschol}\sportwopt}}.
-\end{split}
-\end{equation*}
-
-Now suppose that instead of observing \vreti, one had observed 
-$\vretj = \Pmat\minv{\pvschol}\vreti$.  The mean and covariance of
-\vreti are \pvmu and \pvsig; the mean and covariance of \vretj are
-$\norm{\minv{\pvschol}\pvmu}\basev[1]$ and 
-$\qoform{\pvsig}{\wrapNeParens{\Pmat\minv{\pvschol}}}$.
-Recall that \pvschol is the Cholesky factor of \pvsig, so
-$\qoform{\pvsig}{\minv{\pvschol}} = \eye$ and
+To analyze the haircut, first consider the effects of a rotation
+of the returns vector. Let \Pmat be some invertible square matrix,
+and let $\vretj = \tr{\Pmat}\vreti$. The population mean and covariance 
+of \vretj are $\tr{\Pmat}\pvmu$ and $\qform{\pvsig}{\Pmat}$, thus the 
+Markowitz portfolio is 
+$\minv{\Pmat}\minv{\pvsig}\pvmu = \minv{\Pmat}\sportwopt$.  These
+hold for the sample analogues as well.  Rotation does not change 
+the maximum SNR, since 
+$\qiform{\wrapParens{\qform{\pvsig}{\Pmat}}}{\wrapParens{\tr{\Pmat}\pvmu}} = \qiform{\pvsig}{\pvmu} = \psnropt$.
+Rotation does not change the achieved SNR of the sample Markowitz
+portfolio, since this is
 $$
-\norm{\minv{\pvschol}\pvmu} =
-\sqrt{\qform{\trminv{\pvschol}\minv{\pvschol}}{\pvmu}} =
-\sqrt{\qform{\minv{\pvsig}}{\pvmu}} = \psnropt.$$
-Thus the mean and covariance of \vretj are 
-$\psnropt\basev[1]$ and $\eye$.
-
-The (sample) optimal portfolio on the observations of \vretj corresponding to
-those of \vreti is
+\frac{\trAB{\wrapParens{\tr{\Pmat}\pvmu}}{\minv{\Pmat}\sportwopt}}{\sqrt{\qform{\wrapParens{\qform{\pvsig}{\Pmat}}}{\wrapParens{\minv{\Pmat}\sportwopt}}}}
+= \frac{\trAB{\pvmu}{\sportwopt}}{\sqrt{\qform{\pvsig}{\sportwopt}}}
+= \psnrsopt. 
 $$
-\sportw[y,*] = \minv{\wrapNeParens{\Pmat\minv{\pvschol}\svsig\trminv{\pvschol}\tr{\Pmat}}}\Pmat\minv{\pvschol}\svmu 
-= \trminv{\Pmat}\tr{\pvschol}\minv{\svsig}\svmu 
-= \trminv{\Pmat}\tr{\pvschol}\sportw[*].
-$$
-So we can rewrite the haircut (in terms of \vreti) as 
-\begin{equation}
-1-\hcut = \frac{\trAB{\basev[1]}{\sportw[y,*]}}{\norm{\sportw[y,*]}}.
-\end{equation}
 
-So \WLOG it suffices to study the case where one observes \vretj, forms the Markowitz portfolio and experiences
+Thus the haircut is not changed under a rotation. Now choose \Pmat 
+to be a square root of \minv{\pvsig} that rotates \pvmu 
+onto the first coordinate.\sidenote{This can be done by
+taking a lower Cholesky factor, then a rotation.} 
+That is, pick \Pmat such that 
+$\minv{\pvsig} = \ogram{\Pmat}$ and
+$\tr{\Pmat}\pvmu = \norm{\tr{\Pmat}\pvmu}\basev[1]$.  Note that
+$\norm{\tr{\Pmat}\pvmu} = \sqrt{\gram{\wrapParens{\tr{\Pmat}\pvmu}}} =
+\sqrt{\qform{\minv{\pvsig}}{\pvmu}} = \psnropt.$ Thus the mean and
+covariance of \vretj are $\psnropt\basev[1]$ and
+$\qform{\pvsig}{\Pmat} = \qform{\minv{\wrapParens{\ogram{\Pmat}}}}{\Pmat} = \eye.$
+
+So \WLOG it suffices to study the case where one observes \vretj, 
+forms the Markowitz portfolio and experiences
 some haircut.  But the population parameters associated with 
-\vretj are simpler to deal with.
+\vretj are simpler to deal with, a fact abused in the section.
 
 \subsubsection{A Simple Approximation for Gaussian Returns}
 
@@ -2059,8 +2038,8 @@ the contribution of the first element of \sportw[y,*] from the denominator by ma
 %\end{equation}
 %Because this approximation ignores the `noise' contributed by the sample covariance, I would guess that this
 %is a stochastic lower bound on the true haircut, though a proof is not forthcoming.  
-Here \nctlaw{x,y} is a non-central \tstat-distribution with non-centrality
-parameter $x$ and $y$ degrees of freedom.
+Here \nctlaw{\nctp,\nu} is a non-central \tstat-distribution with 
+non-centrality parameter $\nctp$ and $\nu$ degrees of freedom.
 
 %When $\ssiz/\nlatf$ is large, the following is a reasonable approximation to
 %the distribution of \hcut:
@@ -2147,6 +2126,10 @@ print(summary(hcuts))
 qhcut <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
 	1 - sin(atan((1/sqrt(df1-1)) * qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail)))
 }
+qhcut2 <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
+	atant <- atan((1/sqrt(df1-1)) * qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail))
+	1 - sin(atant - 0.0184 * zeta.s * sqrt(df1 - 1))
+}
 # if you wanted to look at how bad the plug-in estimator is, then
 # uncomment the following (you are warned):
 # zeta.hat.s <- experiments[2,];                                   
@@ -2156,9 +2139,9 @@ qhcut <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
 # 			 col=2)
 
 # qqplot;
-qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
+qqplot(qhcut2(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
 			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles")
-qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.s) },
+qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut2(p,n.stok,n.obs,zeta.s) },
 			 col=2)
 @
 <<'hcut_med',include=FALSE>>=
