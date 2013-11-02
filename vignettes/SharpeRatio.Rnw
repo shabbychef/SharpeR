@@ -1400,7 +1400,7 @@ Student's \tstat-statistic squared (and thus side information is lost).
 
 %FOLDUP
 
-<<hot_ssiz_table,echo=FALSE,results='asis'>>=
+<<'hot_ssiz_table',echo=FALSE,results='asis'>>=
 fname <- system.file('extdata','hotelling_power_rule.rda',package='SharpeR')
 if (fname == "") {
 	fname <- 'hotelling_power_rule.rda'
@@ -2019,7 +2019,7 @@ forms the Markowitz portfolio and experiences
 some haircut.  But the population parameters associated with 
 \vretj are simpler to deal with, a fact abused in the section.
 
-\subsubsection{A Simple Approximation for Gaussian Returns}
+\subsubsection{Approximate haircut under Gaussian returns}%FOLDUP
 
 A simple approximation to the haircut can be had by supposing that
 $\sportw[y,*] \approx \svmu[y]$. That is, since the population covariance of \vretj is the identity,
@@ -2071,6 +2071,7 @@ simulations, however, suggest it is a fairly tight bound for large $\ssiz/\nlatf
 
 Here I look at the haircut via Monte Carlo simulations:
 
+% 2FIX: precompute this like the others, so you can have 2048
 <<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
 require(MASS)
 
@@ -2124,11 +2125,11 @@ hcuts <- experiments[1,]
 print(summary(hcuts))
 # haircut approximation in the equation above
 qhcut <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
-	1 - sin(atan((1/sqrt(df1-1)) * qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail)))
-}
-qhcut2 <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
-	atant <- atan((1/sqrt(df1-1)) * qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail))
-	1 - sin(atant - 0.0184 * zeta.s * sqrt(df1 - 1))
+	atant <- atan((1/sqrt(df1-1)) * 
+		qt(p,df=df1-1,ncp=sqrt(df2)*zeta.s,lower.tail=!lower.tail))
+	# a slightly better approximation is:
+	# retval <- 1 - sin(atant - 0.0184 * zeta.s * sqrt(df1 - 1))
+	retval <- 1 - sin(atant)
 }
 # if you wanted to look at how bad the plug-in estimator is, then
 # uncomment the following (you are warned):
@@ -2139,9 +2140,9 @@ qhcut2 <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
 # 			 col=2)
 
 # qqplot;
-qqplot(qhcut2(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
+qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
 			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles")
-qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut2(p,n.stok,n.obs,zeta.s) },
+qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.s) },
 			 col=2)
 @
 <<'hcut_med',include=FALSE>>=
@@ -2202,6 +2203,53 @@ observed \svmu and \svsig. In this case one \emph{cannot} simply
 plug-in some estimate of \psnropt computed from \ssropt (via MLE, KRS, \etc)
 into \eqnref{hcut_apx}. The reason is that the error in the approximation of
 \psnropt is not independent of the modeling error that causes the haircut.
+%UNFOLD
+
+\subsubsection{Empirical approximations under Gaussian returns}%FOLDUP
+
+For `sane' ranges of \ssiz, \nlatf, and \psnropt, Monte Carlo studies
+using Gaussian returns support the following approximations for 
+the haircut, which you should take with a grain of salt:
+\sideWarning
+
+\begin{equation}
+\begin{split}
+	\hcut &\approx 1 - \fsin{\farctan{\frac{\nctvar}{\sqrt{\nlatf - 1}}} - 0.0184 \psnropt \sqrt{\nlatf-1}},\\
+        &\phantom{a bunch of text}\mbox{where}\,\,\nctvar\sim\nctlaw{\sqrt{\ssiz}\psnropt,\nlatf-1},\\
+	\median{\hcut} &\approx  1 - \fsin{\farctan{\frac{\sqrt{\ssiz}\psnropt}{\sqrt{\nlatf-1}}}},\\
+	\E{\hcut} &\approx  1 - \sqrt{\frac{\ssiz\psnropt^2}{\nlatf + \ssiz\psnropt^2}},\\
+	\VAR{\hcut} &\approx  \frac{\nlatf}{\wrapNeParens{\nlatf + \wrapNeBracks{\ssiz\psnropt^2}^{1.08}}^2}.
+\end{split}
+\end{equation}
+
+% 2FIX: start here, and talk more about the above MC sims and such ...
+
+<<'hcut_moments',echo=FALSE,results='asis'>>=
+mc.med <- median(hcuts)
+mc.mean <- mean(hcuts)
+mc.sd <- sd(hcuts)
+
+mc.p <- n.stok
+mc.n <- n.obs
+mc.zs <- zeta.s
+
+fit.med <- 1 - sin(atan(mc.zs * sqrt(mc.n / (mc.p - 1))))
+fit.mean <- 1 - sqrt(1 - (mc.p / (mc.p + mc.n * mc.zs^2)))
+fit.sd <- sqrt(mc.p) / (mc.p + (mc.n * mc.zs^2) ^ 1.08)
+
+fit.df <- data.frame(apx=c(fit.med,fit.mean,fit.sd),
+	mc=c(mc.med,mc.mean,mc.sd))
+rownames(fit.df) <- c("median","mean","standard deviation")
+
+# 2FIX: start here;yy
+xres <- xtable(fit.df,label="tab:hcutfit",
+	caption="Haircut fits ...")
+print(xres,include.rownames=TRUE,sanitize.text.function=function(x){x})
+
+
+@
+
+%UNFOLD
 
 %UNFOLD
 %UNFOLD
