@@ -57,7 +57,7 @@ sample.haircut <- function(n,p,...) {
 # set everything up
 set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
 ope <- 253
-n.sim <- 2048 
+n.sim <- 4096 
 n.stok <- 6
 n.yr <- 4
 n.obs <- ceiling(ope * n.yr)
