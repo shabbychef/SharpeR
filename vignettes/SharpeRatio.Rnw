@@ -2152,7 +2152,9 @@ with \df[1], \df[2] degrees of freedom and non-centrality parameter
 \end{enumerate}
 %UNFOLD
 
-\subsection{Portfolio optimization with an $\ell_2$ constraint}
+\providecommand{\ellk}[1]{\mathUL{\ell}{}{#1}}
+
+\subsection{Portfolio optimization with an \ellk{2} constraint}
 
 \label{sec:insane_risk_manager}
 
@@ -2162,6 +2164,7 @@ Consider the constrained portfolio optimization problem on \nstrat assets,
 \frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
 \label{eqn:cons_port_ell2}
 \end{equation}
+where \Rbuj is an \ellk{2} constraint. 
 
 
 
