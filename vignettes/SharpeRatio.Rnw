@@ -923,6 +923,7 @@ return series, or the failure of models or our ability to predict: skew is a pro
 and we do not have enough evidence to detect the skew.
 
 <<'skewstudy_prelim',echo=FALSE,cache=FALSE>>=
+# MOCK it up.
 fname <- system.file('extdata','skew_study.rda',package='SharpeR')
 if (fname == "") {
 	fname <- 'skew_study.rda'
@@ -1401,6 +1402,7 @@ Student's \tstat-statistic squared (and thus side information is lost).
 %FOLDUP
 
 <<'hot_ssiz_table',echo=FALSE,results='asis'>>=
+# MOCK it up.
 fname <- system.file('extdata','hotelling_power_rule.rda',package='SharpeR')
 if (fname == "") {
 	fname <- 'hotelling_power_rule.rda'
@@ -2071,8 +2073,19 @@ simulations, however, suggest it is a fairly tight bound for large $\ssiz/\nlatf
 
 Here I look at the haircut via Monte Carlo simulations:
 
-% 2FIX: precompute this like the others, so you can have 2048
-<<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
+<<'haircut_study_load',echo=FALSE,cache=FALSE>>=
+# MOCK it up.
+fname <- system.file('extdata','haircut_study.rda',package='SharpeR')
+if (fname == "") {
+	fname <- 'haircut_study.rda'
+}
+# poofs n.sim,n.stok,n.yr,n.obs,zeta.s,ope,hcuts
+load(fname)
+
+medv.true <- median(hcuts)
+med.snr.true <- zeta.s * (1 - medv.true)
+@
+<<'haircut_study_mock',eval=FALSE,echo=TRUE>>=
 require(MASS)
 
 # simple markowitz.
@@ -2112,16 +2125,18 @@ sample.haircut <- function(n,p,...) {
 # set everything up
 set.seed(as.integer(charToRaw("496509a9-dd90-4347-aee2-1de6d3635724")))
 ope <- 253
-LONG.FORM <- FALSE
-n.sim <- if (LONG.FORM) 2048 else 512
-n.stok <- if (LONG.FORM) 8 else 6
+n.sim <- 2048 
+n.stok <- 6
 n.yr <- 4
 n.obs <- ceiling(ope * n.yr)
 zeta.s <- 1.20 / sqrt(ope)   # optimal SNR, in daily units
 
 # run some experiments
-system.time(experiments <- replicate(n.sim,sample.haircut(n.obs,n.stok,zeta.s)))
+experiments <- replicate(n.sim,sample.haircut(n.obs,n.stok,zeta.s))
 hcuts <- experiments[1,]
+@
+
+<<'haircutting',fig.cap=paste("Q-Q plot of",n.sim,"simulated haircut values versus the approximation given by \\eqnref{hcut_apx} is shown.")>>=
 print(summary(hcuts))
 # haircut approximation in the equation above
 qhcut <- function(p, df1, df2, zeta.s, lower.tail=TRUE) {
@@ -2144,10 +2159,6 @@ qqplot(qhcut(ppoints(length(hcuts)),n.stok,n.obs,zeta.s),hcuts,
 			 xlab = "Theoretical Approximate Quantiles", ylab = "Sample Quantiles")
 qqline(hcuts,datax=FALSE,distribution = function(p) { qhcut(p,n.stok,n.obs,zeta.s) },
 			 col=2)
-@
-<<'hcut_med',include=FALSE>>=
-medv.true <- median(hcuts)
-med.snr.true <- zeta.s * (1 - medv.true)
 @
 
 I check the quality of the approximation given in \eqnref{hcut_apx} by a Q-Q 
