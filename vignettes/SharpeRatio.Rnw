@@ -2928,7 +2928,36 @@ $$
 This is a \emph{very} loose upper bound on the probability of a loss, and is fairly useless on any timescale
 for which the SNR is less than one.
 
-%\subsubsection{\txtSR and drawdowns}
+
+%UNFOLD
+
+\subsection{\txtSR and drawdowns}%FOLDUP
+
+\providecommand{\ddown}[1]{\mathSUB{D}{#1}}
+\providecommand{\opmax}{\MATHIT{\operatorname{max}}}
+\providecommand{\opmin}{\MATHIT{\operatorname{min}}}
+
+Drawdowns are the quant's bugbear. Though a fund may have a reasonably
+high \txtSNR, it will likely face redemptions and widespread managerial 
+panic if it experiences a large drawdown. Moreover, drawdowns are a 
+statistically nebulous beast: the sample maximum drawdown does not correspond
+in an obvious way to some population parameter; the variance of sample
+maximum drawdown is typically very high; traded strategies are typically 
+cherry-picked to not have a large maximum drawdown in backtests; the
+distribution of maximum drawdowns is certainly affected by skew and
+kurtosis, heteroskedasticity, omitted variable bias and autocorrelation.
+
+However, it may be helpful to have a simple model of drawdowns, and there
+is a connection with the \txtSR. Given \ssiz observations of the mark to
+market of a single asset, \pryp[i], 
+the maximum drawdown is defined as
+\begin{equation}
+\ddown{\ssiz} \defeq \opmax_{1 \le i < j \le \ssiz} \log \wrapParens{\frac{\pryp[i]}{\pryp[j]}}.
+\end{equation}
+Let \reti[i] be the \emph{log} returns: $\reti[i] =
+\log\frac{\pryp[i]}{\pryp[i-1]}$, assumed to be \iid
+
+\nocite{magdon2002sharpe}
 
 %UNFOLD
 %UNFOLD
