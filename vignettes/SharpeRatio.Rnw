@@ -2954,10 +2954,84 @@ the maximum drawdown is defined as
 \begin{equation}
 \ddown{\ssiz} \defeq \opmax_{1 \le i < j \le \ssiz} \log \wrapParens{\frac{\pryp[i]}{\pryp[j]}}.
 \end{equation}
+The drawdown is negative the most extreme peak to point log return, and is
+always non-negative.  The maximum drawdown can be expressed as a 
+a percent loss as
+$100 \wrapParens{\exp{\ddown{\ssiz}} - 1} \%$.
+
 Let \reti[i] be the \emph{log} returns: $\reti[i] =
 \log\frac{\pryp[i]}{\pryp[i-1]}$, assumed to be \iid
+Let \pmu and \psig be the population mean and standard deviation
+of the log returns \reti[i]. Now note that
+\begin{equation*}
+\begin{split}
+\log \wrapParens{\frac{\pryp[i]}{\pryp[j]}}
+&= - \sum_{i < k \le j} \reti[k],\\
+&= - \wrapParens{\wrapBracks{j-i-1}\pmu + \psig \sum_{i < k \le j} \retj[k]},\\
+&= - \psig \wrapParens{\wrapBracks{j-i-1}\psnr + \sum_{i < k \le j} \retj[k]},
+\end{split}
+\end{equation*}
+where \retj[i] is a zero-mean, unit-variance random variable that is a
+linear function of \reti[i].  
 
+Now re-express the maximum drawdown in units of the volatility of 
+log returns at the sampling frequency:
+\begin{equation}
+\frac{\ddown{\ssiz}}{\psig} = - \opmin_{1 \le i < j \le \ssiz} 
+\wrapParens{\wrapBracks{j-i-1}\psnr + \sum_{i < k \le j} \retj[k]}.
+\end{equation}
+The volatility is a natural numeraire: one expects an asset with 
+a larger volatility to have larger drawdowns. Moreover, the quantity
+on the righthand side is a random variable drawn from a 
+one parameter (the \txtSNR) family, rather than a two parameter 
+(location and scale) family.
 \nocite{magdon2002sharpe}
+
+\subsubsection{VAR-like constraint}
+
+\providecommand{\dknok}{\MATHIT{\epsilon}}
+\providecommand{\dprob}{\MATHIT{\delta}}
+\providecommand{\daset}[1]{\mathSUB{\mathcal{C}{#1}}}
+
+
+One reasonable way a portfolio manager might approach drawdowns is 
+to define a `knockout' drawdown from which she will certainly
+not recover\sidenote{This is certainly a function of the 
+fund's clients, or the PM's boss.} and a maximum probability of
+hitting that knockout in a given epoch (\ie \ssiz). 
+For example, the desired property might be
+\emph{``the probability of a 40\% drawdown in one year is less than 0.1\%.''}
+These constrain the acceptable \txtSNR and volatility of the fund.  
+
+Fix the one-parameter family of distribution on \retj. Then, 
+for given \dknok, \dprob, and \ssiz, the acceptable funds are 
+defined by the set
+\begin{equation}
+\daset{\dknok,\dprob,\ssiz} \defeq \setwo{\wrapParens{\psig,\psnr}}{\Pr{\frac{\ddown{\ssiz}}{\psig} \ge \dknok} \le \dprob}.
+\end{equation}
+It is obvious that the set \daset{\dknok,\dprob,\ssiz} has certain
+`monotonicity' properties: a fund with lower volatility or higher \txtSNR
+than a fund in the set is also in the set. That is, 
+\begin{equation*}
+%\begin{split}
+\wrapBracks{\wrapParens{\psig[2],\psnr} \in \daset{\dknok,\dprob,\ssiz}}
+\bigwedge
+\wrapBracks{\psig[1] < \psig[2]}
+\Rightarrow
+\wrapParens{\psig[2],\psnr} \in \daset{\dknok,\dprob,\ssiz},
+%\wrapBracks{\wrapParens{\psig,\psnr} \in \daset{\dknok,\dprob,\ssiz}}
+%\bigwedge
+%\wrapBracks{\psnr < \psnr}
+%&\Rightarrow
+%\wrapParens{\psig[2],\psnr} \in \daset{\dknok,\dprob,\ssiz}.
+%\end{split}
+\end{equation*}
+
+
+
+
+
+
 
 %UNFOLD
 %UNFOLD
