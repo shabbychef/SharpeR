@@ -2154,19 +2154,68 @@ with \df[1], \df[2] degrees of freedom and non-centrality parameter
 
 \providecommand{\ellk}[1]{\mathUL{\ell}{}{#1}}
 
-\subsection{Portfolio optimization with an \ellk{2} constraint}
+\subsection{Portfolio optimization with an \ellk{2} constraint}%FOLDUP
 
 \label{sec:insane_risk_manager}
 
+\providecommand{\Lbnd}{\Mtx{\Gamma}}
+\providecommand{\Eigval}{\Mtx{\Lambda}}
+\providecommand{\Eigvec}{\Mtx{P}}
+
 Consider the constrained portfolio optimization problem on \nstrat assets,
 \begin{equation}
-\max_{\sportw : \gram{\sportw} \le \Rbuj^2}
+\max_{\sportw : \qform{\Lbnd}{\sportw} \le \Rbuj^2}
 \frac{\trAB{\sportw}{\svmu} - \rfr}{\sqrt{\qform{\svsig}{\sportw}}},
 \label{eqn:cons_port_ell2}
 \end{equation}
-where \Rbuj is an \ellk{2} constraint. 
+where \Rbuj is an \ellk{2} constraint, and \Lbnd is a fixed, symmetric
+positive definite matrix. This corresponds to the case where one is
+maximizing \txtSR subject to a volatility constraint imposed by a 
+covariance different from the one used to estimate \txtSR. This can
+result from \eg using a longer history to compute \Lbnd, or from having
+an insane risk-manager, \etc
 
+Let \Eigvec be the matrix whose rows are the
+generalized eigenvalues of $\svsig, \Lbnd$, and let \Eigval be the 
+diagonal matrix whose elements are the generalized eigenvalues. That
+is, we have
+\begin{equation*}
+\svsig\Eigvec = \Lbnd\Eigvec\Eigval,\quad\qform{\Lbnd}{\Eigvec} = \eye.
+\end{equation*}
+Now let $\sportw = \Eigvec\sportv$.  We can re-frame the original
+problem, \eqnref{cons_port_ell2}, in terms of \sportv as follows:
+\begin{equation}
+\max_{\sportv : \gram{\sportv} \le \Rbuj^2}
+\frac{\trAB{\sportv}{\Eigvec\svmu} - \rfr}{\sqrt{\qform{\Eigval}{\sportv}}},
+\label{eqn:cons_port_ell2_alt}
+\end{equation}
+Employing the Lagrange multiplier technique, this optimization problem
+is solved by
+\begin{equation}
+\sportvopt 
+= c \minv{\wrapParens{\Eigval + \gamma\eye}}\Eigvec\svmu,
+\end{equation}
+where $c$ is set to satisfy the risk cap, and $\gamma$ comes from
+the Lagrange multiplier. To satisfy the risk cap, we should have
+\begin{equation*}
+c = \frac{R}{\sqrt{\qqform{\wrapParens{\Eigval + \gamma\eye}^{-2}}{\Eigvec}{\svmu}}}.
+\end{equation*}
 
+The problem is reduced to a one-dimensional optimization of $\gamma$:
+\begin{equation}
+\max_{\gamma}
+\frac{\qqform{\minv{\wrapParens{\Eigval + \gamma\eye}}}{\Eigvec}{\svmu} -
+\frac{\rfr}{\Rbuj} \sqrt{\qqform{\wrapParens{\Eigval + \gamma\eye}^{-2}}{\Eigvec}{\svmu}}}{ 
+\sqrt{\qqform{\Eigval\wrapParens{\Eigval + \gamma\eye}^{-2}}{\Eigvec}{\svmu}}}.
+\label{eqn:cons_port_ell2_alt2}
+\end{equation}
+
+Unfortunately, this problem has to be solved numerically in 
+$\gamma$. Moreover, the statistical properties of the resultant
+optimum are not, to my knowledge, well understood.
+\sideWarning
+
+%UNFOLD
 
 \subsection{Optimal \txtSR under positivity constraint}%FOLDUP
 
@@ -2946,6 +2995,8 @@ maximum drawdown is typically very high; traded strategies are typically
 cherry-picked to not have a large maximum drawdown in backtests; the
 distribution of maximum drawdowns is certainly affected by skew and
 kurtosis, heteroskedasticity, omitted variable bias and autocorrelation.
+Even assuming \iid Gaussian returns, modeling 
+drawdowns is non-trivial. \cite{magdon2002sharpe}
 
 However, it may be helpful to have a simple model of drawdowns, and there
 is a connection with the \txtSR. Given \ssiz observations of the mark to
@@ -2966,7 +3017,7 @@ of the log returns \reti[i]. Now note that
 \begin{equation*}
 \begin{split}
 \log \wrapParens{\frac{\pryp[i]}{\pryp[j]}}
-&= - \sum_{i < k \le j} \reti[k],\\
+= - \sum_{i < k \le j} \reti[k]
 &= - \wrapParens{\wrapBracks{j-i-1}\pmu + \psig \sum_{i < k \le j} \retj[k]},\\
 &= - \psig \wrapParens{\wrapBracks{j-i-1}\psnr + \sum_{i < k \le j} \retj[k]},
 \end{split}
@@ -2987,12 +3038,12 @@ one parameter (the \txtSNR) family, rather than a two parameter
 (location and scale) family.
 \nocite{magdon2002sharpe}
 
-\subsubsection{VAR-like constraint}
+\subsubsection{VaR-like constraint}
 
 \providecommand{\dknok}{\MATHIT{\epsilon}}
 \providecommand{\dprob}{\MATHIT{\delta}}
-\providecommand{\daset}[1]{\mathSUB{\mathcal{C}{#1}}}
-
+\providecommand{\daset}[1]{\funcit{\mathcal{C}}{#1}}
+\providecommand{\dslop}{\MATHIT{b}}
 
 One reasonable way a portfolio manager might approach drawdowns is 
 to define a `knockout' drawdown from which she will certainly
@@ -3003,35 +3054,43 @@ For example, the desired property might be
 \emph{``the probability of a 40\% drawdown in one year is less than 0.1\%.''}
 These constrain the acceptable \txtSNR and volatility of the fund.  
 
-Fix the one-parameter family of distribution on \retj. Then, 
+As a risk constraint, this condition shares the hallmark limitation of
+the value-at-risk (VaR) measure, namely that it may limit the probability
+of a certain sized drawdown, but not its expected magnitude. For example,
+underwriting catastrophe insurance may satisfy this drawdown constraint,
+but may suffer from enormous losses when a drawdown does occur.
+Nevertheless, this VaR-like constraint is simple to model, and may be
+more useful than harmful.
+
+Fix the one-parameter family of distributions on \retj. Then, 
 for given \dknok, \dprob, and \ssiz, the acceptable funds are 
 defined by the set
 \begin{equation}
-\daset{\dknok,\dprob,\ssiz} \defeq \setwo{\wrapParens{\psig,\psnr}}{\Pr{\frac{\ddown{\ssiz}}{\psig} \ge \dknok} \le \dprob}.
+\daset{\dknok,\dprob,\ssiz} \defeq
+\setwo{\wrapParens{\psnr,\psig}}{\psig > 0,\,\Pr{\ddown{\ssiz} \ge \psig \dknok} \le \dprob}.
 \end{equation}
-It is obvious that the set \daset{\dknok,\dprob,\ssiz} has certain
-`monotonicity' properties: a fund with lower volatility or higher \txtSNR
-than a fund in the set is also in the set. That is, 
+It is obvious that the set $\daset{\dknok,\dprob,\ssiz}$ is 
+`lower right monotonic', \ie a fund with lower volatility or 
+higher \txtSNR than a fund in the set is also in the 
+set\sidenote{Ignoring the obvious discontinuity at the origin.}. That is, 
+if $\wrapParens{\psnr[1],\psig[1]} \in \daset{\dknok,\dprob,\ssiz}$ and
+$\psnr[1] \le \psnr[2]$ and $\psig[2] \le \psig[1]$ then
+$\wrapParens{\psnr[2],\psig[2]} \in \daset{\dknok,\dprob,\ssiz}$.
+
+When the \reti are daily returns, the range of \txtSNR one may 
+reasonably expect for portfolios of equities is fairly modest. 
+In this case, the lower boundary of 
+\daset{\dknok,\dprob,\ssiz} can be approximated by a half space:
 \begin{equation*}
-%\begin{split}
-\wrapBracks{\wrapParens{\psig[2],\psnr} \in \daset{\dknok,\dprob,\ssiz}}
-\bigwedge
-\wrapBracks{\psig[1] < \psig[2]}
-\Rightarrow
-\wrapParens{\psig[2],\psnr} \in \daset{\dknok,\dprob,\ssiz},
-%\wrapBracks{\wrapParens{\psig,\psnr} \in \daset{\dknok,\dprob,\ssiz}}
-%\bigwedge
-%\wrapBracks{\psnr < \psnr}
-%&\Rightarrow
-%\wrapParens{\psig[2],\psnr} \in \daset{\dknok,\dprob,\ssiz}.
-%\end{split}
+\setwo{\wrapParens{\psnr,\psig} \in \daset{\dknok,\dprob,\ssiz}}{\abs{\psnr} \le \psnr[big]}
+\approx 
+\setwo{\wrapParens{\psnr,\psig}}{\psig \le \psig[0] + \dslop \psnr,\, \abs{\psnr} \le \psnr[big]},
 \end{equation*}
-
-
-
-
-
-
+where \psig[0] and \dslop are functions of \dknok, \dprob, \ssiz, and 
+the family of distributions on \retj. The minimum acceptable \txtSNR
+is $\fracc{-\psig[0]}{\dslop}.$ It may be the case that $\psig[0]$
+is negative...
+% 2FIX: more
 
 %UNFOLD
 %UNFOLD

@@ -349,6 +349,9 @@
 \providecommand{\qoiform}[2]{\qoform{\minv{#1}}{#2}}
 \providecommand{\crossp}[1]{\gram{\wrapNeParens{#1}}}
 
+\providecommand{\qqform}[3]{\qform{\qform{#1}{#2}}{#3}}
+\providecommand{\qqqform}[4]{\qform{\qform{\qform{#1}{#2}}{#3}}{#4}}
+
 % a conditional on b
 %\providecommand{\acondb}[2]{\MATHIT{#1\,\left|\,#2\right.}}
 \providecommand{\acondb}[2]{\MATHIT{#1\left|\,#2\right.}}
@@ -673,6 +676,9 @@
 
 \providecommand{\sportwoptG}[1]{\sportw[*,#1]}
 \providecommand{\pportwoptG}[1]{\pportw[*,#1]}
+
+\providecommand{\sportv}[1][{}]{\vectUL{\hat{v}}{}{#1}}
+\providecommand{\sportvopt}{\sportv[*]}
 
 
 % basis vectors
