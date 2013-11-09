@@ -2996,7 +2996,7 @@ cherry-picked to not have a large maximum drawdown in backtests; the
 distribution of maximum drawdowns is certainly affected by skew and
 kurtosis, heteroskedasticity, omitted variable bias and autocorrelation.
 Even assuming \iid Gaussian returns, modeling 
-drawdowns is non-trivial. \cite{magdon2002sharpe}
+drawdowns is non-trivial. \cite{magdon2002sharpe,becker2010exact}
 
 However, it may be helpful to have a simple model of drawdowns, and there
 is a connection with the \txtSR. Given \ssiz observations of the mark to
