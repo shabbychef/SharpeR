@@ -87,6 +87,7 @@ EXTDATA_FILES	 		 = $(PREMAKE_RDA)
 VIGNETTE_D 				 = vignettes
 VIGNETTE_CACHE 		 = $(VIGNETTE_D)/cache
 VIGNETTE_EXTRAS		 = $(VIGNETTE_D)/SharpeRatio.Rnw $(VIGNETTE_D)/SharpeR.sty
+VIGNETTE_EXTRAS		+= $(VIGNETTE_D)/AsymptoticMarkowitz.Rnw
 VIGNETTE_SRCS  		 = $(VIGNETTE_D)/$(PKG_NAME).Rnw $(VIGNETTE_D)/$(PKG_NAME).bib
 VIGNETTE_PDF   		 = $(VIGNETTE_D)/$(PKG_NAME).pdf
 VIGNETTE_HTML  		 = $(VIGNETTE_D)/index.html

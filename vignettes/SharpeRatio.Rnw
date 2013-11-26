@@ -95,7 +95,7 @@ lseq <- function(from,to,length.out) {
 
 \title{Notes on the \txtSR}
 \author{Steven E. Pav %
-\thanks{\email{shabbychef@gmail.com} This document is a bit of a hodgepodge at
+\thanks{\email{shabbychef@gmail.com} This document is a bit of a mess at
 the moment, and is in a constant state of flux.}}
 %\date{\today, \currenttime}
 
@@ -103,7 +103,7 @@ the moment, and is in a constant state of flux.}}
 %UNFOLD
 
 \begin{abstract}%FOLDUP
-Herein is an incomplete collection of facts about the \txtSR, and the 
+Herein is a hodgepodge of facts about the \txtSR, and the 
 \txtSR of the Markowitz portfolio. Connections between
 the \txtSR and the \tstat-test, and between the Markowitz portfolio and
 the Hotelling \Tstat statistic are explored. Many classical results 
@@ -1090,8 +1090,8 @@ investment has idiosyncratic `alpha' (\ie \pregco[0]) without significant exposu
 
 %Typically factor models are justified by some hypotheses about
 %2FIX
-%\cite{GVK322224764}
-\nocite{GVK322224764}
+%\cite{GVK322224764,Krause2001}
+\nocite{GVK322224764,Krause2001}
 
 \subsubsection{Examples of linear attribution models}%FOLDUP
 
@@ -1241,7 +1241,6 @@ model: autocorrelation, heteroskedasticity, non-normality, outliers, \etc
 
 
 %UNFOLD
-
 
 %UNFOLD
 %UNFOLD
@@ -3101,6 +3100,7 @@ is negative...
 \nocite{geary1936distribution}
 \nocite{doi:10.1080/13518470802423478,SJOS:SJOS729}
 \nocite{okhrin2006distributional,okhrin2008estimation,schmidzabo2008}
+\nocite{markowitz1952portfolio,markowitz1999early,markowitz2012foundations}
 
 %\bibliographystyle{jss}
 %\bibliographystyle{siam}
