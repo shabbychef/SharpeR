@@ -353,13 +353,13 @@ violations of the \iid assumptions. \cite{Zeileis:2004:JSSOBK:v11i10}
 
 %UNFOLD
 
-\subsection{The \txtMP maximizes the \txtSR}%FOLDUP
+\subsection{The \txtSR optimal portfolio}%FOLDUP
 
 \begin{lemma}[\txtSR optimal portfolio]
-Assuming \pvmu is not the vector of zeros, and \pvsig is invertible,
+Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
 the portfolio optimization problem
 \begin{equation}
-\max_{\pportw : \qform{\pvsig}{\pportw} \le \Rbuj^2} 
+\max_{\pportw :\, \qform{\pvsig}{\pportw} \le \Rbuj^2} 
 \frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
 \end{equation}
 for $\rfr \ge 0, \Rbuj > 0$ is solved by
@@ -385,10 +385,9 @@ Solving the first equation gives us
 $$
 \pportw = c\,\minvAB{\pvsig}{\pvmu}.
 $$
-Plugging this into the objective reduces the problem to the
-univariate optimization
+This reduces the problem to the univariate optimization
 \begin{equation}
-\max_{c : c^2 \le \fracc{\Rbuj^2}{\psnrsqopt}} 
+\max_{c :\, c^2 \le \fracc{\Rbuj^2}{\psnrsqopt}} 
 \sign{c} \psnropt - \frac{\rfr}{\abs{c}\psnropt},
 \end{equation}
 where $\psnrsqopt = \qiform{\pvsig}{\pvmu}.$ The optimimum
@@ -453,14 +452,18 @@ $c_{\nlatf} = -\half + \half[\nlatf]\log\wrapParens{2\pi}.$
 \label{lemma:x_dist_gaussian}
 \end{lemma}%UNFOLD
 \begin{proof}%FOLDUP
-Note that
-$$
+By the block determinant formula,
+\begin{equation*}
+\det{\pvsm} 
+= \det{1}\det{\wrapParens{\pvsig + \ogram{\pvmu}} - \pvmu 1^{-1} \tr{\pvmu}}
+= \det{\pvsig}.
+\end{equation*}
+Note also that
+\begin{equation*}
 \qiform{\pvsig}{\wrapParens{\vreti - \pvmu}} = 
 \qiform{\pvsm}{\avreti} - 1.
-$$
-Using the block determinant formula, we find that \pvsm has the same 
-determinant as \pvsig, that is $\det{\pvsm} = \det{\pvsig}.$  These
-relationships hold without assuming a particular distribution for 
+\end{equation*}
+These relationships hold without assuming a particular distribution for 
 \vreti. 
 
 The density of \vreti is then
