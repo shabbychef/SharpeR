@@ -137,6 +137,8 @@
 % is this replicated elsewhere?
 \providecommand{\det}[1]{\abs{#1}}
 \providecommand{\logdet}[1]{\MATHIT{\log\det{#1}}}
+\providecommand{\sign}[1]{\funcit{\operatorname{sign}}{#1}}
+
 
 % as vector, a column.
 \providecommand{\asvec}[1]{\tr{\wrapBracks{#1}}}
@@ -495,6 +497,7 @@
 \providecommand{\sMGLHE}[1][]{\MtxUL{\hat{E}}{}{#1}}
 
 \providecommand{\eye}[1][]{\MtxUL{I}{}{#1}}
+\providecommand{\mzero}[1][]{\MtxUL{0}{}{#1}}
 
 
 %CDF and quantile%FOLDUP
@@ -675,6 +678,8 @@
 \providecommand{\sportw}[1][{}]{\vectUL{\hat{w}}{}{#1}}
 \providecommand{\sportwopt}{\sportw[*]}
 \providecommand{\pportwopt}{\pportw[*]}
+\providecommand{\sportwoptR}{\sportw[\Rbuj,*]}
+\providecommand{\pportwoptR}{\pportw[\Rbuj,*]}
 
 \providecommand{\sportwoptG}[1]{\sportw[*,#1]}
 \providecommand{\pportwoptG}[1]{\pportw[*,#1]}

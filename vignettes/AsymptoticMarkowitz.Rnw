@@ -120,12 +120,13 @@ on linear combinations of the precision matrix and the
 \txtMP. \cite{dempster1972}
 \end{abstract}%UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}%FOLDUP
 
 Given \nlatf assets with expected return \pvmu and covariance of return \pvsig,
 the portfolio defined as 
 \begin{equation}
-\pportwopt \defeq \lambda \minvAB{\pvsig}{\svmu}
+\pportwopt \defeq \lambda \minvAB{\pvsig}{\pvmu}
 \end{equation}
 plays a special role in modern portfolio 
 theory. \cite{markowitz1952portfolio,brandt2009portfolio,GVK322224764}
@@ -136,17 +137,19 @@ portfolio optimization problems.
 Besides the classic mean-variance formulation,
 it solves the (population) \txtSR maximization problem:
 \begin{equation}
-\pportwopt = \argmax_{\pportw : \qform{\pvsig}{\pportw} \le \Rbuj^2} 
+\max_{\pportw : \qform{\pvsig}{\pportw} \le \Rbuj^2} 
 \frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
 \label{eqn:opt_port_I}
 \end{equation}
-where \rfr is the risk-free, or `disastrous', rate of return, and 
+where $\rfr\ge 0$ is the risk-free, or `disastrous', rate of return, and 
 $\Rbuj > 0$ is some given `risk budget'. 
+The solution to this optimization problem is $\lambda \minvAB{\pvsig}{\pvmu}$,
+where $\lambda = \fracc{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}.$
 \nocite{markowitz1952portfolio}  % does not actually mention this portfolio?
 
 In practice, the \txtMP has a somewhat checkered history. 
 The population parameters \pvmu and \pvsig are not known and must
-be estimated from samples; estimation error results in a feasible
+be estimated from samples. Estimation error results in a feasible
 portfolio, \sportwopt, of dubious value. Michaud went so far as to call
 mean-variance optimization, 
 ``error maximization.'' \cite{michaud1989markowitz}  
@@ -157,9 +160,13 @@ This paper focuses on the asymptotic distribution of the sample \txtMP.
 By formulating the problem as a linear regression, Britten-Jones 
 very cleverly devised hypothesis tests on elements of \pportwopt,
 assuming multivariate Gaussian returns. \cite{BrittenJones1999}  
-Okhrin and Schmid, and Bodnar and Okhrin give the (univariate) density of
+In a remarkable series of papers, Okhrin and Schmid, and 
+Bodnar and Okhrin give the (univariate) density of
 the dot product of \pportwopt and a deterministic vector, again for the
 case of Gaussian returns. \cite{okhrin2006distributional,SJOS:SJOS729}  
+Okhrin and Schmid also show that all moments of
+$\fracc{\sportwopt}{\trAB{\vone}{\sportwopt}}$ of order greater than or
+equal to one do not exist. \cite{okhrin2006distributional}
 
 Here I derive asymptotic normality of \sportwopt, the sample
 analogue of \pportwopt, assuming only that the first four moments
@@ -181,7 +188,7 @@ This allows one, for example, to estimate the proportion of error
 in the \txtMP attributable to mis-estimation of the covariance
 matrix. According to lore, the error in portfolio weights is
 mostly attributable to mis-estimation of \pvmu, 
-not of \pvsig. \cite{chopra1993effect} 
+not of \pvsig. \cite{chopra1993effect,NBERw0444}
 
 Finally, assuming Gaussian returns, a likelihood ratio test for
 performing inference on linear combinations of elements of
@@ -192,6 +199,7 @@ the precision matrix alone. \cite{dempster1972}
 % \cite{tu2011markowitz}  % is this needed? really. talmud ... 
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The augmented second moment}%FOLDUP
 
 Let \vreti be an array of returns of \nlatf assets, with mean \pvmu, and
@@ -205,11 +213,12 @@ moment of \avreti:
 \end{equation}
 By inspection one can confirm that the
 inverse of \pvsm is
-$$
+\begin{equation}
 \minv{\pvsm} 
 = \twobytwo{1 + \qiform{\pvsig}{\pvmu}}{-\tr{\pvmu}\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{\minv{\pvsig}}
 = \twobytwo{1 + \psnrsqopt}{-\tr{\pportwopt}}{-\pportwopt}{\minv{\pvsig}},
-$$
+\label{eqn:trick_inversion}
+\end{equation}
 where $\pportwopt=\minvAB{\pvsig}{\svmu}$ is the \txtMP,
 and $\psnropt=\sqrt{\qiform{\pvsig}{\pvmu}}$ is the \txtSR of
 that portfolio. The matrix \pvsm contains the first and second
@@ -234,7 +243,6 @@ whose rows are the vectors \tr{\avreti[i]}. The na\"{i}ve sample estimator
 \end{equation}
 is an unbiased estimator since $\pvsm = \E{\gram{\avreti}}$.
 
-
 \subsection{Asymptotic distribution of the \txtMP}%FOLDUP
 
 \label{subsec:dist_markoport}
@@ -251,9 +259,45 @@ Let \fvec{\Mtx{A}}, and \fvech{\Mtx{A}} be the vector and half-space
 vector operators.  The former turns an $\nlatf\times\nlatf$ matrix into
 an $\nlatf^2$ vector of its columns stacked on top of each other; the 
 latter vectorizes a symmetric (or lower triangular) matrix into a vector
-of the non-redundant elements. \cite{magnus1980elimination} 
+of the non-redundant elements.  
+Let \Elim be the `Elimination Matrix,' a matrix of zeros and ones with the
+property that 
+$\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$  \cite{magnus1980elimination} 
 
-\begin{lemma}
+A technical lemma is needed.
+\begin{lemma}%FOLDUP
+For symmetric, invertible matrix \Mtx{A}, 
+\begin{equation}
+\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
+= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
+\label{eqn:deriv_vech_matrix_inverse}
+\end{equation}
+\label{lemma:deriv_vech_matrix_inverse}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+The following is a standard result of 
+matrix calculus, \cite{magnus1999matrix,petersen2012matrix,facklernotes}
+\begin{equation}
+\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
+= - \AkronA{\minv{\Mtx{A}}}.
+\label{eqn:deriv_matrix_inverse}
+\end{equation}
+The non-redundant parts of this can be expressed via the
+Elimination matrix,
+\begin{equation*}
+\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
+= \qoform{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}{\Elim}
+= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
+\end{equation*}
+\end{proof}%UNFOLD
+
+Note how \lemmaref{deriv_vech_matrix_inverse} generalizes the scalar case:
+$$
+\dbyd{x^{-1}}{x} = - \wrapParens{x^{-1} x^{-1}}.
+$$
+The asymptotic distribution of \minv{\pvsm} then follows from standard
+techniques.
+\begin{theorem}%FOLDUP
 Let \svsm be the unbiased sample estimate of 
 \pvsm, based on \ssiz \iid samples of \vreti.
 Then, asymptotically in \ssiz, 
@@ -268,9 +312,9 @@ Then, asymptotically in \ssiz,
 where \pvvar is the variance of \ogram{\avreti}.
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
-\label{lemma:inv_distribution}
-\end{lemma}
-\begin{proof}
+\label{theorem:inv_distribution}
+\end{theorem}%UNFOLD
+\begin{proof}%FOLDUP
 Under the multivariate central limit theorem \cite{wasserman2004all}
 \begin{equation}
 \sqrt{\ssiz}\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
@@ -279,34 +323,22 @@ Under the multivariate central limit theorem \cite{wasserman2004all}
 \label{eqn:mvclt_svsm}
 \end{equation}
 where \pvvar is the variance of \ogram{\avreti}, which, in general, 
-is unknown. (For the case where \vreti is multivariate Gaussian,
-\pvvar is known; see \theoremref{inv_distribution_gaussian}.)
+is unknown. 
+%(For the case where \vreti is multivariate Gaussian,
+%\pvvar is known; see \theoremref{inv_distribution_gaussian}.)
 
-%The \txtMP appears in $-\minv{\svsm}$. 
-Let \Elim
-be the `Elimination Matrix,' a matrix of zeros and ones with the
-property that $\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$  
-\cite{magnus1980elimination} We can find the asymptotic distribution
-of $\minv{\svsm}$ via the delta method. The derivative of the matrix
-inverse is given by
-\begin{equation}
-\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
-= - \AkronA{\minv{\Mtx{A}}},
-\label{eqn:deriv_matrix_inverse}
-\end{equation}
-for symmetric \Mtx{A}.  \cite{magnus1980elimination,facklernotes}
-We can reduce this to the non-redundant parts via the Elimination matrix:
-\begin{equation}
-\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
-= \qoform{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}{\Elim}
-= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
-\label{eqn:deriv_vech_matrix_inverse}
-\end{equation}
+By the delta method,
+\begin{equation*}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\rightsquigarrow 
+\normlaw{0,\qform{\pvvar}{\wrapBracks{\dbyd{\fvech{\minv{\pvsm}}}{\fvech{\pvsm}}}}}.
+\end{equation*}
+The derivative is given by \lemmaref{deriv_vech_matrix_inverse}, and
+the result follows.
+\end{proof}%UNFOLD
 
-The result then follows from the delta method.
-\end{proof}
-
-To estimate the covariance of $\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}$,
+%To estimate the covariance of $\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}$,
+To estimate the covariance of $\fvech{\minv{\svsm}}$,
 plug in \svsm for \pvsm in the covariance computation, and use some
 consistent estimator for \pvvar, call 
 it \svvar. 
@@ -318,14 +350,93 @@ More elaborate covariance estimators can be used, for example, to deal with
 violations of the \iid assumptions. \cite{Zeileis:2004:JSSOBK:v11i10}
 \nocite{magnus1999matrix,magnus1980elimination}
 \nocite{BrittenJones1999}
+
+%UNFOLD
+
+\subsection{The \txtMP maximizes the \txtSR}%FOLDUP
+
+\begin{lemma}[\txtSR optimal portfolio]
+Assuming \pvmu is not the vector of zeros, and \pvsig is invertible,
+the portfolio optimization problem
+\begin{equation}
+\max_{\pportw : \qform{\pvsig}{\pportw} \le \Rbuj^2} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+\begin{equation}
+\pportwoptR \defeq \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
+\minvAB{\pvsig}{\pvmu}.
+\end{equation}
+Moreover, this is the unique solution whenever $\rfr > 0$.
+\label{lemma:sr_optimal_portfolio}
+\end{lemma}
+\begin{proof}
+By the Lagrange multiplier technique, the optimal portfolio
+solves the following equations:
+\begin{equation*}
+\begin{split}
+0 &= c_1 \pvmu - c_2 \pvsig \pportw - \gamma \pvsig \pportw,\\
+\qform{\pvsig}{\pportw} &\le \Rbuj^2,
+\end{split}
+\end{equation*}
+where $\gamma$ is the Lagrange multiplier, and $c_1, c_2$ are 
+scalar constants.
+Solving the first equation gives us
+$$
+\pportw = c\,\minvAB{\pvsig}{\pvmu}.
+$$
+Plugging this into the objective reduces the problem to the
+univariate optimization
+\begin{equation}
+\max_{c : c^2 \le \fracc{\Rbuj^2}{\psnrsqopt}} 
+\sign{c} \psnropt - \frac{\rfr}{\abs{c}\psnropt},
+\end{equation}
+where $\psnrsqopt = \qiform{\pvsig}{\pvmu}.$ The optimimum
+occurs for $c = \fracc{\Rbuj}{\psnropt}$, moreover the optimum
+is unique when $\rfr > 0$.
+\end{proof}
+
+Note that the first element of \fvech{\minv{\pvsm}} is $1 +
+\qiform{\pvsig}{\pvmu}$, and elements 2 through $\nlatf+1$ are 
+$-\pportwopt$. Thus, \pportwoptR, the portfolio that maximizes the \txtSR, 
+is some transformation of \fvech{\minv{\pvsm}}, and another 
+application of the delta method gives its asymptotic distribution,
+as follows.
+
+\label{lemma:sr_optimal_portfolio}
+\begin{corollary}
+Let 
+\begin{equation}
+\pportwoptR \defeq \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
+\minvAB{\pvsig}{\pvmu},
+\end{equation}
+and similarly, let \sportwoptR be the sample analogue, where \Rbuj is
+some risk budget. Then
+\begin{multline}
+\sqrt{\ssiz}\wrapParens{\sportwoptR - \pportwoptR} 
+\rightsquigarrow \\
+\normlaw{0,\qqform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\AkronA{\minv{\pvsm}}}}{\Elim}}}{\Mtx{K}}},
+\label{eqn:mvclt_portfolio}
+\end{multline}
+where 
+$$
+\Mtx{K} = - \Rbuj \asvec{\half \frac{\pportwoptR}{\psnropt},
+\oneby{\psnropt}\eye[\nlatf],\mzero},
+$$
+and $\psnrsqopt \defeq \qiform{\pvsig}{\pvmu}.$
+\end{corollary}
 %UNFOLD
 
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Distribution under Gaussian returns}%FOLDUP
 
-Assuming $\vreti\sim\normlaw{\pvmu,\pvsig}$, we can express the density
-of \vreti and of \svsm in simple terms involving \nlatf, \pvsm, and \ssiz.
+The goal of this section is to derive a variant of 
+\theoremref{inv_distribution} for the case where \vreti follow a 
+multivariate Gaussian distribution. First, 
+assuming $\vreti\sim\normlaw{\pvmu,\pvsig}$, we can express the density
+of \vreti, and of \svsm, in terms of \nlatf, \ssiz, and \pvsm.
 
 \begin{lemma}%FOLDUP
 Suppose $\vreti\sim\normlaw{\pvmu,\pvsig}$. Letting 
@@ -542,14 +653,14 @@ So
  &= - \half[\ssiz] \qoElim{\wrapParens{\AkronA{\pvsm}}},
 \end{split}
 \end{equation*}
-via \eqnref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
-`Elimination Matrix.' \cite{magnus1980elimination}
-
+%via \lemmaref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
+%`Elimination Matrix.' \cite{magnus1980elimination}
+via \lemmaref{deriv_vech_matrix_inverse}. 
 Since the Fisher Information is negative the expected value of this 
 Hessian, the result follows. \cite{pawitanIAL}
 \end{proof}%UNFOLD
 \begin{corollary}%FOLDUP
-By change of variables, and again using \eqnref{deriv_vech_matrix_inverse}, 
+By change of variables, and again using \lemmaref{deriv_vech_matrix_inverse}, 
 the Fisher Information with respect to \pvsm is
 \begin{equation}
 \FishIf[\ssiz]{\pvsm} = \half[\ssiz]
@@ -557,7 +668,7 @@ the Fisher Information with respect to \pvsm is
 \end{equation}
 \end{corollary}%UNFOLD
 
-Thus the analogue of \lemmaref{inv_distribution} for Gaussian returns
+Thus the analogue of \theoremref{inv_distribution} for Gaussian returns
 is given by the following theorem.
 \begin{theorem}%FOLDUP
 Let \svsm be the unbiased sample estimate of 
@@ -696,6 +807,7 @@ a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
 %UNFOLD
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Examples}%FOLDUP
 
 Empirically, the marginal Wald test for zero weighting in the 
@@ -748,29 +860,31 @@ print(bjones.tstat)
 print(ism.wald)
 @
 
-<<'test_FF3',echo=TRUE>>=
-ff3 <- read.csv('http://www.quandl.com/api/v1/datasets/KFRENCH/FACTORS_M.csv?&trim_start=1926-07-31&trim_end=2013-10-31&sort_order=desc', colClasses=c('Month'='Date'))
+%<<'test_FF3',echo=TRUE>>=
+%ff3 <- read.csv('http://www.quandl.com/api/v1/datasets/KFRENCH/FACTORS_M.csv?&trim_start=1926-07-31&trim_end=2013-10-31&sort_order=desc', colClasses=c('Month'='Date'))
 
-rfr <- ff3[,'RF']
-hml <- ff3[,'HML'] - rfr
-smb <- ff3[,'SMB'] - rfr
+%require(sandwich)
 
-ff.ret <- cbind(mkt=ff3[,'Mkt.RF'],hml,smb)
+%rfr <- ff3[,'RF']
+%hml <- ff3[,'HML'] - rfr
+%smb <- ff3[,'SMB'] - rfr
 
-my.ws <- ism.ws(ff.ret)
-my.ws2 <- ism.ws(ff.ret,vcov.func=vcovHAC)
-my.bt <- bjones.ts(ff.ret)
+%ff.ret <- cbind(mkt=ff3[,'Mkt.RF'],hml,smb)
 
-# conditionally?
-blahm <- cbind(-ff.ret[(1:(dim(ff.ret)[1]-1)),],ff.ret[(2:dim(ff.ret)[1]),])
-# futz from here ... 
-XX <- ism_vcov(blahm)
+%my.ws <- ism.ws(ff.ret)
+%my.ws2 <- ism.ws(ff.ret,vcov.func=vcovHAC)
+%my.bt <- bjones.ts(ff.ret)
 
-@
+%# conditionally?
+%blahm <- cbind(-ff.ret[(1:(dim(ff.ret)[1]-1)),],ff.ret[(2:dim(ff.ret)[1]),])
+%# futz from here ... 
+%XX <- ism_vcov(blahm)
+%@
 
 % 2FIX: add examples here ... 
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bibliography%FOLDUP
 \nocite{markowitz1952portfolio,markowitz1999early,markowitz2012foundations}
 %\bibliographystyle{jss}
