@@ -355,12 +355,13 @@ violations of the \iid assumptions. \cite{Zeileis:2004:JSSOBK:v11i10}
 
 \subsection{The \txtSR optimal portfolio}%FOLDUP
 
-\begin{lemma}[\txtSR optimal portfolio]
+\begin{lemma}[\txtSR optimal portfolio]%FOLDUP
 Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
 the portfolio optimization problem
 \begin{equation}
-\max_{\pportw :\, \qform{\pvsig}{\pportw} \le \Rbuj^2} 
+\argmax_{\pportw :\, \qform{\pvsig}{\pportw} \le \Rbuj^2} 
 \frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:sr_optimal_portfolio_problem}
 \end{equation}
 for $\rfr \ge 0, \Rbuj > 0$ is solved by
 \begin{equation}
@@ -368,9 +369,11 @@ for $\rfr \ge 0, \Rbuj > 0$ is solved by
 \minvAB{\pvsig}{\pvmu}.
 \end{equation}
 Moreover, this is the unique solution whenever $\rfr > 0$.
+The maximal objective achieved by this portfolio is
+$\sqrt{\qiform{\pvsig}{\pvmu}} - \fracc{\rfr}{\Rbuj}$.
 \label{lemma:sr_optimal_portfolio}
-\end{lemma}
-\begin{proof}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
 By the Lagrange multiplier technique, the optimal portfolio
 solves the following equations:
 \begin{equation*}
@@ -393,20 +396,19 @@ This reduces the problem to the univariate optimization
 where $\psnrsqopt = \qiform{\pvsig}{\pvmu}.$ The optimimum
 occurs for $c = \fracc{\Rbuj}{\psnropt}$, moreover the optimum
 is unique when $\rfr > 0$.
-\end{proof}
+\end{proof}%UNFOLD
 
 Note that the first element of \fvech{\minv{\pvsm}} is $1 +
 \qiform{\pvsig}{\pvmu}$, and elements 2 through $\nlatf+1$ are 
 $-\pportwopt$. Thus, \pportwoptR, the portfolio that maximizes the \txtSR, 
 is some transformation of \fvech{\minv{\pvsm}}, and another 
 application of the delta method gives its asymptotic distribution,
-as follows.
+as in the following corollary to \theoremref{inv_distribution}.
 
-\label{lemma:sr_optimal_portfolio}
-\begin{corollary}
+\begin{corollary}%FOLDUP
 Let 
 \begin{equation}
-\pportwoptR \defeq \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
+\pportwoptR = \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
 \minvAB{\pvsig}{\pvmu},
 \end{equation}
 and similarly, let \sportwoptR be the sample analogue, where \Rbuj is
@@ -419,11 +421,111 @@ some risk budget. Then
 \end{multline}
 where 
 $$
-\Mtx{K} = - \Rbuj \asvec{\half \frac{\pportwoptR}{\psnropt},
+\Mtx{K} = - \Rbuj \asvec{\half \frac{\pportwoptR}{\psnrsqopt},
 \oneby{\psnropt}\eye[\nlatf],\mzero},
 $$
 and $\psnrsqopt \defeq \qiform{\pvsig}{\pvmu}.$
-\end{corollary}
+\end{corollary}%UNFOLD
+\begin{proof}%FOLDUP
+By the delta method, and \theoremref{inv_distribution}, it suffices
+to show that 
+$$\Mtx{K} = \dbyd{\pportwoptR}{\fvech{\minv{\pvsm}}}.$$
+To show this, note that \pportwoptR is $-\Rbuj$ times elements
+2 through $\nlatf+1$ of \fvech{\minv{\pvsm}} divided by 
+$\psnropt = \sqrt{\trAB{\basev[1]}{\fvech{\minv{\pvsm}}} - 1}$, where
+$\basev[i]$ is the \kth{i} column of the identity matrix. The result
+follows from basic calculus.
+\end{proof}%UNFOLD
+
+% 2FIX: nstrat nstrathej fuck. as in, does this make sense in SharpeRatio.rnw? 
+
+Consider, now, the \emph{constrained} portfolio optimization problem,
+\begin{equation*}
+\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
+\Rbuj^2} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\end{equation*}
+where $\hejG$ is now a $\nlatfhej \times \nlatf$ matrix of 
+rank \nlatfhej.
+We can interpret the \hejG constraint as stating that the covariance of 
+the returns of a feasible portfolio with the returns of a portfolio 
+whose weights are in a given row of \hejG shall equal zero.
+In the garden variety application of this problem, \hejG consists of 
+\nlatfhej rows of the identity matrix;
+in this case, feasible portfolios are `hedged' with respect 
+to the \nlatfhej assets selected by \hejG
+(although they may hold some position in the hedged assets).
+
+\begin{lemma}[constrained \txtSR optimal portfolio]%FOLDUP
+Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
+the portfolio optimization problem
+\begin{equation}
+\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
+\Rbuj^2} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:cons_port_prob}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+% (2FIX nomenclature)
+\begin{equation*}
+\begin{split}
+\pportwoptFoo{\Rbuj,\hejG,} &\defeq c \wrapParens{\minv{\pvsig}{\pvmu} -
+	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu},\\
+ c &= \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu} - 
+	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}}}.
+\end{split}
+\end{equation*}
+When $\rfr > 0$ the solution is unique.
+\label{lemma:cons_sr_optimal_portfolio}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+By the Lagrange multiplier technique, the optimal portfolio
+solves the following equations:
+\begin{equation*}
+\begin{split}
+0 &= c_1 \pvmu - c_2 \pvsig \pportw - \gamma_1 \pvsig \pportw -
+\pvsig\trAB{\hejG}{\vect{\gamma_2}},\\
+\qform{\pvsig}{\pportw} &\le \Rbuj^2,\\
+\hejG\pvsig \pportw &= \vzero,
+\end{split}
+\end{equation*}
+where $\gamma_i$ are Lagrange multipliers, and $c_1, c_2$ are 
+scalar constants.
+
+Solving the first equation gives
+$$
+\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\trAB{\hejG}{\vect{\gamma_2}}}.
+$$
+Reconciling this with the hedging equation we have
+$$
+\vzero 
+= \hejG\pvsig \pportw 
+= c_3 \hejG\pvsig \wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\trAB{\hejG}{\vect{\gamma_2}}},
+$$ 
+and therefore 
+$\vect{\gamma_2} = \minvAB{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu.$
+Thus
+$$
+\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu}.
+$$
+Plugging this into the objective reduces the problem to the
+univariate optimization
+\begin{equation*}
+\max_{c_3 :\, c_3^2 \le \fracc{\Rbuj^2}{\psnrsqoptG{\hejG}}} 
+\sign{c_3} \psnroptG{\hejG} - \frac{\rfr}{\abs{c_3}\psnroptG{\hejG}},
+\end{equation*}
+where $\psnrsqoptG{\hejG} = \qiform{\pvsig}{\pvmu} - 
+	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}.$
+The optimimum
+occurs for $c = \fracc{\Rbuj}{\psnroptG{\hejG}}$, moreover the optimum
+is unique when $\rfr > 0$.
+\end{proof}%UNFOLD
+
+
+
 %UNFOLD
 
 %UNFOLD

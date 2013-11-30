@@ -267,13 +267,13 @@
 \providecommand{\mfact}[1][]{\MtxUL{\MakeUppercase{\prvsymf}}{}{#1}}
 
 % distribution of factor
-\providecommand{\pfacmu}{\vectUL{\mu}{}{f}}
-\providecommand{\trpfacmu}{\vectUL{\mu}{\top}{f}}
+\providecommand{\pfacmu}{\vectUL{\prvMean}{}{f}}
+\providecommand{\trpfacmu}{\vectUL{\prvMean}{\top}{f}}
 \providecommand{\pfacsig}{\MtxUL{\Gamma}{}{f}}
 \providecommand{\pfacgram}[1][]{\MATHIT{\pfacsig + #1\pfacmu\trpfacmu}}
 
-\providecommand{\sfacmu}{\vectUL{\hat{\mu}}{}{f}}
-\providecommand{\trsfacmu}{\vectUL{\hat{\mu}}{\top}{f}}
+\providecommand{\sfacmu}{\vectUL{\hat{\prvMean}}{}{f}}
+\providecommand{\trsfacmu}{\vectUL{\hat{\prvMean}}{\top}{f}}
 \providecommand{\sfacsig}{\MtxUL{\hat{\Gamma}}{}{f}}
 
 % the error or residual
@@ -320,6 +320,7 @@
 \providecommand{\hejG}{\Mtx{G}}
 \providecommand{\hejg}{\vect{g}}
 \providecommand{\nstrathej}{\nstrat[g]}
+\providecommand{\nlatfhej}{\nlatf[g]}
 
 % unified second moment stuff.
 \providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
@@ -374,6 +375,7 @@
 \providecommand{\prvStd}[0]{\sigma}
 \providecommand{\prvPrec}[0]{\lambda}
 \providecommand{\prvCov}[0]{\Sigma}
+\providecommand{\prviCov}[0]{\Lambda}
 
 % raw, zero-centered moment.
 \providecommand{\prvRawMom}[0]{\kappa}
@@ -542,7 +544,7 @@
 \providecommand{\chisqqnt}[2]{\FOOqnt{\prvchisq}{#1}{#2}}
 \providecommand{\chisqlaw}[1]{\makelaw{\prvchisq}{#1}}
 
-% gamma
+% gamma distribution
 \providecommand{\prvgamma}{\Gamma}
 \providecommand{\gammacdf}[2]{\FOOcdf{\prvgamma}{#1}{#2}}
 \providecommand{\gammaqnt}[2]{\FOOqnt{\prvgamma}{#1}{#2}}
@@ -673,13 +675,19 @@
 %aspect ratio
 \providecommand{\arat}[1][a]{\mathSUB{c}{#1}}
 
+% portfolios
+\providecommand{\prvPortfolio}[0]{\nu}
+
 \providecommand{\portw}[1][{}]{\vectUL{w}{}{#1}}
-\providecommand{\pportw}[1][{}]{\vectUL{\nu}{}{#1}}
-\providecommand{\sportw}[1][{}]{\vectUL{\hat{w}}{}{#1}}
-\providecommand{\sportwopt}{\sportw[*]}
-\providecommand{\pportwopt}{\pportw[*]}
-\providecommand{\sportwoptR}{\sportw[\Rbuj,*]}
-\providecommand{\pportwoptR}{\pportw[\Rbuj,*]}
+
+\providecommand{\pportw}[1][{}]{\vectUL{\prvPortfolio}{}{#1}}
+\providecommand{\sportw}[1][{}]{\vectUL{\hat{\prvPortfolio}}{}{#1}}
+\providecommand{\sportwoptFoo}[1]{\sportw[{#1}*]}
+\providecommand{\pportwoptFoo}[1]{\pportw[{#1}*]}
+\providecommand{\sportwopt}{\sportwoptFoo{}}
+\providecommand{\pportwopt}{\pportwoptFoo{}}
+\providecommand{\sportwoptR}{\sportwoptFoo{\Rbuj,}}
+\providecommand{\pportwoptR}{\pportwoptFoo{\Rbuj,}}
 
 \providecommand{\sportwoptG}[1]{\sportw[*,#1]}
 \providecommand{\pportwoptG}[1]{\pportw[*,#1]}
