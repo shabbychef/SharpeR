@@ -1004,7 +1004,8 @@ a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
 %\bibliographystyle{ieeetr}
 \bibliographystyle{plainnat}
 %\bibliographystyle{acm}
-\bibliography{SharpeR,rauto}
+%\bibliography{SharpeR,rauto}
+\bibliography{AsymptoticMarkowitz}
 %UNFOLD
 
 \end{document}

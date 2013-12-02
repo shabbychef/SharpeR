@@ -143,6 +143,7 @@ PRETEX       = TEXINPUTS=$(TEXINPADD):$$TEXINPUTS
 PREBIB       = BSTINPUTS=$(TEXINPADD):$$BSTINPUTS \
                BIBINPUTS=$(TEXINPADD):$$BIBINPUTS 
 BIBTEX      := $(shell which bibtex)
+LATEX       := $(shell which latex)
 
 BASE_DEF_PACKAGES   = "utils,graphics,grDevices,methods,stats,$(PKG_NAME)"
 
@@ -404,7 +405,19 @@ vignette_cache : $(VIGNETTE_CACHE_SENTINEL)
 				 FORCE_RECOMPUTE='TRUE' \
 				 $(R) $(R_FLAGS) --slave -e "setwd('$(VIGNETTE_D)');knitr::knit(basename('$<'));"
 
-the_paper : vignettes/AsymptoticMarkowitz.tex
+%.dvi : %.tex 
+		$(PRETEX) $(LATEX) $<
+		if grep Citation $*.log > /dev/null; then $(PREBIB) $(BIBTEX) $*; $(PRETEX) $(LATEX) $*; fi
+		if grep Rerun $*.log > /dev/null; then $(PRETEX) $(LATEX) $*; fi
+		@-cp $*.dvi $(VIGNETTE_D)
+		@-cp $*.aux $(VIGNETTE_D)
+		@-cp $*.log $(VIGNETTE_D)
+
+%.bbl : %.bib
+		$(PREBIB) $(BIBTEX) $*
+		@-cp $*.bbl $(VIGNETTE_D)
+
+the_paper : vignettes/AsymptoticMarkowitz.dvi vignettes/AsymptoticMarkowitz.tex vignettes/AsymptoticMarkowitz.bbl
 
 # make data needed by the vignette. what bother.
 $(EXTDATA_D)/%.rda : $(NODIST_R_DIR)/make_%.R
@@ -520,6 +533,13 @@ suggestions :
 	@-echo 'sleep `jot -r 1 2 57` && git commit -a -m "working on vignette"'
 	@-echo "git push origin $(GIT_BRANCH)"
 
+# for submission to arxiv;
+# what bother;
+#
+# I basically did
+# cd vignettes/
+# make -f ~/sys/etc/MOAMakefile AsymptoticMarkowitz.dvi 
+# and then used the .tex and .bbl files
 
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:tags=tags;:syntax=make:filetype=make:ai:si:cin:nu:fo=croqt:cino=p0t0c5(0:
