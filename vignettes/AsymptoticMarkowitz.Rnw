@@ -101,7 +101,7 @@ lseq <- function(from,to,length.out) {
 \begin{document}
 
 \title{Asymptotic Distribution of the \txtMwtz Portfolio}
-\author{Steven E. Pav \thanks{\email{shabbychef@gmail.com}}}
+\author{Steven E. Pav \thanks{\email{spav@alumni.cmu.edu}}}
 %\date{\today, \currenttime}
 
 \maketitle
@@ -393,7 +393,7 @@ This reduces the problem to the univariate optimization
 \max_{c :\, c^2 \le \fracc{\Rbuj^2}{\psnrsqopt}} 
 \sign{c} \psnropt - \frac{\rfr}{\abs{c}\psnropt},
 \end{equation}
-where $\psnrsqopt = \qiform{\pvsig}{\pvmu}.$ The optimimum
+where $\psnrsqopt = \qiform{\pvsig}{\pvmu}.$ The optimum
 occurs for $c = \fracc{\Rbuj}{\psnropt}$, moreover the optimum
 is unique when $\rfr > 0$.
 \end{proof}%UNFOLD
@@ -437,94 +437,95 @@ $\basev[i]$ is the \kth{i} column of the identity matrix. The result
 follows from basic calculus.
 \end{proof}%UNFOLD
 
-% 2FIX: nstrat nstrathej fuck. as in, does this make sense in SharpeRatio.rnw? 
+%% constrained case ... %FOLDUP
+%% 2FIX: nstrat nstrathej fuck. as in, does this make sense in SharpeRatio.rnw? 
+%% these show up as k and p, and what are you doing?
 
-Consider, now, the \emph{constrained} portfolio optimization problem,
-\begin{equation*}
-\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
-\Rbuj^2} 
-\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
-\end{equation*}
-where $\hejG$ is now a $\nlatfhej \times \nlatf$ matrix of 
-rank \nlatfhej.
-We can interpret the \hejG constraint as stating that the covariance of 
-the returns of a feasible portfolio with the returns of a portfolio 
-whose weights are in a given row of \hejG shall equal zero.
-In the garden variety application of this problem, \hejG consists of 
-\nlatfhej rows of the identity matrix;
-in this case, feasible portfolios are `hedged' with respect 
-to the \nlatfhej assets selected by \hejG
-(although they may hold some position in the hedged assets).
+%Consider, now, the \emph{constrained} portfolio optimization problem,
+%\begin{equation*}
+%\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
+%\Rbuj^2} 
+%\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+%\end{equation*}
+%where $\hejG$ is now a $\nlatfhej \times \nlatf$ matrix of 
+%rank \nlatfhej.
+%We can interpret the \hejG constraint as stating that the covariance of 
+%the returns of a feasible portfolio with the returns of a portfolio 
+%whose weights are in a given row of \hejG shall equal zero.
+%In the garden variety application of this problem, \hejG consists of 
+%\nlatfhej rows of the identity matrix;
+%in this case, feasible portfolios are `hedged' with respect 
+%to the \nlatfhej assets selected by \hejG
+%(although they may hold some position in the hedged assets).
 
-\begin{lemma}[constrained \txtSR optimal portfolio]%FOLDUP
-Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
-the portfolio optimization problem
-\begin{equation}
-\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
-\Rbuj^2} 
-\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
-\label{eqn:cons_port_prob}
-\end{equation}
-for $\rfr \ge 0, \Rbuj > 0$ is solved by
-% (2FIX nomenclature)
-\begin{equation*}
-\begin{split}
-\pportwoptFoo{\Rbuj,\hejG,} &\defeq c \wrapParens{\minv{\pvsig}{\pvmu} -
-	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu},\\
- c &= \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu} - 
-	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}}}.
-\end{split}
-\end{equation*}
-When $\rfr > 0$ the solution is unique.
-\label{lemma:cons_sr_optimal_portfolio}
-\end{lemma}%UNFOLD
-\begin{proof}%FOLDUP
-By the Lagrange multiplier technique, the optimal portfolio
-solves the following equations:
-\begin{equation*}
-\begin{split}
-0 &= c_1 \pvmu - c_2 \pvsig \pportw - \gamma_1 \pvsig \pportw -
-\pvsig\trAB{\hejG}{\vect{\gamma_2}},\\
-\qform{\pvsig}{\pportw} &\le \Rbuj^2,\\
-\hejG\pvsig \pportw &= \vzero,
-\end{split}
-\end{equation*}
-where $\gamma_i$ are Lagrange multipliers, and $c_1, c_2$ are 
-scalar constants.
+%\begin{lemma}[constrained \txtSR optimal portfolio]%FOLDUP
+%Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
+%the portfolio optimization problem
+%\begin{equation}
+%\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
+%\Rbuj^2} 
+%\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+%\label{eqn:cons_port_prob}
+%\end{equation}
+%for $\rfr \ge 0, \Rbuj > 0$ is solved by
+%% (2FIX nomenclature)
+%\begin{equation*}
+%\begin{split}
+%\pportwoptFoo{\Rbuj,\hejG,} &\defeq c \wrapParens{\minv{\pvsig}{\pvmu} -
+	%\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu},\\
+ %c &= \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu} - 
+	%\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}}}.
+%\end{split}
+%\end{equation*}
+%When $\rfr > 0$ the solution is unique.
+%\label{lemma:cons_sr_optimal_portfolio}
+%\end{lemma}%UNFOLD
+%\begin{proof}%FOLDUP
+%By the Lagrange multiplier technique, the optimal portfolio
+%solves the following equations:
+%\begin{equation*}
+%\begin{split}
+%0 &= c_1 \pvmu - c_2 \pvsig \pportw - \gamma_1 \pvsig \pportw -
+%\pvsig\trAB{\hejG}{\vect{\gamma_2}},\\
+%\qform{\pvsig}{\pportw} &\le \Rbuj^2,\\
+%\hejG\pvsig \pportw &= \vzero,
+%\end{split}
+%\end{equation*}
+%where $\gamma_i$ are Lagrange multipliers, and $c_1, c_2$ are 
+%scalar constants.
 
-Solving the first equation gives
-$$
-\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
-\trAB{\hejG}{\vect{\gamma_2}}}.
-$$
-Reconciling this with the hedging equation we have
-$$
-\vzero 
-= \hejG\pvsig \pportw 
-= c_3 \hejG\pvsig \wrapBracks{\minvAB{\pvsig}{\pvmu} -
-\trAB{\hejG}{\vect{\gamma_2}}},
-$$ 
-and therefore 
-$\vect{\gamma_2} = \minvAB{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu.$
-Thus
-$$
-\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
-\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu}.
-$$
-Plugging this into the objective reduces the problem to the
-univariate optimization
-\begin{equation*}
-\max_{c_3 :\, c_3^2 \le \fracc{\Rbuj^2}{\psnrsqoptG{\hejG}}} 
-\sign{c_3} \psnroptG{\hejG} - \frac{\rfr}{\abs{c_3}\psnroptG{\hejG}},
-\end{equation*}
-where $\psnrsqoptG{\hejG} = \qiform{\pvsig}{\pvmu} - 
-	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}.$
-The optimimum
-occurs for $c = \fracc{\Rbuj}{\psnroptG{\hejG}}$, moreover the optimum
-is unique when $\rfr > 0$.
-\end{proof}%UNFOLD
-
-
+%Solving the first equation gives
+%$$
+%\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
+%\trAB{\hejG}{\vect{\gamma_2}}}.
+%$$
+%Reconciling this with the hedging equation we have
+%$$
+%\vzero 
+%= \hejG\pvsig \pportw 
+%= c_3 \hejG\pvsig \wrapBracks{\minvAB{\pvsig}{\pvmu} -
+%\trAB{\hejG}{\vect{\gamma_2}}},
+%$$ 
+%and therefore 
+%$\vect{\gamma_2} = \minvAB{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu.$
+%Thus
+%$$
+%\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
+%\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu}.
+%$$
+%Plugging this into the objective reduces the problem to the
+%univariate optimization
+%\begin{equation*}
+%\max_{c_3 :\, c_3^2 \le \fracc{\Rbuj^2}{\psnrsqoptG{\hejG}}} 
+%\sign{c_3} \psnroptG{\hejG} - \frac{\rfr}{\abs{c_3}\psnroptG{\hejG}},
+%\end{equation*}
+%where $\psnrsqoptG{\hejG} = \qiform{\pvsig}{\pvmu} - 
+	%\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}.$
+%The optimum
+%occurs for $c = \fracc{\Rbuj}{\psnroptG{\hejG}}$, moreover the optimum
+%is unique when $\rfr > 0$.
+%\end{proof}%UNFOLD
+%%UNFOLD
 
 %UNFOLD
 
@@ -573,9 +574,9 @@ The density of \vreti is then
 \begin{split}
 \normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
 \longexp{-\half \qiform{\pvsig}{\wrapParens{\vreti - \pvmu}}},\\
- &= \frac{\wrapParens{\det{\pvsig}}^{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
+ &= \frac{\detpow{\pvsig}{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
 \longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
- &= \wrapParens{2\pi}^{-\nlatf/2} \wrapParens{\det{\pvsm}}^{-\half}
+ &= \wrapParens{2\pi}^{-\nlatf/2} \detpow{\pvsm}{-\half}
 \longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
  &= \wrapParens{2\pi}^{-\nlatf/2}
 \longexp{\half - \half \logdet{\pvsm} - \half \trace{\minv{\pvsm}\ogram{\avreti}}},
@@ -888,6 +889,12 @@ Newton's method is then the iterative scheme
 \vitrlam{k+1}{} \leftarrow \vitrlam{k}{} -
 \minv{\wrapParens{\drbydr{\vitrerr{k}{}}{\vitrlam{k}{}}}} \vitrerr{k}.
 \end{equation}
+%Note there is no reason one must use a Newton scheme to maximize the
+%likelihood. High quality optimization routines (\eg BFGS) which require
+%only the gradient to be 
+%There is no reason to restrict oneself to a Newton solver. High quality
+%optimization routines which require ...
+%\cite{nocedal2006numerical} 
 
 When (if?) the iterative scheme converges on the optimum, plugging in
 \vitrlam{k}{} into \eqnref{lrt_mle_soln} gives the MLE under the null.
@@ -913,81 +920,81 @@ a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
 %UNFOLD
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Examples}%FOLDUP
+%\section{Examples}%FOLDUP
 
-Empirically, the marginal Wald test for zero weighting in the 
-\txtMP based on this approximation are nearly
-identical to the \tstat-statistics produced by the procedure
-of Britten-Jones, as shown below. \cite{BrittenJones1999} 
+%Empirically, the marginal Wald test for zero weighting in the 
+%\txtMP based on this approximation are nearly
+%identical to the \tstat-statistics produced by the procedure
+%of Britten-Jones, as shown below. \cite{BrittenJones1999} 
 
-<<'me_vs_bjones',echo=TRUE>>=
-nday <- 1024
-nstk <- 5
+%<<'me_vs_bjones',echo=TRUE>>=
+%nday <- 1024
+%nstk <- 5
 
-# under the null: all returns are zero mean;
-set.seed(as.integer(charToRaw("7fbb2a84-aa4c-4977-8301-539e48355a35")))
-rets <- matrix(rnorm(nday * nstk),nrow=nday)
+%# under the null: all returns are zero mean;
+%set.seed(as.integer(charToRaw("7fbb2a84-aa4c-4977-8301-539e48355a35")))
+%rets <- matrix(rnorm(nday * nstk),nrow=nday)
 
-# t-stat via Britten-Jones procedure
-bjones.ts <- function(rets) {
-	ones.vec <- matrix(1,nrow=dim(rets)[1],ncol=1)
-	bjones.mod <- lm(ones.vec ~ rets - 1)
-	bjones.sum <- summary(bjones.mod)
-	retval <- bjones.sum$coefficients[,3]
-}
-# wald stat via inverse second moment trick
-ism.ws <- function(rets,...) {
-# flipping the sign on returns is idiomatic,
-	asymv <- ism_vcov(- as.matrix(rets),...)
-	asymv.mu <- asymv$mu[1:asymv$p]
-	asymv.Sg <- asymv$Ohat[1:asymv$p,1:asymv$p]
-	retval <- asymv.mu / sqrt(diag(asymv.Sg))
-}
+%# t-stat via Britten-Jones procedure
+%bjones.ts <- function(rets) {
+	%ones.vec <- matrix(1,nrow=dim(rets)[1],ncol=1)
+	%bjones.mod <- lm(ones.vec ~ rets - 1)
+	%bjones.sum <- summary(bjones.mod)
+	%retval <- bjones.sum$coefficients[,3]
+%}
+%# wald stat via inverse second moment trick
+%ism.ws <- function(rets,...) {
+%# flipping the sign on returns is idiomatic,
+	%asymv <- ism_vcov(- as.matrix(rets),...)
+	%asymv.mu <- asymv$mu[1:asymv$p]
+	%asymv.Sg <- asymv$Ohat[1:asymv$p,1:asymv$p]
+	%retval <- asymv.mu / sqrt(diag(asymv.Sg))
+%}
 
-bjones.tstat <- bjones.ts(rets)
-ism.wald <- ism.ws(rets)
+%bjones.tstat <- bjones.ts(rets)
+%ism.wald <- ism.ws(rets)
 
-# compare them:
-print(bjones.tstat)
-print(ism.wald)
+%# compare them:
+%print(bjones.tstat)
+%print(ism.wald)
 
-# repeat under the alternative;
-set.seed(as.integer(charToRaw("a5f17b28-436b-4d01-a883-85b3e5b7c218")))
-zero.rets <- t(matrix(rnorm(nday * nstk),nrow=nday))
-mu.vals <- (1/sqrt(253)) * seq(-1,1,length.out=nstk) 
-rets <- t(zero.rets + mu.vals)
+%# repeat under the alternative;
+%set.seed(as.integer(charToRaw("a5f17b28-436b-4d01-a883-85b3e5b7c218")))
+%zero.rets <- t(matrix(rnorm(nday * nstk),nrow=nday))
+%mu.vals <- (1/sqrt(253)) * seq(-1,1,length.out=nstk) 
+%rets <- t(zero.rets + mu.vals)
 
-bjones.tstat <- bjones.ts(rets)
-ism.wald <- ism.ws(rets)
+%bjones.tstat <- bjones.ts(rets)
+%ism.wald <- ism.ws(rets)
 
-# compare them:
-print(bjones.tstat)
-print(ism.wald)
-@
-
-%<<'test_FF3',echo=TRUE>>=
-%ff3 <- read.csv('http://www.quandl.com/api/v1/datasets/KFRENCH/FACTORS_M.csv?&trim_start=1926-07-31&trim_end=2013-10-31&sort_order=desc', colClasses=c('Month'='Date'))
-
-%require(sandwich)
-
-%rfr <- ff3[,'RF']
-%hml <- ff3[,'HML'] - rfr
-%smb <- ff3[,'SMB'] - rfr
-
-%ff.ret <- cbind(mkt=ff3[,'Mkt.RF'],hml,smb)
-
-%my.ws <- ism.ws(ff.ret)
-%my.ws2 <- ism.ws(ff.ret,vcov.func=vcovHAC)
-%my.bt <- bjones.ts(ff.ret)
-
-%# conditionally?
-%blahm <- cbind(-ff.ret[(1:(dim(ff.ret)[1]-1)),],ff.ret[(2:dim(ff.ret)[1]),])
-%# futz from here ... 
-%XX <- ism_vcov(blahm)
+%# compare them:
+%print(bjones.tstat)
+%print(ism.wald)
 %@
 
-% 2FIX: add examples here ... 
-%UNFOLD
+%%<<'test_FF3',echo=TRUE>>=
+%%ff3 <- read.csv('http://www.quandl.com/api/v1/datasets/KFRENCH/FACTORS_M.csv?&trim_start=1926-07-31&trim_end=2013-10-31&sort_order=desc', colClasses=c('Month'='Date'))
+
+%%require(sandwich)
+
+%%rfr <- ff3[,'RF']
+%%hml <- ff3[,'HML'] - rfr
+%%smb <- ff3[,'SMB'] - rfr
+
+%%ff.ret <- cbind(mkt=ff3[,'Mkt.RF'],hml,smb)
+
+%%my.ws <- ism.ws(ff.ret)
+%%my.ws2 <- ism.ws(ff.ret,vcov.func=vcovHAC)
+%%my.bt <- bjones.ts(ff.ret)
+
+%%# conditionally?
+%%blahm <- cbind(-ff.ret[(1:(dim(ff.ret)[1]-1)),],ff.ret[(2:dim(ff.ret)[1]),])
+%%# futz from here ... 
+%%XX <- ism_vcov(blahm)
+%%@
+
+%% 2FIX: add examples here ... 
+%%UNFOLD
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bibliography%FOLDUP

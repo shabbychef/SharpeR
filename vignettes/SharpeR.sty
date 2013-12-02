@@ -136,6 +136,11 @@
 \providecommand{\trace}[1]{\funcit{\mbox{tr}}{#1}}
 % is this replicated elsewhere?
 \providecommand{\det}[1]{\abs{#1}}
+\renewcommand{\det}[1]{\abs{#1}}
+\providecommand{\detpow}[2]{\neUL{\det{#1}}{#2}{}}
+% functional det
+\providecommand{\fdet}[1]{\funcit{\operatorname{det}}{#1}}
+\renewcommand{\fdet}[1]{\funcit{\operatorname{det}}{#1}}
 \providecommand{\logdet}[1]{\MATHIT{\log\det{#1}}}
 \providecommand{\sign}[1]{\funcit{\operatorname{sign}}{#1}}
 

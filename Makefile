@@ -175,6 +175,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 	vignette_cache \
 	the_vignette \
 	static_vignette \
+	the_paper \
 	R
 
 help:
@@ -395,6 +396,15 @@ $(VIGNETTE_CACHE_SENTINEL) : $(VIGNETTE_SRCS) $(LOCAL)/$(PKG_NAME)/INDEX
 	touch $@
 
 vignette_cache : $(VIGNETTE_CACHE_SENTINEL)
+
+%.tex : %.Rnw 
+	$(call WARN_DEPS)
+	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,TTR" \
+				 FORCE_RECOMPUTE='TRUE' \
+				 $(R) $(R_FLAGS) --slave -e "setwd('$(VIGNETTE_D)');knitr::knit(basename('$<'));"
+
+the_paper : vignettes/AsymptoticMarkowitz.tex
 
 # make data needed by the vignette. what bother.
 $(EXTDATA_D)/%.rda : $(NODIST_R_DIR)/make_%.R
