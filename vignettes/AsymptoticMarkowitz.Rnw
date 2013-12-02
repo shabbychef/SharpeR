@@ -6,7 +6,7 @@
 \documentclass[10pt,a4paper,english]{article}
 
 % front matter%FOLDUP
-\usepackage{url}
+\usepackage[hyphens]{url}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 % for therefore
@@ -18,6 +18,8 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 
+% see http://tex.stackexchange.com/a/3034/2530
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
 \usepackage{hyperref}
 \usepackage[square,numbers]{natbib}
 %\usepackage[authoryear]{natbib}
@@ -309,7 +311,7 @@ Then, asymptotically in \ssiz,
 \label{eqn:mvclt_isvsm}
 \end{multline}
 %\end{equation}
-where \pvvar is the variance of \ogram{\avreti}.
+where \pvvar is the variance of $\fvech{\ogram{\avreti}}$.
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
 \label{theorem:inv_distribution}
@@ -322,7 +324,7 @@ Under the multivariate central limit theorem \cite{wasserman2004all}
 \normlaw{0,\pvvar},
 \label{eqn:mvclt_svsm}
 \end{equation}
-where \pvvar is the variance of \ogram{\avreti}, which, in general, 
+where \pvvar is the variance of $\fvech{\ogram{\avreti}}$, which, in general, 
 is unknown. 
 %(For the case where \vreti is multivariate Gaussian,
 %\pvvar is known; see \theoremref{inv_distribution_gaussian}.)
