@@ -17,6 +17,7 @@
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{example}[theorem]{Example}
 
 % see http://tex.stackexchange.com/a/3034/2530
 \PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
@@ -268,35 +269,59 @@ $\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$  \cite{magnus1980elimination}
 
 A technical lemma is needed.
 \begin{lemma}%FOLDUP
-For symmetric, invertible matrix \Mtx{A}, 
+Define
 \begin{equation}
-\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
-= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
+\fsymd{\Mtx{B}} \defeq \Mtx{B} + \tr{\Mtx{B}} - \diag{\Mtx{B}},
+\end{equation}
+where \diag{\Mtx{B}} is the diagonal matrix with the same diagonal
+as \Mtx{B}.
+
+Then, for symmetric, invertible matrix \Mtx{A}, 
+\begin{equation}
+\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
+= \fsymd{- \AkronA{\minv{\Mtx{A}}}} 
+= - 2 \wrapParens{\AkronA{\minv{\Mtx{A}}}}
++ \diag{\AkronA{\minv{\Mtx{A}}}},
 \label{eqn:deriv_vech_matrix_inverse}
 \end{equation}
+and thus
+\begin{equation*}
+\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} = 
+\qoElim{\fsymd{- \AkronA{\minv{\Mtx{A}}}}}.
+\end{equation*}
 \label{lemma:deriv_vech_matrix_inverse}
 \end{lemma}%UNFOLD
 \begin{proof}%FOLDUP
-The following is a standard result of 
-matrix calculus, \cite{magnus1999matrix,petersen2012matrix,facklernotes}
+For general matrix \Mtx{A}, the following is 
+known, \cite{facklernotes,magnus1999matrix}
 \begin{equation}
 \dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
-= - \AkronA{\minv{\Mtx{A}}}.
+= - \wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}.
 \label{eqn:deriv_matrix_inverse}
 \end{equation}
-The non-redundant parts of this can be expressed via the
+Note how this generalizes the derivative in the 
+scalar case:
+$\dbyd{x^{-1}}{x} = - \wrapParens{x^{-1} x^{-1}}.$
+For \emph{symmetric} \Mtx{A}, this relation has to 
+be adjusted.  The function \fsymd{\cdot}
+takes the general derivative to the form for a derivative
+with respect to a symmetric matrix.  \cite[\cf section 2.8.2]{petersen2012matrix}
+Thus, for symmetric \Mtx{A}, 
+\begin{equation}
+\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
+= \fsymd{- \wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}}
+= - 2 \wrapParens{\AkronA{\minv{\Mtx{A}}}} + \diag{\AkronA{\minv{\Mtx{A}}}}.
+\label{eqn:deriv_symmetric_matrix_inverse}
+\end{equation}
+
+The non-redundant parts of this can then be expressed via the
 Elimination matrix,
 \begin{equation*}
 \dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
-= \qoform{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}{\Elim}
-= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
+= \qoElim{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}.
 \end{equation*}
 \end{proof}%UNFOLD
 
-Note how \lemmaref{deriv_vech_matrix_inverse} generalizes the scalar case:
-$$
-\dbyd{x^{-1}}{x} = - \wrapParens{x^{-1} x^{-1}}.
-$$
 The asymptotic distribution of \minv{\pvsm} then follows from standard
 techniques.
 \begin{theorem}%FOLDUP
@@ -307,11 +332,12 @@ Then, asymptotically in \ssiz,
 \begin{multline}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow \\
-\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\AkronA{\minv{\pvsm}}}}{\Elim}}}},
+\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\fsymd{-\AkronA{\minv{\pvsm}}}}{\Elim}}}},
 \label{eqn:mvclt_isvsm}
 \end{multline}
 %\end{equation}
-where \pvvar is the variance of $\fvech{\ogram{\avreti}}$.
+where \pvvar is the variance of $\fvech{\ogram{\avreti}}$, and
+$\fsymd{\Mtx{B}} \defeq \Mtx{B} + \tr{\Mtx{B}} - \diag{\Mtx{B}}$.
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
 \label{theorem:inv_distribution}
@@ -706,13 +732,15 @@ respect to \minv{\pvsm}:
 \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}} 
 	&= \half[\ssiz]\drbydr{\logdet{\minv{\pvsm}}}{\minv{\pvsm}} 
 	- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\minv{\pvsm}},\\
-  &= \half[\ssiz]\wrapParens{\pvsm - \svsm},
+  &= \half[\ssiz]\wrapParens{{\pvsm} - {\svsm}},
 \end{split}
 \end{equation}
-where the matrix calculus follows from the 
-Matrix Cookbook.  \cite{petersen2012matrix}
+where the matrix calculus follows from standard 
+results. \cite{petersen2012matrix}
 \nocite{magnus1999matrix,petersen2012matrix}
-Thus the likelihood is maximized by 
+Note we need not take symmetry into account in the derivative, since
+it is possible that the MLE could be non-symmetric.
+Thus \svsm is a root to the equation, and the likelihood is maximized by 
 $\pvsm[\txtMLE] = \svsm$.
 \end{proof}%UNFOLD
 
@@ -730,16 +758,22 @@ $\pvsm[\txtMLE] = \svsm$.
 
 \providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
 \providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
-\providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
-\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
-\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
 
 \begin{lemma}%FOLDUP
 The Fisher Information of $\minv{\pvsm}$ is
 \begin{equation}
-\FishIf[\ssiz]{\minv{\pvsm}} = \half[\ssiz]
-\qoElim{\wrapParens{\AkronA{\pvsm}}}.
+\FishIf[\ssiz]{\minv{\pvsm}} 
+= \half[\ssiz] \fsymd{\AkronA{\pvsm}}
+= \ssiz \wrapParens{\AkronA{\pvsm}} -
+\half[\ssiz] \diag{\AkronA{\pvsm}},
 \label{eqn:itheta_fish_inf_eqn}
+\end{equation}
+and thus the Fisher Information of $\fvech{\minv{\pvsm}}$ is
+\begin{equation}
+\FishIf[\ssiz]{\fvech{\minv{\pvsm}}} 
+= \ssiz \qoElim{\wrapParens{\AkronA{\pvsm}}} -
+\half[\ssiz] \qoElim{\diag{\AkronA{\pvsm}}}.
+\label{eqn:itheta_vech_fish_inf_eqn}
 \end{equation}
 \label{lemma:itheta_fish_inf}
 \end{lemma}%UNFOLD
@@ -757,8 +791,8 @@ So
 \begin{split}
 \drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
  & \defeq
-\drbydr{\fvech{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvech{\minv{\pvsm}}},\\
- &= - \half[\ssiz] \qoElim{\wrapParens{\AkronA{\pvsm}}},
+\drbydr{\fvec{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvec{\minv{\pvsm}}},\\
+ &= - \half[\ssiz] \fsymd{\AkronA{\pvsm}}.
 \end{split}
 \end{equation*}
 %via \lemmaref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
@@ -767,14 +801,14 @@ via \lemmaref{deriv_vech_matrix_inverse}.
 Since the Fisher Information is negative the expected value of this 
 Hessian, the result follows. \cite{pawitanIAL}
 \end{proof}%UNFOLD
-\begin{corollary}%FOLDUP
-By change of variables, and again using \lemmaref{deriv_vech_matrix_inverse}, 
-the Fisher Information with respect to \pvsm is
-\begin{equation}
-\FishIf[\ssiz]{\pvsm} = \half[\ssiz]
-\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}.
-\end{equation}
-\end{corollary}%UNFOLD
+%\begin{corollary}%FOLDUP
+%By change of variables, and again using \lemmaref{deriv_vech_matrix_inverse}, 
+%the Fisher Information with respect to \pvsm is
+%\begin{equation}
+%\FishIf[\ssiz]{\pvsm} = \half[\ssiz]
+%\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}.
+%\end{equation}
+%\end{corollary}%UNFOLD
 
 Thus the analogue of \theoremref{inv_distribution} for Gaussian returns
 is given by the following theorem.
@@ -786,7 +820,7 @@ Then, asymptotically in \ssiz,
 \begin{equation}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow 
-\normlaw{0,2 \minv{\wrapParens{\qoform{\wrapParens{\AkronA{\pvsm}}}{\Elim}}}}.
+\normlaw{0,2 \minv{\wrapParens{\qoElim{\wrapParens{\fsymd{\AkronA{\pvsm}}}}}}}.
 \label{eqn:mvclt_isvsm_gaussian}
 \end{equation}
 \label{theorem:inv_distribution_gaussian}
@@ -798,7 +832,7 @@ Under `the appropriate regularity conditions,'
 \label{eqn:converge_theta}
 \wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow 
-\normlaw{0,\minv{\wrapParens{\FishIf[\ssiz]{\minv{\pvsm}}}}},
+\normlaw{0,\minv{\wrapBracks{\FishIf[\ssiz]{\fvech{\minv{\pvsm}}}}}},
 \end{equation}
 and the result follows from 
 \lemmaref{itheta_fish_inf}.
@@ -806,6 +840,12 @@ and the result follows from
 
 The `plug-in' estimator of the covariance substitutes in \svsm for
 \pvsm in the right hand side of \eqnref{mvclt_isvsm_gaussian}.
+
+\begin{example}
+Consider the one-dimensional case. In this case, \fvech
+foo text.  \cite{spiegel2007schaum}
+
+\end{example}
 %UNFOLD
 
 \subsection{Likelihood ratio test on \txtMP}%FOLDUP
@@ -815,7 +855,6 @@ The `plug-in' estimator of the covariance substitutes in \svsm for
 
 %This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
 
-For some conformable symmetric matrices \lrtA, and given scalars \lrta, 
 consider the null hypothesis
 \begin{equation}
 H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.

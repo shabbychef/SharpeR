@@ -131,7 +131,12 @@
 \providecommand{\Dupp}[1][{}]{\MtxUL{D}{}{#1}}
 \providecommand{\kron}{\MATHIT{\otimes}}
 
-\providecommand{\AkronA}[1]{\MATHIT{#1 \kron #1}}
+\providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
+\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+
+\providecommand{\AkronA}[1]{\MATHIT{{#1} \kron {#1}}}
+\providecommand{\AtkronA}[1]{\MATHIT{\tr{#1} \kron {#1}}}
+\providecommand{\AkronAt}[1]{\MATHIT{{#1} \kron \tr{#1}}}
 
 \providecommand{\trace}[1]{\funcit{\mbox{tr}}{#1}}
 % is this replicated elsewhere?
@@ -150,6 +155,7 @@
 \providecommand{\vcat}[2]{\asvec{\tr{#1},\tr{#2}}}
 
 \providecommand{\diag}[1]{\funcit{\operatorname{diag}}{#1}}
+\providecommand{\fsymd}[1]{\funcit{f_{\mbox{sym}}}{#1}}
 
 \providecommand{\threebythree}[9]{\wrapBracks{\begin{array}{ccc}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\\{#7}&{#8}&{#9}\end{array}}}
 \providecommand{\twotwosys}[6]{\wrapBracks{\begin{array}{cc|c}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\end{array}}}
