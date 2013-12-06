@@ -14,10 +14,14 @@
 % for theorems?
 \usepackage{amsthm}
 
+\theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}{Example}[section]
 
 % see http://tex.stackexchange.com/a/3034/2530
 \PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
@@ -258,68 +262,79 @@ generalizes the `standard' asymptotic analysis of Sharpe ratio of
 multiple assets. \cite{jobsonkorkie1981,lo2002,Ledoit2008850,Leung2008} 
 %\cite{jobsonkorkie1981,lo2002,mertens2002comments,Ledoit2008850,Leung2008,Wright2012} 
 
-Let \fvec{\Mtx{A}}, and \fvech{\Mtx{A}} be the vector and half-space
+Some notation and technical results concerning matrices are required.
+\begin{definition}[Matrix operations]%FOLDUP
+For matrix \Mtx{A},
+let \fvec{\Mtx{A}}, and \fvech{\Mtx{A}} be the vector and half-space
 vector operators.  The former turns an $\nlatf\times\nlatf$ matrix into
 an $\nlatf^2$ vector of its columns stacked on top of each other; the 
 latter vectorizes a symmetric (or lower triangular) matrix into a vector
 of the non-redundant elements.  
 Let \Elim be the `Elimination Matrix,' a matrix of zeros and ones with the
 property that 
-$\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$  \cite{magnus1980elimination} 
-
-A technical lemma is needed.
-\begin{lemma}%FOLDUP
-Define
-\begin{equation}
-\fsymd{\Mtx{B}} \defeq \Mtx{B} + \tr{\Mtx{B}} - \diag{\Mtx{B}},
-\end{equation}
-where \diag{\Mtx{B}} is the diagonal matrix with the same diagonal
-as \Mtx{B}.
-
-Then, for symmetric, invertible matrix \Mtx{A}, 
+$\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$ The `Duplication Matrix,' \Dupp,
+is the matrix of zeros and ones that reverses this operation: 
+$\Dupp \fvech{\Mtx{A}} = \fvec{\Mtx{A}}.$ \cite{magnus1980elimination} 
+Note that this implies that 
+$$\Elim\Dupp = \eye = \Dupp\Elim.$$
+This implies that \Dupp is the Moore-Penrose pseudoinverse of \Elim.
+%Let \diag{\Mtx{A}} be the diagonal matrix with 
+%the same diagonal as \Mtx{A}. 
+%Define
+%\begin{equation}
+%\fsymd{\Mtx{A}} \defeq \Mtx{A} + \tr{\Mtx{A}} - \diag{\Mtx{A}}.
+%\end{equation}
+\end{definition}%UNFOLD
+\begin{definition}[Derivatives]%FOLDUP
+For $m$-vector \vect{x}, and $n$-vector \vect{y}, let the derivative
+\dbyd{\vect{y}}{\vect{x}} be the $n\times m$ matrix whose first column
+is the partial derivative of \vect{y} with respect to $x_1$.  
+This follows the so-called `numerator layout'. 
+For matrices \Mtx{X} and \Mtx{Y}, let
+\begin{equation*}
+\dbyd{\Mtx{Y}}{\Mtx{X}} \defeq \dbyd{\fvec{\Mtx{Y}}}{\fvec{\Mtx{X}}}.
+\end{equation*}
+\end{definition}%UNFOLD
+\begin{lemma}[Derivative of matrix inverse]%FOLDUP
+For invertible matrix \Mtx{A}, 
 \begin{equation}
 \dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
-= \fsymd{- \AkronA{\minv{\Mtx{A}}}} 
-= - 2 \wrapParens{\AkronA{\minv{\Mtx{A}}}}
-+ \diag{\AkronA{\minv{\Mtx{A}}}},
+= - \wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}
+= - \minv{\wrapParens{\tr{\Mtx{A}}\kron\Mtx{A}}}.
+\label{eqn:deriv_vec_matrix_inverse}
+\end{equation}
+For \emph{symmetric} \Mtx{A}, the derivative with respect to the
+non-redundant part is 
+\begin{equation}
+\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
+= - \EXD{\wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}}.
 \label{eqn:deriv_vech_matrix_inverse}
 \end{equation}
-and thus
-\begin{equation*}
-\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} = 
-\qoElim{\fsymd{- \AkronA{\minv{\Mtx{A}}}}}.
-\end{equation*}
+
 \label{lemma:deriv_vech_matrix_inverse}
 \end{lemma}%UNFOLD
-\begin{proof}%FOLDUP
-For general matrix \Mtx{A}, the following is 
-known, \cite{facklernotes,magnus1999matrix}
-\begin{equation}
-\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
-= - \wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}.
-\label{eqn:deriv_matrix_inverse}
-\end{equation}
-Note how this generalizes the derivative in the 
-scalar case:
+Note how this result generalizes the scalar derivative:
 $\dbyd{x^{-1}}{x} = - \wrapParens{x^{-1} x^{-1}}.$
-For \emph{symmetric} \Mtx{A}, this relation has to 
-be adjusted.  The function \fsymd{\cdot}
-takes the general derivative to the form for a derivative
-with respect to a symmetric matrix.  \cite[\cf section 2.8.2]{petersen2012matrix}
-Thus, for symmetric \Mtx{A}, 
-\begin{equation}
-\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
-= \fsymd{- \wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}}
-= - 2 \wrapParens{\AkronA{\minv{\Mtx{A}}}} + \diag{\AkronA{\minv{\Mtx{A}}}}.
-\label{eqn:deriv_symmetric_matrix_inverse}
-\end{equation}
-
-The non-redundant parts of this can then be expressed via the
-Elimination matrix,
+\begin{proof}%FOLDUP
+\eqnref{deriv_vec_matrix_inverse} is a known 
+result. \cite{facklernotes,magnus1999matrix}
+For the symmetric case, use the chain rule:
 \begin{equation*}
 \dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
-= \qoElim{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}.
+= \dbyd{\fvech{\minv{\Mtx{A}}}}{\fvec{\minv{\Mtx{A}}}} 
+  \dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}
+  \dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}}
+= \EXD{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}},
 \end{equation*}
+where the last equation follows because the definitions
+$\fvech{\Mtx{X}} = \Elim\fvec{\Mtx{X}}$ 
+and 
+$\fvec{\Mtx{X}} = \Dupp\fvech{\Mtx{X}}$ imply
+$$
+\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvec{\minv{\Mtx{A}}}} = \Elim,
+\quad\mbox{and}\quad
+\dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}} = \Dupp.
+$$
 \end{proof}%UNFOLD
 
 The asymptotic distribution of \minv{\pvsm} then follows from standard
@@ -327,17 +342,16 @@ techniques.
 \begin{theorem}%FOLDUP
 Let \svsm be the unbiased sample estimate of 
 \pvsm, based on \ssiz \iid samples of \vreti.
+Let \pvvar be the variance of $\fvech{\ogram{\avreti}}$.
 Then, asymptotically in \ssiz, 
 %\begin{equation}
 \begin{multline}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow \\
-\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\fsymd{-\AkronA{\minv{\pvsm}}}}{\Elim}}}},
+\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}.
 \label{eqn:mvclt_isvsm}
 \end{multline}
 %\end{equation}
-where \pvvar is the variance of $\fvech{\ogram{\avreti}}$, and
-$\fsymd{\Mtx{B}} \defeq \Mtx{B} + \tr{\Mtx{B}} - \diag{\Mtx{B}}$.
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
 \label{theorem:inv_distribution}
@@ -355,11 +369,11 @@ is unknown.
 %(For the case where \vreti is multivariate Gaussian,
 %\pvvar is known; see \theoremref{inv_distribution_gaussian}.)
 
-By the delta method,
+By the delta method \cite{wasserman2004all},
 \begin{equation*}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow 
-\normlaw{0,\qform{\pvvar}{\wrapBracks{\dbyd{\fvech{\minv{\pvsm}}}{\fvech{\pvsm}}}}}.
+\normlaw{0,\qoform{\pvvar}{\wrapBracks{\dbyd{\fvech{\minv{\pvsm}}}{\fvech{\pvsm}}}}}.
 \end{equation*}
 The derivative is given by \lemmaref{deriv_vech_matrix_inverse}, and
 the result follows.
@@ -444,7 +458,7 @@ some risk budget. Then
 \begin{multline}
 \sqrt{\ssiz}\wrapParens{\sportwoptR - \pportwoptR} 
 \rightsquigarrow \\
-\normlaw{0,\qqform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\AkronA{\minv{\pvsm}}}}{\Elim}}}{\Mtx{K}}},
+\normlaw{0,\qform{\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}{\Mtx{K}}},
 \label{eqn:mvclt_portfolio}
 \end{multline}
 where 
@@ -738,8 +752,8 @@ respect to \minv{\pvsm}:
 where the matrix calculus follows from standard 
 results. \cite{petersen2012matrix}
 \nocite{magnus1999matrix,petersen2012matrix}
-Note we need not take symmetry into account in the derivative, since
-it is possible that the MLE could be non-symmetric.
+%Note we need not take symmetry into account in the derivative, since
+%it is possible that the MLE could be non-symmetric.
 Thus \svsm is a root to the equation, and the likelihood is maximized by 
 $\pvsm[\txtMLE] = \svsm$.
 \end{proof}%UNFOLD
@@ -760,19 +774,17 @@ $\pvsm[\txtMLE] = \svsm$.
 \providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
 
 \begin{lemma}%FOLDUP
-The Fisher Information of $\minv{\pvsm}$ is
+The Fisher Information of $\fvec{\minv{\pvsm}}$ is
 \begin{equation}
-\FishIf[\ssiz]{\minv{\pvsm}} 
-= \half[\ssiz] \fsymd{\AkronA{\pvsm}}
-= \ssiz \wrapParens{\AkronA{\pvsm}} -
-\half[\ssiz] \diag{\AkronA{\pvsm}},
+\FishIf[\ssiz]{\fvec{\minv{\pvsm}}} 
+= \half[\ssiz] {\AkronA{\pvsm}},
 \label{eqn:itheta_fish_inf_eqn}
 \end{equation}
-and thus the Fisher Information of $\fvech{\minv{\pvsm}}$ is
+and, by change of variables, the Fisher Information 
+of $\fvech{\minv{\pvsm}}$ is
 \begin{equation}
 \FishIf[\ssiz]{\fvech{\minv{\pvsm}}} 
-= \ssiz \qoElim{\wrapParens{\AkronA{\pvsm}}} -
-\half[\ssiz] \qoElim{\diag{\AkronA{\pvsm}}}.
+= \half[\ssiz] \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}.
 \label{eqn:itheta_vech_fish_inf_eqn}
 \end{equation}
 \label{lemma:itheta_fish_inf}
@@ -842,8 +854,36 @@ The `plug-in' estimator of the covariance substitutes in \svsm for
 \pvsm in the right hand side of \eqnref{mvclt_isvsm_gaussian}.
 
 \begin{example}
-Consider the one-dimensional case. In this case, \fvech
-foo text.  \cite{spiegel2007schaum}
+To sanity check \theoremref{inv_distribution_gaussian}, 
+consider the $\nlatf = 1$ Gaussian case. In this case, 
+$$
+\fvech{\pvsm} = \asvec{1,\pmu,\psig^2 + \pmu^2},\quad\mbox{and}\quad
+\fvech{\minv{\pvsm}} =
+ \asvec{1 + \frac{\pmu^2}{\psig^2},- \frac{\pmu}{\psig^2},\oneby{\psig^2}}.
+$$
+Let $\smu, \ssig^2$ be the unbiased sample estimates. By well 
+known results \cite{spiegel2007schaum}, $\smu$ and $\ssig^2$ are independent,
+and have asymptotic variances of $\psig^2/\ssiz$ and $2\psig^4/\ssiz$ 
+respectively. By the delta method, the asymptotic variances of the elements
+of \fvech{\minv{\pvsm}} can be computed as
+\begin{equation*}
+\begin{split}
+\VAR{1 + \frac{\smu^2}{\ssig^2}} 
+&= \wrapParens{\frac{2\pmu}{\psig^2}}^2\psig^2
+ + \wrapParens{- \frac{\pmu^2}{\psig^4}}^2 2\psig^4
+= \frac{4\pmu^2}{\psig^2} + \frac{2\pmu^4}{\psig^4},\\
+\VAR{- \frac{\smu}{\ssig^2}} 
+&= \wrapParens{-\frac{1}{\psig^2}}^2\psig^2 
+ + \wrapParens{- \frac{\pmu}{\psig^4}}^2 2\psig^4
+= \frac{1}{\psig^2} + \frac{2\pmu^2}{\psig^4},\\
+\VAR{\frac{1}{\ssig^2}} 
+&= \wrapParens{- \frac{1}{\psig^4}}^2 2\psig^4
+= \frac{2}{\psig^4}.
+\end{split}
+\end{equation*}
+
+Now compute the same quantities via \theoremref{inv_distribution_gaussian}, 
+
 
 \end{example}
 %UNFOLD

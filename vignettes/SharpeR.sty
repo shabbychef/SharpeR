@@ -133,6 +133,8 @@
 
 \providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
 \providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+\providecommand{\EXD}[1]{\MATHIT{\Elim {#1} \Dupp}}
+
 
 \providecommand{\AkronA}[1]{\MATHIT{{#1} \kron {#1}}}
 \providecommand{\AtkronA}[1]{\MATHIT{\tr{#1} \kron {#1}}}
@@ -186,6 +188,11 @@
 \providecommand{\minv}[1]{\mathSUP{#1}{-1}}
 \providecommand{\trminv}[1]{\mathSUP{#1}{-\top}}
 \providecommand{\minvAB}[2]{\MATHIT{\minv{#1}{#2}}}
+
+% Hermitian and pseudoinverse
+\providecommand{\htr}[1]{\mathSUP{#1}{*}}
+\providecommand{\pinv}[1]{\mathSUP{#1}{+}}
+
 % cholesky 
 \providecommand{\chol}[1]{\mathSUP{#1}{1/2}}
 \providecommand{\trchol}[1]{\mathSUP{#1}{\top/2}}
