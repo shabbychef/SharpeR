@@ -479,95 +479,6 @@ $\basev[i]$ is the \kth{i} column of the identity matrix. The result
 follows from basic calculus.
 \end{proof}%UNFOLD
 
-%% constrained case ... %FOLDUP
-%% 2FIX: nstrat nstrathej fuck. as in, does this make sense in SharpeRatio.rnw? 
-%% these show up as k and p, and what are you doing?
-
-%Consider, now, the \emph{constrained} portfolio optimization problem,
-%\begin{equation*}
-%\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
-%\Rbuj^2} 
-%\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
-%\end{equation*}
-%where $\hejG$ is now a $\nlatfhej \times \nlatf$ matrix of 
-%rank \nlatfhej.
-%We can interpret the \hejG constraint as stating that the covariance of 
-%the returns of a feasible portfolio with the returns of a portfolio 
-%whose weights are in a given row of \hejG shall equal zero.
-%In the garden variety application of this problem, \hejG consists of 
-%\nlatfhej rows of the identity matrix;
-%in this case, feasible portfolios are `hedged' with respect 
-%to the \nlatfhej assets selected by \hejG
-%(although they may hold some position in the hedged assets).
-
-%\begin{lemma}[constrained \txtSR optimal portfolio]%FOLDUP
-%Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
-%the portfolio optimization problem
-%\begin{equation}
-%\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
-%\Rbuj^2} 
-%\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
-%\label{eqn:cons_port_prob}
-%\end{equation}
-%for $\rfr \ge 0, \Rbuj > 0$ is solved by
-%% (2FIX nomenclature)
-%\begin{equation*}
-%\begin{split}
-%\pportwoptFoo{\Rbuj,\hejG,} &\defeq c \wrapParens{\minv{\pvsig}{\pvmu} -
-	%\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu},\\
- %c &= \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu} - 
-	%\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}}}.
-%\end{split}
-%\end{equation*}
-%When $\rfr > 0$ the solution is unique.
-%\label{lemma:cons_sr_optimal_portfolio}
-%\end{lemma}%UNFOLD
-%\begin{proof}%FOLDUP
-%By the Lagrange multiplier technique, the optimal portfolio
-%solves the following equations:
-%\begin{equation*}
-%\begin{split}
-%0 &= c_1 \pvmu - c_2 \pvsig \pportw - \gamma_1 \pvsig \pportw -
-%\pvsig\trAB{\hejG}{\vect{\gamma_2}},\\
-%\qform{\pvsig}{\pportw} &\le \Rbuj^2,\\
-%\hejG\pvsig \pportw &= \vzero,
-%\end{split}
-%\end{equation*}
-%where $\gamma_i$ are Lagrange multipliers, and $c_1, c_2$ are 
-%scalar constants.
-
-%Solving the first equation gives
-%$$
-%\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
-%\trAB{\hejG}{\vect{\gamma_2}}}.
-%$$
-%Reconciling this with the hedging equation we have
-%$$
-%\vzero 
-%= \hejG\pvsig \pportw 
-%= c_3 \hejG\pvsig \wrapBracks{\minvAB{\pvsig}{\pvmu} -
-%\trAB{\hejG}{\vect{\gamma_2}}},
-%$$ 
-%and therefore 
-%$\vect{\gamma_2} = \minvAB{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu.$
-%Thus
-%$$
-%\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
-%\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu}.
-%$$
-%Plugging this into the objective reduces the problem to the
-%univariate optimization
-%\begin{equation*}
-%\max_{c_3 :\, c_3^2 \le \fracc{\Rbuj^2}{\psnrsqoptG{\hejG}}} 
-%\sign{c_3} \psnroptG{\hejG} - \frac{\rfr}{\abs{c_3}\psnroptG{\hejG}},
-%\end{equation*}
-%where $\psnrsqoptG{\hejG} = \qiform{\pvsig}{\pvmu} - 
-	%\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}.$
-%The optimum
-%occurs for $c = \fracc{\Rbuj}{\psnroptG{\hejG}}$, moreover the optimum
-%is unique when $\rfr > 0$.
-%\end{proof}%UNFOLD
-%%UNFOLD
 
 %UNFOLD
 
@@ -804,7 +715,8 @@ So
 \drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
  & \defeq
 \drbydr{\fvec{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvec{\minv{\pvsm}}},\\
- &= - \half[\ssiz] \fsymd{\AkronA{\pvsm}}.
+ &= - \half[\ssiz] \dbyd{\pvsm - \svsm}{\fvec{\minv{\pvsm}}},\\
+ &= - \half[\ssiz] \wrapParens{\AkronA{\pvsm}}.
 \end{split}
 \end{equation*}
 %via \lemmaref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
@@ -812,6 +724,10 @@ So
 via \lemmaref{deriv_vech_matrix_inverse}. 
 Since the Fisher Information is negative the expected value of this 
 Hessian, the result follows. \cite{pawitanIAL}
+
+To get the Fisher Information with respect to \fvech{\minv{\pvsm}}, apply the
+change of variables formula, using the fact that 
+$\dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}} = \Dupp.$
 \end{proof}%UNFOLD
 %\begin{corollary}%FOLDUP
 %By change of variables, and again using \lemmaref{deriv_vech_matrix_inverse}, 
@@ -832,7 +748,7 @@ Then, asymptotically in \ssiz,
 \begin{equation}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow 
-\normlaw{0,2 \minv{\wrapParens{\qoElim{\wrapParens{\fsymd{\AkronA{\pvsm}}}}}}}.
+\normlaw{0,2 \minv{\wrapParens{\qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}}}}.
 \label{eqn:mvclt_isvsm_gaussian}
 \end{equation}
 \label{theorem:inv_distribution_gaussian}
@@ -998,6 +914,99 @@ hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as
 a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
 
 %UNFOLD
+%UNFOLD
+
+\section{Extensions}
+
+% constrained case ... %FOLDUP
+% 2FIX: nstrat nstrathej fuck. as in, does this make sense in SharpeRatio.rnw? 
+% these show up as k and p, and what are you doing?
+
+Consider, now, the \emph{constrained} portfolio optimization problem,
+\begin{equation*}
+\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
+\Rbuj^2} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\end{equation*}
+where $\hejG$ is now a $\nlatfhej \times \nlatf$ matrix of 
+rank \nlatfhej.
+We can interpret the \hejG constraint as stating that the covariance of 
+the returns of a feasible portfolio with the returns of a portfolio 
+whose weights are in a given row of \hejG shall equal zero.
+In the garden variety application of this problem, \hejG consists of 
+\nlatfhej rows of the identity matrix;
+in this case, feasible portfolios are `hedged' with respect 
+to the \nlatfhej assets selected by \hejG
+(although they may hold some position in the hedged assets).
+
+\begin{lemma}[constrained \txtSR optimal portfolio]%FOLDUP
+Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
+the portfolio optimization problem
+\begin{equation}
+\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
+\Rbuj^2} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:cons_port_prob}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+% (2FIX nomenclature)
+\begin{equation*}
+\begin{split}
+\pportwoptFoo{\Rbuj,\hejG,} &\defeq c \wrapParens{\minv{\pvsig}{\pvmu} -
+	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu},\\
+ c &= \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu} - 
+	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}}}.
+\end{split}
+\end{equation*}
+When $\rfr > 0$ the solution is unique.
+\label{lemma:cons_sr_optimal_portfolio}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+By the Lagrange multiplier technique, the optimal portfolio
+solves the following equations:
+\begin{equation*}
+\begin{split}
+0 &= c_1 \pvmu - c_2 \pvsig \pportw - \gamma_1 \pvsig \pportw -
+\pvsig\trAB{\hejG}{\vect{\gamma_2}},\\
+\qform{\pvsig}{\pportw} &\le \Rbuj^2,\\
+\hejG\pvsig \pportw &= \vzero,
+\end{split}
+\end{equation*}
+where $\gamma_i$ are Lagrange multipliers, and $c_1, c_2$ are 
+scalar constants.
+
+Solving the first equation gives
+$$
+\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\trAB{\hejG}{\vect{\gamma_2}}}.
+$$
+Reconciling this with the hedging equation we have
+$$
+\vzero 
+= \hejG\pvsig \pportw 
+= c_3 \hejG\pvsig \wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\trAB{\hejG}{\vect{\gamma_2}}},
+$$ 
+and therefore 
+$\vect{\gamma_2} = \minvAB{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu.$
+Thus
+$$
+\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu}.
+$$
+Plugging this into the objective reduces the problem to the
+univariate optimization
+\begin{equation*}
+\max_{c_3 :\, c_3^2 \le \fracc{\Rbuj^2}{\psnrsqoptG{\hejG}}} 
+\sign{c_3} \psnroptG{\hejG} - \frac{\rfr}{\abs{c_3}\psnroptG{\hejG}},
+\end{equation*}
+where $\psnrsqoptG{\hejG} = \qiform{\pvsig}{\pvmu} - 
+	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}.$
+The optimum
+occurs for $c = \fracc{\Rbuj}{\psnroptG{\hejG}}$, moreover the optimum
+is unique when $\rfr > 0$.
+\end{proof}%UNFOLD
+
 %UNFOLD
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
