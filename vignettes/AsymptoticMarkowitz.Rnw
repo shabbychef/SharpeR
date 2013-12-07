@@ -276,8 +276,13 @@ $\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$ The `Duplication Matrix,' \Dupp,
 is the matrix of zeros and ones that reverses this operation: 
 $\Dupp \fvech{\Mtx{A}} = \fvec{\Mtx{A}}.$ \cite{magnus1980elimination} 
 Note that this implies that 
-$$\Elim\Dupp = \eye = \Dupp\Elim.$$
-This implies that \Dupp is the Moore-Penrose pseudoinverse of \Elim.
+$$\Elim\Dupp = \eye \wrapParens{\ne \Dupp\Elim}.$$
+%This implies that \Dupp is the Moore-Penrose pseudoinverse of \Elim.
+
+Let \Unun be the `remove first' matrix, whose size should be inferred
+in context. It is a matrix of all rows but the first of the identity
+matrix. It exists to remove the first element of a vector.
+
 %Let \diag{\Mtx{A}} be the diagonal matrix with 
 %the same diagonal as \Mtx{A}. 
 %Define
@@ -307,7 +312,7 @@ For \emph{symmetric} \Mtx{A}, the derivative with respect to the
 non-redundant part is 
 \begin{equation}
 \dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
-= - \EXD{\wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}}.
+= - \EXD{\wrapParens{\minv{\Mtx{A}}\kron\minv{\Mtx{A}}}}.
 \label{eqn:deriv_vech_matrix_inverse}
 \end{equation}
 
@@ -392,7 +397,9 @@ More elaborate covariance estimators can be used, for example, to deal with
 violations of the \iid assumptions. \cite{Zeileis:2004:JSSOBK:v11i10}
 \nocite{magnus1999matrix,magnus1980elimination}
 \nocite{BrittenJones1999}
-
+Note that because the first element of 
+$\fvech{\ogram{\avreti[i]}}$ is a deterministic $1$, the first row and
+column of \pvvar is all zeros, and we need not estimate it.
 %UNFOLD
 
 \subsection{The \txtSR optimal portfolio}%FOLDUP
@@ -603,71 +610,52 @@ where $c'_{\ssiz,\nlatf}$ is the term in brackets on the third line.
 Factoring out $\fracc{-2}{\ssiz}$ and taking an exponent gives the
 result.
 \end{proof}%UNFOLD
-\begin{corollary}
+\begin{corollary}%FOLDUP
 The random variable $\ssiz\svsm$ has the same density, up to a constant 
 in \nlatf and \ssiz, as a 
 $\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
 and scale matrix \pvsm. Thus $\ssiz\svsm$ is a \emph{conditional} Wishart,
 conditional on $\svsm_{1,1} = 1$.  \cite{press2012applied,anderson2003introduction}
 %conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.  % for the other form.
-\end{corollary}
-
-\subsection{Maximum likelihood estimator}%FOLDUP
-
-%The maximum likelihood estimator of \ichol{\pvsm} is found by 
-%taking the derivative of the (log) likelihood and finding a root.
-%That is,
-%\begin{equation*}
-%\begin{split}
-%0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\ichol{\pvsm}},\\
-  %&= -2 \trminv{\wrapParens{\ichol{\pvsm[m]}}} + \ichol{\pvsm[m]}2\svsm,
-%\end{split}
-%\end{equation*}
-%leaning heavily on the Matrix Cookbook for 
-%the derivatives. \cite{petersen2012matrix}
-%This is solved by $\ichol{\pvsm[m]} = \ichol{\svsm}$, and thus the
-%na\"{i}ve sample estimate is the MLE.
-\providecommand{\txtMLE}{\mbox{MLE}}
-
-\begin{lemma}%FOLDUP
-\svsm is the maximum likelihood estimator of \pvsm. \label{lemma:theta_mle}
-\end{lemma}%UNFOLD
-\begin{proof}%FOLDUP
-The maximum likelihood estimator of \pvsm would be found by 
-taking the derivative of the (log) likelihood, given by 
-\lemmaref{theta_dist_gaussian}, with respect to
-\pvsm and finding a root. However, the derivative of log likelihood
-with respect to \pvsm is unpleasant, so instead take the derivative with
-respect to \minv{\pvsm}:
-%with respect to \pvsm is mildly unpleasant:
-%\begin{equation}
-%\begin{split}
-%\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\pvsm} 
-	%&= - \half[\ssiz]\drbydr{\logdet{\pvsm}}{\pvsm} 
-	%- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\pvsm},\\
-	%&= - \half[\ssiz]\minv{\pvsm}
-	%+ \half[\ssiz]\minv{\pvsm}\svsm\minv{\pvsm},
-%\end{split}
-%\label{eqn:mle_deadend}
-%\end{equation}
-%However, the derivative with respect to \minv{\pvsm} is a bit
-%simpler:
+\end{corollary}%UNFOLD
+\begin{corollary}%FOLDUP
+The derivatives of log likelihood are given by 
 \begin{equation}
 \begin{split}
-\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}} 
-	&= \half[\ssiz]\drbydr{\logdet{\minv{\pvsm}}}{\minv{\pvsm}} 
-	- \half[\ssiz]\drbydr{\trace{\minv{\pvsm}\svsm}}{\minv{\pvsm}},\\
-  &= \half[\ssiz]\wrapParens{{\pvsm} - {\svsm}},
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\fvec{\pvsm}} 
+	&= - \half[\ssiz]\tr{\wrapBracks{\fvec{\minv{\pvsm} -
+\minv{\pvsm}\svsm\minv{\pvsm}}}},\\
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\fvec{\minv{\pvsm}}} 
+	&= -\half[\ssiz]\tr{\wrapBracks{\fvec{\pvsm - \svsm}}}.
 \end{split}
+\label{eqn:deriv_gauss_loglik}
 \end{equation}
-where the matrix calculus follows from standard 
-results. \cite{petersen2012matrix}
-\nocite{magnus1999matrix,petersen2012matrix}
-%Note we need not take symmetry into account in the derivative, since
-%it is possible that the MLE could be non-symmetric.
-Thus \svsm is a root to the equation, and the likelihood is maximized by 
-$\pvsm[\txtMLE] = \svsm$.
+\end{corollary}%UNFOLD
+\begin{proof}%FOLDUP
+Plugging in the log likelihood gives
+\begin{equation*}
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\fvec{\pvsm}}
+ = - \half[\ssiz]\wrapBracks{\drbydr{\logdet{\pvsm}}{\fvec{\pvsm}} +
+\drbydr{\trace{\minv{\pvsm}\svsm}}{\fvec{\pvsm}}},
+\end{equation*}
+and then standard matrix calculus gives the first 
+result. \cite{magnus1999matrix,petersen2012matrix}
+Proceeding similarly gives the second.
 \end{proof}%UNFOLD
+
+This immediately gives us the Maximum Likelihood Estimator.
+
+\begin{corollary}[MLE]%FOLDUP
+\svsm is the maximum likelihood estimator of \pvsm. \label{corollary:theta_mle}
+\end{corollary}%UNFOLD
+
+To compute the covariance of \fvech{\pvsm}, \pvvar, in the Gaussian case, one
+can compute the Fisher Information, then appeal to the fact that
+\pvsm is the MLE. However, because the first element of \fvech{\pvsm}
+is a deterministic $1$, the first row and column of \pvvar are all
+zeros. This is an unfortunate wrinkle. The solution is to compute the
+Fisher Information with respect to the nonredundant variables, 
+$\Unun\fvech{\pvsm}$, as follows.
 
 %Since $\pvsm[\txtMLE] = \svsm$, the log likelihood of the MLE is 
 %\begin{equation}
@@ -681,53 +669,68 @@ $\pvsm[\txtMLE] = \svsm$.
 %\end{split}
 %\end{equation}
 
-\providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
-\providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
+%\begin{lemma}%FOLDUP
+%The Fisher Information of $\fvec{\minv{\pvsm}}$ is
+%\begin{equation}
+%\FishIf[\ssiz]{\fvec{\minv{\pvsm}}} 
+%= \half[\ssiz] {\AkronA{\pvsm}},
+%\label{eqn:itheta_fish_inf_eqn}
+%\end{equation}
+%and, by change of variables, the Fisher Information 
+%of $\fvech{\minv{\pvsm}}$ is
+%\begin{equation}
+%\FishIf[\ssiz]{\fvech{\minv{\pvsm}}} 
+%= \half[\ssiz] \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}.
+%\label{eqn:itheta_vech_fish_inf_eqn}
+%\end{equation}
+%\label{lemma:itheta_fish_inf}
+%\end{lemma}%UNFOLD
 
 \begin{lemma}%FOLDUP
-The Fisher Information of $\fvec{\minv{\pvsm}}$ is
-\begin{equation}
-\FishIf[\ssiz]{\fvec{\minv{\pvsm}}} 
-= \half[\ssiz] {\AkronA{\pvsm}},
-\label{eqn:itheta_fish_inf_eqn}
-\end{equation}
-and, by change of variables, the Fisher Information 
-of $\fvech{\minv{\pvsm}}$ is
-\begin{equation}
-\FishIf[\ssiz]{\fvech{\minv{\pvsm}}} 
-= \half[\ssiz] \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}.
-\label{eqn:itheta_vech_fish_inf_eqn}
-\end{equation}
-\label{lemma:itheta_fish_inf}
+The Fisher Information of $\Unun\fvech{\pvsm}$ is 
+\begin{multline}
+\FishIf[\ssiz]{\Unun\fvech{\pvsm}} 
+=\\ \half[\ssiz] 
+\qoform{ \qform{ \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}
+}{\wrapBracks{\EXD{\wrapParens{\minv{\pvsm}\kron\minv{\pvsm}}}}} }{\Unun}.
+\label{eqn:theta_fish_inf_eqn}
+\end{multline}
+\label{lemma:theta_fish_inf}
 \end{lemma}%UNFOLD
 \begin{proof}%FOLDUP
-First compute
-the Hessian of $\log\FOOpdf{}{\svsm}{\pvsm}$ with
-respect to $\fvech{\minv{\pvsm}}$. From the proof of
-\lemmaref{theta_mle}, 
+First compute the Hessian of $\log\FOOpdf{}{\svsm}{\pvsm}$ with
+respect to $\fvec{\minv{\pvsm}}$. The Hessian is defined as
 \begin{equation*}
-\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
- = \half[\ssiz]\wrapParens{\pvsm - \svsm}.
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvec{\minv{\pvsm}}}}
+ \defeq
+\drbydr{\tr{\wrapBracks{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\fvec{\minv{\pvsm}}}}}}{\fvec{\minv{\pvsm}}}.
 \end{equation*}
-So
+Then, from \eqnref{deriv_gauss_loglik},
 \begin{equation*}
 \begin{split}
-\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
- & \defeq
-\drbydr{\fvec{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvec{\minv{\pvsm}}},\\
- &= - \half[\ssiz] \dbyd{\pvsm - \svsm}{\fvec{\minv{\pvsm}}},\\
- &= - \half[\ssiz] \wrapParens{\AkronA{\pvsm}}.
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvec{\minv{\pvsm}}}}
+ &= - \half[\ssiz] \dbyd{\wrapBracks{\pvsm - \svsm}}{\fvec{\minv{\pvsm}}},\\
+ &= - \half[\ssiz] \wrapParens{\AkronA{\pvsm}},
 \end{split}
 \end{equation*}
-%via \lemmaref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
-%`Elimination Matrix.' \cite{magnus1980elimination}
-via \lemmaref{deriv_vech_matrix_inverse}. 
+via \lemmaref{deriv_vech_matrix_inverse}. Perform a change of variables.
+Noting that $\dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}} = \Dupp,$ we have
+\begin{equation*}
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvech{\minv{\pvsm}}}}
+ = - \half[\ssiz] \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}.
+\end{equation*}
+Using \lemmaref{deriv_vech_matrix_inverse}, perform another change of
+variables to find
+\begin{equation*}
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvech{\pvsm}}}
+ = - \half[\ssiz] 
+\qform{ \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}
+}{\wrapBracks{\EXD{\wrapParens{\minv{\pvsm}\kron\minv{\pvsm}}}}}.
+\end{equation*}
+Finally, perform the change of variables to get the Hessian with
+respect to $\Unun\fvech{\pvsm}$. 
 Since the Fisher Information is negative the expected value of this 
 Hessian, the result follows. \cite{pawitanIAL}
-
-To get the Fisher Information with respect to \fvech{\minv{\pvsm}}, apply the
-change of variables formula, using the fact that 
-$\dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}} = \Dupp.$
 \end{proof}%UNFOLD
 %\begin{corollary}%FOLDUP
 %By change of variables, and again using \lemmaref{deriv_vech_matrix_inverse}, 
@@ -746,11 +749,18 @@ Let \svsm be the unbiased sample estimate of
 Gaussian.
 Then, asymptotically in \ssiz, 
 \begin{equation}
-\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\sqrt{\ssiz}\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
 \rightsquigarrow 
-\normlaw{0,2 \minv{\wrapParens{\qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}}}}.
+\normlaw{0,\pvvar},
 \label{eqn:mvclt_isvsm_gaussian}
 \end{equation}
+where the first row and column of \pvvar are all zero, and the lower
+block part is
+\begin{equation*}
+2\minv{\wrapBracks{
+\qoform{ \qform{ \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}
+}{\wrapBracks{\EXD{\wrapParens{\minv{\pvsm}\kron\minv{\pvsm}}}}} }{\Unun}}}.
+\end{equation*}
 \label{theorem:inv_distribution_gaussian}
 \end{theorem}%UNFOLD
 \begin{proof}%FOLDUP
@@ -758,12 +768,12 @@ Under `the appropriate regularity conditions,'
 \cite{wasserman2004all,pawitanIAL}
 \begin{equation}
 \label{eqn:converge_theta}
-\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\wrapParens{\Unun\fvech{{\svsm}} - \Unun\fvech{{\pvsm}}} 
 \rightsquigarrow 
-\normlaw{0,\minv{\wrapBracks{\FishIf[\ssiz]{\fvech{\minv{\pvsm}}}}}},
+\normlaw{0,\minv{\wrapBracks{\FishIf[\ssiz]{\Unun\fvech{{\pvsm}}}}}},
 \end{equation}
 and the result follows from 
-\lemmaref{itheta_fish_inf}.
+\lemmaref{theta_fish_inf}.
 \end{proof}%UNFOLD
 
 The `plug-in' estimator of the covariance substitutes in \svsm for
@@ -802,7 +812,7 @@ Now compute the same quantities via \theoremref{inv_distribution_gaussian},
 
 
 \end{example}
-%UNFOLD
+
 
 \subsection{Likelihood ratio test on \txtMP}%FOLDUP
 
@@ -811,7 +821,7 @@ Now compute the same quantities via \theoremref{inv_distribution_gaussian},
 
 %This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
 
-consider the null hypothesis
+Consider the null hypothesis
 \begin{equation}
 H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
 \label{eqn:lrt_null_back}
@@ -819,7 +829,8 @@ H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
 The constraints have to be sensible. 
 For example, they cannot
 violate the positive definiteness of 
-\minv{\pvsm}, \etc Without loss of generality, we can assume
+\minv{\pvsm}, symmetry, \etc 
+Without loss of generality, we can assume
 that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
 symmetric \Mtx{G} and square \Mtx{H}, 
 $\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
@@ -908,7 +919,7 @@ The likelihood ratio test statistic is
 \label{eqn:wilks_lambda_def}
 \end{equation}
 using the fact that \svsm is the unrestricted MLE, per 
-\lemmaref{theta_mle}.
+\corollaryref{theta_mle}.
 By Wilks' Theorem, under the null 
 hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as 
 a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}

@@ -40,6 +40,8 @@
 # print(1000*vcov(foomod))
 # print(cov(X))
 
+require(matrixcalc)
+
 # variance covariance#FOLDUP
 #' @title Compute variance covariance of 'Unified' Second Moment 
 #'
@@ -254,8 +256,12 @@ ism_vcov <- function(X,vcov.func=vcov) {
 	dim(elim.idx) <- c((p+1)*(p+1),1)
 	elim.idx[1] <- FALSE
 
-	sub.deriv <- deriv[elim.idx,elim.idx]
-	Ohat <- t(sub.deriv) %*% sm_est$Ohat %*% sub.deriv
+	#sub.deriv <- deriv[elim.idx,elim.idx]
+	Dupp <- matrixcalc::duplication.matrix(p+1)
+	# arg!
+	Dupp <- Dupp[,2:dim(Dupp)[2]] 
+	sub.deriv <- deriv[elim.idx,] %*% Dupp
+	Ohat <- (sub.deriv) %*% sm_est$Ohat %*% t(sub.deriv)
 
 	mu <- iTheta[elim.idx]
 	strnames <- rownames(sm_est$mu)

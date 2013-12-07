@@ -29,6 +29,7 @@
 \providecommand{\tabref}[1]{Table\nobreakspace\ref{tab:#1}}
 \providecommand{\lemmaref}[1]{Lemma\nobreakspace\ref{lemma:#1}}
 \providecommand{\theoremref}[1]{Theorem\nobreakspace\ref{theorem:#1}}
+\providecommand{\corollaryref}[1]{Corollary\nobreakspace\ref{corollary:#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % meta meta commands
@@ -129,6 +130,7 @@
 \providecommand{\fvech}[1]{\vech{#1}}
 \providecommand{\Elim}[1][{}]{\MtxUL{L}{}{#1}}
 \providecommand{\Dupp}[1][{}]{\MtxUL{D}{}{#1}}
+\providecommand{\Unun}[1][{-1}]{\MtxUL{U}{}{#1}}
 \providecommand{\kron}{\MATHIT{\otimes}}
 
 \providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
@@ -781,6 +783,9 @@
 \providecommand{\NORMM}[2]{\ensuremath{\left\|{#2}\right\|_{#1}}\xspace}
 \providecommand{\norm}[2][2]{\NORMM{#1}{#2}}
 
+\providecommand{\txtMLE}{\mbox{MLE}}
+\providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
+\providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
 %
 %for vim modeline: (do not edit)
 % vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=%%s:syn=latex:ft=latex
