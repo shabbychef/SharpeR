@@ -172,6 +172,9 @@
 \providecommand{\threebyone}[3]{\wrapBracks{\begin{array}{r}{#1}\\{#2}\\{#3}\end{array}}}
 \providecommand{\onebytwo}[2]{\wrapBracks{\begin{array}{rr}{#1}&{#2}\end{array}}}
 
+\providecommand{\threebythreesym}[6]{\threebythree{#1}{#2}{#3}{\tr{#2}}{#4}{#5}{\tr{#3}}{\tr{#5}}{#6}}
+\providecommand{\threebythreessym}[6]{\threebythree{#1}{#2}{#3}{#2}{#4}{#5}{#3}{#5}{#6}}
+
 
 % idealized and conditional SNR functions
 \providecommand{\pSNRfoo}[2]{\funcit{\mathSUB{\mbox{SNR}}{#1}}{#2}}

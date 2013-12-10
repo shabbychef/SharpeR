@@ -21,6 +21,7 @@
 
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
+\newtheorem{conjecture}[theorem]{Conjecture}
 \newtheorem{example}{Example}[section]
 
 % see http://tex.stackexchange.com/a/3034/2530
@@ -755,7 +756,7 @@ Then, asymptotically in \ssiz,
 \label{eqn:mvclt_isvsm_gaussian}
 \end{equation}
 where the first row and column of \pvvar are all zero, and the lower
-block part is
+right block part
 \begin{equation*}
 2\minv{\wrapBracks{
 \qoform{ \qform{ \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}
@@ -773,13 +774,24 @@ Under `the appropriate regularity conditions,'
 \normlaw{0,\minv{\wrapBracks{\FishIf[\ssiz]{\Unun\fvech{{\pvsm}}}}}},
 \end{equation}
 and the result follows from 
-\lemmaref{theta_fish_inf}.
+\lemmaref{theta_fish_inf}, and the fact that the first elements of both
+\vech{\svsm} and \vech{\pvsm} are a deterministic $1$.
 \end{proof}%UNFOLD
 
 The `plug-in' estimator of the covariance substitutes in \svsm for
 \pvsm in the right hand side of \eqnref{mvclt_isvsm_gaussian}.
 
-\begin{example}
+\begin{conjecture}%FOLDUP
+Asymptotically in \ssiz, 
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\rightsquigarrow 
+\normlaw{0,2 \minv{\wrapBracks{\qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}}} -
+2\ogram{\basev[1]}}.
+\end{equation}
+\end{conjecture}%UNFOLD
+
+\begin{example}%FOLDUP
 To sanity check \theoremref{inv_distribution_gaussian}, 
 consider the $\nlatf = 1$ Gaussian case. In this case, 
 $$
@@ -790,8 +802,18 @@ $$
 Let $\smu, \ssig^2$ be the unbiased sample estimates. By well 
 known results \cite{spiegel2007schaum}, $\smu$ and $\ssig^2$ are independent,
 and have asymptotic variances of $\psig^2/\ssiz$ and $2\psig^4/\ssiz$ 
-respectively. By the delta method, the asymptotic variances of the elements
-of \fvech{\minv{\pvsm}} can be computed as
+respectively. By the delta method, the asymptotic variance of
+$\Unun \fvech{\svsm}$ can be computed as
+\begin{equation*}
+\begin{split}
+\VAR{\fvech{\minv{\svsm}}} &\rightsquigarrow 
+\oneby{\ssiz}\qform{\twobytwossym{\psig^2}{0}{2\psig^4}}{\twobytwo{1}{2\pmu}{0}{1}}
+= \oneby{\ssiz}\twobytwossym{\psig^2}{2\pmu\psig^2}{4\pmu^2\psig^2 + 2\psig^4}.
+\end{split}
+\end{equation*}
+
+2FIX ... 
+
 \begin{equation*}
 \begin{split}
 \VAR{1 + \frac{\smu^2}{\ssig^2}} 
@@ -811,7 +833,7 @@ of \fvech{\minv{\pvsm}} can be computed as
 Now compute the same quantities via \theoremref{inv_distribution_gaussian}, 
 
 
-\end{example}
+\end{example}%UNFOLD
 
 
 \subsection{Likelihood ratio test on \txtMP}%FOLDUP
