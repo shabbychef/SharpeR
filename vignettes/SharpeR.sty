@@ -29,6 +29,7 @@
 \providecommand{\tabref}[1]{Table\nobreakspace\ref{tab:#1}}
 \providecommand{\lemmaref}[1]{Lemma\nobreakspace\ref{lemma:#1}}
 \providecommand{\theoremref}[1]{Theorem\nobreakspace\ref{theorem:#1}}
+\providecommand{\definitionref}[1]{Definition\nobreakspace\ref{definition:#1}}
 \providecommand{\corollaryref}[1]{Corollary\nobreakspace\ref{corollary:#1}}
 \providecommand{\conjectureref}[1]{Conjecture\nobreakspace\ref{conjecture:#1}}
 
@@ -260,6 +261,9 @@
 \providecommand{\vreta}[1][]{\vectUL{\prvsyma}{}{#1}}
 \providecommand{\vretg}[1][]{\vectUL{\prvsymg}{}{#1}}
 
+% heteroskedasticity
+\providecommand{\fvola}[1][]{\mathSUB{h}{#1}}
+
 % augmented
 \providecommand{\avreti}[1][]{\vectUL{\tilde{\prvsymi}}{}{#1}}
 \providecommand{\amreti}[1][]{\MtxUL{\tilde{\MakeUppercase{\prvsymi}}}{}{#1}}
@@ -343,6 +347,8 @@
 
 \providecommand{\hejG}{\Mtx{G}}
 \providecommand{\hejg}{\vect{g}}
+\providecommand{\hejGt}{\MATHIT{\tilde{\hejG}}}
+\providecommand{\Delhej}{\mathUL{\Delta}{}{\hejG}}
 \providecommand{\nstrathej}{\nstrat[g]}
 \providecommand{\nlatfhej}{\nlatf[g]}
 
@@ -380,6 +386,10 @@
 
 \providecommand{\qqform}[3]{\qform{\qform{#1}{#2}}{#3}}
 \providecommand{\qqqform}[4]{\qform{\qform{\qform{#1}{#2}}{#3}}{#4}}
+
+\providecommand{\wrapProj}[2]{\qiform{\wrapParens{\qoform{#1}{#2}}}{#2}}
+
+
 
 % a conditional on b
 %\providecommand{\acondb}[2]{\MATHIT{#1\,\left|\,#2\right.}}
@@ -771,6 +781,7 @@
 \providecommand{\drbydr}[3][{}]{\@SEPCrbyr{\@SEPCdiffl}{#1}{#2}{#3}}
 \providecommand{\dbyd}[3][{}]{\@SEPCrbyr{\@SEPCdiffl}{#1}{#2}{#3}}
 \providecommand{\dydx}{\dbyd{y}{x}}
+\providecommand{\dvecbydvec}[3][{}]{\dbyd[#1]{\fvec{#2}}{\fvec{#3}}}
 
 %with partials d^1 2 / 3
 \providecommand{\prby}[3][{}]{\@SEPCrby{\@SEPCpartl}{#1}{#2}{#3}}

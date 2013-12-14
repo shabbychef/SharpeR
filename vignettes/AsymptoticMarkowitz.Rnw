@@ -673,6 +673,7 @@ $$
 \oneby{\psnropt}\eye[\nlatf],\mzero},
 $$
 and $\psnrsqopt \defeq \qiform{\pvsig}{\pvmu}.$
+\label{corollary:portwoptR_dist}
 \end{corollary}%UNFOLD
 \begin{proof}%FOLDUP
 By the delta method, and \theoremref{inv_distribution}, it suffices
@@ -1199,10 +1200,121 @@ occurs for $c = \fracc{\Rbuj}{\psnroptG{\hejG}}$, moreover the optimum
 is unique when $\rfr > 0$.
 \end{proof}%UNFOLD
 
+\begin{definition}[Delta Inverse Second Moment]%FOLDUP
+
+Let \hejGt be the $\wrapParens{1+\nlatfhej}\times\wrapParens{\nlatf+1}$
+matrix,
+$$
+\hejGt \defeq \twobytwossym{1}{0}{\hejG}.
+$$
+Define the `delta inverse second moment' as
+$$
+\Delhej\minv{\pvsm} \defeq \minv{\pvsm} -
+\wrapProj{\pvsm}{\hejGt}.
+$$
+\label{definition:delta_inv_second_moment}
+\end{definition}%UNFOLD
+
+Simple algebra proves the following lemma.
+
+\begin{lemma}
+The elements of $\Delhej\minv{\pvsm}$
+are 
+\begin{equation*}
+\Delhej\minv{\pvsm} =
+\twobytwo{ \qiform{\pvsig}{\pvmu} - \wrapProj{\pvsig}{\hejG} }{
+-\tr{\pvmu}\minv{\pvsig} + \tr{\pvmu}\wrapProj{\pvsig}{\hejG}}{
+-\minv{\pvsig}\pvmu + \wrapProj{\pvsig}{\hejG}\pvmu}{
+\minv{\pvsig} - \wrapProj{\pvsig}{\hejG}}.
+\end{equation*}
+%\twobytwosym{ \qiform{\pvsig}{\pvmu} - \wrapProj{\pvsig}{\hejG} }{
+%-\wrapBracks{\tr{\pvmu}\minv{\pvsig} - \tr{\pvmu}\wrapProj{\pvsig}{\hejG}}}{
+%\minv{\pvsig} - \wrapProj{\pvsig}{\hejG}}.
+In particular, elements $2$ through $\nlatf+1$ of 
+$-\fvech{\Delhej\minv{\pvsm}}$ are the portfolio $\pportwoptFoo{\Rbuj,\hejG,}$
+defined in \lemmaref{cons_sr_optimal_portfolio}, up to the scaling
+constant $c$ which is the ratio of \Rbuj to the square root of the first
+element of \fvech{\Delhej\minv{\pvsm}}.
+\end{lemma}
+
+The statistic $\qiform{\pvsig}{\pvmu} - \wrapProj{\pvsig}{\hejG}$, for the
+case where \hejG is some rows of the $\nlatf \times \nlatf$ identity matrix,
+was first proposed by Rao, and its distribution under Gaussian returns was 
+later found by Giri. \cite{rao1952,giri1964likelihood} This test statistic
+may be used for tests of portfolio \emph{spanning} for the case where a
+risk-free instrument is traded.  \cite{HKspan1987,KanZhou2012}
+
+The asymptotic distribution of $\Delhej\minv{\svsm}$ is given by the
+following theorem, which is the analogue of \theoremref{inv_distribution}.
+
+\begin{theorem}%FOLDUP
+Let \svsm be the unbiased sample estimate of 
+\pvsm, based on \ssiz \iid samples of \vreti. Let $\Delhej\minv{\pvsm}$
+be defined as in \definitionref{delta_inv_second_moment}, and similarly
+define $\Delhej\minv{\svsm}$.  Let \pvvar be the variance of 
+$\fvech{\ogram{\avreti}}$.  Then, asymptotically in \ssiz, 
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\Delhej\minv{\svsm}} - \fvech{\Delhej\minv{\pvsm}}} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\label{eqn:mvclt_hej_isvsm}
+\end{equation}
+where
+\begin{equation*}
+\Mtx{H} = - \EXD{\wrapBracks{\AkronA{\minv{\pvsm}} - 
+\wrapParens{\AkronA{\tr{\hejGt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}}
+\wrapParens{\AkronA{\hejGt}}}}.
+\end{equation*}
+\label{theorem:delhej_inv_distribution}
+\end{theorem}%UNFOLD
+\begin{proof}%FOLDUP
+By the multivariate delta method, it suffices to prove that
+$$
+\Mtx{H} = \dbyd{\fvech{\Delhej\minv{\pvsm}}}{\fvech{\pvsm}}.
+$$
+Via \lemmaref{deriv_vech_matrix_inverse}, and the proof of 
+\theoremref{inv_distribution}, it suffices to prove that
+$$
+\dbyd{\fvec{\wrapProj{\pvsm}{\hejGt}}}{\fvec{\pvsm}} = 
+-\wrapParens{\AkronA{\tr{\hejGt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}}
+\wrapParens{\AkronA{\hejGt}}.
+$$
+
+A well-known fact regarding matrix manipulation \cite{magnus1999matrix} is
+$$
+\fvec{\Mtx{A}\Mtx{B}\Mtx{C}} = \wrapParens{\Mtx{A}\kron\tr{\Mtx{C}}}
+\fvec{\Mtx{B}},\quad\mbox{and, therefore,}\quad
+\dvecbydvec{\Mtx{A}\Mtx{B}\Mtx{C}}{\Mtx{B}} = \Mtx{A}\kron\tr{\Mtx{C}}.
+$$
+Using this, and the chain rule, we have:
+\begin{equation*}
+\begin{split}
+\dbyd{\fvec{\wrapProj{\pvsm}{\hejGt}}}{\fvec{\pvsm}} 
+&=
+\dvecbydvec{\wrapProj{\pvsm}{\hejGt}}{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}} 
+\dvecbydvec{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
+\dvecbydvec{\qoform{\pvsm}{\hejGt}}{\pvsm}\\
+&= 
+\wrapParens{\AkronA{\tr{\hejGt}}} 
+\dvecbydvec{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
+\wrapParens{\AkronA{\hejGt}}.
+\end{split}
+\end{equation*}
+\lemmaref{deriv_vech_matrix_inverse} gives the middle term, completing the
+proof.
+\end{proof}
+An analogue of \corollaryref{portwoptR_dist} gives the asymptotic 
+distribution of $\pportwoptFoo{\Rbuj,\hejG,}$
+defined in \lemmaref{cons_sr_optimal_portfolio}.
 %UNFOLD
 
 \subsection{Conditional Heteroskedasticity}%FOLDUP
 
+One possible deficiency of the above analysis is that it ignores
+`voltility clustering'. \cite{stylized_facts} To deal with this,
+consider a scalar volatility indicator, \fvola[i]. This is a random
+variable which is observable at the time the investment decision is
+required to capture \vreti[i+1].
 %UNFOLD
 
 \subsection{Conditional Expectation}%FOLDUP
