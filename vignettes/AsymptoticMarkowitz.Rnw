@@ -303,6 +303,7 @@ lseq <- function(from,to,length.out) {
     %UNFOLD
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % document incantations%FOLDUP
 \begin{document}
 
@@ -313,6 +314,7 @@ lseq <- function(from,to,length.out) {
 \maketitle
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}%FOLDUP
 The asymptotic distribution of the \txtMP, \minvAB{\svsig}{\svmu},
 is derived, for the general case (assuming fourth moments of returns exist), 
@@ -323,7 +325,9 @@ can estimate the proportion of error in the \txtMP due to
 mis-estimation of the covariance matrix. A likelihood ratio test is given
 which generalizes Dempster's Covariance Selection test to allow inference
 on linear combinations of the precision matrix and the 
-\txtMP. \cite{dempster1972}
+\txtMP. \cite{dempster1972} Extensions of the main method to deal with
+hedged portfolios, conditional heteroskedasticity, and conditional 
+expectation are given.
 \end{abstract}%UNFOLD
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -502,7 +506,8 @@ For matrices \Mtx{X} and \Mtx{Y}, let
 \begin{lemma}[Derivative of matrix inverse]%FOLDUP
 For invertible matrix \Mtx{A}, 
 \begin{equation}
-\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}} 
+\dbyd{\minv{\Mtx{A}}}{\Mtx{A}} = 
+%\dvecbydvec{\minv{\Mtx{A}}}{\Mtx{A}}
 = - \wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}
 = - \minv{\wrapParens{\tr{\Mtx{A}}\kron\Mtx{A}}}.
 \label{eqn:deriv_vec_matrix_inverse}
@@ -544,6 +549,7 @@ $$
 The asymptotic distribution of \minv{\pvsm} then follows from standard
 techniques.
 \begin{theorem}%FOLDUP
+\label{theorem:inv_distribution}
 Let \svsm be the unbiased sample estimate of 
 \pvsm, based on \ssiz \iid samples of \vreti.
 Let \pvvar be the variance of $\fvech{\ogram{\avreti}}$.
@@ -558,7 +564,6 @@ Then, asymptotically in \ssiz,
 %\end{equation}
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
-\label{theorem:inv_distribution}
 \end{theorem}%UNFOLD
 \begin{proof}%FOLDUP
 Under the multivariate central limit theorem \cite{wasserman2004all}
@@ -604,6 +609,7 @@ column of \pvvar is all zeros, and we need not estimate it.
 \subsection{The \txtSR optimal portfolio}%FOLDUP
 
 \begin{lemma}[\txtSR optimal portfolio]%FOLDUP
+\label{lemma:sr_optimal_portfolio}
 Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
 the portfolio optimization problem
 \begin{equation}
@@ -619,7 +625,6 @@ for $\rfr \ge 0, \Rbuj > 0$ is solved by
 Moreover, this is the unique solution whenever $\rfr > 0$.
 The maximal objective achieved by this portfolio is
 $\sqrt{\qiform{\pvsig}{\pvmu}} - \fracc{\rfr}{\Rbuj}$.
-\label{lemma:sr_optimal_portfolio}
 \end{lemma}%UNFOLD
 \begin{proof}%FOLDUP
 By the Lagrange multiplier technique, the optimal portfolio
@@ -700,7 +705,7 @@ multivariate Gaussian distribution. First,
 assuming $\vreti\sim\normlaw{\pvmu,\pvsig}$, we can express the density
 of \vreti, and of \svsm, in terms of \nlatf, \ssiz, and \pvsm.
 
-\begin{lemma}%FOLDUP
+\begin{lemma}[Gaussian sample density]%FOLDUP
 Suppose $\vreti\sim\normlaw{\pvmu,\pvsig}$. Letting 
 $\avreti = \asvec{1,\tr{\vreti}}$, and $\pvsm = \E{\ogram{\avreti}}$,
 then the negative log likelihood of \vreti is
@@ -750,7 +755,7 @@ and the result follows.
 \end{proof}
 %UNFOLD
 
-\begin{lemma}%FOLDUP
+\begin{lemma}[Gaussian second moment matrix density]%FOLDUP
 Let $\vreti\sim\normlaw{\pvmu,\pvsig}$, 
 $\avreti = \asvec{1,\tr{\vreti}}$, 
 and $\pvsm = \E{\ogram{\avreti}}$. 
@@ -886,7 +891,7 @@ $\Unun\fvech{\pvsm}$, as follows.
 %\label{lemma:itheta_fish_inf}
 %\end{lemma}%UNFOLD
 
-\begin{lemma}%FOLDUP
+\begin{lemma}[Fisher Information]%FOLDUP
 The Fisher Information of $\Unun\fvech{\pvsm}$ is 
 \begin{multline}
 \FishIf[\ssiz]{\Unun\fvech{\pvsm}} 
@@ -978,10 +983,12 @@ and the result follows from
 \end{proof}%UNFOLD
 
 The `plug-in' estimator of the covariance substitutes in \svsm for
-\pvsm in the right hand side of \eqnref{mvclt_isvsm_gaussian}.
+\pvsm in the right hand side of \eqnref{mvclt_isvsm_gaussian}. 
+The following conjecture is true in the $\nlatf=1$ case. Use of 
+the Sherman-Morrison-Woodbury formula might aid in a proof.
 
 \begin{conjecture}%FOLDUP
-Asymptotically in \ssiz, 
+For the Gaussian case, asymptotically in \ssiz, 
 \begin{equation}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow 
@@ -1107,6 +1114,7 @@ a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
 %UNFOLD
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Extensions}%FOLDUP
 
 The technique outlined above admits a number of interesting extensions.
@@ -1284,19 +1292,19 @@ A well-known fact regarding matrix manipulation \cite{magnus1999matrix} is
 $$
 \fvec{\Mtx{A}\Mtx{B}\Mtx{C}} = \wrapParens{\Mtx{A}\kron\tr{\Mtx{C}}}
 \fvec{\Mtx{B}},\quad\mbox{and, therefore,}\quad
-\dvecbydvec{\Mtx{A}\Mtx{B}\Mtx{C}}{\Mtx{B}} = \Mtx{A}\kron\tr{\Mtx{C}}.
+\dbyd{\Mtx{A}\Mtx{B}\Mtx{C}}{\Mtx{B}} = \Mtx{A}\kron\tr{\Mtx{C}}.
 $$
 Using this, and the chain rule, we have:
 \begin{equation*}
 \begin{split}
-\dbyd{\fvec{\wrapProj{\pvsm}{\hejGt}}}{\fvec{\pvsm}} 
+\dbyd{\wrapProj{\pvsm}{\hejGt}}{\pvsm} 
 &=
-\dvecbydvec{\wrapProj{\pvsm}{\hejGt}}{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}} 
-\dvecbydvec{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
-\dvecbydvec{\qoform{\pvsm}{\hejGt}}{\pvsm}\\
+\dbyd{\wrapProj{\pvsm}{\hejGt}}{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}} 
+\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
+\dbyd{\qoform{\pvsm}{\hejGt}}{\pvsm}\\
 &= 
 \wrapParens{\AkronA{\tr{\hejGt}}} 
-\dvecbydvec{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
+\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
 \wrapParens{\AkronA{\hejGt}}.
 \end{split}
 \end{equation*}
@@ -1308,16 +1316,212 @@ distribution of $\pportwoptFoo{\Rbuj,\hejG,}$
 defined in \lemmaref{cons_sr_optimal_portfolio}.
 %UNFOLD
 
+%UNFOLD
 \subsection{Conditional Heteroskedasticity}%FOLDUP
 
-One possible deficiency of the above analysis is that it ignores
-`voltility clustering'. \cite{stylized_facts} To deal with this,
-consider a scalar volatility indicator, \fvola[i]. This is a random
-variable which is observable at the time the investment decision is
-required to capture \vreti[i+1].
+The methods described above ignore `volatility clustering', and assume
+homoskedasticity. \cite{stylized_facts} To deal with this,
+consider a strictly positive scalar random variable, \fvola[i], 
+observable at the time the investment decision is
+required to capture \vreti[i+1]. For reasons to be obvious later, it 
+is more convenient to think of \fvola[i] as a `quietude' indicator.
+
+Two simple competing models for conditional heteroskedasticity are
+\begin{align}
+\label{eqn:cond_model_I}
+\mbox{(constant):}\quad \Econd{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-1}\pvmu & \Varcond{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-2} \pvsig,\\
+\label{eqn:cond_model_II}
+\mbox{(floating):}\quad \Econd{\vreti[i+1]}{\fvola[i]} &=
+\pvmu & \Varcond{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-2} \pvsig.
+\end{align}
+Under the model in \eqnref{cond_model_I}, the maximal \txtSR
+is $\sqrt{\qiform{\pvsig}{\pvmu}}$, independent of \fvola[i];
+under \eqnref{cond_model_II}, it is 
+is $\fvola[i]\sqrt{\qiform{\pvsig}{\pvmu}}$, thus the names.
+
+The optimal portfolio under both models is the same, as stated
+in the following lemma, the proof of which follows exactly as that of 
+\lemmaref{sr_optimal_portfolio}.
+
+\begin{lemma}[Conditional \txtSR optimal portfolio]%FOLDUP
+\label{lemma:cond_sr_optimal_portfolio_I}
+Under either the model in \eqnref{cond_model_I} or \eqnref{cond_model_II}, 
+conditional on observing \fvola[i], the portfolio optimization problem
+\begin{equation}
+\argmax_{\pportw :\, \Varcond{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i]} \le \Rbuj^2} 
+\frac{\Econd{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i]} -
+\rfr}{\sqrt{\Varcond{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i]}}},
+\label{eqn:cond_sr_optimal_portfolio_problem_I}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+\begin{equation}
+\pportwopt = \frac{\fvola[i] \Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
+\minvAB{\pvsig}{\pvmu}.
+\end{equation}
+Moreover, this is the unique solution whenever $\rfr > 0$.
+\end{lemma}%UNFOLD
+
+To perform inference on the portfolio \pportwopt from 
+\lemmaref{cond_sr_optimal_portfolio_I}, under the `constant'
+model of \eqnref{cond_model_I}, apply the unconditional techniques
+to the sample second moment of $\fvola[i]\avreti[i+1]$. 
+
+For
+the `floating' model of \eqnref{cond_model_II}, however, some 
+adjustment to the technique is required.
+Define $\aavreti[i+1] \defeq \fvola[i]\avreti[i+1]$; that is,
+$\aavreti[i+1] = \asvec{\fvola[i],\fvola[i]\tr{\vreti[i+1]}}$. 
+Consider the second moment of \aavreti:
+\begin{equation}
+\pvsm[{\fvola}] \defeq \E{\ogram{\aavreti}} = 
+	\twobytwo{\volavar}{\volavar\tr{\pvmu}}{\volavar\pvmu}{\pvsig +
+\qoform{\volavar}{\pvmu}},\quad\mbox{where}\quad
+\volavar \defeq \E{\fvola^2}.
+%\label{eqn:pvsm_def}
+\end{equation}
+The inverse of \pvsm[{\fvola}] is
+\begin{equation}
+\minv{\pvsm[{\fvola}]} 
+= \twobytwo{\volaivar + \qiform{\pvsig}{\pvmu}}{-\tr{\pvmu}\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{\minv{\pvsig}}
+%= \twobytwo{1 + \psnrsqopt}{-\tr{\pportwopt}}{-\pportwopt}{\minv{\pvsig}},
+\label{eqn:new_trick_inversion}
+\end{equation}
+Once again, the optimal portfolio (up to scaling and sign), appears in
+\fvech{\minv{\pvsm[{\fvola}]}}.
+Similarly, define the sample analogue:
+\begin{equation}
+\svsm[{\fvola}] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}.
+\end{equation}
+We can find the asymptotic distribution of \fvech{\svsm[{\fvola}]}
+using the same techniques as in the unconditional case, as in the
+following analogue of \theoremref{inv_distribution}:
+
+\begin{theorem}%FOLDUP
+\label{theorem:cond_inv_distribution}
+Let $\svsm[{\fvola}] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}$,
+based on \ssiz \iid samples of \asvec{\fvola,\vreti}.
+Let \pvvar be the variance of $\fvech{\ogram{\aavreti}}$.
+Then, asymptotically in \ssiz, 
+%\begin{equation}
+\begin{multline}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\fvola}]}} -
+\fvech{\minv{\pvsm[{\fvola}]}}} 
+\rightsquigarrow \\
+\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\fvola}]}}}}}}}.
+\label{eqn:cond_mvclt_isvsm}
+\end{multline}
+%\end{equation}
+Furthermore, we may replace \pvvar in this equation with an asymptotically
+consistent estimator, \svvar.
+\end{theorem}%UNFOLD
+
+The only real difference from the unconditional case is that we cannot
+automatically assume that the first row and column of \pvvar is zero
+(unless \fvola is actually constant, which misses the point). Moreover,
+the shortcut for estimating \pvvar under Gaussian returns is not 
+valid without some patching, an exercise left for the reader.
+
+Dependence or independence of maximal \txtSR from 
+volatility is an assumption which, ideally, one could test with
+data. A mixed model containing both characteristics can be written
+as follows:
+\begin{align}
+\label{eqn:cond_model_III}
+\mbox{(mixed):}\quad \Econd{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-1}\pvmu[0] + \pvmu[1] & \Varcond{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-2} \pvsig.
+\end{align}
+One could then test whether elements of $\pvmu[0]$ or of $\pvmu[1]$ are
+zero. Analyzing this model is somewhat complicated without moving to a
+more general framework, as in the sequel.
+
 %UNFOLD
 
-\subsection{Conditional Expectation}%FOLDUP
+\subsection{Conditional Expectation and Heteroskedasticity}%FOLDUP
+
+Suppose you observe random variables $\fvola[i] > 0$, and 
+\nfac-vector $\vfact[i]$ at some time prior to when the investment
+decision is required to capture \vreti[i+1]. It need not be the case
+that \fvola[{}] and \vfact[{}] are independent. The general model
+is now
+\begin{align}
+\label{eqn:cond_model_IV}
+\mbox{(bi-conditional):}\quad 
+\Econd{\vreti[i+1]}{\fvola[i],\vfact[i]} &=
+\pRegco \vfact[i] &
+\Varcond{\vreti[i+1]}{\fvola[i],\vfact[i]} &=
+\fvola[i]^{-2} \pvsig,
+\end{align}
+where \pRegco is some $\nlatf \times \nfac$ matrix. By letting
+$\vfact[i] = \asvec{\fvola[i]^{-1},1}$ we recover 
+the mixed model in \eqnref{cond_model_III}. However, this model is
+considerably more general.  The conditionally-optimal portfolio
+is given by the following lemma.
+
+\begin{lemma}[Conditional \txtSR optimal portfolio]%FOLDUP
+\label{lemma:cond_sr_optimal_portfolio_II}
+Under the model in \eqnref{cond_model_IV},
+conditional on observing \fvola[i] and \vfact[i], 
+the portfolio optimization problem
+\begin{equation}
+\argmax_{\pportw :\, \Varcond{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i],\vfact[i]} \le \Rbuj^2} 
+\frac{\Econd{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i],\vfact[i]} -
+\rfr}{\sqrt{\Varcond{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i],\vfact[i]}}},
+\label{eqn:cond_sr_optimal_portfolio_problem_I}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+\begin{equation}
+\pportwopt = \frac{\fvola[i]
+\Rbuj}{\sqrt{\qform{\qiform{\pvsig}{\pRegco}}{\vfact[i]}}}
+\minvAB{\pvsig}{\pRegco\vfact[i]}.
+\end{equation}
+Moreover, this is the unique solution whenever $\rfr > 0$.
+\end{lemma}%UNFOLD
+The matrix \minvAB{\pvsig}{\pRegco} is the generalization of the
+Markowitz portfolio: it is the multiplier for a model under which
+the optimal portfolio is linear in the features \vfact[i] (up to
+scaling to satisfy the risk budget). We can think of this matrix
+as the `Markowitz coefficient'. If an entire column of 
+\minvAB{\pvsig}{\pRegco} is zero, it suggests that the 
+corresponding element of \vfact[{}] can be ignored in investment
+decisions; if an entire row of \minvAB{\pvsig}{\pRegco} is zero,
+it suggests the corresponding instrument delivers no return or
+hedging benefit.
+
+{\bf Caution:} It is emphatically \emph{not} the case that 
+investing in the portfolio \pportwopt from 
+\lemmaref{cond_sr_optimal_portfolio_II} at every time step 
+is long-term \txtSR optimal. One may possibly achieve a higher long-term
+\txtSR by down-levering at times when the conditional \txtSR is low.
+This is an area of active research.
+
+To perform inference on the Markowitz coefficient, we can proceed
+exactly as above. Let
+\begin{equation}
+\aavreti[i+1] \defeq \asvec{\fvola[i]\tr{\vfact[i]},\fvola[i]\tr{\vreti[i+1]}}.
+\end{equation}
+Consider the second moment of \aavreti:
+\begin{equation}
+\pvsm[f] \defeq \E{\ogram{\aavreti}} = 
+	\twobytwo{\pfacsig}{\pfacsig\tr{\pRegco}}{\pRegco\pfacsig}{\pvsig +
+\qoform{\pfacsig}{\pRegco}},\quad\mbox{where}\quad
+\pfacsig \defeq \E{\fvola[{}]\ogram{\vfact[{}]}}.
+%\label{eqn:pvsm_def}
+\end{equation}
+
+The inverse of \pvsm[f] is
+\begin{equation}
+\minv{\pvsm[f]}
+= \twobytwo{\minv{\pfacsig} +
+\qiform{\pvsig}{\pRegco}}{-\tr{\pRegco}\minv{\pvsig}}{-\minv{\pvsig}\pRegco}{\minv{\pvsig}}
+\label{eqn:new_new_trick_inversion}
+\end{equation}
+Once again, the optimal portfolio (up to scaling and sign), appears in
+\fvech{\minv{\pvsm[f]}}
+
 
 %UNFOLD
 %UNFOLD
@@ -1411,6 +1615,7 @@ required to capture \vreti[i+1].
 \bibliography{AsymptoticMarkowitz}
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix%FOLDUP
 
 \section{Confirming the scalar Gaussian case}

@@ -100,7 +100,7 @@
 
 \providecommand{\setwo}[2]{\MATHIT{\left\{ #1 \left|\; {#2} \right.\right\}}}
 
-\providecommand{\defeq}{=_{\mbox{df}}}
+\providecommand{\defeq}{=_{\operatorname{df}}}
 \providecommand{\kth}[1]{\MATHIT{#1^{\text{th}}}}
 
 
@@ -124,9 +124,9 @@
 
 % all commands%FOLDUP
 % vector operator
-\providecommand{\vecop}[1]{\funcit{\mbox{vec}}{#1}}
+\providecommand{\vecop}[1]{\funcit{\operatorname{vec}}{#1}}
 %\providecommand{\vec}[1]{\funcit{\mbox{vec}}{#1}}
-\providecommand{\vech}[1]{\funcit{\mbox{vech}}{#1}}  % Magnus writes as v( )
+\providecommand{\vech}[1]{\funcit{\operatorname{vech}}{#1}}  % Magnus writes as v( )
 
 \providecommand{\fvec}[1]{\vecop{#1}}
 \providecommand{\fvech}[1]{\vech{#1}}
@@ -263,10 +263,14 @@
 
 % heteroskedasticity
 \providecommand{\fvola}[1][]{\mathSUB{h}{#1}}
+\providecommand{\volafoo}[2]{\mathUL{\gamma}{#1}{#2}}
+\providecommand{\volavar}[1][]{\volafoo{2}{#1}}
+\providecommand{\volaivar}[1][]{\volafoo{-2}{#1}}
 
 % augmented
 \providecommand{\avreti}[1][]{\vectUL{\tilde{\prvsymi}}{}{#1}}
 \providecommand{\amreti}[1][]{\MtxUL{\tilde{\MakeUppercase{\prvsymi}}}{}{#1}}
+\providecommand{\aavreti}[1][]{\vectUL{\tilde{\tilde{\prvsymi}}}{}{#1}}
 
 % transpose of same
 \providecommand{\trvreti}[1][]{\vectUL{\prvsymi}{\top}{#1}}
@@ -293,6 +297,7 @@
 \providecommand{\vfact}[1][t]{\vectUL{\prvsymf}{}{#1}}
 \providecommand{\trvfact}[1][t]{\vectUL{\prvsymf}{\top}{#1}}
 \providecommand{\mfact}[1][]{\MtxUL{\MakeUppercase{\prvsymf}}{}{#1}}
+
 
 % distribution of factor
 \providecommand{\pfacmu}{\vectUL{\prvMean}{}{f}}
@@ -394,6 +399,8 @@
 % a conditional on b
 %\providecommand{\acondb}[2]{\MATHIT{#1\,\left|\,#2\right.}}
 \providecommand{\acondb}[2]{\MATHIT{#1\left|\,#2\right.}}
+\providecommand{\Econd}[2]{\E{\acondb{#1}{#2}}}
+\providecommand{\Varcond}[2]{\VAR{\acondb{#1}{#2}}}
 
 % sample statistics%FOLDUP
 \providecommand{\smean}[1]{\MATHIT{\bar{#1}}}
@@ -663,7 +670,7 @@
 %\providecommand{\E}[1]{\MATHIT{\mbox{\large E}\wrapNeBracks{#1}}}
 %%\providecommand{\E}[1]{\ensuremath{\operatorname{E}\left[#1\right]}}
 \providecommand{\E}[1]{\MATHIT{\operatorname{E}\wrapNeBracks{#1}}}
-\providecommand{\VAR}[1]{\funcit{\mbox{Var}}{#1}}
+\providecommand{\VAR}[1]{\funcit{\operatorname{Var}}{#1}}
 \providecommand{\GAM}[1]{\MATHIT{\Gamma\wrapNeParens{#1}}}
 \providecommand{\skewness}[1]{\funcit{\mbox{skew}}{#1}}
 \providecommand{\exkurt}[1]{\funcit{\mbox{ex\,kurtosis}}{#1}}
