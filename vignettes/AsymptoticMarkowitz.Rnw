@@ -24,6 +24,11 @@
 \newtheorem{conjecture}[theorem]{Conjecture}
 \newtheorem{example}{Example}[section]
 
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{caution}{Caution}
+\newtheorem*{note}{Note}
+
 % see http://tex.stackexchange.com/a/3034/2530
 \PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
 \usepackage{hyperref}
@@ -1343,7 +1348,7 @@ under \eqnref{cond_model_II}, it is
 is $\fvola[i]\sqrt{\qiform{\pvsig}{\pvmu}}$, thus the names.
 
 The optimal portfolio under both models is the same, as stated
-in the following lemma, the proof of which follows exactly as that of 
+in the following lemma, the proof of which follows by simply using
 \lemmaref{sr_optimal_portfolio}.
 
 \begin{lemma}[Conditional \txtSR optimal portfolio]%FOLDUP
@@ -1402,7 +1407,7 @@ following analogue of \theoremref{inv_distribution}:
 \begin{theorem}%FOLDUP
 \label{theorem:cond_inv_distribution}
 Let $\svsm[{\fvola}] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}$,
-based on \ssiz \iid samples of \asvec{\fvola,\vreti}.
+based on \ssiz \iid samples of \asvec{\fvola,\tr{\vreti}}.
 Let \pvvar be the variance of $\fvech{\ogram{\aavreti}}$.
 Then, asymptotically in \ssiz, 
 %\begin{equation}
@@ -1457,9 +1462,11 @@ is now
 \end{align}
 where \pRegco is some $\nlatf \times \nfac$ matrix. By letting
 $\vfact[i] = \asvec{\fvola[i]^{-1},1}$ we recover 
-the mixed model in \eqnref{cond_model_III}. However, this model is
-considerably more general.  The conditionally-optimal portfolio
-is given by the following lemma.
+the mixed model in \eqnref{cond_model_III}; the bi-conditional model
+is considerably more general, however.  The conditionally-optimal portfolio
+is given by the following lemma. Once again, the proof proceeds simply
+by plugging in the conditional expected return and volatility into
+\lemmaref{sr_optimal_portfolio}.
 
 \begin{lemma}[Conditional \txtSR optimal portfolio]%FOLDUP
 \label{lemma:cond_sr_optimal_portfolio_II}
@@ -1480,6 +1487,16 @@ for $\rfr \ge 0, \Rbuj > 0$ is solved by
 \end{equation}
 Moreover, this is the unique solution whenever $\rfr > 0$.
 \end{lemma}%UNFOLD
+
+\begin{caution}
+It is emphatically \emph{not} the case that 
+investing in the portfolio \pportwopt from 
+\lemmaref{cond_sr_optimal_portfolio_II} at every time step 
+is long-term \txtSR optimal. One may possibly achieve a higher long-term
+\txtSR by down-levering at times when the conditional \txtSR is low.
+This is an area of active research.
+\end{caution}
+
 The matrix \minvAB{\pvsig}{\pRegco} is the generalization of the
 Markowitz portfolio: it is the multiplier for a model under which
 the optimal portfolio is linear in the features \vfact[i] (up to
@@ -1491,12 +1508,10 @@ decisions; if an entire row of \minvAB{\pvsig}{\pRegco} is zero,
 it suggests the corresponding instrument delivers no return or
 hedging benefit.
 
-{\bf Caution:} It is emphatically \emph{not} the case that 
-investing in the portfolio \pportwopt from 
-\lemmaref{cond_sr_optimal_portfolio_II} at every time step 
-is long-term \txtSR optimal. One may possibly achieve a higher long-term
-\txtSR by down-levering at times when the conditional \txtSR is low.
-This is an area of active research.
+2FIX:
+A typical analysis from MGLH land ... 
+\cite{Rencher2002,Muller1984143}
+
 
 To perform inference on the Markowitz coefficient, we can proceed
 exactly as above. Let
@@ -1508,10 +1523,9 @@ Consider the second moment of \aavreti:
 \pvsm[f] \defeq \E{\ogram{\aavreti}} = 
 	\twobytwo{\pfacsig}{\pfacsig\tr{\pRegco}}{\pRegco\pfacsig}{\pvsig +
 \qoform{\pfacsig}{\pRegco}},\quad\mbox{where}\quad
-\pfacsig \defeq \E{\fvola[{}]\ogram{\vfact[{}]}}.
+\pfacsig \defeq \E{\fvola[{}]^2\ogram{\vfact[{}]}}.
 %\label{eqn:pvsm_def}
 \end{equation}
-
 The inverse of \pvsm[f] is
 \begin{equation}
 \minv{\pvsm[f]}
@@ -1519,10 +1533,31 @@ The inverse of \pvsm[f] is
 \qiform{\pvsig}{\pRegco}}{-\tr{\pRegco}\minv{\pvsig}}{-\minv{\pvsig}\pRegco}{\minv{\pvsig}}
 \label{eqn:new_new_trick_inversion}
 \end{equation}
-Once again, the optimal portfolio (up to scaling and sign), appears in
-\fvech{\minv{\pvsm[f]}}
+Once again, the Markowitz coefficient (up to scaling and sign), appears in
+\fvech{\minv{\pvsm[f]}}.
 
-
+\begin{theorem}%FOLDUP
+\label{theorem:cond_inv_distribution_II}
+Let $\svsm[f] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}$,
+based on \ssiz \iid samples of \asvec{\fvola,\tr{\vfact[{}]},\tr{\vreti}},
+where 
+$$
+\aavreti[i+1] \defeq \asvec{\fvola[i]\tr{\vfact[i]},\fvola[i]\tr{\vreti[i+1]}}.
+$$
+Let \pvvar be the variance of $\fvech{\ogram{\aavreti}}$.
+Then, asymptotically in \ssiz, 
+%\begin{equation}
+\begin{multline}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[f]}} -
+\fvech{\minv{\pvsm[f]}}} 
+\rightsquigarrow \\
+\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm[f]}}}}}}}.
+\label{eqn:cond_mvclt_isvsm_II}
+\end{multline}
+%\end{equation}
+Furthermore, we may replace \pvvar in this equation with an asymptotically
+consistent estimator, \svvar.
+\end{theorem}%UNFOLD
 %UNFOLD
 %UNFOLD
 

@@ -637,10 +637,12 @@
 \providecommand{\serr}[1][]{\mathSUB{\hat{\epsilon}}{#1}}
 
 % multivariate regression;
-\providecommand{\pRegco}[1][]{\mathSUB{B}{#1}}
+\providecommand{\prvRegsym}{B}
+\providecommand{\pRegco}[1][]{\MtxUL{\prvRegsym}{}{#1}}
+\providecommand{\sRegco}[1][]{\MtxUL{\hat{\prvRegsym}}{}{#1}}
+
 \providecommand{\pErr}[1][]{\mathSUB{E}{#1}}
 \providecommand{\pErrt}[1][t]{\pErr[#1]}
-\providecommand{\sRegco}[1][]{\mathSUB{\hat{B}}{#1}}
 \providecommand{\sErr}[1][]{\mathSUB{\hat{E}}{#1}}
 
 %UNFOLD
