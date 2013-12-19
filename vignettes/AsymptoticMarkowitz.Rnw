@@ -458,17 +458,9 @@ whose rows are the vectors \tr{\avreti[i]}. The na\"{i}ve sample estimator
 \end{equation}
 is an unbiased estimator since $\pvsm = \E{\gram{\avreti}}$.
 
-\subsection{Asymptotic distribution of the \txtMP}%FOLDUP
+\subsection{Matrix Derivatives}%FOLDUP
 
-\label{subsec:dist_markoport}
-\nocite{BrittenJones1999}
-
-Collecting the mean and covariance into the second moment matrix 
-gives the asymptotic distribution of the sample \txtMP
-without much work. In some sense, this computation
-generalizes the `standard' asymptotic analysis of Sharpe ratio of
-multiple assets. \cite{jobsonkorkie1981,lo2002,Ledoit2008850,Leung2008} 
-%\cite{jobsonkorkie1981,lo2002,mertens2002comments,Ledoit2008850,Leung2008,Wright2012} 
+\label{subsec:matrix_derivatives}
 
 Some notation and technical results concerning matrices are required.
 \begin{definition}[Matrix operations]%FOLDUP
@@ -502,17 +494,40 @@ matrix. It exists to remove the first element of a vector.
 For $m$-vector \vect{x}, and $n$-vector \vect{y}, let the derivative
 \dbyd{\vect{y}}{\vect{x}} be the $n\times m$ matrix whose first column
 is the partial derivative of \vect{y} with respect to $x_1$.  
-This follows the so-called `numerator layout'. 
-For matrices \Mtx{X} and \Mtx{Y}, let
+This follows the so-called `numerator layout' convention. 
+For matrices \Mtx{Y} and \Mtx{X}, define
 \begin{equation*}
 \dbyd{\Mtx{Y}}{\Mtx{X}} \defeq \dbyd{\fvec{\Mtx{Y}}}{\fvec{\Mtx{X}}}.
 \end{equation*}
 \end{definition}%UNFOLD
+\begin{lemma}[Miscellaneous Derivatives]%FOLDUP
+For symmetric matrices \Mtx{Y} and \Mtx{X}, 
+%\begin{align}
+%\dbyd{\fvech{\Mtx{Y}}}{\fvec{\Mtx{X}}} &= \Elim \dbyd{\Mtx{Y}}{\Mtx{X}},\\
+%\dbyd{\fvec{\Mtx{Y}}}{\fvech{\Mtx{X}}} &= \dbyd{\Mtx{Y}}{\Mtx{X}}\Dupp,\\
+%\dbyd{\fvech{\Mtx{Y}}}{\fvech{\Mtx{X}}} &= \EXD{\dbyd{\Mtx{Y}}{\Mtx{X}}}.
+%\end{align}
+\begin{equation}
+\dbyd{\fvech{\Mtx{Y}}}{\fvec{\Mtx{X}}} = \Elim \dbyd{\Mtx{Y}}{\Mtx{X}},\quad
+\dbyd{\fvec{\Mtx{Y}}}{\fvech{\Mtx{X}}} = \dbyd{\Mtx{Y}}{\Mtx{X}}\Dupp,\quad
+\dbyd{\fvech{\Mtx{Y}}}{\fvech{\Mtx{X}}} = \EXD{\dbyd{\Mtx{Y}}{\Mtx{X}}}.
+\end{equation}
+\label{lemma:misc_derivs}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+For the first equation, note that 
+$\fvech{\Mtx{Y}} = \Elim\fvec{\Mtx{Y}}$, thus by the chain rule:
+$$
+\dbyd{\fvech{\Mtx{Y}}}{\fvec{\Mtx{X}}} = 
+\dbyd{\Elim \fvec{\Mtx{Y}}}{\fvec{\Mtx{Y}}} = \Elim \dbyd{\Mtx{Y}}{\Mtx{X}},
+$$
+by linearity of the derivative. The other identities follow similarly.
+\end{proof}%UNFOLD
 \begin{lemma}[Derivative of matrix inverse]%FOLDUP
 For invertible matrix \Mtx{A}, 
 \begin{equation}
-\dbyd{\minv{\Mtx{A}}}{\Mtx{A}} = 
-%\dvecbydvec{\minv{\Mtx{A}}}{\Mtx{A}}
+\dbyd{\minv{\Mtx{A}}}{\Mtx{A}} 
+%= \dvecbydvec{\minv{\Mtx{A}}}{\Mtx{A}}
 = - \wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}
 = - \minv{\wrapParens{\tr{\Mtx{A}}\kron\Mtx{A}}}.
 \label{eqn:deriv_vec_matrix_inverse}
@@ -532,27 +547,24 @@ $\dbyd{x^{-1}}{x} = - \wrapParens{x^{-1} x^{-1}}.$
 \begin{proof}%FOLDUP
 \eqnref{deriv_vec_matrix_inverse} is a known 
 result. \cite{facklernotes,magnus1999matrix}
-For the symmetric case, use the chain rule:
-\begin{equation*}
-\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
-= \dbyd{\fvech{\minv{\Mtx{A}}}}{\fvec{\minv{\Mtx{A}}}} 
-  \dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}
-  \dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}}
-= \EXD{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}},
-\end{equation*}
-where the last equation follows because the definitions
-$\fvech{\Mtx{X}} = \Elim\fvec{\Mtx{X}}$ 
-and 
-$\fvec{\Mtx{X}} = \Dupp\fvech{\Mtx{X}}$ imply
-$$
-\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvec{\minv{\Mtx{A}}}} = \Elim,
-\quad\mbox{and}\quad
-\dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}} = \Dupp.
-$$
+\eqnref{deriv_vech_matrix_inverse} then follows using \lemmaref{misc_derivs}.
 \end{proof}%UNFOLD
+%UNFOLD
 
-The asymptotic distribution of \minv{\pvsm} then follows from standard
-techniques.
+\subsection{Asymptotic distribution of the \txtMP}%FOLDUP
+
+\label{subsec:dist_markoport}
+\nocite{BrittenJones1999}
+
+Collecting the mean and covariance into the second moment matrix 
+gives the asymptotic distribution of the sample \txtMP
+without much work. In some sense, this computation
+generalizes the `standard' asymptotic analysis of Sharpe ratio of
+multiple assets. \cite{jobsonkorkie1981,lo2002,Ledoit2008850,Leung2008} 
+%\cite{jobsonkorkie1981,lo2002,mertens2002comments,Ledoit2008850,Leung2008,Wright2012} 
+
+%The asymptotic distribution of \minv{\pvsm} then follows from standard
+%techniques.
 \begin{theorem}%FOLDUP
 \label{theorem:inv_distribution}
 Let \svsm be the unbiased sample estimate of 
@@ -688,15 +700,13 @@ and $\psnrsqopt \defeq \qiform{\pvsig}{\pvmu}.$
 \begin{proof}%FOLDUP
 By the delta method, and \theoremref{inv_distribution}, it suffices
 to show that 
-$$\Mtx{K} = \dbyd{\pportwoptR}{\fvech{\minv{\pvsm}}}.$$
+$$\tr{\Mtx{K}} = \dbyd{\pportwoptR}{\fvech{\minv{\pvsm}}}.$$
 To show this, note that \pportwoptR is $-\Rbuj$ times elements
 2 through $\nlatf+1$ of \fvech{\minv{\pvsm}} divided by 
 $\psnropt = \sqrt{\trAB{\basev[1]}{\fvech{\minv{\pvsm}}} - 1}$, where
 $\basev[i]$ is the \kth{i} column of the identity matrix. The result
 follows from basic calculus.
 \end{proof}%UNFOLD
-
-
 %UNFOLD
 
 %UNFOLD
@@ -1122,7 +1132,12 @@ a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Extensions}%FOLDUP
 
-The technique outlined above admits a number of interesting extensions.
+For large samples, Wald statistics of the elements of the Markowitz
+portfolio computed using the procedure outlined above tend to be 
+very similar to the t-statistics produced by the procedure of 
+Britten-Jones. \cite{BrittenJones1999} 
+However, the technique proposed here admits a number of interesting
+extensions.
 
 \subsection{Hedging Constraint} % constrained case ... %FOLDUP
 % 2FIX: nstrat nstrathej fuck. as in, does this make sense in SharpeRatio.rnw? 
@@ -1214,7 +1229,7 @@ is unique when $\rfr > 0$.
 \end{proof}%UNFOLD
 
 \begin{definition}[Delta Inverse Second Moment]%FOLDUP
-
+\label{definition:delta_inv_second_moment}
 Let \hejGt be the $\wrapParens{1+\nlatfhej}\times\wrapParens{\nlatf+1}$
 matrix,
 $$
@@ -1223,14 +1238,12 @@ $$
 Define the `delta inverse second moment' as
 $$
 \Delhej\minv{\pvsm} \defeq \minv{\pvsm} -
-\wrapProj{\pvsm}{\hejGt}.
-$$
-\label{definition:delta_inv_second_moment}
+\wrapProj{\pvsm}{\hejGt}.$$
 \end{definition}%UNFOLD
 
 Simple algebra proves the following lemma.
 
-\begin{lemma}
+\begin{lemma}%FOLDUP
 The elements of $\Delhej\minv{\pvsm}$
 are 
 \begin{equation*}
@@ -1248,7 +1261,7 @@ $-\fvech{\Delhej\minv{\pvsm}}$ are the portfolio $\pportwoptFoo{\Rbuj,\hejG,}$
 defined in \lemmaref{cons_sr_optimal_portfolio}, up to the scaling
 constant $c$ which is the ratio of \Rbuj to the square root of the first
 element of \fvech{\Delhej\minv{\pvsm}}.
-\end{lemma}
+\end{lemma}%UNFOLD
 
 The statistic $\qiform{\pvsig}{\pvmu} - \wrapProj{\pvsig}{\hejG}$, for the
 case where \hejG is some rows of the $\nlatf \times \nlatf$ identity matrix,
@@ -1285,10 +1298,12 @@ By the multivariate delta method, it suffices to prove that
 $$
 \Mtx{H} = \dbyd{\fvech{\Delhej\minv{\pvsm}}}{\fvech{\pvsm}}.
 $$
-Via \lemmaref{deriv_vech_matrix_inverse}, and the proof of 
-\theoremref{inv_distribution}, it suffices to prove that
+Via \lemmaref{misc_derivs},
+%Via \lemmaref{deriv_vech_matrix_inverse},
+%and the proof of \theoremref{inv_distribution}, 
+it suffices to prove that
 $$
-\dbyd{\fvec{\wrapProj{\pvsm}{\hejGt}}}{\fvec{\pvsm}} = 
+\dbyd{\wrapProj{\pvsm}{\hejGt}}{\pvsm} = 
 -\wrapParens{\AkronA{\tr{\hejGt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}}
 \wrapParens{\AkronA{\hejGt}}.
 $$
@@ -1321,6 +1336,25 @@ distribution of $\pportwoptFoo{\Rbuj,\hejG,}$
 defined in \lemmaref{cons_sr_optimal_portfolio}.
 %UNFOLD
 
+\subsubsection{Hedging with Portfolio Constraints}
+
+In the hedged portfolio optimization problem above, the optimal portfolio
+will, in general, hold money in the row space of \hejG. For example, in 
+the garden variety application, where one is hedging out exposure to 
+`the market' by including a broad market ETF, and taking \hejG to be 
+the corresponding row of the identity matrix, the final portfolio may 
+hold some position in that broad market ETF. This is fine for an ETF,
+but one may wish to hedge out exposure to an untradeable returns 
+stream--the returns of an index, say.
+
+Suppose then that the portfolio restriction is $\zerJc\portw = 0$, for
+a given full-rank $\wrapParens{\nlatf - \nlatfzer} \times \nlatf$
+matrix \zerJc. Let \zerJ be the complement of \zerJc. That is,
+$\zerJc \tr{\zerJ} = \mzero$ and $\gram{\zerJ} = \eye$.
+
+
+2FIX: continue.
+
 %UNFOLD
 \subsection{Conditional Heteroskedasticity}%FOLDUP
 
@@ -1345,7 +1379,7 @@ Two simple competing models for conditional heteroskedasticity are
 Under the model in \eqnref{cond_model_I}, the maximal \txtSR
 is $\sqrt{\qiform{\pvsig}{\pvmu}}$, independent of \fvola[i];
 under \eqnref{cond_model_II}, it is 
-is $\fvola[i]\sqrt{\qiform{\pvsig}{\pvmu}}$, thus the names.
+is $\fvola[i]\sqrt{\qiform{\pvsig}{\pvmu}}$, thus the model names.
 
 The optimal portfolio under both models is the same, as stated
 in the following lemma, the proof of which follows by simply using
@@ -1444,7 +1478,6 @@ zero. Analyzing this model is somewhat complicated without moving to a
 more general framework, as in the sequel.
 
 %UNFOLD
-
 \subsection{Conditional Expectation and Heteroskedasticity}%FOLDUP
 
 Suppose you observe random variables $\fvola[i] > 0$, and 
@@ -1508,10 +1541,11 @@ decisions; if an entire row of \minvAB{\pvsig}{\pRegco} is zero,
 it suggests the corresponding instrument delivers no return or
 hedging benefit.
 
-2FIX:
-A typical analysis from MGLH land ... 
-\cite{Rencher2002,Muller1984143}
-
+Tests on \minvAB{\pvsig}{\pRegco} should be contrasted with
+the so-called Multivariate General Linear Hypothesis (MGLH), 
+which tests the matrix equation
+$\Mtx{A}\pRegco\Mtx{C} = \Mtx{T}$, for conformable 
+$\Mtx{A},\Mtx{C},\Mtx{T}$.  \cite{Rencher2002,Muller1984143}
 
 To perform inference on the Markowitz coefficient, we can proceed
 exactly as above. Let
@@ -1535,6 +1569,9 @@ The inverse of \pvsm[f] is
 \end{equation}
 Once again, the Markowitz coefficient (up to scaling and sign), appears in
 \fvech{\minv{\pvsm[f]}}.
+
+The following theorem is an analogue of, and shares a proof with,
+\theoremref{inv_distribution}.
 
 \begin{theorem}%FOLDUP
 \label{theorem:cond_inv_distribution_II}
