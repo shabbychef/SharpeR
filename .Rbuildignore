@@ -17,3 +17,4 @@ rebuildTags.sh
 SharpeR_\d.\d+.tar.gz
 SharpeR.Rcheck
 unit_test.log
+asymarko_example.ipynb

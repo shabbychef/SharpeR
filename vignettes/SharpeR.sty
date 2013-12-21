@@ -200,6 +200,9 @@
 \providecommand{\htr}[1]{\mathSUP{#1}{*}}
 \providecommand{\pinv}[1]{\mathSUP{#1}{+}}
 
+% Complement
+\providecommand{\cmpl}[1]{\mathSUP{#1}{\mathcal{C}}}
+
 % cholesky 
 \providecommand{\chol}[1]{\mathSUP{#1}{1/2}}
 \providecommand{\trchol}[1]{\mathSUP{#1}{\top/2}}
@@ -358,7 +361,8 @@
 \providecommand{\nlatfhej}{\nlatf[g]}
 
 \providecommand{\zerJ}{\Mtx{J}}
-\providecommand{\zerJc}{\MtxUL{J}{\mathcal{C}}{}}
+\providecommand{\zerJc}{\cmpl{\zerJ}}
+\providecommand{\zerJt}{\MATHIT{\tilde{\zerJ}}}
 \providecommand{\nlatfzer}{\nlatf[j]}
 
 % unified second moment stuff.
@@ -741,6 +745,9 @@
 
 \providecommand{\sportv}[1][{}]{\vectUL{\hat{v}}{}{#1}}
 \providecommand{\sportvopt}{\sportv[*]}
+
+\providecommand{\pportx}[1][{}]{\vectUL{\xi}{}{#1}}
+\providecommand{\sportx}[1][{}]{\vectUL{\hat{\xi}}{}{#1}}
 
 
 % basis vectors

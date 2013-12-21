@@ -449,6 +449,11 @@ newbuild :
 	$(MAKE) tags
 	$(MAKE) build
 
+# Python. well, iPython.
+
+%.tex : %.ipynb
+		ipython nbconvert --to latex --output $@ $<
+
 ################################
 # CLEAN UP 
 ################################

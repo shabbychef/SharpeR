@@ -1139,16 +1139,190 @@ Britten-Jones. \cite{BrittenJones1999}
 However, the technique proposed here admits a number of interesting
 extensions.
 
-\subsection{Hedging Constraint} % constrained case ... %FOLDUP
+\subsection{Subspace Constraint} %FOLDUP
+\label{subsec:subspace_constraint}
+
+Consider the \emph{constrained} portfolio optimization problem
+\begin{equation}
+\max_{\substack{\pportw : \zerJc \pportw = \vzero,\\
+\qform{\pvsig}{\pportw} \le \Rbuj^2}}
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:portopt_zer}
+\end{equation}
+where $\zerJc$ is a $\wrapParens{\nlatf - \nlatfzer} \times \nlatf$ 
+matrix of rank $\nlatf - \nlatfzer$, 
+\rfr is the disastrous rate, and $\Rbuj > 0$ is the
+risk budget. Let the rows of \zerJ span the null space of the rows of
+\zerJc; that is, $\zerJc \tr{\zerJ} = \mzero$, and $\ogram{\zerJ} = \eye$.
+We can interpret the orthogonality constraint $\zerJc \pportw = \vzero$ as
+stating that \pportw must be a linear combination of the columns of
+\tr{\zerJ}, thus $\pportw = \trAB{\zerJ}{\pportx}$. The columns of
+\tr{\zerJ} may be considered `baskets' of assets to which our investments
+are restricted.
+
+We can rewrite the portfolio optimization problem in terms of solving
+for \pportx, but then find the asymptotic distribution of the resultant
+\pportw. Note that the expected return and covariance of the portfolio
+\pportx are, respectively, \trAB{\pportx}{\zerJ\pvmu} and 
+\qform{\qoform{\pvsig}{\zerJ}}{\pportx}. Thus we can plug in
+$\zerJ\pvmu$ and \qoform{\pvsig}{\zerJ} into 
+\lemmaref{sr_optimal_portfolio} to get the following analogue.
+
+\begin{lemma}[subspace constrained \txtSR optimal portfolio]%FOLDUP
+\label{lemma:subsp_cons_sr_optimal_portfolio}
+Assuming the rows of \zerJ span the null space of the rows of \zerJc,
+$\zerJ\pvmu \ne \vzero$, and \pvsig is invertible,
+the portfolio optimization problem
+\begin{equation}
+\max_{\substack{\pportw : \zerJc \pportw = \vzero,\\
+\qform{\pvsig}{\pportw} \le \Rbuj^2}} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:portopt_zer_I}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+\begin{equation*}
+\begin{split}
+\pportwoptFoo{\Rbuj,\zerJ,} 
+ &\defeq c \wrapProj{\pvsig}{\zerJ}\pvmu,\\
+ c &= \frac{\Rbuj}{\sqrt{\qform{\wrapProj{\pvsig}{\zerJ}}{\pvmu}}}.
+\end{split}
+\end{equation*}
+When $\rfr > 0$ the solution is unique.
+\end{lemma}%UNFOLD
+
+We can easily find the asymptotic distribution of
+\sportwoptFoo{\Rbuj,\zerJ,}, the sample analogue of the optimal portfolio
+in \lemmaref{subsp_cons_sr_optimal_portfolio}. First define the
+subspace second moment.
+
+
+%\begin{definition}[Subspace Second Moment]%FOLDUP
+%\label{definition:subspace_second_moment}
+%Let \zerJt be the $\wrapParens{1+\nlatfzer}\times\wrapParens{\nlatf+1}$
+%matrix,
+%$$
+%\zerJt \defeq \twobytwossym{1}{0}{\zerJ}.
+%$$
+%Define the `subspace second moment' as
+%$$
+%\pvsm[\zerJ] \defeq \qoform{\pvsm}{\zerJt}.
+%$$
+%\end{definition}%UNFOLD
+\begin{definition}%FOLDUP
+\label{definition:subspace_second_moment}
+Let \zerJt be the $\wrapParens{1+\nlatfzer}\times\wrapParens{\nlatf+1}$
+matrix,
+$$
+\zerJt \defeq \twobytwossym{1}{0}{\zerJ}.
+$$
+%Define the `subspace second moment' as
+%$$
+%\pvsm[\zerJ] \defeq \qoform{\pvsm}{\zerJt}.
+%$$
+\end{definition}%UNFOLD
+
+Simple algebra proves the following lemma.
+
+\begin{lemma}%FOLDUP
+The elements of $\wrapProj{\pvsm}{\zerJt}$
+are 
+\begin{equation*}
+\wrapProj{\pvsm}{\zerJt}
+=
+\twobytwo{ 1 + \qform{\wrapProj{\pvsig}{\zerJ}}{\pvmu} }{
+-\tr{\pvmu}\wrapProj{\pvsig}{\zerJ}}{
+-\wrapProj{\pvsig}{\zerJ}\pvmu}{
+\wrapProj{\pvsig}{\zerJ}}.
+\end{equation*}
+In particular, elements $2$ through $\nlatf+1$ of 
+$-\fvech{\wrapProj{\pvsm}{\zerJt}}$ are the portfolio
+$\sportwoptFoo{\Rbuj,\zerJ,}$
+defined in \lemmaref{subsp_cons_sr_optimal_portfolio}, up to the scaling
+constant $c$ which is the ratio of \Rbuj to the square root of the first
+element of $\fvech{\wrapProj{\pvsm}{\zerJt}}$ minus one.
+\end{lemma}%UNFOLD
+
+The asymptotic distribution of $\fvech{\wrapProj{\pvsm}{\zerJt}}$
+is given by the following theorem, which is the analogue 
+of \theoremref{inv_distribution}.
+
+\begin{theorem}%FOLDUP
+\label{theorem:subzer_inv_distribution}
+Let \svsm be the unbiased sample estimate of 
+\pvsm, based on \ssiz \iid samples of \vreti. 
+Let \zerJt 
+be defined as in \definitionref{subspace_second_moment}.
+Let \pvvar be the variance of $\fvech{\ogram{\avreti}}$.  
+Then, asymptotically in \ssiz, 
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\wrapProj{\svsm}{\zerJt}} -
+\fvech{\wrapProj{\pvsm}{\zerJt}}}
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\label{eqn:mvclt_zer_isvsm}
+\end{equation}
+where
+\begin{equation*}
+\Mtx{H} = - \EXD{\wrapParens{\AkronA{\tr{\zerJt}}} 
+\wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}}} 
+\wrapParens{\AkronA{\zerJt}}}.
+\end{equation*}
+\end{theorem}%UNFOLD
+\begin{proof}%FOLDUP
+By the multivariate delta method, it suffices to prove that
+$$
+\Mtx{H} = \dbyd{\fvech{\wrapProj{\svsm}{\zerJt}}}{\fvech{\pvsm}}.
+$$
+Via \lemmaref{misc_derivs}, it suffices to prove that
+$$
+\dbyd{\wrapProj{\pvsm}{\zerJt}}{\pvsm}
+= 
+- \wrapParens{\AkronA{\tr{\zerJt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}}}
+\wrapParens{\AkronA{\zerJt}}.
+$$
+
+A well-known fact regarding matrix manipulation \cite{magnus1999matrix} is
+$$
+\fvec{\Mtx{A}\Mtx{B}\Mtx{C}} = \wrapParens{\Mtx{A}\kron\tr{\Mtx{C}}}
+\fvec{\Mtx{B}},\quad\mbox{therefore,}\quad
+\dbyd{\Mtx{A}\Mtx{B}\Mtx{C}}{\Mtx{B}} = \Mtx{A}\kron\tr{\Mtx{C}}.
+$$
+Using this, and the chain rule, we have:
+\begin{equation*}
+\begin{split}
+\dbyd{\wrapProj{\pvsm}{\zerJt}}{\pvsm}
+&=
+\dbyd{\wrapProj{\pvsm}{\zerJt}}{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}} 
+\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}}{\qoform{\pvsm}{\zerJt}}
+\dbyd{\qoform{\pvsm}{\zerJt}}{\pvsm}\\
+&= 
+\wrapParens{\AkronA{\tr{\zerJt}}} 
+\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}}{\qoform{\pvsm}{\zerJt}}
+\wrapParens{\AkronA{\zerJt}}.
+\end{split}
+\end{equation*}
+\lemmaref{deriv_vech_matrix_inverse} gives the middle term, completing the
+proof.
+\end{proof}
+An analogue of \corollaryref{portwoptR_dist} gives the asymptotic 
+distribution of $\pportwoptFoo{\Rbuj,\zerJ,}$
+defined in \lemmaref{subsp_cons_sr_optimal_portfolio}.
+%UNFOLD
+
+
+%UNFOLD
+\subsection{Hedging Constraint} %FOLDUP
+\label{subsec:hedging_constraint}
 % 2FIX: nstrat nstrathej fuck. as in, does this make sense in SharpeRatio.rnw? 
 % these show up as k and p, and what are you doing?
 
-Consider, now, the \emph{constrained} portfolio optimization problem,
-\begin{equation*}
-\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
-\Rbuj^2} 
+Consider, now, the constrained portfolio optimization problem,
+\begin{equation}
+\max_{\substack{\pportw : \hejG\pvsig \pportw = \vzero,\\
+\qform{\pvsig}{\pportw} \le \Rbuj^2}}
 \frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
-\end{equation*}
+\label{eqn:portopt_hej}
+\end{equation}
 where $\hejG$ is now a $\nlatfhej \times \nlatf$ matrix of 
 rank \nlatfhej.
 We can interpret the \hejG constraint as stating that the covariance of 
@@ -1161,11 +1335,12 @@ to the \nlatfhej assets selected by \hejG
 (although they may hold some position in the hedged assets).
 
 \begin{lemma}[constrained \txtSR optimal portfolio]%FOLDUP
+\label{lemma:cons_sr_optimal_portfolio}
 Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
 the portfolio optimization problem
 \begin{equation}
-\max_{\pportw : \hejG\pvsig \pportw = \vzero,\, \qform{\pvsig}{\pportw} \le
-\Rbuj^2} 
+\max_{\substack{\pportw : \hejG\pvsig \pportw = \vzero,\\ 
+\qform{\pvsig}{\pportw} \le \Rbuj^2}} 
 \frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
 \label{eqn:cons_port_prob}
 \end{equation}
@@ -1174,13 +1349,12 @@ for $\rfr \ge 0, \Rbuj > 0$ is solved by
 \begin{equation*}
 \begin{split}
 \pportwoptFoo{\Rbuj,\hejG,} &\defeq c \wrapParens{\minv{\pvsig}{\pvmu} -
-	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu},\\
+	\wrapProj{\pvsig}{\hejG}\pvmu},\\
  c &= \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu} - 
-	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}}}.
+	\qform{\wrapProj{\pvsig}{\hejG}}{\pvmu}}}.
 \end{split}
 \end{equation*}
 When $\rfr > 0$ the solution is unique.
-\label{lemma:cons_sr_optimal_portfolio}
 \end{lemma}%UNFOLD
 \begin{proof}%FOLDUP
 By the Lagrange multiplier technique, the optimal portfolio
@@ -1213,7 +1387,7 @@ $\vect{\gamma_2} = \minvAB{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu.$
 Thus
 $$
 \pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
-\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu}.
+\wrapProj{\pvsig}{\hejG}\pvmu}.
 $$
 Plugging this into the objective reduces the problem to the
 univariate optimization
@@ -1222,11 +1396,18 @@ univariate optimization
 \sign{c_3} \psnroptG{\hejG} - \frac{\rfr}{\abs{c_3}\psnroptG{\hejG}},
 \end{equation*}
 where $\psnrsqoptG{\hejG} = \qiform{\pvsig}{\pvmu} - 
-	\qiform{\wrapParens{\qoform{\pvsig}{\hejG}}}{\wrapParens{\hejG\pvmu}}.$
+  \qform{\wrapProj{\pvsig}{\hejG}}{\pvmu}.$
 The optimum
 occurs for $c = \fracc{\Rbuj}{\psnroptG{\hejG}}$, moreover the optimum
 is unique when $\rfr > 0$.
 \end{proof}%UNFOLD
+
+The optimal hedged
+portfolio in \lemmaref{cons_sr_optimal_portfolio} is, up to scaling,
+the difference of the unconstrained optimal portfolio
+from \lemmaref{sr_optimal_portfolio} and the subspace constrained
+portfolio in \lemmaref{subsp_cons_sr_optimal_portfolio}. This `delta'
+analogy continues for the rest of this section.
 
 \begin{definition}[Delta Inverse Second Moment]%FOLDUP
 \label{definition:delta_inv_second_moment}
@@ -1248,7 +1429,7 @@ The elements of $\Delhej\minv{\pvsm}$
 are 
 \begin{equation*}
 \Delhej\minv{\pvsm} =
-\twobytwo{ \qiform{\pvsig}{\pvmu} - \wrapProj{\pvsig}{\hejG} }{
+\twobytwo{ \qiform{\pvsig}{\pvmu} - \qform{\wrapProj{\pvsig}{\hejG}}{\pvmu} }{
 -\tr{\pvmu}\minv{\pvsig} + \tr{\pvmu}\wrapProj{\pvsig}{\hejG}}{
 -\minv{\pvsig}\pvmu + \wrapProj{\pvsig}{\hejG}\pvmu}{
 \minv{\pvsig} - \wrapProj{\pvsig}{\hejG}}.
@@ -1263,7 +1444,8 @@ constant $c$ which is the ratio of \Rbuj to the square root of the first
 element of \fvech{\Delhej\minv{\pvsm}}.
 \end{lemma}%UNFOLD
 
-The statistic $\qiform{\pvsig}{\pvmu} - \wrapProj{\pvsig}{\hejG}$, for the
+The statistic 
+$\qiform{\svsig}{\svmu} - \qform{\wrapProj{\svsig}{\hejG}}{\svmu}$, for the
 case where \hejG is some rows of the $\nlatf \times \nlatf$ identity matrix,
 was first proposed by Rao, and its distribution under Gaussian returns was 
 later found by Giri. \cite{rao1952,giri1964likelihood} This test statistic
@@ -1275,7 +1457,8 @@ following theorem, which is the analogue of \theoremref{inv_distribution}.
 
 \begin{theorem}%FOLDUP
 Let \svsm be the unbiased sample estimate of 
-\pvsm, based on \ssiz \iid samples of \vreti. Let $\Delhej\minv{\pvsm}$
+\pvsm, based on \ssiz \iid samples of \vreti. 
+Let $\Delhej\minv{\pvsm}$
 be defined as in \definitionref{delta_inv_second_moment}, and similarly
 define $\Delhej\minv{\svsm}$.  Let \pvvar be the variance of 
 $\fvech{\ogram{\avreti}}$.  Then, asymptotically in \ssiz, 
@@ -1293,52 +1476,58 @@ where
 \end{equation*}
 \label{theorem:delhej_inv_distribution}
 \end{theorem}%UNFOLD
+%\begin{proof}%FOLDUP
+%By the multivariate delta method, it suffices to prove that
+%$$
+%\Mtx{H} = \dbyd{\fvech{\Delhej\minv{\pvsm}}}{\fvech{\pvsm}}.
+%$$
+%Via \lemmaref{misc_derivs},
+%%Via \lemmaref{deriv_vech_matrix_inverse},
+%%and the proof of \theoremref{inv_distribution}, 
+%it suffices to prove that
+%$$
+%\dbyd{\wrapProj{\pvsm}{\hejGt}}{\pvsm} = 
+%-\wrapParens{\AkronA{\tr{\hejGt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}}
+%\wrapParens{\AkronA{\hejGt}}.
+%$$
+
+%A well-known fact regarding matrix manipulation \cite{magnus1999matrix} is
+%$$
+%\fvec{\Mtx{A}\Mtx{B}\Mtx{C}} = \wrapParens{\Mtx{A}\kron\tr{\Mtx{C}}}
+%\fvec{\Mtx{B}},\quad\mbox{therefore,}\quad
+%\dbyd{\Mtx{A}\Mtx{B}\Mtx{C}}{\Mtx{B}} = \Mtx{A}\kron\tr{\Mtx{C}}.
+%$$
+%Using this, and the chain rule, we have:
+%\begin{equation*}
+%\begin{split}
+%\dbyd{\wrapProj{\pvsm}{\hejGt}}{\pvsm} 
+%&=
+%\dbyd{\wrapProj{\pvsm}{\hejGt}}{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}} 
+%\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
+%\dbyd{\qoform{\pvsm}{\hejGt}}{\pvsm}\\
+%&= 
+%\wrapParens{\AkronA{\tr{\hejGt}}} 
+%\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
+%\wrapParens{\AkronA{\hejGt}}.
+%\end{split}
+%\end{equation*}
+%\lemmaref{deriv_vech_matrix_inverse} gives the middle term, completing the
+%proof.
+%\end{proof}
+%An analogue of \corollaryref{portwoptR_dist} gives the asymptotic 
+%distribution of $\pportwoptFoo{\Rbuj,\hejG,}$
+%defined in \lemmaref{cons_sr_optimal_portfolio}.
+%%UNFOLD
 \begin{proof}%FOLDUP
-By the multivariate delta method, it suffices to prove that
-$$
-\Mtx{H} = \dbyd{\fvech{\Delhej\minv{\pvsm}}}{\fvech{\pvsm}}.
-$$
-Via \lemmaref{misc_derivs},
-%Via \lemmaref{deriv_vech_matrix_inverse},
-%and the proof of \theoremref{inv_distribution}, 
-it suffices to prove that
-$$
-\dbyd{\wrapProj{\pvsm}{\hejGt}}{\pvsm} = 
--\wrapParens{\AkronA{\tr{\hejGt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}}
-\wrapParens{\AkronA{\hejGt}}.
-$$
+Essentially the same as that of \theoremref{subzer_inv_distribution}.
+\end{proof}%UNFOLD
 
-A well-known fact regarding matrix manipulation \cite{magnus1999matrix} is
-$$
-\fvec{\Mtx{A}\Mtx{B}\Mtx{C}} = \wrapParens{\Mtx{A}\kron\tr{\Mtx{C}}}
-\fvec{\Mtx{B}},\quad\mbox{and, therefore,}\quad
-\dbyd{\Mtx{A}\Mtx{B}\Mtx{C}}{\Mtx{B}} = \Mtx{A}\kron\tr{\Mtx{C}}.
-$$
-Using this, and the chain rule, we have:
-\begin{equation*}
-\begin{split}
-\dbyd{\wrapProj{\pvsm}{\hejGt}}{\pvsm} 
-&=
-\dbyd{\wrapProj{\pvsm}{\hejGt}}{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}} 
-\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
-\dbyd{\qoform{\pvsm}{\hejGt}}{\pvsm}\\
-&= 
-\wrapParens{\AkronA{\tr{\hejGt}}} 
-\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
-\wrapParens{\AkronA{\hejGt}}.
-\end{split}
-\end{equation*}
-\lemmaref{deriv_vech_matrix_inverse} gives the middle term, completing the
-proof.
-\end{proof}
-An analogue of \corollaryref{portwoptR_dist} gives the asymptotic 
-distribution of $\pportwoptFoo{\Rbuj,\hejG,}$
-defined in \lemmaref{cons_sr_optimal_portfolio}.
 %UNFOLD
+\subsection{Subspace and Hedging Constraints}%FOLDUP
+\label{subsec:subspace_and_hedge_constraint}
 
-\subsubsection{Hedging with Portfolio Constraints}
-
-In the hedged portfolio optimization problem above, the optimal portfolio
+In the hedged portfolio optimization problem considered in 
+\subsecref{hedging_constraint}, the optimal portfolio
 will, in general, hold money in the row space of \hejG. For example, in 
 the garden variety application, where one is hedging out exposure to 
 `the market' by including a broad market ETF, and taking \hejG to be 
@@ -1347,14 +1536,35 @@ hold some position in that broad market ETF. This is fine for an ETF,
 but one may wish to hedge out exposure to an untradeable returns 
 stream--the returns of an index, say.
 
-Suppose then that the portfolio restriction is $\zerJc\portw = 0$, for
-a given full-rank $\wrapParens{\nlatf - \nlatfzer} \times \nlatf$
-matrix \zerJc. Let \zerJ be the complement of \zerJc. That is,
-$\zerJc \tr{\zerJ} = \mzero$ and $\gram{\zerJ} = \eye$.
+To deal with this problem, we can combine the constraints of 
+\subsecref{hedging_constraint} and \subsecref{subspace_constraint}.
+So let \zerJ, \zerJc, \hejG be as above.
+
+\begin{lemma}[subspace constrained \txtSR optimal portfolio]%FOLDUP
+\label{lemma:snh_cons_sr_optimal_portfolio}
+Assuming the rows of \zerJ span the null space of the rows of \zerJc,
+$\zerJ\pvmu \ne \vzero$, and \pvsig is invertible,
+the portfolio optimization problem
+\begin{equation}
+\max_{\substack{\pportw : \zerJc \pportw = \vzero,\\
+\hejG\pvsig \pportw = \vzero,\\
+\qform{\pvsig}{\pportw} \le \Rbuj^2}} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:portopt_zer_III}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+%\begin{equation*}
+%\begin{split}
+%\pportwoptFoo{\Rbuj,\zerJ,} 
+ %&\defeq c \wrapProj{\pvsig}{\zerJ}\pvmu,\\
+ %c &= \frac{\Rbuj}{\sqrt{\qform{\wrapProj{\pvsig}{\zerJ}}{\pvmu}}}.
+%\end{split}
+%\end{equation*}
+When $\rfr > 0$ the solution is unique.
+\end{lemma}%UNFOLD
 
 
 2FIX: continue.
-
 %UNFOLD
 \subsection{Conditional Heteroskedasticity}%FOLDUP
 
