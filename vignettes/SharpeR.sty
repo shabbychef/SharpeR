@@ -157,7 +157,8 @@
 
 
 % as vector, a column.
-\providecommand{\asvec}[1]{\tr{\wrapBracks{#1}}}
+\providecommand{\asrowvec}[1]{\wrapBracks{#1}}
+\providecommand{\asvec}[1]{\tr{\asrowvec{#1}}}
 \providecommand{\vcat}[2]{\asvec{\tr{#1},\tr{#2}}}
 
 \providecommand{\diag}[1]{\funcit{\operatorname{diag}}{#1}}
@@ -200,8 +201,11 @@
 \providecommand{\htr}[1]{\mathSUP{#1}{*}}
 \providecommand{\pinv}[1]{\mathSUP{#1}{+}}
 
+\providecommand{\bottom}{\bot}
+
 % Complement
-\providecommand{\cmpl}[1]{\mathSUP{#1}{\mathcal{C}}}
+%\providecommand{\cmpl}[1]{\mathSUP{#1}{\mathcal{C}}}
+\providecommand{\cmpl}[1]{\mathSUP{#1}{\bot}}
 
 % cholesky 
 \providecommand{\chol}[1]{\mathSUP{#1}{1/2}}
@@ -265,7 +269,7 @@
 \providecommand{\vretg}[1][]{\vectUL{\prvsymg}{}{#1}}
 
 % heteroskedasticity
-\providecommand{\fvola}[1][]{\mathSUB{h}{#1}}
+\providecommand{\fvola}[1][]{\mathSUB{q}{#1}}
 \providecommand{\volafoo}[2]{\mathUL{\gamma}{#1}{#2}}
 \providecommand{\volavar}[1][]{\volafoo{2}{#1}}
 \providecommand{\volaivar}[1][]{\volafoo{-2}{#1}}
@@ -300,6 +304,9 @@
 \providecommand{\vfact}[1][t]{\vectUL{\prvsymf}{}{#1}}
 \providecommand{\trvfact}[1][t]{\vectUL{\prvsymf}{\top}{#1}}
 \providecommand{\mfact}[1][]{\MtxUL{\MakeUppercase{\prvsymf}}{}{#1}}
+
+% index. i or t?
+\providecommand{\idx}{\MATHIT{t}}
 
 
 % distribution of factor

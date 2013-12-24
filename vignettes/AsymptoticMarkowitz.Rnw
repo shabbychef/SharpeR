@@ -501,6 +501,7 @@ For matrices \Mtx{Y} and \Mtx{X}, define
 \end{equation*}
 \end{definition}%UNFOLD
 \begin{lemma}[Miscellaneous Derivatives]%FOLDUP
+\label{lemma:misc_derivs}
 For symmetric matrices \Mtx{Y} and \Mtx{X}, 
 %\begin{align}
 %\dbyd{\fvech{\Mtx{Y}}}{\fvec{\Mtx{X}}} &= \Elim \dbyd{\Mtx{Y}}{\Mtx{X}},\\
@@ -512,7 +513,6 @@ For symmetric matrices \Mtx{Y} and \Mtx{X},
 \dbyd{\fvec{\Mtx{Y}}}{\fvech{\Mtx{X}}} = \dbyd{\Mtx{Y}}{\Mtx{X}}\Dupp,\quad
 \dbyd{\fvech{\Mtx{Y}}}{\fvech{\Mtx{X}}} = \EXD{\dbyd{\Mtx{Y}}{\Mtx{X}}}.
 \end{equation}
-\label{lemma:misc_derivs}
 \end{lemma}%UNFOLD
 \begin{proof}%FOLDUP
 For the first equation, note that 
@@ -571,14 +571,30 @@ Let \svsm be the unbiased sample estimate of
 \pvsm, based on \ssiz \iid samples of \vreti.
 Let \pvvar be the variance of $\fvech{\ogram{\avreti}}$.
 Then, asymptotically in \ssiz, 
+%\begin{multline}
+%\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+%\rightsquigarrow \\
+%\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}.
+%\label{eqn:mvclt_isvsm}
+%\end{multline}
 %\begin{equation}
-\begin{multline}
-\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
-\rightsquigarrow \\
-\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}.
-\label{eqn:mvclt_isvsm}
-\end{multline}
+%\begin{split}
+%\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+%&\rightsquigarrow 
+%\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},\\
+%\mbox{where}\quad\Mtx{H} &= -\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}.
+%\label{eqn:mvclt_isvsm}
+%\end{split}
 %\end{equation}
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\rightsquigarrow \normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\label{eqn:mvclt_isvsm}
+\end{equation}
+where
+\begin{equation}
+\Mtx{H} = -\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}.
+\end{equation}
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
 \end{theorem}%UNFOLD
@@ -594,7 +610,6 @@ where \pvvar is the variance of $\fvech{\ogram{\avreti}}$, which, in general,
 is unknown. 
 %(For the case where \vreti is multivariate Gaussian,
 %\pvvar is known; see \theoremref{ ... 
-
 By the delta method \cite{wasserman2004all},
 \begin{equation*}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
@@ -676,6 +691,7 @@ application of the delta method gives its asymptotic distribution,
 as in the following corollary to \theoremref{inv_distribution}.
 
 \begin{corollary}%FOLDUP
+\label{corollary:portwoptR_dist}
 Let 
 \begin{equation}
 \pportwoptR = \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
@@ -683,24 +699,42 @@ Let
 \end{equation}
 and similarly, let \sportwoptR be the sample analogue, where \Rbuj is
 some risk budget. Then
-\begin{multline}
+%\begin{multline}
+%\sqrt{\ssiz}\wrapParens{\sportwoptR - \pportwoptR} 
+%\rightsquigarrow \\
+%\normlaw{0,\qform{\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}{\Mtx{K}}},
+%\label{eqn:mvclt_portfolio}
+%\end{multline}
+%where 
+%$$
+%\Mtx{K} = - \Rbuj \asvec{\half \frac{\pportwoptR}{\psnrsqopt},
+%\oneby{\psnropt}\eye[\nlatf],\mzero},
+%$$
+%and $\psnrsqopt \defeq \qiform{\pvsig}{\pvmu}.$
+\begin{equation}
 \sqrt{\ssiz}\wrapParens{\sportwoptR - \pportwoptR} 
-\rightsquigarrow \\
-\normlaw{0,\qform{\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}{\Mtx{K}}},
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
 \label{eqn:mvclt_portfolio}
-\end{multline}
-where 
-$$
-\Mtx{K} = - \Rbuj \asvec{\half \frac{\pportwoptR}{\psnrsqopt},
-\oneby{\psnropt}\eye[\nlatf],\mzero},
-$$
-and $\psnrsqopt \defeq \qiform{\pvsig}{\pvmu}.$
-\label{corollary:portwoptR_dist}
+\end{equation}
+where
+\begin{equation}
+\begin{split}
+\Mtx{H} &= \wrapParens{- \asrowvec{\oneby{2\psnrsqopt} \pportwoptR,
+\frac{\Rbuj}{\psnropt}\eye[\nlatf],\mzero}} 
+\wrapParens{-\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}},\\
+\psnrsqopt &\defeq \qiform{\pvsig}{\pvmu}.
+\end{split}
+\end{equation}
 \end{corollary}%UNFOLD
 \begin{proof}%FOLDUP
 By the delta method, and \theoremref{inv_distribution}, it suffices
 to show that 
-$$\tr{\Mtx{K}} = \dbyd{\pportwoptR}{\fvech{\minv{\pvsm}}}.$$
+%$$\tr{\Mtx{K}} = \dbyd{\pportwoptR}{\fvech{\minv{\pvsm}}}.$$
+$$\dbyd{\pportwoptR}{\fvech{\minv{\pvsm}}} 
+= - \asrowvec{\oneby{2\psnrsqopt} \pportwoptR,
+\frac{\Rbuj}{\psnropt}\eye[\nlatf],\mzero}.
+$$
 To show this, note that \pportwoptR is $-\Rbuj$ times elements
 2 through $\nlatf+1$ of \fvech{\minv{\pvsm}} divided by 
 $\psnropt = \sqrt{\trAB{\basev[1]}{\fvech{\minv{\pvsm}}} - 1}$, where
@@ -934,7 +968,8 @@ Then, from \eqnref{deriv_gauss_loglik},
 \end{split}
 \end{equation*}
 via \lemmaref{deriv_vech_matrix_inverse}. Perform a change of variables.
-Noting that $\dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}} = \Dupp,$ we have
+%Noting that $\dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}} = \Dupp,$ we have
+Via \lemmaref{misc_derivs}, 
 \begin{equation*}
 \drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvech{\minv{\pvsm}}}}
  = - \half[\ssiz] \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}.
@@ -964,6 +999,7 @@ Hessian, the result follows. \cite{pawitanIAL}
 Thus the analogue of \theoremref{inv_distribution} for Gaussian returns
 is given by the following theorem.
 \begin{theorem}%FOLDUP
+\label{theorem:theta_asym_var_gaussian}
 Let \svsm be the unbiased sample estimate of 
 \pvsm, based on \ssiz \iid samples of \vreti, assumed multivariate
 Gaussian.
@@ -975,13 +1011,12 @@ Then, asymptotically in \ssiz,
 \label{eqn:mvclt_isvsm_gaussian}
 \end{equation}
 where the first row and column of \pvvar are all zero, and the lower
-right block part
+right block part is
 \begin{equation*}
 2\minv{\wrapBracks{
 \qoform{ \qform{ \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}
 }{\wrapBracks{\EXD{\wrapParens{\minv{\pvsm}\kron\minv{\pvsm}}}}} }{\Unun}}}.
 \end{equation*}
-\label{theorem:theta_asym_var_gaussian}
 \end{theorem}%UNFOLD
 \begin{proof}%FOLDUP
 Under `the appropriate regularity conditions,'
@@ -1003,6 +1038,7 @@ The following conjecture is true in the $\nlatf=1$ case. Use of
 the Sherman-Morrison-Woodbury formula might aid in a proof.
 
 \begin{conjecture}%FOLDUP
+\label{conjecture:theta_asym_var_gaussian}
 For the Gaussian case, asymptotically in \ssiz, 
 \begin{equation}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
@@ -1010,7 +1046,6 @@ For the Gaussian case, asymptotically in \ssiz,
 \normlaw{0,2 \minv{\wrapBracks{\qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}}} -
 2\ogram{\basev[1]}}.
 \end{equation}
-\label{conjecture:theta_asym_var_gaussian}
 \end{conjecture}%UNFOLD
 
 A check of \theoremref{theta_asym_var_gaussian} and an illustration of
@@ -1138,6 +1173,12 @@ very similar to the t-statistics produced by the procedure of
 Britten-Jones. \cite{BrittenJones1999} 
 However, the technique proposed here admits a number of interesting
 extensions.
+
+The script for each of these extensions is the same: define, then solve,
+some portfolio optimization problem; show that the solution can be defined
+in terms of some transformation of $\minv{\pvsm}$; implicitly the sample
+analogue is defined in terms of the same transformation of $\minv{\svsm}$; 
+find the asymptotic distribution of the sample portfolio in terms of \pvvar.
 
 \subsection{Subspace Constraint} %FOLDUP
 \label{subsec:subspace_constraint}
@@ -1519,53 +1560,70 @@ where
 %defined in \lemmaref{cons_sr_optimal_portfolio}.
 %%UNFOLD
 \begin{proof}%FOLDUP
-Essentially the same as that of \theoremref{subzer_inv_distribution}.
+Minor modification of proof of \theoremref{subzer_inv_distribution}.
 \end{proof}%UNFOLD
-
-%UNFOLD
-\subsection{Subspace and Hedging Constraints}%FOLDUP
-\label{subsec:subspace_and_hedge_constraint}
-
-In the hedged portfolio optimization problem considered in 
-\subsecref{hedging_constraint}, the optimal portfolio
-will, in general, hold money in the row space of \hejG. For example, in 
+\begin{caution}%FOLDUP
+In the hedged portfolio optimization problem considered here, 
+the optimal portfolio will, in general, hold money in the 
+row space of \hejG. 
+For example, in 
 the garden variety application, where one is hedging out exposure to 
 `the market' by including a broad market ETF, and taking \hejG to be 
 the corresponding row of the identity matrix, the final portfolio may 
 hold some position in that broad market ETF. This is fine for an ETF,
 but one may wish to hedge out exposure to an untradeable returns 
 stream--the returns of an index, say.
+Combining the hedging constraint of this section with the
+subspace constraint of \subsecref{subspace_constraint} is
+simple in the case where the rows of \hejG are spanned
+by the rows of \zerJ. The more general case, however, is rather
+more complicated.
+\end{caution}%UNFOLD
 
-To deal with this problem, we can combine the constraints of 
-\subsecref{hedging_constraint} and \subsecref{subspace_constraint}.
-So let \zerJ, \zerJc, \hejG be as above.
-
-\begin{lemma}[subspace constrained \txtSR optimal portfolio]%FOLDUP
-\label{lemma:snh_cons_sr_optimal_portfolio}
-Assuming the rows of \zerJ span the null space of the rows of \zerJc,
-$\zerJ\pvmu \ne \vzero$, and \pvsig is invertible,
-the portfolio optimization problem
-\begin{equation}
-\max_{\substack{\pportw : \zerJc \pportw = \vzero,\\
-\hejG\pvsig \pportw = \vzero,\\
-\qform{\pvsig}{\pportw} \le \Rbuj^2}} 
-\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
-\label{eqn:portopt_zer_III}
-\end{equation}
-for $\rfr \ge 0, \Rbuj > 0$ is solved by
-%\begin{equation*}
-%\begin{split}
-%\pportwoptFoo{\Rbuj,\zerJ,} 
- %&\defeq c \wrapProj{\pvsig}{\zerJ}\pvmu,\\
- %c &= \frac{\Rbuj}{\sqrt{\qform{\wrapProj{\pvsig}{\zerJ}}{\pvmu}}}.
-%\end{split}
-%\end{equation*}
-When $\rfr > 0$ the solution is unique.
-\end{lemma}%UNFOLD
-
-
-2FIX: continue.
 %UNFOLD
+%\subsection{Subspace and Hedging Constraints}%FOLDUP
+%\label{subsec:subspace_and_hedge_constraint}
+
+%In the hedged portfolio optimization problem considered in 
+%\subsecref{hedging_constraint}, the optimal portfolio
+%will, in general, hold money in the row space of \hejG. For example, in 
+%the garden variety application, where one is hedging out exposure to 
+%`the market' by including a broad market ETF, and taking \hejG to be 
+%the corresponding row of the identity matrix, the final portfolio may 
+%hold some position in that broad market ETF. This is fine for an ETF,
+%but one may wish to hedge out exposure to an untradeable returns 
+%stream--the returns of an index, say.
+
+%To deal with this problem, we can combine the constraints of 
+%\subsecref{hedging_constraint} and \subsecref{subspace_constraint}.
+%So let \zerJ, \zerJc, \hejG be as above.
+
+%\begin{lemma}[subspace constrained \txtSR optimal portfolio]%FOLDUP
+%\label{lemma:snh_cons_sr_optimal_portfolio}
+%Assuming the rows of \zerJ span the null space of the rows of \zerJc,
+%$\zerJ\pvmu \ne \vzero$, and \pvsig is invertible,
+%the portfolio optimization problem
+%\begin{equation}
+%\max_{\substack{\pportw : \zerJc \pportw = \vzero,\\
+%\hejG\pvsig \pportw = \vzero,\\
+%\qform{\pvsig}{\pportw} \le \Rbuj^2}} 
+%\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+%\label{eqn:portopt_zer_III}
+%\end{equation}
+%for $\rfr \ge 0, \Rbuj > 0$ is solved by
+%%\begin{equation*}
+%%\begin{split}
+%%\pportwoptFoo{\Rbuj,\zerJ,} 
+ %%&\defeq c \wrapProj{\pvsig}{\zerJ}\pvmu,\\
+ %%c &= \frac{\Rbuj}{\sqrt{\qform{\wrapProj{\pvsig}{\zerJ}}{\pvmu}}}.
+%%\end{split}
+%%\end{equation*}
+%When $\rfr > 0$ the solution is unique.
+%\end{lemma}%UNFOLD
+
+
+%2FIX: continue.
+%%UNFOLD
 \subsection{Conditional Heteroskedasticity}%FOLDUP
 
 The methods described above ignore `volatility clustering', and assume
@@ -1654,15 +1712,26 @@ Let $\svsm[{\fvola}] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}$,
 based on \ssiz \iid samples of \asvec{\fvola,\tr{\vreti}}.
 Let \pvvar be the variance of $\fvech{\ogram{\aavreti}}$.
 Then, asymptotically in \ssiz, 
-%\begin{equation}
-\begin{multline}
+%%\begin{equation}
+%\begin{multline}
+%\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\fvola}]}} -
+%\fvech{\minv{\pvsm[{\fvola}]}}} 
+%\rightsquigarrow \\
+%\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\fvola}]}}}}}}}.
+%\label{eqn:cond_mvclt_isvsm}
+%\end{multline}
+%%\end{equation}
+\begin{equation}
+\label{eqn:cond_mvclt_isvsm}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\fvola}]}} -
 \fvech{\minv{\pvsm[{\fvola}]}}} 
-\rightsquigarrow \\
-\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\fvola}]}}}}}}}.
-\label{eqn:cond_mvclt_isvsm}
-\end{multline}
-%\end{equation}
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\end{equation}
+where
+\begin{equation}
+\Mtx{H} = \EXD{\wrapParens{\AkronA{\minv{\pvsm[{\fvola}]}}}}.
+\end{equation}
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
 \end{theorem}%UNFOLD
@@ -1764,28 +1833,28 @@ exactly as above. Let
 \end{equation}
 Consider the second moment of \aavreti:
 \begin{equation}
-\pvsm[f] \defeq \E{\ogram{\aavreti}} = 
+\pvsm[{\sfact[]}] \defeq \E{\ogram{\aavreti}} = 
 	\twobytwo{\pfacsig}{\pfacsig\tr{\pRegco}}{\pRegco\pfacsig}{\pvsig +
 \qoform{\pfacsig}{\pRegco}},\quad\mbox{where}\quad
 \pfacsig \defeq \E{\fvola[{}]^2\ogram{\vfact[{}]}}.
 %\label{eqn:pvsm_def}
 \end{equation}
-The inverse of \pvsm[f] is
+The inverse of \pvsm[{\sfact[]}] is
 \begin{equation}
-\minv{\pvsm[f]}
+\minv{\pvsm[{\sfact[]}]}
 = \twobytwo{\minv{\pfacsig} +
 \qiform{\pvsig}{\pRegco}}{-\tr{\pRegco}\minv{\pvsig}}{-\minv{\pvsig}\pRegco}{\minv{\pvsig}}
 \label{eqn:new_new_trick_inversion}
 \end{equation}
 Once again, the Markowitz coefficient (up to scaling and sign), appears in
-\fvech{\minv{\pvsm[f]}}.
+\fvech{\minv{\pvsm[{\sfact[]}]}}.
 
 The following theorem is an analogue of, and shares a proof with,
 \theoremref{inv_distribution}.
 
 \begin{theorem}%FOLDUP
 \label{theorem:cond_inv_distribution_II}
-Let $\svsm[f] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}$,
+Let $\svsm[{\sfact[]}] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}$,
 based on \ssiz \iid samples of \asvec{\fvola,\tr{\vfact[{}]},\tr{\vreti}},
 where 
 $$
@@ -1793,15 +1862,26 @@ $$
 $$
 Let \pvvar be the variance of $\fvech{\ogram{\aavreti}}$.
 Then, asymptotically in \ssiz, 
-%\begin{equation}
-\begin{multline}
-\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[f]}} -
-\fvech{\minv{\pvsm[f]}}} 
-\rightsquigarrow \\
-\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm[f]}}}}}}}.
+%%\begin{equation}
+%\begin{multline}
+%\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\sfact[]}]}} -
+%\fvech{\minv{\pvsm[{\sfact[]}]}}} 
+%\rightsquigarrow \\
+%\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\sfact[]}]}}}}}}}.
+%\label{eqn:cond_mvclt_isvsm_II}
+%\end{multline}
+%%\end{equation}
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\sfact[]}]}} -
+\fvech{\minv{\pvsm[{\sfact[]}]}}} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
 \label{eqn:cond_mvclt_isvsm_II}
-\end{multline}
-%\end{equation}
+\end{equation}
+where
+\begin{equation}
+\Mtx{H} = \EXD{\wrapParens{\AkronA{\minv{\pvsm[{\sfact[]}]}}}}.
+\end{equation}
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
 \end{theorem}%UNFOLD
@@ -1815,6 +1895,16 @@ consistent estimator, \svvar.
 %\txtMP based on this approximation are nearly
 %identical to the \tstat-statistics produced by the procedure
 %of Britten-Jones, as shown below. \cite{BrittenJones1999} 
+
+%<<'load_data',echo=TRUE>>=
+%fname <- system.file('extdata','gmacro_data.rda',package='SharpeR')
+%if (fname == "") {
+	%fname <- 'gmacro_data.rda'
+%}
+%# poofs ff5.xts ff10.xts fff.xts dp.xts shill.xts
+%load(fname)
+
+%@
 
 %<<'me_vs_bjones',echo=TRUE>>=
 %nday <- 1024
@@ -1941,24 +2031,27 @@ Now it remains to compute $\VAR{\Unun \fvech{\svsm}}$ via
 \theoremref{theta_asym_var_gaussian}, and then 
 \VAR{\fvech{\minv{\svsm}}} via
 \theoremref{inv_distribution}, and confirm they match the values above.
-This is a rather tedious computation; here I present a session in Sympy
-\cite{sympy} that performs this computation:
+This is a rather tedious computation; here I present an iPython
+notebook using Sympy to perform this computation.
+\cite{PER-GRA:2007,sympy} 
 
 
-
-    
+% SYMPY from here out%FOLDUP
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}1}]:} \PY{k+kn}{from} \PY{n+nn}{\PYZus{}\PYZus{}future\PYZus{}\PYZus{}} \PY{k+kn}{import} \PY{n}{division}
+{\color{incolor}In [{\color{incolor}1}]:} \PY{c}{\PYZsh{} confirm the asymptotic distribution of Theta}
+        \PY{c}{\PYZsh{} for scalar Gaussian case.}
+        \PY{k+kn}{from} \PY{n+nn}{\PYZus{}\PYZus{}future\PYZus{}\PYZus{}} \PY{k+kn}{import} \PY{n}{division}
         \PY{k+kn}{from} \PY{n+nn}{sympy} \PY{k+kn}{import} \PY{o}{*}
         \PY{k+kn}{from} \PY{n+nn}{sympy.physics.quantum} \PY{k+kn}{import} \PY{n}{TensorProduct}
-        \PY{n}{init\PYZus{}printing}\PY{p}{(}\PY{n}{use\PYZus{}unicode}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PY{n}{wrap\PYZus{}line}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PY{n}{no\PYZus{}global}\PY{o}{=}\PY{n+nb+bp}{True}\PY{p}{)}
+        \PY{n}{init\PYZus{}printing}\PY{p}{(}\PY{n}{use\PYZus{}unicode}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PY{n}{wrap\PYZus{}line}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PYZbs{}
+                      \PY{n}{no\PYZus{}global}\PY{o}{=}\PY{n+nb+bp}{True}\PY{p}{)}
         \PY{n}{mu} \PY{o}{=} \PY{n}{symbols}\PY{p}{(}\PY{l+s}{\PYZsq{}}\PY{l+s}{\PYZbs{}}\PY{l+s}{mu}\PY{l+s}{\PYZsq{}}\PY{p}{)}
         \PY{n}{sg} \PY{o}{=} \PY{n}{symbols}\PY{p}{(}\PY{l+s}{\PYZsq{}}\PY{l+s}{\PYZbs{}}\PY{l+s}{sigma}\PY{l+s}{\PYZsq{}}\PY{p}{)} 
         \PY{c}{\PYZsh{} the elimination, duplication and U\PYZus{}\PYZob{}\PYZhy{}1\PYZcb{} matrices:}
         \PY{n}{Elim} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}  \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}   \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
         \PY{n}{Dupp} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
         \PY{n}{Unun} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}  \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
-        \PY{k}{def} \PY{n+nf}{quad\PYZus{}form}\PY{p}{(}\PY{n}{A}\PY{p}{,}\PY{n}{x}\PY{p}{)}\PY{p}{:}
+        \PY{k}{def} \PY{n+nf}{Qform}\PY{p}{(}\PY{n}{A}\PY{p}{,}\PY{n}{x}\PY{p}{)}\PY{p}{:}
             \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}compute the quadratic form x\PYZsq{}Ax\PYZdq{}\PYZdq{}\PYZdq{}}
             \PY{k}{return} \PY{n}{x}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)} \PY{o}{*} \PY{n}{A} \PY{o}{*} \PY{n}{x}
 \end{Verbatim}
@@ -1979,16 +2072,17 @@ This is a rather tedious computation; here I present a session in Sympy
     \begin{Verbatim}[commandchars=\\\{\}]
 {\color{incolor}In [{\color{incolor}3}]:} \PY{c}{\PYZsh{} compute tensor products and }
         \PY{c}{\PYZsh{} the derivative d vech(Theta\PYZca{}\PYZhy{}1) / d vech(Theta)}
+        \PY{c}{\PYZsh{} see also \theoremref{inv_distribution}}
         \PY{n}{Theta\PYZus{}Theta} \PY{o}{=} \PY{n}{TensorProduct}\PY{p}{(}\PY{n}{Theta}\PY{p}{,}\PY{n}{Theta}\PY{p}{)}
         \PY{n}{iTheta\PYZus{}iTheta} \PY{o}{=} \PY{n}{TensorProduct}\PY{p}{(}\PY{n}{Theta}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}\PY{p}{,}\PY{n}{Theta}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}\PY{p}{)}
         \PY{n}{theta\PYZus{}i\PYZus{}deriv} \PY{o}{=} \PY{n}{Elim} \PY{o}{*} \PY{p}{(}\PY{n}{iTheta\PYZus{}iTheta}\PY{p}{)} \PY{o}{*} \PY{n}{Dupp}
 \end{Verbatim}
 
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}4}]:} \PY{c}{\PYZsh{} towards thm \ref{theorem:theta_asym_var_gaussian}}
-        \PY{n}{DTTD} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
-        \PY{n}{D\PYZus{}DTTD\PYZus{}D} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{DTTD}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{p}{)}
-        \PY{n}{iOmega} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{D\PYZus{}DTTD\PYZus{}D}\PY{p}{,}\PY{n}{Unun}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+{\color{incolor}In [{\color{incolor}4}]:} \PY{c}{\PYZsh{} towards \theoremref{theta_asym_var_gaussian}}
+        \PY{n}{DTTD} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
+        \PY{n}{D\PYZus{}DTTD\PYZus{}D} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{DTTD}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{p}{)}
+        \PY{n}{iOmega} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{D\PYZus{}DTTD\PYZus{}D}\PY{p}{,}\PY{n}{Unun}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
         \PY{n}{Omega} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{iOmega}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}
         \PY{n}{simplify}\PY{p}{(}\PY{n}{Omega}\PY{p}{)}
 \end{Verbatim}
@@ -1999,13 +2093,14 @@ This is a rather tedious computation; here I present a session in Sympy
         \left[\begin{matrix}\sigma^{2} & 2 \mu \sigma^{2}\\2 \mu \sigma^{2} & 2 \sigma^{2} \left(2 \mu^{2} + \sigma^{2}\right)\end{matrix}\right]
         \end{equation*}
 
-This matches the computation in \eqnref{gauss_confirm_theta}. On to the
-inverse:
     
 
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}5}]:} \PY{c}{\PYZsh{} now use theorem \ref{theorem:inv_distribution}}
-        \PY{n}{theta\PYZus{}inv\PYZus{}var} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Omega}\PY{p}{,}\PY{n}{Unun}\PY{p}{)}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+{\color{incolor}In [{\color{incolor}5}]:} \PY{c}{\PYZsh{} this matches the computation in \eqnref{gauss_confirm_theta}}
+        \PY{c}{\PYZsh{} on to the inverse:}
+        \PY{c}{\PYZsh{} actually use \theoremref{inv_distribution}}
+        \PY{n}{theta\PYZus{}i\PYZus{}deriv\PYZus{}t} \PY{o}{=} \PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}
+        \PY{n}{theta\PYZus{}inv\PYZus{}var} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{Qform}\PY{p}{(}\PY{n}{Omega}\PY{p}{,}\PY{n}{Unun}\PY{p}{)}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv\PYZus{}t}\PY{p}{)}
         \PY{n}{simplify}\PY{p}{(}\PY{n}{theta\PYZus{}inv\PYZus{}var}\PY{p}{)}
 \end{Verbatim}
 \texttt{\color{outcolor}Out[{\color{outcolor}5}]:}
@@ -2015,14 +2110,14 @@ inverse:
         \left[\begin{matrix}\frac{2 \mu^{2}}{\sigma^{4}} \left(\mu^{2} + 2 \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{2 \mu^{2}}{\sigma^{4}}\\- \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{1}{\sigma^{4}} \left(2 \mu^{2} + \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}}\\\frac{2 \mu^{2}}{\sigma^{4}} & - \frac{2 \mu}{\sigma^{4}} & \frac{2}{\sigma^{4}}\end{matrix}\right]
         \end{equation*}
 
-This matches the computation in \eqnref{gauss_confirm_itheta}.  Check
-the conjecture:
     
 
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}6}]:} \PY{c}{\PYZsh{} now conjecture \ref{conjecture:theta_asym_var_gaussian}}
-        \PY{n}{conjec} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
-        \PY{n}{convar} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{p}{(}\PY{n}{conjec}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+{\color{incolor}In [{\color{incolor}6}]:} \PY{c}{\PYZsh{} this matches the computation in \eqnref{gauss_confirm_itheta}}
+        \PY{c}{\PYZsh{} now check \conjectureref{theta_asym_var_gaussian}}
+        \PY{n}{conjec} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
+        \PY{n}{e1} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
+        \PY{n}{convar} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{p}{(}\PY{n}{conjec}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{e1} \PY{o}{*} \PY{n}{e1}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
         \PY{n}{simplify}\PY{p}{(}\PY{n}{convar}\PY{p}{)}
 \end{Verbatim}
 \texttt{\color{outcolor}Out[{\color{outcolor}6}]:}
@@ -2046,6 +2141,111 @@ the conjecture:
         \end{equation*}
 
     
+
+
+    %UNFOLD
+    
+    
+%%  OLD%FOLDUP
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}1}]:} \PY{k+kn}{from} \PY{n+nn}{\PYZus{}\PYZus{}future\PYZus{}\PYZus{}} \PY{k+kn}{import} \PY{n}{division}
+        %\PY{k+kn}{from} \PY{n+nn}{sympy} \PY{k+kn}{import} \PY{o}{*}
+        %\PY{k+kn}{from} \PY{n+nn}{sympy.physics.quantum} \PY{k+kn}{import} \PY{n}{TensorProduct}
+        %\PY{n}{init\PYZus{}printing}\PY{p}{(}\PY{n}{use\PYZus{}unicode}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PY{n}{wrap\PYZus{}line}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PY{n}{no\PYZus{}global}\PY{o}{=}\PY{n+nb+bp}{True}\PY{p}{)}
+        %\PY{n}{mu} \PY{o}{=} \PY{n}{symbols}\PY{p}{(}\PY{l+s}{\PYZsq{}}\PY{l+s}{\PYZbs{}}\PY{l+s}{mu}\PY{l+s}{\PYZsq{}}\PY{p}{)}
+        %\PY{n}{sg} \PY{o}{=} \PY{n}{symbols}\PY{p}{(}\PY{l+s}{\PYZsq{}}\PY{l+s}{\PYZbs{}}\PY{l+s}{sigma}\PY{l+s}{\PYZsq{}}\PY{p}{)} 
+        %\PY{c}{\PYZsh{} the elimination, duplication and U\PYZus{}\PYZob{}\PYZhy{}1\PYZcb{} matrices:}
+        %\PY{n}{Elim} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}  \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}   \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        %\PY{n}{Dupp} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        %\PY{n}{Unun} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}  \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        %\PY{k}{def} \PY{n+nf}{quad\PYZus{}form}\PY{p}{(}\PY{n}{A}\PY{p}{,}\PY{n}{x}\PY{p}{)}\PY{p}{:}
+            %\PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}compute the quadratic form x\PYZsq{}Ax\PYZdq{}\PYZdq{}\PYZdq{}}
+            %\PY{k}{return} \PY{n}{x}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)} \PY{o}{*} \PY{n}{A} \PY{o}{*} \PY{n}{x}
+%\end{Verbatim}
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}2}]:} \PY{n}{Theta} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{n}{mu}\PY{p}{,}\PY{n}{mu}\PY{p}{,}\PY{n}{mu}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{+} \PY{n}{sg}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}
+        %\PY{n}{Theta}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}2}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}1 & \mu\\\mu & \mu^{2} + \sigma^{2}\end{matrix}\right]
+        %\end{equation*}
+
+    
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}3}]:} \PY{c}{\PYZsh{} compute tensor products and }
+        %\PY{c}{\PYZsh{} the derivative d vech(Theta\PYZca{}\PYZhy{}1) / d vech(Theta)}
+        %\PY{n}{Theta\PYZus{}Theta} \PY{o}{=} \PY{n}{TensorProduct}\PY{p}{(}\PY{n}{Theta}\PY{p}{,}\PY{n}{Theta}\PY{p}{)}
+        %\PY{n}{iTheta\PYZus{}iTheta} \PY{o}{=} \PY{n}{TensorProduct}\PY{p}{(}\PY{n}{Theta}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}\PY{p}{,}\PY{n}{Theta}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        %\PY{n}{theta\PYZus{}i\PYZus{}deriv} \PY{o}{=} \PY{n}{Elim} \PY{o}{*} \PY{p}{(}\PY{n}{iTheta\PYZus{}iTheta}\PY{p}{)} \PY{o}{*} \PY{n}{Dupp}
+%\end{Verbatim}
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}4}]:} \PY{c}{\PYZsh{} towards thm \ref{theorem:theta_asym_var_gaussian}}
+        %\PY{n}{DTTD} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
+        %\PY{n}{D\PYZus{}DTTD\PYZus{}D} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{DTTD}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{p}{)}
+        %\PY{n}{iOmega} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{D\PYZus{}DTTD\PYZus{}D}\PY{p}{,}\PY{n}{Unun}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        %\PY{n}{Omega} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{iOmega}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}
+        %\PY{n}{simplify}\PY{p}{(}\PY{n}{Omega}\PY{p}{)}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}4}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}\sigma^{2} & 2 \mu \sigma^{2}\\2 \mu \sigma^{2} & 2 \sigma^{2} \left(2 \mu^{2} + \sigma^{2}\right)\end{matrix}\right]
+        %\end{equation*}
+
+%This matches the computation in \eqnref{gauss_confirm_theta}. On to the
+%inverse:
+    
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}5}]:} \PY{c}{\PYZsh{} now use theorem \ref{theorem:inv_distribution}}
+        %\PY{n}{theta\PYZus{}inv\PYZus{}var} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Omega}\PY{p}{,}\PY{n}{Unun}\PY{p}{)}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        %\PY{n}{simplify}\PY{p}{(}\PY{n}{theta\PYZus{}inv\PYZus{}var}\PY{p}{)}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}5}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}\frac{2 \mu^{2}}{\sigma^{4}} \left(\mu^{2} + 2 \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{2 \mu^{2}}{\sigma^{4}}\\- \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{1}{\sigma^{4}} \left(2 \mu^{2} + \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}}\\\frac{2 \mu^{2}}{\sigma^{4}} & - \frac{2 \mu}{\sigma^{4}} & \frac{2}{\sigma^{4}}\end{matrix}\right]
+        %\end{equation*}
+
+%This matches the computation in \eqnref{gauss_confirm_itheta}.  Check
+%the conjecture:
+    
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}6}]:} \PY{c}{\PYZsh{} now conjecture \ref{conjecture:theta_asym_var_gaussian}}
+        %\PY{n}{conjec} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
+        %\PY{n}{convar} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{p}{(}\PY{n}{conjec}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+        %\PY{n}{simplify}\PY{p}{(}\PY{n}{convar}\PY{p}{)}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}6}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}\frac{2 \mu^{2}}{\sigma^{4}} \left(\mu^{2} + 2 \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{2 \mu^{2}}{\sigma^{4}}\\- \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{1}{\sigma^{4}} \left(2 \mu^{2} + \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}}\\\frac{2 \mu^{2}}{\sigma^{4}} & - \frac{2 \mu}{\sigma^{4}} & \frac{2}{\sigma^{4}}\end{matrix}\right]
+        %\end{equation*}
+
+    
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}7}]:} \PY{c}{\PYZsh{} are they the same?}
+        %\PY{n}{simplify}\PY{p}{(}\PY{n}{theta\PYZus{}inv\PYZus{}var} \PY{o}{\PYZhy{}} \PY{n}{convar}\PY{p}{)}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}7}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}0 & 0 & 0\\0 & 0 & 0\\0 & 0 & 0\end{matrix}\right]
+        %\end{equation*}
+
+    %%UNFOLD
 
 \end{example}%UNFOLD
 %UNFOLD

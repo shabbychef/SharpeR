@@ -452,7 +452,7 @@ newbuild :
 # Python. well, iPython.
 
 %.tex : %.ipynb
-		ipython nbconvert --to latex --output $@ $<
+		ipython nbconvert --to latex --output $* $<
 
 ################################
 # CLEAN UP 
