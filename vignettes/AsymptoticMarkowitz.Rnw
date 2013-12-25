@@ -1174,11 +1174,13 @@ Britten-Jones. \cite{BrittenJones1999}
 However, the technique proposed here admits a number of interesting
 extensions.
 
-The script for each of these extensions is the same: define, then solve,
-some portfolio optimization problem; show that the solution can be defined
-in terms of some transformation of $\minv{\pvsm}$; implicitly the sample
-analogue is defined in terms of the same transformation of $\minv{\svsm}$; 
+The script for each of these extensions is the same: 
+define, then solve, some portfolio optimization problem; 
+show that the solution can be defined in terms of some transformation 
+of $\minv{\pvsm}$, giving an implicit recipe for constructing the 
+sample portfolio based on the same transformation of $\minv{\svsm}$; 
 find the asymptotic distribution of the sample portfolio in terms of \pvvar.
+%which can be estimated empirically, or via assuming Gaussian returns.
 
 \subsection{Subspace Constraint} %FOLDUP
 \label{subsec:subspace_constraint}
@@ -1627,7 +1629,8 @@ more complicated.
 \subsection{Conditional Heteroskedasticity}%FOLDUP
 
 The methods described above ignore `volatility clustering', and assume
-homoskedasticity. \cite{stylized_facts} To deal with this,
+homoskedasticity. \cite{stylized_facts,nelson1991,ARCH1987} 
+To deal with this,
 consider a strictly positive scalar random variable, \fvola[i], 
 observable at the time the investment decision is
 required to capture \vreti[i+1]. For reasons to be obvious later, it 
@@ -1647,7 +1650,9 @@ Two simple competing models for conditional heteroskedasticity are
 Under the model in \eqnref{cond_model_I}, the maximal \txtSR
 is $\sqrt{\qiform{\pvsig}{\pvmu}}$, independent of \fvola[i];
 under \eqnref{cond_model_II}, it is 
-is $\fvola[i]\sqrt{\qiform{\pvsig}{\pvmu}}$, thus the model names.
+is $\fvola[i]\sqrt{\qiform{\pvsig}{\pvmu}}$. 
+The model names reflect whether or not
+the maximal \txtSR varies conditional on \fvola[i].
 
 The optimal portfolio under both models is the same, as stated
 in the following lemma, the proof of which follows by simply using
@@ -1730,7 +1735,7 @@ Then, asymptotically in \ssiz,
 \end{equation}
 where
 \begin{equation}
-\Mtx{H} = \EXD{\wrapParens{\AkronA{\minv{\pvsm[{\fvola}]}}}}.
+\Mtx{H} = -\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\fvola}]}}}}.
 \end{equation}
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
@@ -1772,13 +1777,18 @@ is now
 \Varcond{\vreti[i+1]}{\fvola[i],\vfact[i]} &=
 \fvola[i]^{-2} \pvsig,
 \end{align}
-where \pRegco is some $\nlatf \times \nfac$ matrix. By letting
+where \pRegco is some $\nlatf \times \nfac$ matrix. Without the
+\fvola[i] term, these are the `predictive regression' equations
+commonly used in Tactical Asset 
+Allocation.  \cite{connor1997,herold2004TAA,brandt2009portfolio}
+
+By letting
 $\vfact[i] = \asvec{\fvola[i]^{-1},1}$ we recover 
 the mixed model in \eqnref{cond_model_III}; the bi-conditional model
 is considerably more general, however.  The conditionally-optimal portfolio
 is given by the following lemma. Once again, the proof proceeds simply
 by plugging in the conditional expected return and volatility into
-\lemmaref{sr_optimal_portfolio}.
+\lemmaref{sr_optimal_portfolio}. 
 
 \begin{lemma}[Conditional \txtSR optimal portfolio]%FOLDUP
 \label{lemma:cond_sr_optimal_portfolio_II}
@@ -1806,7 +1816,10 @@ investing in the portfolio \pportwopt from
 \lemmaref{cond_sr_optimal_portfolio_II} at every time step 
 is long-term \txtSR optimal. One may possibly achieve a higher long-term
 \txtSR by down-levering at times when the conditional \txtSR is low.
-This is an area of active research.
+The optimal long term investment strategy falls under the 
+rubric of `multiperiod portfolio choice', and is an area of active
+research. \cite{mulvey2003advantages,fabozzi2007robust,brandt2009portfolio}
+%research. \cite{mulvey2003advantages,fabozzi2007robust,bertsimas2008robust}
 \end{caution}
 
 The matrix \minvAB{\pvsig}{\pRegco} is the generalization of the
@@ -1880,7 +1893,7 @@ Then, asymptotically in \ssiz,
 \end{equation}
 where
 \begin{equation}
-\Mtx{H} = \EXD{\wrapParens{\AkronA{\minv{\pvsm[{\sfact[]}]}}}}.
+\Mtx{H} = -\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\sfact[]}]}}}}.
 \end{equation}
 Furthermore, we may replace \pvvar in this equation with an asymptotically
 consistent estimator, \svvar.
@@ -2031,10 +2044,10 @@ Now it remains to compute $\VAR{\Unun \fvech{\svsm}}$ via
 \theoremref{theta_asym_var_gaussian}, and then 
 \VAR{\fvech{\minv{\svsm}}} via
 \theoremref{inv_distribution}, and confirm they match the values above.
-This is a rather tedious computation; here I present an iPython
-notebook using Sympy to perform this computation.
-\cite{PER-GRA:2007,sympy} 
-
+This is a rather tedious computation best left to a computer. Below is 
+an excerpt of an iPython notebook using Sympy \cite{PER-GRA:2007,sympy}
+which performs this computation. 
+This notebook is available online. \cite{SEP2013example}
 
 % SYMPY from here out%FOLDUP
     \begin{Verbatim}[commandchars=\\\{\}]
@@ -2144,7 +2157,6 @@ notebook using Sympy to perform this computation.
 
 
     %UNFOLD
-    
     
 %%  OLD%FOLDUP
     %\begin{Verbatim}[commandchars=\\\{\}]

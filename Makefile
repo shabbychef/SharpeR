@@ -542,9 +542,14 @@ suggestions :
 # what bother;
 #
 # I basically did
+# make vignettes/AsymptoticMarkowitz.tex
 # cd vignettes/
 # make -f ~/sys/etc/MOAMakefile AsymptoticMarkowitz.dvi 
 # and then used the .tex and .bbl files
+arxiv : vignettes/AsymptoticMarkowitz.tex
+	@-echo 'cd vignettes/'
+	@-echo 'make -f ~/sys/etc/MOAMakefile AsymptoticMarkowitz.dvi'
+
 
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:tags=tags;:syntax=make:filetype=make:ai:si:cin:nu:fo=croqt:cino=p0t0c5(0:
