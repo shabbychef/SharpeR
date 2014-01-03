@@ -1,4 +1,4 @@
-# Copyright 2012-2013 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2014 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.

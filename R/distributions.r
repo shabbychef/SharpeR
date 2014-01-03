@@ -1,4 +1,4 @@
-# Copyright 2012-2013 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2014 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -747,7 +747,7 @@ qlambdap <- Vectorize(.qlambdap,
 #' @details
 #' 
 #' Suppose \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio} distribution
-#' (see \code{\link{package-SharpeR}}) for known degrees of freedom, and 
+#' (see \code{\link{SharpeR}}) for known degrees of freedom, and 
 #' unknown non-centrality parameter \eqn{\zeta_*}{zeta*}. The 
 #' 'confidence distribution' views \eqn{\zeta_*}{zeta*} as a random
 #' quantity once \eqn{z_*}{z*} is observed. As such, the CDF of
@@ -796,32 +796,27 @@ qlambdap <- Vectorize(.qlambdap,
 #'
 #' zeta.s <- 2.0
 #' ope <- 253
-#' ntest <- 2000
+#' ntest <- 50
 #' df1 <- 4
 #' df2 <- 6 * ope
 #' rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
-#' qvs <- seq(0,10,length.out=101)
+#' qvs <- seq(0,10,length.out=51)
 #' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope)
+#' \dontrun{
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
+#' }
 #' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
+#' \dontrun{
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
+#' }
 #' 
-#' # 2FIX: shove these into the unit tests for monotonicity?
-#' svs <- seq(0,4,length.out=101)
+#' svs <- seq(0,4,length.out=51)
 #' pps <- pco_sropt(2,df1,df2,svs,ope)
-#' if (require(txtplot))
-#'  txtplot(svs,pps)
 #' pps <- pco_sropt(2,df1,df2,svs,ope,lower.tail=FALSE)
-#' if (require(txtplot))
-#'  txtplot(svs,pps)
 #' 
-#' if (require(txtplot))
-#'  txtplot(qvs,pps)
 #' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
-#' if (require(txtplot))
-#'  txtplot(qvs,pps)
 #' pco_sropt(-1,df1,df2,rvs[1],ope)
 #'
 #' qvs <- qco_sropt(0.05,df1=df1,df2=df2,z.s=rvs)
@@ -836,8 +831,8 @@ qlambdap <- Vectorize(.qlambdap,
 #' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),df2,rvs)
 #' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 #'
-# 2FIX: add ope?
 pco_sropt <- function(q,df1,df2,z.s,ope=1,lower.tail=TRUE,log.p=FALSE) {
+	# 2FIX: add ope?
 	# 2FIX: do the annualization just once for efficiency?
 	# this is just a silly wrapper on psropt
 	# delegate

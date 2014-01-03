@@ -55,6 +55,10 @@
   Markowitz portfolio and the precision matrix on \eqn{X}.
   Performing this transform before passing the data to this
   function should be considered idiomatic.
+
+  This function will be deprecated in future releases of
+  this package. Users should migrate at that time to a
+  similar function in the MarkowitzR package.
 }
 \examples{
 X <- matrix(rnorm(1000*3),ncol=3)

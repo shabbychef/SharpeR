@@ -45,6 +45,11 @@
   estimator, like \code{sandwich:vcovHAC},
   \code{sandwich:vcovHC}, \emph{etc.}
 }
+\note{
+  This function will be deprecated in future releases of
+  this package. Users should migrate at that time to a
+  similar function in the MarkowitzR package.
+}
 \examples{
 X <- matrix(rnorm(1000*3),ncol=3)
 Sigmas <- sm_vcov(X)

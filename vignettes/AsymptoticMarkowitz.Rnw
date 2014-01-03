@@ -1996,8 +1996,8 @@ consistent estimator, \svvar.
 %\bibliographystyle{ieeetr}
 \bibliographystyle{plainnat}
 %\bibliographystyle{acm}
-%\bibliography{SharpeR,rauto}
-\bibliography{AsymptoticMarkowitz}
+\bibliography{SharpeR,rauto}
+%\bibliography{AsymptoticMarkowitz}
 %UNFOLD
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,118 @@
+\name{plambdap}
+\alias{plambdap}
+\alias{qlambdap}
+\alias{rlambdap}
+\title{The lambda-prime distribution.}
+\usage{
+  plambdap(q, df, tstat, lower.tail = TRUE, log.p = FALSE)
+
+  qlambdap(p, df, tstat, lower.tail = TRUE, log.p = FALSE)
+}
+\arguments{
+  \item{q}{vector of quantiles.}
+
+  \item{p}{vector of probabilities.}
+
+  \item{df}{the degrees of freedom of the t-statistic.}
+
+  \item{tstat}{the observed (non-central) t-statistic.}
+
+  \item{log.p}{logical; if TRUE, probabilities p are given
+  as \eqn{\mbox{log}(p)}{log(p)}.}
+
+  \item{lower.tail}{logical; if TRUE (default),
+  probabilities are \eqn{P[X \le x]}{P[X <= x]}, otherwise,
+  \eqn{P[X > x]}{P[X > x]}.}
+}
+\value{
+  \code{dlambdap} gives the density, \code{plambdap} gives
+  the distribution function, \code{qlambdap} gives the
+  quantile function, and \code{rlambdap} generates random
+  deviates.
+
+  Invalid arguments will result in return value \code{NaN}
+  with a warning.
+}
+\description{
+  Distribution function and quantile function for
+  LeCoutre's lambda-prime distribution with \code{df}
+  degrees of freedom and the observed t-statistic,
+  \code{tstat}.
+}
+\details{
+  Let \eqn{t}{t} be distributed as a non-central t with
+  \eqn{\nu}{v} degrees of freedom and non-centrality
+  parameter \eqn{\delta}{ncp}. We can view this as \deqn{t
+  = \frac{Z + \delta}{\sqrt{V/\nu}}.}{t = (Z +
+  ncp)/sqrt(V/v)} where \eqn{Z}{Z} is a standard normal,
+  \eqn{\delta}{ncp} is the non-centrality parameter,
+  \eqn{V}{V} is a chi-square RV with \eqn{\nu}{v} degrees
+  of freedom, independent of \eqn{Z}{Z}.  We can rewrite
+  this as \deqn{\delta = t\sqrt{V/\nu} + Z.}{ncp = t
+  sqrt(V/v) + Z}
+
+  Thus a 'lambda-prime' random variable with parameters
+  \eqn{t}{t} and \eqn{\nu}{v} is one expressable as a sum
+  \deqn{t\sqrt{V/\nu} + Z}{t sqrt(V/v) + Z} for Chi-square
+  \eqn{V}{V} with \eqn{\nu}{v} d.f., independent from
+  standard normal \eqn{Z}{Z}
+}
+\note{
+  \code{plambdap} should be an increasing function of the
+  argument \code{q}, and decreasing in \code{tstat}.
+  \code{qlambdap} should be increasing in \code{p}
+}
+\examples{
+rvs <- rnorm(128)
+pvs <- plambdap(rvs, 253*6, 0.5)
+plot(ecdf(pvs))
+pvs <- plambdap(rvs, 253*6, 1)
+plot(ecdf(pvs))
+pvs <- plambdap(rvs, 253*6, -0.5)
+plot(ecdf(pvs))
+# test vectorization:
+qv <- qlambdap(0.1,128,2)
+qv <- qlambdap(c(0.1),128,2)
+qv <- qlambdap(c(0.2),128,2)
+qv <- qlambdap(c(0.2),253,2)
+qv <- qlambdap(c(0.1,0.2),128,2)
+qv <- qlambdap(c(0.1,0.2),c(128,253),2)
+qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4))
+qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
+}
+\author{
+  Steven E. Pav \email{shabbychef@gmail.com}
+}
+\references{
+  Lecoutre, Bruno. "Another look at confidence intervals
+  for the noncentral t distribution." Journal of Modern
+  Applied Statistical Methods 6, no. 1 (2007): 107--116.
+  \url{http://www.univ-rouen.fr/LMRS/Persopage/Lecoutre/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
+
+  Lecoutre, Bruno. "Two useful distributions for Bayesian
+  predictive procedures under normal models." Journal of
+  Statistical Planning and Inference 79 (1999): 93--105.
+}
+\seealso{
+  t-distribution functions,
+  \code{\link{dt},\link{pt},\link{qt},\link{rt}}
+
+  Other sr: \code{\link{as.sr}},
+  \code{\link{as.sr.data.frame}},
+  \code{\link{as.sr.default}}, \code{\link{as.sr.lm}},
+  \code{\link{as.sr.matrix}},
+  \code{\link{as.sr.timeSeries}}, \code{\link{as.sr.xts}},
+  \code{\link{confint.del_sropt}},
+  \code{\link{confint.sr}}, \code{\link{confint.sropt}},
+  \code{\link{dsr}}, \code{\link{is.sr}},
+  \code{\link{power.sr_test}},
+  \code{\link{print.del_sropt}}, \code{\link{print.sr}},
+  \code{\link{print.sropt}}, \code{\link{reannualize}},
+  \code{\link{reannualize.sr}},
+  \code{\link{reannualize.sropt}}, \code{\link{se}},
+  \code{\link{se.sr}}, \code{\link{sr}},
+  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
+  \code{\link{sr_vcov}}
+}
+\keyword{distribution}
+

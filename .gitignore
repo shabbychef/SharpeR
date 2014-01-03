@@ -11,12 +11,16 @@
 .local/
 .staging/
 *.Rcheck
+.ipynb_checkpoints
 
 # unit testing
 unit_test.log
 
 # build static/dynamic
 convoluted_build.sh
+
+# screwing around
+fooz.R
 
 # automagically generated?
 # ah, but these are needed for install_github:

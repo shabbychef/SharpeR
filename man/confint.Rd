@@ -132,7 +132,7 @@ aci <- confint(asro,level=0.95)
   \code{\link{as.sr.matrix}},
   \code{\link{as.sr.timeSeries}}, \code{\link{as.sr.xts}},
   \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{power.sr_test}},
+  \code{\link{plambdap}}, \code{\link{power.sr_test}},
   \code{\link{print.del_sropt}}, \code{\link{print.sr}},
   \code{\link{print.sropt}}, \code{\link{reannualize}},
   \code{\link{reannualize.sr}},
@@ -144,7 +144,8 @@ aci <- confint(asro,level=0.95)
   Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},
   \code{\link{as.sropt.xts}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
+  \code{\link{is.sropt}}, \code{\link{pco_sropt}},
+  \code{\link{power.sropt_test}},
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}, \code{\link{sropt}},
   \code{\link{sropt_test}}

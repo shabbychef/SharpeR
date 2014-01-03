@@ -2361,6 +2361,7 @@ distinction between mean and covariance, in order to simplify
 calculations and exposition. The basic idea is to prepend a 
 deterministic 1 to the random vector, then perform
 inference on the \emph{uncentered} second moment matrix.
+A longer form of this chapter is available elsewhere. \cite{pav2013markowitz}
 
 Let \avreti be the \nlatf-variate vector \vreti prepended with a 1:
 $\avreti = \asvec{1,\tr{\vreti}}$. Consider the second
@@ -2442,7 +2443,10 @@ is unknown. For the case where \vreti is multivariate Gaussian,
 The Markowitz portfolio appears in $-\minv{\svsm}$. Let \Elim
 be the `Elimination Matrix,' a matrix of zeros and ones with the
 property that $\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$  
-\cite{magnus1980elimination} We can find the asymptotic distribution
+\cite{magnus1980elimination} 
+Let \Dupp be the duplication matrix, which has the property that
+$\fvec{\Mtx{A}} = \Dupp\fvech{\Mtx{A}}.$  
+We can find the asymptotic distribution
 of $\minv{\svsm}$ via the delta method. The derivative of the matrix
 inverse is given by
 \begin{equation}
@@ -2454,8 +2458,8 @@ for symmetric \Mtx{A}.  \cite{magnus1980elimination,facklernotes}
 We can reduce this to the non-redundant parts via the Elimination matrix:
 \begin{equation}
 \dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
-= \qoform{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}{\Elim}
-= - \qoform{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}{\Elim}.
+= \EXD{\dbyd{\fvec{\minv{\Mtx{A}}}}{\fvec{\Mtx{A}}}}
+= - \EXD{\wrapParens{\AkronA{\minv{\Mtx{A}}}}}.
 \label{eqn:deriv_vech_matrix_inverse}
 \end{equation}
 
@@ -2464,7 +2468,7 @@ Then we have, via the delta method,
 \begin{multline}
 \sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
 \rightsquigarrow \\
-\normlaw{0,\qform{\pvvar}{\wrapBracks{\qoform{\wrapParens{\AkronA{\minv{\pvsm}}}}{\Elim}}}}.
+\normlaw{0,\qform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}.
 \label{eqn:mvclt_isvsm}
 \end{multline}
 %\end{equation}
@@ -2682,70 +2686,70 @@ Since $\pvsm[\txtMLE] = \svsm$, the log likelihood of the MLE is
 \end{split}
 \end{equation}
 
-\subsubsection{Fisher Information}
+%\subsubsection{Fisher Information}%FOLDUP
 
-\label{subsec:gaussian_fisher_inf}
+%\label{subsec:gaussian_fisher_inf}
 
-\providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
-\providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
-\providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
-\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
-\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+%\providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
+%\providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
+%\providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
+%\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+%\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
 
-To compute the Fisher Information, first compute
-the Hessian of $\log\FOOpdf{}{\svsm}{\pvsm}$ with
-respect to $\fvech{\minv{\pvsm}}$. From above we know that
-\begin{equation*}
-\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
- = \half[\ssiz]\wrapParens{\pvsm - \svsm}.
-\end{equation*}
-So
-\begin{equation*}
-\begin{split}
-\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
- & \defeq
-\drbydr{\fvech{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvech{\minv{\pvsm}}},\\
- &= - \half[\ssiz] \qoElim{\wrapParens{\AkronA{\pvsm}}},
-\end{split}
-\end{equation*}
-via \eqnref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
-`Elimination Matrix.' \cite{magnus1980elimination}
+%To compute the Fisher Information, first compute
+%the Hessian of $\log\FOOpdf{}{\svsm}{\pvsm}$ with
+%respect to $\fvech{\minv{\pvsm}}$. From above we know that
+%\begin{equation*}
+%\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+ %= \half[\ssiz]\wrapParens{\pvsm - \svsm}.
+%\end{equation*}
+%So
+%\begin{equation*}
+%\begin{split}
+%\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+ %& \defeq
+%\drbydr{\fvech{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}}}{\fvech{\minv{\pvsm}}},\\
+ %&= - \half[\ssiz] \qoElim{\wrapParens{\AkronA{\pvsm}}},
+%\end{split}
+%\end{equation*}
+%via \eqnref{deriv_vech_matrix_inverse}, where, again, \Elim is the 
+%`Elimination Matrix.' \cite{magnus1980elimination}
 
-Thus 
-\begin{equation}
-\FishIf[\ssiz]{\minv{\pvsm}} = \half[\ssiz]
-\qoElim{\wrapParens{\AkronA{\pvsm}}}.
-\end{equation}
-By change of variables, and again using \eqnref{deriv_vech_matrix_inverse}, 
-the Fisher Information with respect to \pvsm is
-\begin{equation}
-\FishIf[\ssiz]{\pvsm} = \half[\ssiz]
-\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}.
-\end{equation}
+%Thus 
+%\begin{equation}
+%\FishIf[\ssiz]{\minv{\pvsm}} = \half[\ssiz]
+%\qoElim{\wrapParens{\AkronA{\pvsm}}}.
+%\end{equation}
+%By change of variables, and again using \eqnref{deriv_vech_matrix_inverse}, 
+%the Fisher Information with respect to \pvsm is
+%\begin{equation}
+%\FishIf[\ssiz]{\pvsm} = \half[\ssiz]
+%\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}.
+%\end{equation}
 
-Under `the appropriate regularity conditions,' \cite{wasserman2004all}
-\begin{equation}
-\label{eqn:converge_theta}
-\begin{split}
-\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
-& \rightsquigarrow 
-\normlaw{0,\minv{\wrapParens{\FishIf[\ssiz]{\minv{\pvsm}}}}},\\
-\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
-& \rightsquigarrow 
-\normlaw{0,\minv{\wrapParens{\FishIf[\ssiz]{{\pvsm}}}}}.
-\end{split}
-\end{equation}
-Thus for the case of multivariate Gaussian returns, the term \pvvar
-from \eqnref{mvclt_svsm} is identified as
-\begin{equation}
-\begin{split}
-\label{eqn:pvvar_identity}
-\pvvar &= \ssiz\minv{\wrapParens{\FishIf[\ssiz]{{\pvsm}}}},\\
- &= 2
-\minv{\wrapParens{\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}}.
-\end{split}
-\end{equation}
-
+%Under `the appropriate regularity conditions,' \cite{wasserman2004all}
+%\begin{equation}
+%\label{eqn:converge_theta}
+%\begin{split}
+%\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+%& \rightsquigarrow 
+%\normlaw{0,\minv{\wrapParens{\FishIf[\ssiz]{\minv{\pvsm}}}}},\\
+%\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
+%& \rightsquigarrow 
+%\normlaw{0,\minv{\wrapParens{\FishIf[\ssiz]{{\pvsm}}}}}.
+%\end{split}
+%\end{equation}
+%Thus for the case of multivariate Gaussian returns, the term \pvvar
+%from \eqnref{mvclt_svsm} is identified as
+%\begin{equation}
+%\begin{split}
+%\label{eqn:pvvar_identity}
+%\pvvar &= \ssiz\minv{\wrapParens{\FishIf[\ssiz]{{\pvsm}}}},\\
+ %&= 2
+%\minv{\wrapParens{\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}}.
+%\end{split}
+%\end{equation}
+%%UNFOLD
 %UNFOLD
 
 \subsection{Likelihood Ratio Test}%FOLDUP
@@ -3088,8 +3092,8 @@ In this case, the lower boundary of
 where \psig[0] and \dslop are functions of \dknok, \dprob, \ssiz, and 
 the family of distributions on \retj. The minimum acceptable \txtSNR
 is $\fracc{-\psig[0]}{\dslop}.$ It may be the case that $\psig[0]$
-is negative...
-% 2FIX: more
+is negative.
+% 2FIX: more; give an example, say?
 
 %UNFOLD
 %UNFOLD
