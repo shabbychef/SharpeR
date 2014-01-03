@@ -1,0 +1,2267 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Asymptotic Distribution of the Markowitz Portfolio}
+%\VignetteKeyword{Finance}
+%\VignetteKeyword{Sharpe}
+%\VignettePackage{SharpeR}
+\documentclass[10pt,a4paper,english]{article}
+
+% front matter%FOLDUP
+\usepackage[hyphens]{url}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+% for therefore
+\usepackage{amssymb}
+% for theorems?
+\usepackage{amsthm}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{example}{Example}[section]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{caution}{Caution}
+\newtheorem*{note}{Note}
+
+% see http://tex.stackexchange.com/a/3034/2530
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+\usepackage{hyperref}
+\usepackage[square,numbers]{natbib}
+%\usepackage[authoryear]{natbib}
+%\usepackage[iso]{datetime}
+%\usepackage{datetime}
+
+%compactitem and such:
+\usepackage[newitem,newenum,increaseonly]{paralist}
+
+\makeatletter
+\makeatother
+
+%\input{sr_defs.tex}
+\usepackage{SharpeR}
+
+\providecommand{\sideWarning}[1][0.5]{\marginpar{\hfill\includegraphics[width=#1\marginparwidth]{warning}}}
+
+% knitr setup%FOLDUP
+
+<<'preamble', include=FALSE, warning=FALSE, message=FALSE>>=
+library(knitr)
+
+# set the knitr options ... for everyone!
+# if you unset this, then vignette build bonks. oh, joy.
+#opts_knit$set(progress=TRUE)
+opts_knit$set(eval.after='fig.cap')
+# for a package vignette, you do want to echo.
+# opts_chunk$set(echo=FALSE,warning=FALSE,message=FALSE)
+opts_chunk$set(warning=FALSE,message=FALSE)
+#opts_chunk$set(results="asis")
+opts_chunk$set(cache=TRUE,cache.path="cache/SharpeRatio")
+
+#opts_chunk$set(fig.path="figure/",dev=c("pdf","cairo_ps"))
+opts_chunk$set(fig.path="figure/SharpeRatio",dev=c("pdf"))
+opts_chunk$set(fig.width=5,fig.height=4,dpi=64)
+
+# doing this means that png files are made of figures;
+# the savings is small, and it looks like shit:
+#opts_chunk$set(fig.path="figure/",dev=c("png","pdf","cairo_ps"))
+#opts_chunk$set(fig.width=4,fig.height=4)
+# for figures? this is sweave-specific?
+#opts_knit$set(eps=TRUE)
+
+# this would be for figures:
+#opts_chunk$set(out.width='.8\\textwidth')
+# for text wrapping:
+options(width=64,digits=2)
+opts_chunk$set(size="small")
+opts_chunk$set(tidy=TRUE,tidy.opts=list(width.cutoff=50,keep.blank.line=TRUE))
+
+compile.time <- Sys.time()
+
+# from the environment
+
+# only recompute if FORCE_RECOMPUTE=True w/out case match.
+FORCE_RECOMPUTE <- 
+	(toupper(Sys.getenv('FORCE_RECOMPUTE',unset='False')) == "TRUE")
+
+# compiler flags!
+
+# not used yet
+LONG.FORM <- FALSE
+
+mc.resolution <- ifelse(LONG.FORM,1000,200)
+mc.resolution <- max(mc.resolution,100)
+
+library(quantmod)
+options("getSymbols.warning4.0"=FALSE)
+
+library(SharpeR)
+
+gen_norm <- rnorm
+lseq <- function(from,to,length.out) { 
+	exp(seq(log(from),log(to),length.out = length.out))
+}
+@
+%UNFOLD
+    
+% SYMPY preamble%FOLDUP
+    
+    %\usepackage{graphicx} % Used to insert images
+    %\usepackage{adjustbox} % Used to constrain images to a maximum size 
+    \usepackage{color} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    %\usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    %\usepackage[utf8]{inputenc} % Allow utf-8 characters in the tex document
+    %\usepackage[mathletters]{ucs} % Extended unicode (utf-8) support
+		\usepackage{fancyvrb} % verbatim replacement that allows latex
+    %\usepackage{grffile} % extends the file name processing of package graphics 
+                         % to support a larger range 
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    %\usepackage{longtable} % longtable support required by pandoc >1.10
+    
+
+    
+    
+    \definecolor{orange}{cmyk}{0,0.4,0.8,0.2}
+    \definecolor{darkorange}{rgb}{.71,0.21,0.01}
+    \definecolor{darkgreen}{rgb}{.12,.54,.11}
+    \definecolor{myteal}{rgb}{.26, .44, .56}
+    \definecolor{gray}{gray}{0.45}
+    \definecolor{lightgray}{gray}{.95}
+    \definecolor{mediumgray}{gray}{.8}
+    \definecolor{inputbackground}{rgb}{.95, .95, .85}
+    \definecolor{outputbackground}{rgb}{.95, .95, .95}
+    \definecolor{traceback}{rgb}{1, .95, .95}
+    % ansi colors
+    \definecolor{red}{rgb}{.6,0,0}
+    \definecolor{green}{rgb}{0,.65,0}
+    \definecolor{brown}{rgb}{0.6,0.6,0}
+    \definecolor{blue}{rgb}{0,.145,.698}
+    \definecolor{purple}{rgb}{.698,.145,.698}
+    \definecolor{cyan}{rgb}{0,.698,.698}
+    \definecolor{lightgray}{gray}{0.5}
+    
+    % bright ansi colors
+    \definecolor{darkgray}{gray}{0.25}
+    \definecolor{lightred}{rgb}{1.0,0.39,0.28}
+    \definecolor{lightgreen}{rgb}{0.48,0.99,0.0}
+    \definecolor{lightblue}{rgb}{0.53,0.81,0.92}
+    \definecolor{lightpurple}{rgb}{0.87,0.63,0.87}
+    \definecolor{lightcyan}{rgb}{0.5,1.0,0.83}
+    
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    
+    \DefineShortVerb[commandchars=\\\{\}]{\|}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+    
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatability definitions
+    \def\gt{>}
+    \def\lt{<}
+    
+
+    % Pygments definitions
+    
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\expandafter\def\csname PY@tok@gd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gu\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@gt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\expandafter\def\csname PY@tok@gs\endcsname{\let\PY@bf=\textbf}
+\expandafter\def\csname PY@tok@gr\endcsname{\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@cm\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@vg\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@m\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@go\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.53,0.53}{##1}}}
+\expandafter\def\csname PY@tok@ge\endcsname{\let\PY@it=\textit}
+\expandafter\def\csname PY@tok@vc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@il\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@cs\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.74,0.48,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gh\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@ni\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.60,0.60,0.60}{##1}}}
+\expandafter\def\csname PY@tok@nl\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@no\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@na\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.49,0.56,0.16}{##1}}}
+\expandafter\def\csname PY@tok@nb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@ne\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.82,0.25,0.23}{##1}}}
+\expandafter\def\csname PY@tok@nf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@si\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@s2\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@vi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@nt\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nv\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@s1\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sx\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@bp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@c1\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@kc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@c\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@mf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@err\endcsname{\def\PY@bc##1{\setlength{\fboxsep}{0pt}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}
+\expandafter\def\csname PY@tok@kd\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@ss\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@sr\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@mo\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@kn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@mi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@gp\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@o\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@kr\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@s\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@kp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@w\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\expandafter\def\csname PY@tok@kt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\expandafter\def\csname PY@tok@ow\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@sb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@k\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@se\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sd\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % Exact colors from NB
+    \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
+    \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
+
+
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy 
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=blue,
+      linkcolor=darkorange,
+      citecolor=darkgreen,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    %\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    %UNFOLD
+%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% document incantations%FOLDUP
+\begin{document}
+
+\title{Asymptotic Distribution of the \txtMwtz Portfolio}
+\author{Steven E. Pav \thanks{\email{spav@alumni.cmu.edu}}}
+%\date{\today, \currenttime}
+
+\maketitle
+%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}%FOLDUP
+The asymptotic distribution of the \txtMP, \minvAB{\svsig}{\svmu},
+is derived, for the general case (assuming fourth moments of returns exist), 
+and for the case of multivariate normal returns. 
+The derivation allows for inference which is robust to heteroskedasticity 
+and autocorrelation of moments up to order four. As a side effect, one 
+can estimate the proportion of error in the \txtMP due to 
+mis-estimation of the covariance matrix. A likelihood ratio test is given
+which generalizes Dempster's Covariance Selection test to allow inference
+on linear combinations of the precision matrix and the 
+\txtMP. \cite{dempster1972} Extensions of the main method to deal with
+hedged portfolios, conditional heteroskedasticity, and conditional 
+expectation are given.
+\end{abstract}%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}%FOLDUP
+
+Given \nlatf assets with expected return \pvmu and covariance of return \pvsig,
+the portfolio defined as 
+\begin{equation}
+\pportwopt \defeq \lambda \minvAB{\pvsig}{\pvmu}
+\end{equation}
+plays a special role in modern portfolio 
+theory. \cite{markowitz1952portfolio,brandt2009portfolio,GVK322224764}
+It is known as the `efficient portfolio', the `tangency portfolio', 
+and, somewhat informally, the `\txtMP'. 
+It appears, for various $\lambda$, in the solution to numerous
+portfolio optimization problems.  
+Besides the classic mean-variance formulation,
+it solves the (population) \txtSR maximization problem:
+\begin{equation}
+\max_{\pportw : \qform{\pvsig}{\pportw} \le \Rbuj^2} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:opt_port_I}
+\end{equation}
+where $\rfr\ge 0$ is the risk-free, or `disastrous', rate of return, and 
+$\Rbuj > 0$ is some given `risk budget'. 
+The solution to this optimization problem is $\lambda \minvAB{\pvsig}{\pvmu}$,
+where $\lambda = \fracc{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}.$
+\nocite{markowitz1952portfolio}  % does not actually mention this portfolio?
+
+In practice, the \txtMP has a somewhat checkered history. 
+The population parameters \pvmu and \pvsig are not known and must
+be estimated from samples. Estimation error results in a feasible
+portfolio, \sportwopt, of dubious value. Michaud went so far as to call
+mean-variance optimization, 
+``error maximization.'' \cite{michaud1989markowitz}  
+It has been suggested that simple portfolio heuristics outperform the
+\txtMP in practice.  \cite{demiguel2009optimal}  
+
+This paper focuses on the asymptotic distribution of the sample \txtMP. 
+By formulating the problem as a linear regression, Britten-Jones 
+very cleverly devised hypothesis tests on elements of \pportwopt,
+assuming multivariate Gaussian returns. \cite{BrittenJones1999}  
+In a remarkable series of papers, Okhrin and Schmid, and 
+Bodnar and Okhrin give the (univariate) density of
+the dot product of \pportwopt and a deterministic vector, again for the
+case of Gaussian returns. \cite{okhrin2006distributional,SJOS:SJOS729}  
+Okhrin and Schmid also show that all moments of
+$\fracc{\sportwopt}{\trAB{\vone}{\sportwopt}}$ of order greater than or
+equal to one do not exist. \cite{okhrin2006distributional}
+
+Here I derive asymptotic normality of \sportwopt, the sample
+analogue of \pportwopt, assuming only that the first four moments
+exist. Feasible estimation of the variance of \sportwopt is amenable
+to heteroskedasticity and autocorrelation robust 
+inference. \cite{Zeileis:2004:JSSOBK:v11i10}
+The asymptotic distribution under Gaussian returns is also derived.
+
+After estimating the covariance of \sportwopt, one can compute Wald
+test statistics for the elements of \sportwopt, possibly leading one
+to drop some assets from consideration (`sparsification'). Having
+an estimate of the covariance can also allow portfolio shrinkage.
+\cite{demiguel2013size,kinkawa2010estimation}
+
+The derivations in this paper actually solve a more general problem
+than the distribution of the sample \txtMP. The covariance of 
+\sportwopt and the `precision matrix,' \minv{\svsig} are derived.
+This allows one, for example, to estimate the proportion of error
+in the \txtMP attributable to mis-estimation of the covariance
+matrix. According to lore, the error in portfolio weights is
+mostly attributable to mis-estimation of \pvmu, 
+not of \pvsig. \cite{chopra1993effect,NBERw0444}
+
+Finally, assuming Gaussian returns, a likelihood ratio test for
+performing inference on linear combinations of elements of
+the \txtMP and the precision matrix is derived. This test
+generalizes a procedure by Dempster for inference on
+the precision matrix alone. \cite{dempster1972}
+
+% \cite{tu2011markowitz}  % is this needed? really. talmud ... 
+%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The augmented second moment}%FOLDUP
+
+Let \vreti be an array of returns of \nlatf assets, with mean \pvmu, and
+covariance \pvsig.  Let \avreti be \vreti prepended with a 1:
+$\avreti = \asvec{1,\tr{\vreti}}$. Consider the second
+moment of \avreti:
+\begin{equation}
+\pvsm \defeq \E{\ogram{\avreti}} = 
+	\twobytwo{1}{\tr{\pvmu}}{\pvmu}{\pvsig + \ogram{\pvmu}}.
+\label{eqn:pvsm_def}
+\end{equation}
+By inspection one can confirm that the
+inverse of \pvsm is
+\begin{equation}
+\minv{\pvsm} 
+= \twobytwo{1 + \qiform{\pvsig}{\pvmu}}{-\tr{\pvmu}\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{\minv{\pvsig}}
+= \twobytwo{1 + \psnrsqopt}{-\tr{\pportwopt}}{-\pportwopt}{\minv{\pvsig}},
+\label{eqn:trick_inversion}
+\end{equation}
+where $\pportwopt=\minvAB{\pvsig}{\svmu}$ is the \txtMP,
+and $\psnropt=\sqrt{\qiform{\pvsig}{\pvmu}}$ is the \txtSR of
+that portfolio. The matrix \pvsm contains the first and second
+moment of \vreti, but is also the uncentered second moment of
+\avreti, a fact which makes it amenable to analysis via the
+central limit theorem.
+
+The relationships above are merely facts of linear algebra, and so
+hold for sample estimates as well:
+\begin{equation*}
+\minv{\twobytwo{1}{\tr{\svmu}}{\svmu}{\svsig + \ogram{\svmu}}}
+= {\twobytwo{1 +
+\ssrsqopt}{-\tr{\sportwopt}}{-\sportwopt}{\minv{\svsig}}},
+\end{equation*}
+where \svmu, \svsig are some sample estimates of \pvmu and \pvsig, and 
+$\sportwopt = \minvAB{\svsig}{\svmu}, \ssrsqopt = \qiform{\svsig}{\svmu}$.
+
+Given \ssiz \iid observations \vreti[i], let \amreti be the matrix
+whose rows are the vectors \tr{\avreti[i]}. The na\"{i}ve sample estimator
+\begin{equation}
+\svsm \defeq \oneby{\ssiz}\gram{\amreti}
+\end{equation}
+is an unbiased estimator since $\pvsm = \E{\gram{\avreti}}$.
+
+\subsection{Matrix Derivatives}%FOLDUP
+
+\label{subsec:matrix_derivatives}
+
+Some notation and technical results concerning matrices are required.
+\begin{definition}[Matrix operations]%FOLDUP
+For matrix \Mtx{A},
+let \fvec{\Mtx{A}}, and \fvech{\Mtx{A}} be the vector and half-space
+vector operators.  The former turns an $\nlatf\times\nlatf$ matrix into
+an $\nlatf^2$ vector of its columns stacked on top of each other; the 
+latter vectorizes a symmetric (or lower triangular) matrix into a vector
+of the non-redundant elements.  
+Let \Elim be the `Elimination Matrix,' a matrix of zeros and ones with the
+property that 
+$\fvech{\Mtx{A}} = \Elim\fvec{\Mtx{A}}.$ The `Duplication Matrix,' \Dupp,
+is the matrix of zeros and ones that reverses this operation: 
+$\Dupp \fvech{\Mtx{A}} = \fvec{\Mtx{A}}.$ \cite{magnus1980elimination} 
+Note that this implies that 
+$$\Elim\Dupp = \eye \wrapParens{\ne \Dupp\Elim}.$$
+%This implies that \Dupp is the Moore-Penrose pseudoinverse of \Elim.
+
+Let \Unun be the `remove first' matrix, whose size should be inferred
+in context. It is a matrix of all rows but the first of the identity
+matrix. It exists to remove the first element of a vector.
+
+%Let \diag{\Mtx{A}} be the diagonal matrix with 
+%the same diagonal as \Mtx{A}. 
+%Define
+%\begin{equation}
+%\fsymd{\Mtx{A}} \defeq \Mtx{A} + \tr{\Mtx{A}} - \diag{\Mtx{A}}.
+%\end{equation}
+\end{definition}%UNFOLD
+\begin{definition}[Derivatives]%FOLDUP
+For $m$-vector \vect{x}, and $n$-vector \vect{y}, let the derivative
+\dbyd{\vect{y}}{\vect{x}} be the $n\times m$ matrix whose first column
+is the partial derivative of \vect{y} with respect to $x_1$.  
+This follows the so-called `numerator layout' convention. 
+For matrices \Mtx{Y} and \Mtx{X}, define
+\begin{equation*}
+\dbyd{\Mtx{Y}}{\Mtx{X}} \defeq \dbyd{\fvec{\Mtx{Y}}}{\fvec{\Mtx{X}}}.
+\end{equation*}
+\end{definition}%UNFOLD
+\begin{lemma}[Miscellaneous Derivatives]%FOLDUP
+\label{lemma:misc_derivs}
+For symmetric matrices \Mtx{Y} and \Mtx{X}, 
+%\begin{align}
+%\dbyd{\fvech{\Mtx{Y}}}{\fvec{\Mtx{X}}} &= \Elim \dbyd{\Mtx{Y}}{\Mtx{X}},\\
+%\dbyd{\fvec{\Mtx{Y}}}{\fvech{\Mtx{X}}} &= \dbyd{\Mtx{Y}}{\Mtx{X}}\Dupp,\\
+%\dbyd{\fvech{\Mtx{Y}}}{\fvech{\Mtx{X}}} &= \EXD{\dbyd{\Mtx{Y}}{\Mtx{X}}}.
+%\end{align}
+\begin{equation}
+\dbyd{\fvech{\Mtx{Y}}}{\fvec{\Mtx{X}}} = \Elim \dbyd{\Mtx{Y}}{\Mtx{X}},\quad
+\dbyd{\fvec{\Mtx{Y}}}{\fvech{\Mtx{X}}} = \dbyd{\Mtx{Y}}{\Mtx{X}}\Dupp,\quad
+\dbyd{\fvech{\Mtx{Y}}}{\fvech{\Mtx{X}}} = \EXD{\dbyd{\Mtx{Y}}{\Mtx{X}}}.
+\end{equation}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+For the first equation, note that 
+$\fvech{\Mtx{Y}} = \Elim\fvec{\Mtx{Y}}$, thus by the chain rule:
+$$
+\dbyd{\fvech{\Mtx{Y}}}{\fvec{\Mtx{X}}} = 
+\dbyd{\Elim \fvec{\Mtx{Y}}}{\fvec{\Mtx{Y}}} = \Elim \dbyd{\Mtx{Y}}{\Mtx{X}},
+$$
+by linearity of the derivative. The other identities follow similarly.
+\end{proof}%UNFOLD
+\begin{lemma}[Derivative of matrix inverse]%FOLDUP
+For invertible matrix \Mtx{A}, 
+\begin{equation}
+\dbyd{\minv{\Mtx{A}}}{\Mtx{A}} 
+%= \dvecbydvec{\minv{\Mtx{A}}}{\Mtx{A}}
+= - \wrapParens{\trminv{\Mtx{A}}\kron\minv{\Mtx{A}}}
+= - \minv{\wrapParens{\tr{\Mtx{A}}\kron\Mtx{A}}}.
+\label{eqn:deriv_vec_matrix_inverse}
+\end{equation}
+For \emph{symmetric} \Mtx{A}, the derivative with respect to the
+non-redundant part is 
+\begin{equation}
+\dbyd{\fvech{\minv{\Mtx{A}}}}{\fvech{\Mtx{A}}} 
+= - \EXD{\wrapParens{\minv{\Mtx{A}}\kron\minv{\Mtx{A}}}}.
+\label{eqn:deriv_vech_matrix_inverse}
+\end{equation}
+
+\label{lemma:deriv_vech_matrix_inverse}
+\end{lemma}%UNFOLD
+Note how this result generalizes the scalar derivative:
+$\dbyd{x^{-1}}{x} = - \wrapParens{x^{-1} x^{-1}}.$
+\begin{proof}%FOLDUP
+\eqnref{deriv_vec_matrix_inverse} is a known 
+result. \cite{facklernotes,magnus1999matrix}
+\eqnref{deriv_vech_matrix_inverse} then follows using \lemmaref{misc_derivs}.
+\end{proof}%UNFOLD
+%UNFOLD
+
+\subsection{Asymptotic distribution of the \txtMP}%FOLDUP
+
+\label{subsec:dist_markoport}
+\nocite{BrittenJones1999}
+
+Collecting the mean and covariance into the second moment matrix 
+gives the asymptotic distribution of the sample \txtMP
+without much work. In some sense, this computation
+generalizes the `standard' asymptotic analysis of Sharpe ratio of
+multiple assets. \cite{jobsonkorkie1981,lo2002,Ledoit2008850,Leung2008} 
+%\cite{jobsonkorkie1981,lo2002,mertens2002comments,Ledoit2008850,Leung2008,Wright2012} 
+
+%The asymptotic distribution of \minv{\pvsm} then follows from standard
+%techniques.
+\begin{theorem}%FOLDUP
+\label{theorem:inv_distribution}
+Let \svsm be the unbiased sample estimate of 
+\pvsm, based on \ssiz \iid samples of \vreti.
+Let \pvvar be the variance of $\fvech{\ogram{\avreti}}$.
+Then, asymptotically in \ssiz, 
+%\begin{multline}
+%\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+%\rightsquigarrow \\
+%\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}.
+%\label{eqn:mvclt_isvsm}
+%\end{multline}
+%\begin{equation}
+%\begin{split}
+%\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+%&\rightsquigarrow 
+%\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},\\
+%\mbox{where}\quad\Mtx{H} &= -\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}.
+%\label{eqn:mvclt_isvsm}
+%\end{split}
+%\end{equation}
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\rightsquigarrow \normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\label{eqn:mvclt_isvsm}
+\end{equation}
+where
+\begin{equation}
+\Mtx{H} = -\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}.
+\end{equation}
+Furthermore, we may replace \pvvar in this equation with an asymptotically
+consistent estimator, \svvar.
+\end{theorem}%UNFOLD
+\begin{proof}%FOLDUP
+Under the multivariate central limit theorem \cite{wasserman2004all}
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
+\rightsquigarrow 
+\normlaw{0,\pvvar},
+\label{eqn:mvclt_svsm}
+\end{equation}
+where \pvvar is the variance of $\fvech{\ogram{\avreti}}$, which, in general, 
+is unknown. 
+%(For the case where \vreti is multivariate Gaussian,
+%\pvvar is known; see \theoremref{ ... 
+By the delta method \cite{wasserman2004all},
+\begin{equation*}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\wrapBracks{\dbyd{\fvech{\minv{\pvsm}}}{\fvech{\pvsm}}}}}.
+\end{equation*}
+The derivative is given by \lemmaref{deriv_vech_matrix_inverse}, and
+the result follows.
+\end{proof}%UNFOLD
+
+%To estimate the covariance of $\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}$,
+To estimate the covariance of $\fvech{\minv{\svsm}}$,
+plug in \svsm for \pvsm in the covariance computation, and use some
+consistent estimator for \pvvar, call 
+it \svvar. 
+%Rather, one must estimate $\qform{\pvvar}{\Elim}$.
+One way to compute \svvar is to via the sample covariance of the
+vectors $\fvech{\ogram{\avreti[i]}} =
+\asvec{1,\tr{\vreti[i]},\tr{\fvech{\ogram{\vreti[i]}}}}$. 
+More elaborate covariance estimators can be used, for example, to deal with
+violations of the \iid assumptions. \cite{Zeileis:2004:JSSOBK:v11i10}
+\nocite{magnus1999matrix,magnus1980elimination}
+\nocite{BrittenJones1999}
+Note that because the first element of 
+$\fvech{\ogram{\avreti[i]}}$ is a deterministic $1$, the first row and
+column of \pvvar is all zeros, and we need not estimate it.
+%UNFOLD
+
+\subsection{The \txtSR optimal portfolio}%FOLDUP
+
+\begin{lemma}[\txtSR optimal portfolio]%FOLDUP
+\label{lemma:sr_optimal_portfolio}
+Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
+the portfolio optimization problem
+\begin{equation}
+\argmax_{\pportw :\, \qform{\pvsig}{\pportw} \le \Rbuj^2} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:sr_optimal_portfolio_problem}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+\begin{equation}
+\pportwoptR \defeq \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
+\minvAB{\pvsig}{\pvmu}.
+\end{equation}
+Moreover, this is the unique solution whenever $\rfr > 0$.
+The maximal objective achieved by this portfolio is
+$\sqrt{\qiform{\pvsig}{\pvmu}} - \fracc{\rfr}{\Rbuj}$.
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+By the Lagrange multiplier technique, the optimal portfolio
+solves the following equations:
+\begin{equation*}
+\begin{split}
+0 &= c_1 \pvmu - c_2 \pvsig \pportw - \gamma \pvsig \pportw,\\
+\qform{\pvsig}{\pportw} &\le \Rbuj^2,
+\end{split}
+\end{equation*}
+where $\gamma$ is the Lagrange multiplier, and $c_1, c_2$ are 
+scalar constants.
+Solving the first equation gives us
+$$
+\pportw = c\,\minvAB{\pvsig}{\pvmu}.
+$$
+This reduces the problem to the univariate optimization
+\begin{equation}
+\max_{c :\, c^2 \le \fracc{\Rbuj^2}{\psnrsqopt}} 
+\sign{c} \psnropt - \frac{\rfr}{\abs{c}\psnropt},
+\end{equation}
+where $\psnrsqopt = \qiform{\pvsig}{\pvmu}.$ The optimum
+occurs for $c = \fracc{\Rbuj}{\psnropt}$, moreover the optimum
+is unique when $\rfr > 0$.
+\end{proof}%UNFOLD
+
+Note that the first element of \fvech{\minv{\pvsm}} is $1 +
+\qiform{\pvsig}{\pvmu}$, and elements 2 through $\nlatf+1$ are 
+$-\pportwopt$. Thus, \pportwoptR, the portfolio that maximizes the \txtSR, 
+is some transformation of \fvech{\minv{\pvsm}}, and another 
+application of the delta method gives its asymptotic distribution,
+as in the following corollary to \theoremref{inv_distribution}.
+
+\begin{corollary}%FOLDUP
+\label{corollary:portwoptR_dist}
+Let 
+\begin{equation}
+\pportwoptR = \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
+\minvAB{\pvsig}{\pvmu},
+\end{equation}
+and similarly, let \sportwoptR be the sample analogue, where \Rbuj is
+some risk budget. Then
+%\begin{multline}
+%\sqrt{\ssiz}\wrapParens{\sportwoptR - \pportwoptR} 
+%\rightsquigarrow \\
+%\normlaw{0,\qform{\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}}}}{\Mtx{K}}},
+%\label{eqn:mvclt_portfolio}
+%\end{multline}
+%where 
+%$$
+%\Mtx{K} = - \Rbuj \asvec{\half \frac{\pportwoptR}{\psnrsqopt},
+%\oneby{\psnropt}\eye[\nlatf],\mzero},
+%$$
+%and $\psnrsqopt \defeq \qiform{\pvsig}{\pvmu}.$
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\sportwoptR - \pportwoptR} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\label{eqn:mvclt_portfolio}
+\end{equation}
+where
+\begin{equation}
+\begin{split}
+\Mtx{H} &= \wrapParens{- \asrowvec{\oneby{2\psnrsqopt} \pportwoptR,
+\frac{\Rbuj}{\psnropt}\eye[\nlatf],\mzero}} 
+\wrapParens{-\EXD{\wrapParens{\AkronA{\minv{\pvsm}}}}},\\
+\psnrsqopt &\defeq \qiform{\pvsig}{\pvmu}.
+\end{split}
+\end{equation}
+\end{corollary}%UNFOLD
+\begin{proof}%FOLDUP
+By the delta method, and \theoremref{inv_distribution}, it suffices
+to show that 
+%$$\tr{\Mtx{K}} = \dbyd{\pportwoptR}{\fvech{\minv{\pvsm}}}.$$
+$$\dbyd{\pportwoptR}{\fvech{\minv{\pvsm}}} 
+= - \asrowvec{\oneby{2\psnrsqopt} \pportwoptR,
+\frac{\Rbuj}{\psnropt}\eye[\nlatf],\mzero}.
+$$
+To show this, note that \pportwoptR is $-\Rbuj$ times elements
+2 through $\nlatf+1$ of \fvech{\minv{\pvsm}} divided by 
+$\psnropt = \sqrt{\trAB{\basev[1]}{\fvech{\minv{\pvsm}}} - 1}$, where
+$\basev[i]$ is the \kth{i} column of the identity matrix. The result
+follows from basic calculus.
+\end{proof}%UNFOLD
+%UNFOLD
+
+%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Distribution under Gaussian returns}%FOLDUP
+
+The goal of this section is to derive a variant of 
+\theoremref{inv_distribution} for the case where \vreti follow a 
+multivariate Gaussian distribution. First, 
+assuming $\vreti\sim\normlaw{\pvmu,\pvsig}$, we can express the density
+of \vreti, and of \svsm, in terms of \nlatf, \ssiz, and \pvsm.
+
+\begin{lemma}[Gaussian sample density]%FOLDUP
+Suppose $\vreti\sim\normlaw{\pvmu,\pvsig}$. Letting 
+$\avreti = \asvec{1,\tr{\vreti}}$, and $\pvsm = \E{\ogram{\avreti}}$,
+then the negative log likelihood of \vreti is
+\begin{equation}
+- \log\normpdf{\vreti}{\pvmu,\pvsig} = 
+  c_{\nlatf} 
++ \half \logdet{\pvsm} 
++ \half \trace{\minv{\pvsm}\ogram{\avreti}},
+\end{equation}
+for the constant 
+$c_{\nlatf} = -\half + \half[\nlatf]\log\wrapParens{2\pi}.$
+\label{lemma:x_dist_gaussian}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+By the block determinant formula,
+\begin{equation*}
+\det{\pvsm} 
+= \det{1}\det{\wrapParens{\pvsig + \ogram{\pvmu}} - \pvmu 1^{-1} \tr{\pvmu}}
+= \det{\pvsig}.
+\end{equation*}
+Note also that
+\begin{equation*}
+\qiform{\pvsig}{\wrapParens{\vreti - \pvmu}} = 
+\qiform{\pvsm}{\avreti} - 1.
+\end{equation*}
+These relationships hold without assuming a particular distribution for 
+\vreti. 
+
+The density of \vreti is then
+\begin{equation*}
+\begin{split}
+\normpdf{\vreti}{\pvmu,\pvsig} &= \frac{1}{\sqrt{\wrapParens{2\pi}^{\nlatf}\det{\pvsig}}} 
+\longexp{-\half \qiform{\pvsig}{\wrapParens{\vreti - \pvmu}}},\\
+ &= \frac{\detpow{\pvsig}{-\half}}{\wrapParens{2\pi}^{\nlatf/2}}
+\longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2} \detpow{\pvsm}{-\half}
+\longexp{-\half \wrapParens{\qiform{\pvsm}{\avreti} - 1}},\\
+ &= \wrapParens{2\pi}^{-\nlatf/2}
+\longexp{\half - \half \logdet{\pvsm} - \half \trace{\minv{\pvsm}\ogram{\avreti}}},
+%\therefore - \log\normpdf{\vreti}{\pvmu,\pvsig} &= 
+	%- \half + \half[\nlatf]\log\wrapParens{2\pi}
+%+ \half \logdet{\pvsm} 
+%+ \half \trace{\minv{\pvsm}\ogram{\avreti}}.
+\end{split}
+\end{equation*}
+and the result follows.
+\end{proof}
+%UNFOLD
+
+\begin{lemma}[Gaussian second moment matrix density]%FOLDUP
+Let $\vreti\sim\normlaw{\pvmu,\pvsig}$, 
+$\avreti = \asvec{1,\tr{\vreti}}$, 
+and $\pvsm = \E{\ogram{\avreti}}$. 
+Given \ssiz \iid samples \vreti[i], let 
+Let $\svsm = \oneby{\ssiz}\sum_i \ogram{\avreti[i]}$.
+Then the density of \svsm is 
+\begin{equation}
+\FOOpdf{}{\svsm}{\pvsm} =
+\longexp{c'_{\ssiz,\nlatf}}\frac{\det{\svsm}^{\half[\ssiz-\nlatf-2]}}{\det{\pvsm}^{\half[\ssiz]}}
+\longexp{-\half[\ssiz]\trace{\minv{\pvsm}\svsm}},
+\label{eqn:theta_dist_gaussian}
+\end{equation}
+for some $c'_{\ssiz,\nlatf}.$
+\label{lemma:theta_dist_gaussian}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+Let \amreti be the matrix
+whose rows are the vectors \tr{\vreti[i]}. 
+From \lemmaref{x_dist_gaussian}, and using linearity of the trace, 
+the negative log density of \amreti is
+\begin{equation*}
+\begin{split}
+- \log\normpdf{\amreti}{\pvsm} &=
+  \ssiz c_{\nlatf} 
++ \half[\ssiz] \logdet{\pvsm} 
++ \half \trace{\minv{\pvsm}\gram{\amreti}},\\
+\therefore
+\frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz} &= 
+  2 c_{\nlatf} 
++ \logdet{\pvsm} 
++ \trace{\minv{\pvsm}\svsm}.
+\end{split}
+\end{equation*}
+
+By Lemma (5.1.1) of Press \cite{press2012applied}, this can be expressed
+as a density on \svsm:
+\begin{equation*}
+\begin{split}
+\frac{- 2\log\FOOpdf{}{\svsm}{\pvsm}}{\ssiz} 
+&= \frac{- 2\log\normpdf{\amreti}{\pvsm}}{\ssiz}
+	-\frac{2}{\ssiz}\wrapParens{\half[\ssiz-\nlatf-2]\logdet{\svsm}}\\
+&\phantom{=}\,
+	-\frac{2}{\ssiz}\wrapParens{\half[\nlatf+1]\wrapParens{\ssiz - \half[\nlatf]} \log\pi -
+	\sum_{j=1}^{\nlatf+1} \log\funcit{\Gamma}{\half[\ssiz +1-j]}},\\
+&= \wrapBracks{2c_{\nlatf} - \frac{\nlatf+1}{\ssiz}\wrapParens{\ssiz - \half[\nlatf]} \log\pi 
+	- \frac{2}{\ssiz} \sum_{j=1}^{\nlatf+1}
+	\log\funcit{\Gamma}{\half[\ssiz +1-j]}}\\
+&\phantom{=}\,
+	+ \logdet{\pvsm} - \frac{\ssiz-\nlatf-2}{\ssiz}\logdet{\svsm}
+	+ \trace{\minv{\pvsm}\svsm},\\
+&= c'_{\ssiz,\nlatf} 
+	- \log\frac{\det{\svsm}^{\frac{\ssiz-\nlatf-2}{\ssiz}}}{\det{\pvsm}}
+	+ \trace{\minv{\pvsm}\svsm},
+\end{split}
+\end{equation*}
+where $c'_{\ssiz,\nlatf}$ is the term in brackets on the third line.
+Factoring out $\fracc{-2}{\ssiz}$ and taking an exponent gives the
+result.
+\end{proof}%UNFOLD
+\begin{corollary}%FOLDUP
+The random variable $\ssiz\svsm$ has the same density, up to a constant 
+in \nlatf and \ssiz, as a 
+$\nlatf+1$-dimensional Wishart random variable with \ssiz degrees of freedom
+and scale matrix \pvsm. Thus $\ssiz\svsm$ is a \emph{conditional} Wishart,
+conditional on $\svsm_{1,1} = 1$.  \cite{press2012applied,anderson2003introduction}
+%conditional on $\svsm_{\nlatf+1,\nlatf+1} = 1$.  % for the other form.
+\end{corollary}%UNFOLD
+\begin{corollary}%FOLDUP
+The derivatives of log likelihood are given by 
+\begin{equation}
+\begin{split}
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\fvec{\pvsm}} 
+	&= - \half[\ssiz]\tr{\wrapBracks{\fvec{\minv{\pvsm} -
+\minv{\pvsm}\svsm\minv{\pvsm}}}},\\
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\fvec{\minv{\pvsm}}} 
+	&= -\half[\ssiz]\tr{\wrapBracks{\fvec{\pvsm - \svsm}}}.
+\end{split}
+\label{eqn:deriv_gauss_loglik}
+\end{equation}
+\end{corollary}%UNFOLD
+\begin{proof}%FOLDUP
+Plugging in the log likelihood gives
+\begin{equation*}
+\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\fvec{\pvsm}}
+ = - \half[\ssiz]\wrapBracks{\drbydr{\logdet{\pvsm}}{\fvec{\pvsm}} +
+\drbydr{\trace{\minv{\pvsm}\svsm}}{\fvec{\pvsm}}},
+\end{equation*}
+and then standard matrix calculus gives the first 
+result. \cite{magnus1999matrix,petersen2012matrix}
+Proceeding similarly gives the second.
+\end{proof}%UNFOLD
+
+This immediately gives us the Maximum Likelihood Estimator.
+
+\begin{corollary}[MLE]%FOLDUP
+\svsm is the maximum likelihood estimator of \pvsm. \label{corollary:theta_mle}
+\end{corollary}%UNFOLD
+
+To compute the covariance of \fvech{\pvsm}, \pvvar, in the Gaussian case, one
+can compute the Fisher Information, then appeal to the fact that
+\pvsm is the MLE. However, because the first element of \fvech{\pvsm}
+is a deterministic $1$, the first row and column of \pvvar are all
+zeros. This is an unfortunate wrinkle. The solution is to compute the
+Fisher Information with respect to the nonredundant variables, 
+$\Unun\fvech{\pvsm}$, as follows.
+
+%Since $\pvsm[\txtMLE] = \svsm$, the log likelihood of the MLE is 
+%\begin{equation}
+%\begin{split}
+%\log\FOOlik{}{\svsm}{\pvsm[\txtMLE]} 
+ %&= - \half[\ssiz] c'_{\ssiz,\nlatf} - \half[\ssiz] \logdet{\pvsm[\txtMLE]} +
+ %\half[\ssiz-\nlatf-2]\logdet{\svsm}\\
+%&\phantom{=}\,+ \trace{\minv{\pvsm[\txtMLE]}\svsm},\\
+ %&= -\half[\ssiz] c'_{\ssiz,\nlatf} 
+ %- \half[\nlatf+2]\logdet{\svsm} + \wrapParens{\nlatf+1}.
+%\end{split}
+%\end{equation}
+
+%\begin{lemma}%FOLDUP
+%The Fisher Information of $\fvec{\minv{\pvsm}}$ is
+%\begin{equation}
+%\FishIf[\ssiz]{\fvec{\minv{\pvsm}}} 
+%= \half[\ssiz] {\AkronA{\pvsm}},
+%\label{eqn:itheta_fish_inf_eqn}
+%\end{equation}
+%and, by change of variables, the Fisher Information 
+%of $\fvech{\minv{\pvsm}}$ is
+%\begin{equation}
+%\FishIf[\ssiz]{\fvech{\minv{\pvsm}}} 
+%= \half[\ssiz] \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}.
+%\label{eqn:itheta_vech_fish_inf_eqn}
+%\end{equation}
+%\label{lemma:itheta_fish_inf}
+%\end{lemma}%UNFOLD
+
+\begin{lemma}[Fisher Information]%FOLDUP
+The Fisher Information of $\Unun\fvech{\pvsm}$ is 
+\begin{multline}
+\FishIf[\ssiz]{\Unun\fvech{\pvsm}} 
+=\\ \half[\ssiz] 
+\qoform{ \qform{ \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}
+}{\wrapBracks{\EXD{\wrapParens{\minv{\pvsm}\kron\minv{\pvsm}}}}} }{\Unun}.
+\label{eqn:theta_fish_inf_eqn}
+\end{multline}
+\label{lemma:theta_fish_inf}
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+First compute the Hessian of $\log\FOOpdf{}{\svsm}{\pvsm}$ with
+respect to $\fvec{\minv{\pvsm}}$. The Hessian is defined as
+\begin{equation*}
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvec{\minv{\pvsm}}}}
+ \defeq
+\drbydr{\tr{\wrapBracks{\drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\fvec{\minv{\pvsm}}}}}}{\fvec{\minv{\pvsm}}}.
+\end{equation*}
+Then, from \eqnref{deriv_gauss_loglik},
+\begin{equation*}
+\begin{split}
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvec{\minv{\pvsm}}}}
+ &= - \half[\ssiz] \dbyd{\wrapBracks{\pvsm - \svsm}}{\fvec{\minv{\pvsm}}},\\
+ &= - \half[\ssiz] \wrapParens{\AkronA{\pvsm}},
+\end{split}
+\end{equation*}
+via \lemmaref{deriv_vech_matrix_inverse}. Perform a change of variables.
+%Noting that $\dbyd{\fvec{\Mtx{A}}}{\fvech{\Mtx{A}}} = \Dupp,$ we have
+Via \lemmaref{misc_derivs}, 
+\begin{equation*}
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvech{\minv{\pvsm}}}}
+ = - \half[\ssiz] \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}.
+\end{equation*}
+Using \lemmaref{deriv_vech_matrix_inverse}, perform another change of
+variables to find
+\begin{equation*}
+\drbydr[2]{\log\FOOpdf{}{\svsm}{\pvsm}}{\wrapParens{\fvech{\pvsm}}}
+ = - \half[\ssiz] 
+\qform{ \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}
+}{\wrapBracks{\EXD{\wrapParens{\minv{\pvsm}\kron\minv{\pvsm}}}}}.
+\end{equation*}
+Finally, perform the change of variables to get the Hessian with
+respect to $\Unun\fvech{\pvsm}$. 
+Since the Fisher Information is negative the expected value of this 
+Hessian, the result follows. \cite{pawitanIAL}
+\end{proof}%UNFOLD
+%\begin{corollary}%FOLDUP
+%By change of variables, and again using \lemmaref{deriv_vech_matrix_inverse}, 
+%the Fisher Information with respect to \pvsm is
+%\begin{equation}
+%\FishIf[\ssiz]{\pvsm} = \half[\ssiz]
+%\qform{\wrapParens{\qoElim{\wrapParens{\AkronA{\pvsm}}}}}{\wrapBracks{\qoElim{\wrapParens{\AkronA{\minv{\pvsm}}}}}}.
+%\end{equation}
+%\end{corollary}%UNFOLD
+
+Thus the analogue of \theoremref{inv_distribution} for Gaussian returns
+is given by the following theorem.
+\begin{theorem}%FOLDUP
+\label{theorem:theta_asym_var_gaussian}
+Let \svsm be the unbiased sample estimate of 
+\pvsm, based on \ssiz \iid samples of \vreti, assumed multivariate
+Gaussian.
+Then, asymptotically in \ssiz, 
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\svsm} - \fvech{\pvsm}} 
+\rightsquigarrow 
+\normlaw{0,\pvvar},
+\label{eqn:mvclt_isvsm_gaussian}
+\end{equation}
+where the first row and column of \pvvar are all zero, and the lower
+right block part is
+\begin{equation*}
+2\minv{\wrapBracks{
+\qoform{ \qform{ \qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}
+}{\wrapBracks{\EXD{\wrapParens{\minv{\pvsm}\kron\minv{\pvsm}}}}} }{\Unun}}}.
+\end{equation*}
+\end{theorem}%UNFOLD
+\begin{proof}%FOLDUP
+Under `the appropriate regularity conditions,'
+\cite{wasserman2004all,pawitanIAL}
+\begin{equation}
+\label{eqn:converge_theta}
+\wrapParens{\Unun\fvech{{\svsm}} - \Unun\fvech{{\pvsm}}} 
+\rightsquigarrow 
+\normlaw{0,\minv{\wrapBracks{\FishIf[\ssiz]{\Unun\fvech{{\pvsm}}}}}},
+\end{equation}
+and the result follows from 
+\lemmaref{theta_fish_inf}, and the fact that the first elements of both
+\vech{\svsm} and \vech{\pvsm} are a deterministic $1$.
+\end{proof}%UNFOLD
+
+The `plug-in' estimator of the covariance substitutes in \svsm for
+\pvsm in the right hand side of \eqnref{mvclt_isvsm_gaussian}. 
+The following conjecture is true in the $\nlatf=1$ case. Use of 
+the Sherman-Morrison-Woodbury formula might aid in a proof.
+
+\begin{conjecture}%FOLDUP
+\label{conjecture:theta_asym_var_gaussian}
+For the Gaussian case, asymptotically in \ssiz, 
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm}} - \fvech{\minv{\pvsm}}} 
+\rightsquigarrow 
+\normlaw{0,2 \minv{\wrapBracks{\qform{\wrapParens{\AkronA{\pvsm}}}{\Dupp}}} -
+2\ogram{\basev[1]}}.
+\end{equation}
+\end{conjecture}%UNFOLD
+
+A check of \theoremref{theta_asym_var_gaussian} and an illustration of
+\conjectureref{theta_asym_var_gaussian} are given in the appendix.
+
+\subsection{Likelihood ratio test on \txtMP}%FOLDUP
+
+\providecommand{\lrtA}[1][i]{\mathSUB{\Mtx{A}}{#1}}
+\providecommand{\lrta}[1][i]{\mathSUB{a}{#1}}
+
+%This section is based on Dempster's ``Covariance Selection''. \cite{dempster1972}
+
+Consider the null hypothesis
+\begin{equation}
+H_0: \trace{\lrtA[i]\minv{\pvsm}} = \lrta[i],\,i=1,\ldots,m.
+\label{eqn:lrt_null_back}
+\end{equation}
+The constraints have to be sensible. 
+For example, they cannot
+violate the positive definiteness of 
+\minv{\pvsm}, symmetry, \etc 
+Without loss of generality, we can assume
+that the \lrtA[i] are symmetric, since \pvsm is symmetric, and for
+symmetric \Mtx{G} and square \Mtx{H}, 
+$\trace{\Mtx{G}\Mtx{H}} = \trace{\Mtx{G}\half\wrapParens{\Mtx{H} +
+\tr{\Mtx{H}}}}$, and so we could replace any non-symmetric \lrtA[i] with
+$\half\wrapParens{\lrtA[i] + \tr{\lrtA[i]}}$.
+
+Employing the Lagrange multiplier technique, the maximum likelihood
+estimator under the null hypothesis, call it \pvsm[0], solves the
+following equation
+\begin{equation}
+\begin{split}
+0 &= \drbydr{\log\FOOpdf{}{\svsm}{\pvsm}}{\minv{\pvsm}}
+- \sum_i \lambda_i
+\drbydr{\trace{\lrtA[i]\minv{\pvsm}}}{\minv{\pvsm}},\notag \\
+&= - \pvsm[0] + \svsm - \sum_i \lambda_i \lrtA[i],\notag.
+\end{split}
+\end{equation}
+Thus the MLE under the null is
+\begin{equation}
+\pvsm[0] = \svsm - \sum_i \lambda_i \lrtA[i].
+\label{eqn:lrt_mle_soln}
+\end{equation}
+The maximum likelihood estimator under the constraints has to be
+found numerically by solving for the $\lambda_i$, subject
+to the constraints in \eqnref{lrt_null_back}.
+
+This framework slightly generalizes Dempster's 
+``Covariance Selection,'' \cite{dempster1972} which
+reduces to the case where each \lrta[i] is zero, and
+each \lrtA[i] is a matrix of all zeros except two (symmetric) ones 
+somewhere in the lower right $\nlatf \times \nlatf$ sub matrix. In
+all other respects, however, the solution here follows Dempster.
+
+\providecommand{\vitrlam}[2]{\vectUL{\lambda}{\wrapNeParens{#1}}{#2}}
+\providecommand{\sitrlam}[2]{\mathUL{\lambda}{\wrapNeParens{#1}}{#2}}
+\providecommand{\vitrerr}[2]{\vectUL{\epsilon}{\wrapNeParens{#1}}{#2}}
+\providecommand{\sitrerr}[2]{\mathUL{\epsilon}{\wrapNeParens{#1}}{#2}}
+
+An iterative technique for finding the MLE based on a Newton step 
+would proceed as follow.  \cite{nocedal2006numerical} 
+Let \vitrlam{0}{} be some initial estimate of the
+vector of $\lambda_i$. (A good initial estimate can likely be had 
+by abusing the asymptotic normality 
+result from \subsecref{dist_markoport}.)
+The residual of the \kth{k} estimate, \vitrlam{k}{} is
+\begin{equation}
+\vitrerr{k}{i} \defeq 
+\trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}} - \lrta[i].
+\end{equation}
+The Jacobian of this residual with respect to the \kth{l} element of \vitrlam{k}
+is
+\begin{equation}
+\begin{split}
+\drbydr{\vitrerr{k}{i}}{\sitrlam{k}{l}} &= 
+\trace{\lrtA[i]\minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}
+\lrtA[l] \minv{\wrapBracks{\svsm - \sum_j \sitrlam{k}{j} \lrtA[j]}}},\\
+&= \tr{\fvec{\lrtA[i]}} \wrapParens{\AkronA{\minv{\wrapBracks{\svsm - \sum_j
+\sitrlam{k}{j}\lrtA[j]}}}} \fvec{\lrtA[l]}.
+\end{split}
+\end{equation}
+
+Newton's method is then the iterative scheme
+\begin{equation}
+\vitrlam{k+1}{} \leftarrow \vitrlam{k}{} -
+\minv{\wrapParens{\drbydr{\vitrerr{k}{}}{\vitrlam{k}{}}}} \vitrerr{k}.
+\end{equation}
+%Note there is no reason one must use a Newton scheme to maximize the
+%likelihood. High quality optimization routines (\eg BFGS) which require
+%only the gradient to be 
+%There is no reason to restrict oneself to a Newton solver. High quality
+%optimization routines which require ...
+%\cite{nocedal2006numerical} 
+
+When (if?) the iterative scheme converges on the optimum, plugging in
+\vitrlam{k}{} into \eqnref{lrt_mle_soln} gives the MLE under the null.
+The likelihood ratio test statistic is 
+\begin{equation}
+\begin{split}
+-2\log\Lambda &\defeq
+-2\log\wrapParens{\frac{\FOOlik{}{\svsm}{\pvsm[0]}}{\FOOlik{}{\svsm}{\pvsm[\mbox{unrestricted }\txtMLE]}}},\\
+&= \ssiz\wrapParens{\logdet{\pvsm[0]\minv{\svsm}} + 
+\trace{\wrapBracks{\minv{\pvsm[0]} - \minv{\svsm}}\svsm}},\\
+&= \ssiz\wrapParens{\logdet{\pvsm[0]\minv{\svsm}} + 
+\trace{\minv{\pvsm[0]}\svsm} - \wrapBracks{\nlatf + 1}},
+\end{split}
+\label{eqn:wilks_lambda_def}
+\end{equation}
+using the fact that \svsm is the unrestricted MLE, per 
+\corollaryref{theta_mle}.
+By Wilks' Theorem, under the null 
+hypothesis, $-2\log\Lambda$ is, asymptotically in \ssiz, distributed as 
+a chi-square with $m$ degrees of freedom. \cite{wilkstheorem1938}
+
+%UNFOLD
+%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Extensions}%FOLDUP
+
+For large samples, Wald statistics of the elements of the Markowitz
+portfolio computed using the procedure outlined above tend to be 
+very similar to the t-statistics produced by the procedure of 
+Britten-Jones. \cite{BrittenJones1999} 
+However, the technique proposed here admits a number of interesting
+extensions.
+
+The script for each of these extensions is the same: 
+define, then solve, some portfolio optimization problem; 
+show that the solution can be defined in terms of some transformation 
+of $\minv{\pvsm}$, giving an implicit recipe for constructing the 
+sample portfolio based on the same transformation of $\minv{\svsm}$; 
+find the asymptotic distribution of the sample portfolio in terms of \pvvar.
+%which can be estimated empirically, or via assuming Gaussian returns.
+
+\subsection{Subspace Constraint} %FOLDUP
+\label{subsec:subspace_constraint}
+
+Consider the \emph{constrained} portfolio optimization problem
+\begin{equation}
+\max_{\substack{\pportw : \zerJc \pportw = \vzero,\\
+\qform{\pvsig}{\pportw} \le \Rbuj^2}}
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:portopt_zer}
+\end{equation}
+where $\zerJc$ is a $\wrapParens{\nlatf - \nlatfzer} \times \nlatf$ 
+matrix of rank $\nlatf - \nlatfzer$, 
+\rfr is the disastrous rate, and $\Rbuj > 0$ is the
+risk budget. Let the rows of \zerJ span the null space of the rows of
+\zerJc; that is, $\zerJc \tr{\zerJ} = \mzero$, and $\ogram{\zerJ} = \eye$.
+We can interpret the orthogonality constraint $\zerJc \pportw = \vzero$ as
+stating that \pportw must be a linear combination of the columns of
+\tr{\zerJ}, thus $\pportw = \trAB{\zerJ}{\pportx}$. The columns of
+\tr{\zerJ} may be considered `baskets' of assets to which our investments
+are restricted.
+
+We can rewrite the portfolio optimization problem in terms of solving
+for \pportx, but then find the asymptotic distribution of the resultant
+\pportw. Note that the expected return and covariance of the portfolio
+\pportx are, respectively, \trAB{\pportx}{\zerJ\pvmu} and 
+\qform{\qoform{\pvsig}{\zerJ}}{\pportx}. Thus we can plug in
+$\zerJ\pvmu$ and \qoform{\pvsig}{\zerJ} into 
+\lemmaref{sr_optimal_portfolio} to get the following analogue.
+
+\begin{lemma}[subspace constrained \txtSR optimal portfolio]%FOLDUP
+\label{lemma:subsp_cons_sr_optimal_portfolio}
+Assuming the rows of \zerJ span the null space of the rows of \zerJc,
+$\zerJ\pvmu \ne \vzero$, and \pvsig is invertible,
+the portfolio optimization problem
+\begin{equation}
+\max_{\substack{\pportw : \zerJc \pportw = \vzero,\\
+\qform{\pvsig}{\pportw} \le \Rbuj^2}} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:portopt_zer_I}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+\begin{equation*}
+\begin{split}
+\pportwoptFoo{\Rbuj,\zerJ,} 
+ &\defeq c \wrapProj{\pvsig}{\zerJ}\pvmu,\\
+ c &= \frac{\Rbuj}{\sqrt{\qform{\wrapProj{\pvsig}{\zerJ}}{\pvmu}}}.
+\end{split}
+\end{equation*}
+When $\rfr > 0$ the solution is unique.
+\end{lemma}%UNFOLD
+
+We can easily find the asymptotic distribution of
+\sportwoptFoo{\Rbuj,\zerJ,}, the sample analogue of the optimal portfolio
+in \lemmaref{subsp_cons_sr_optimal_portfolio}. First define the
+subspace second moment.
+
+
+%\begin{definition}[Subspace Second Moment]%FOLDUP
+%\label{definition:subspace_second_moment}
+%Let \zerJt be the $\wrapParens{1+\nlatfzer}\times\wrapParens{\nlatf+1}$
+%matrix,
+%$$
+%\zerJt \defeq \twobytwossym{1}{0}{\zerJ}.
+%$$
+%Define the `subspace second moment' as
+%$$
+%\pvsm[\zerJ] \defeq \qoform{\pvsm}{\zerJt}.
+%$$
+%\end{definition}%UNFOLD
+\begin{definition}%FOLDUP
+\label{definition:subspace_second_moment}
+Let \zerJt be the $\wrapParens{1+\nlatfzer}\times\wrapParens{\nlatf+1}$
+matrix,
+$$
+\zerJt \defeq \twobytwossym{1}{0}{\zerJ}.
+$$
+%Define the `subspace second moment' as
+%$$
+%\pvsm[\zerJ] \defeq \qoform{\pvsm}{\zerJt}.
+%$$
+\end{definition}%UNFOLD
+
+Simple algebra proves the following lemma.
+
+\begin{lemma}%FOLDUP
+The elements of $\wrapProj{\pvsm}{\zerJt}$
+are 
+\begin{equation*}
+\wrapProj{\pvsm}{\zerJt}
+=
+\twobytwo{ 1 + \qform{\wrapProj{\pvsig}{\zerJ}}{\pvmu} }{
+-\tr{\pvmu}\wrapProj{\pvsig}{\zerJ}}{
+-\wrapProj{\pvsig}{\zerJ}\pvmu}{
+\wrapProj{\pvsig}{\zerJ}}.
+\end{equation*}
+In particular, elements $2$ through $\nlatf+1$ of 
+$-\fvech{\wrapProj{\pvsm}{\zerJt}}$ are the portfolio
+$\sportwoptFoo{\Rbuj,\zerJ,}$
+defined in \lemmaref{subsp_cons_sr_optimal_portfolio}, up to the scaling
+constant $c$ which is the ratio of \Rbuj to the square root of the first
+element of $\fvech{\wrapProj{\pvsm}{\zerJt}}$ minus one.
+\end{lemma}%UNFOLD
+
+The asymptotic distribution of $\fvech{\wrapProj{\pvsm}{\zerJt}}$
+is given by the following theorem, which is the analogue 
+of \theoremref{inv_distribution}.
+
+\begin{theorem}%FOLDUP
+\label{theorem:subzer_inv_distribution}
+Let \svsm be the unbiased sample estimate of 
+\pvsm, based on \ssiz \iid samples of \vreti. 
+Let \zerJt 
+be defined as in \definitionref{subspace_second_moment}.
+Let \pvvar be the variance of $\fvech{\ogram{\avreti}}$.  
+Then, asymptotically in \ssiz, 
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\wrapProj{\svsm}{\zerJt}} -
+\fvech{\wrapProj{\pvsm}{\zerJt}}}
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\label{eqn:mvclt_zer_isvsm}
+\end{equation}
+where
+\begin{equation*}
+\Mtx{H} = - \EXD{\wrapParens{\AkronA{\tr{\zerJt}}} 
+\wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}}} 
+\wrapParens{\AkronA{\zerJt}}}.
+\end{equation*}
+\end{theorem}%UNFOLD
+\begin{proof}%FOLDUP
+By the multivariate delta method, it suffices to prove that
+$$
+\Mtx{H} = \dbyd{\fvech{\wrapProj{\svsm}{\zerJt}}}{\fvech{\pvsm}}.
+$$
+Via \lemmaref{misc_derivs}, it suffices to prove that
+$$
+\dbyd{\wrapProj{\pvsm}{\zerJt}}{\pvsm}
+= 
+- \wrapParens{\AkronA{\tr{\zerJt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}}}
+\wrapParens{\AkronA{\zerJt}}.
+$$
+
+A well-known fact regarding matrix manipulation \cite{magnus1999matrix} is
+$$
+\fvec{\Mtx{A}\Mtx{B}\Mtx{C}} = \wrapParens{\Mtx{A}\kron\tr{\Mtx{C}}}
+\fvec{\Mtx{B}},\quad\mbox{therefore,}\quad
+\dbyd{\Mtx{A}\Mtx{B}\Mtx{C}}{\Mtx{B}} = \Mtx{A}\kron\tr{\Mtx{C}}.
+$$
+Using this, and the chain rule, we have:
+\begin{equation*}
+\begin{split}
+\dbyd{\wrapProj{\pvsm}{\zerJt}}{\pvsm}
+&=
+\dbyd{\wrapProj{\pvsm}{\zerJt}}{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}} 
+\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}}{\qoform{\pvsm}{\zerJt}}
+\dbyd{\qoform{\pvsm}{\zerJt}}{\pvsm}\\
+&= 
+\wrapParens{\AkronA{\tr{\zerJt}}} 
+\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\zerJt}}}}{\qoform{\pvsm}{\zerJt}}
+\wrapParens{\AkronA{\zerJt}}.
+\end{split}
+\end{equation*}
+\lemmaref{deriv_vech_matrix_inverse} gives the middle term, completing the
+proof.
+\end{proof}
+An analogue of \corollaryref{portwoptR_dist} gives the asymptotic 
+distribution of $\pportwoptFoo{\Rbuj,\zerJ,}$
+defined in \lemmaref{subsp_cons_sr_optimal_portfolio}.
+%UNFOLD
+
+
+%UNFOLD
+\subsection{Hedging Constraint} %FOLDUP
+\label{subsec:hedging_constraint}
+% 2FIX: nstrat nstrathej fuck. as in, does this make sense in SharpeRatio.rnw? 
+% these show up as k and p, and what are you doing?
+
+Consider, now, the constrained portfolio optimization problem,
+\begin{equation}
+\max_{\substack{\pportw : \hejG\pvsig \pportw = \vzero,\\
+\qform{\pvsig}{\pportw} \le \Rbuj^2}}
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:portopt_hej}
+\end{equation}
+where $\hejG$ is now a $\nlatfhej \times \nlatf$ matrix of 
+rank \nlatfhej.
+We can interpret the \hejG constraint as stating that the covariance of 
+the returns of a feasible portfolio with the returns of a portfolio 
+whose weights are in a given row of \hejG shall equal zero.
+In the garden variety application of this problem, \hejG consists of 
+\nlatfhej rows of the identity matrix;
+in this case, feasible portfolios are `hedged' with respect 
+to the \nlatfhej assets selected by \hejG
+(although they may hold some position in the hedged assets).
+
+\begin{lemma}[constrained \txtSR optimal portfolio]%FOLDUP
+\label{lemma:cons_sr_optimal_portfolio}
+Assuming $\pvmu \ne \vzero$, and \pvsig is invertible,
+the portfolio optimization problem
+\begin{equation}
+\max_{\substack{\pportw : \hejG\pvsig \pportw = \vzero,\\ 
+\qform{\pvsig}{\pportw} \le \Rbuj^2}} 
+\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+\label{eqn:cons_port_prob}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+% (2FIX nomenclature)
+\begin{equation*}
+\begin{split}
+\pportwoptFoo{\Rbuj,\hejG,} &\defeq c \wrapParens{\minv{\pvsig}{\pvmu} -
+	\wrapProj{\pvsig}{\hejG}\pvmu},\\
+ c &= \frac{\Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu} - 
+	\qform{\wrapProj{\pvsig}{\hejG}}{\pvmu}}}.
+\end{split}
+\end{equation*}
+When $\rfr > 0$ the solution is unique.
+\end{lemma}%UNFOLD
+\begin{proof}%FOLDUP
+By the Lagrange multiplier technique, the optimal portfolio
+solves the following equations:
+\begin{equation*}
+\begin{split}
+0 &= c_1 \pvmu - c_2 \pvsig \pportw - \gamma_1 \pvsig \pportw -
+\pvsig\trAB{\hejG}{\vect{\gamma_2}},\\
+\qform{\pvsig}{\pportw} &\le \Rbuj^2,\\
+\hejG\pvsig \pportw &= \vzero,
+\end{split}
+\end{equation*}
+where $\gamma_i$ are Lagrange multipliers, and $c_1, c_2$ are 
+scalar constants.
+
+Solving the first equation gives
+$$
+\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\trAB{\hejG}{\vect{\gamma_2}}}.
+$$
+Reconciling this with the hedging equation we have
+$$
+\vzero 
+= \hejG\pvsig \pportw 
+= c_3 \hejG\pvsig \wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\trAB{\hejG}{\vect{\gamma_2}}},
+$$ 
+and therefore 
+$\vect{\gamma_2} = \minvAB{\wrapParens{\qoform{\pvsig}{\hejG}}}{\hejG}\pvmu.$
+Thus
+$$
+\pportw = c_3\wrapBracks{\minvAB{\pvsig}{\pvmu} -
+\wrapProj{\pvsig}{\hejG}\pvmu}.
+$$
+Plugging this into the objective reduces the problem to the
+univariate optimization
+\begin{equation*}
+\max_{c_3 :\, c_3^2 \le \fracc{\Rbuj^2}{\psnrsqoptG{\hejG}}} 
+\sign{c_3} \psnroptG{\hejG} - \frac{\rfr}{\abs{c_3}\psnroptG{\hejG}},
+\end{equation*}
+where $\psnrsqoptG{\hejG} = \qiform{\pvsig}{\pvmu} - 
+  \qform{\wrapProj{\pvsig}{\hejG}}{\pvmu}.$
+The optimum
+occurs for $c = \fracc{\Rbuj}{\psnroptG{\hejG}}$, moreover the optimum
+is unique when $\rfr > 0$.
+\end{proof}%UNFOLD
+
+The optimal hedged
+portfolio in \lemmaref{cons_sr_optimal_portfolio} is, up to scaling,
+the difference of the unconstrained optimal portfolio
+from \lemmaref{sr_optimal_portfolio} and the subspace constrained
+portfolio in \lemmaref{subsp_cons_sr_optimal_portfolio}. This `delta'
+analogy continues for the rest of this section.
+
+\begin{definition}[Delta Inverse Second Moment]%FOLDUP
+\label{definition:delta_inv_second_moment}
+Let \hejGt be the $\wrapParens{1+\nlatfhej}\times\wrapParens{\nlatf+1}$
+matrix,
+$$
+\hejGt \defeq \twobytwossym{1}{0}{\hejG}.
+$$
+Define the `delta inverse second moment' as
+$$
+\Delhej\minv{\pvsm} \defeq \minv{\pvsm} -
+\wrapProj{\pvsm}{\hejGt}.$$
+\end{definition}%UNFOLD
+
+Simple algebra proves the following lemma.
+
+\begin{lemma}%FOLDUP
+The elements of $\Delhej\minv{\pvsm}$
+are 
+\begin{equation*}
+\Delhej\minv{\pvsm} =
+\twobytwo{ \qiform{\pvsig}{\pvmu} - \qform{\wrapProj{\pvsig}{\hejG}}{\pvmu} }{
+-\tr{\pvmu}\minv{\pvsig} + \tr{\pvmu}\wrapProj{\pvsig}{\hejG}}{
+-\minv{\pvsig}\pvmu + \wrapProj{\pvsig}{\hejG}\pvmu}{
+\minv{\pvsig} - \wrapProj{\pvsig}{\hejG}}.
+\end{equation*}
+%\twobytwosym{ \qiform{\pvsig}{\pvmu} - \wrapProj{\pvsig}{\hejG} }{
+%-\wrapBracks{\tr{\pvmu}\minv{\pvsig} - \tr{\pvmu}\wrapProj{\pvsig}{\hejG}}}{
+%\minv{\pvsig} - \wrapProj{\pvsig}{\hejG}}.
+In particular, elements $2$ through $\nlatf+1$ of 
+$-\fvech{\Delhej\minv{\pvsm}}$ are the portfolio $\pportwoptFoo{\Rbuj,\hejG,}$
+defined in \lemmaref{cons_sr_optimal_portfolio}, up to the scaling
+constant $c$ which is the ratio of \Rbuj to the square root of the first
+element of \fvech{\Delhej\minv{\pvsm}}.
+\end{lemma}%UNFOLD
+
+The statistic 
+$\qiform{\svsig}{\svmu} - \qform{\wrapProj{\svsig}{\hejG}}{\svmu}$, for the
+case where \hejG is some rows of the $\nlatf \times \nlatf$ identity matrix,
+was first proposed by Rao, and its distribution under Gaussian returns was 
+later found by Giri. \cite{rao1952,giri1964likelihood} This test statistic
+may be used for tests of portfolio \emph{spanning} for the case where a
+risk-free instrument is traded.  \cite{HKspan1987,KanZhou2012}
+
+The asymptotic distribution of $\Delhej\minv{\svsm}$ is given by the
+following theorem, which is the analogue of \theoremref{inv_distribution}.
+
+\begin{theorem}%FOLDUP
+Let \svsm be the unbiased sample estimate of 
+\pvsm, based on \ssiz \iid samples of \vreti. 
+Let $\Delhej\minv{\pvsm}$
+be defined as in \definitionref{delta_inv_second_moment}, and similarly
+define $\Delhej\minv{\svsm}$.  Let \pvvar be the variance of 
+$\fvech{\ogram{\avreti}}$.  Then, asymptotically in \ssiz, 
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\Delhej\minv{\svsm}} - \fvech{\Delhej\minv{\pvsm}}} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\label{eqn:mvclt_hej_isvsm}
+\end{equation}
+where
+\begin{equation*}
+\Mtx{H} = - \EXD{\wrapBracks{\AkronA{\minv{\pvsm}} - 
+\wrapParens{\AkronA{\tr{\hejGt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}}
+\wrapParens{\AkronA{\hejGt}}}}.
+\end{equation*}
+\label{theorem:delhej_inv_distribution}
+\end{theorem}%UNFOLD
+%\begin{proof}%FOLDUP
+%By the multivariate delta method, it suffices to prove that
+%$$
+%\Mtx{H} = \dbyd{\fvech{\Delhej\minv{\pvsm}}}{\fvech{\pvsm}}.
+%$$
+%Via \lemmaref{misc_derivs},
+%%Via \lemmaref{deriv_vech_matrix_inverse},
+%%and the proof of \theoremref{inv_distribution}, 
+%it suffices to prove that
+%$$
+%\dbyd{\wrapProj{\pvsm}{\hejGt}}{\pvsm} = 
+%-\wrapParens{\AkronA{\tr{\hejGt}}} \wrapParens{\AkronA{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}}
+%\wrapParens{\AkronA{\hejGt}}.
+%$$
+
+%A well-known fact regarding matrix manipulation \cite{magnus1999matrix} is
+%$$
+%\fvec{\Mtx{A}\Mtx{B}\Mtx{C}} = \wrapParens{\Mtx{A}\kron\tr{\Mtx{C}}}
+%\fvec{\Mtx{B}},\quad\mbox{therefore,}\quad
+%\dbyd{\Mtx{A}\Mtx{B}\Mtx{C}}{\Mtx{B}} = \Mtx{A}\kron\tr{\Mtx{C}}.
+%$$
+%Using this, and the chain rule, we have:
+%\begin{equation*}
+%\begin{split}
+%\dbyd{\wrapProj{\pvsm}{\hejGt}}{\pvsm} 
+%&=
+%\dbyd{\wrapProj{\pvsm}{\hejGt}}{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}} 
+%\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
+%\dbyd{\qoform{\pvsm}{\hejGt}}{\pvsm}\\
+%&= 
+%\wrapParens{\AkronA{\tr{\hejGt}}} 
+%\dbyd{\minv{\wrapParens{\qoform{\pvsm}{\hejGt}}}}{\qoform{\pvsm}{\hejGt}}
+%\wrapParens{\AkronA{\hejGt}}.
+%\end{split}
+%\end{equation*}
+%\lemmaref{deriv_vech_matrix_inverse} gives the middle term, completing the
+%proof.
+%\end{proof}
+%An analogue of \corollaryref{portwoptR_dist} gives the asymptotic 
+%distribution of $\pportwoptFoo{\Rbuj,\hejG,}$
+%defined in \lemmaref{cons_sr_optimal_portfolio}.
+%%UNFOLD
+\begin{proof}%FOLDUP
+Minor modification of proof of \theoremref{subzer_inv_distribution}.
+\end{proof}%UNFOLD
+\begin{caution}%FOLDUP
+In the hedged portfolio optimization problem considered here, 
+the optimal portfolio will, in general, hold money in the 
+row space of \hejG. 
+For example, in 
+the garden variety application, where one is hedging out exposure to 
+`the market' by including a broad market ETF, and taking \hejG to be 
+the corresponding row of the identity matrix, the final portfolio may 
+hold some position in that broad market ETF. This is fine for an ETF,
+but one may wish to hedge out exposure to an untradeable returns 
+stream--the returns of an index, say.
+Combining the hedging constraint of this section with the
+subspace constraint of \subsecref{subspace_constraint} is
+simple in the case where the rows of \hejG are spanned
+by the rows of \zerJ. The more general case, however, is rather
+more complicated.
+\end{caution}%UNFOLD
+
+%UNFOLD
+%\subsection{Subspace and Hedging Constraints}%FOLDUP
+%\label{subsec:subspace_and_hedge_constraint}
+
+%In the hedged portfolio optimization problem considered in 
+%\subsecref{hedging_constraint}, the optimal portfolio
+%will, in general, hold money in the row space of \hejG. For example, in 
+%the garden variety application, where one is hedging out exposure to 
+%`the market' by including a broad market ETF, and taking \hejG to be 
+%the corresponding row of the identity matrix, the final portfolio may 
+%hold some position in that broad market ETF. This is fine for an ETF,
+%but one may wish to hedge out exposure to an untradeable returns 
+%stream--the returns of an index, say.
+
+%To deal with this problem, we can combine the constraints of 
+%\subsecref{hedging_constraint} and \subsecref{subspace_constraint}.
+%So let \zerJ, \zerJc, \hejG be as above.
+
+%\begin{lemma}[subspace constrained \txtSR optimal portfolio]%FOLDUP
+%\label{lemma:snh_cons_sr_optimal_portfolio}
+%Assuming the rows of \zerJ span the null space of the rows of \zerJc,
+%$\zerJ\pvmu \ne \vzero$, and \pvsig is invertible,
+%the portfolio optimization problem
+%\begin{equation}
+%\max_{\substack{\pportw : \zerJc \pportw = \vzero,\\
+%\hejG\pvsig \pportw = \vzero,\\
+%\qform{\pvsig}{\pportw} \le \Rbuj^2}} 
+%\frac{\trAB{\pportw}{\pvmu} - \rfr}{\sqrt{\qform{\pvsig}{\pportw}}},
+%\label{eqn:portopt_zer_III}
+%\end{equation}
+%for $\rfr \ge 0, \Rbuj > 0$ is solved by
+%%\begin{equation*}
+%%\begin{split}
+%%\pportwoptFoo{\Rbuj,\zerJ,} 
+ %%&\defeq c \wrapProj{\pvsig}{\zerJ}\pvmu,\\
+ %%c &= \frac{\Rbuj}{\sqrt{\qform{\wrapProj{\pvsig}{\zerJ}}{\pvmu}}}.
+%%\end{split}
+%%\end{equation*}
+%When $\rfr > 0$ the solution is unique.
+%\end{lemma}%UNFOLD
+
+
+%2FIX: continue.
+%%UNFOLD
+\subsection{Conditional Heteroskedasticity}%FOLDUP
+
+The methods described above ignore `volatility clustering', and assume
+homoskedasticity. \cite{stylized_facts,nelson1991,ARCH1987} 
+To deal with this,
+consider a strictly positive scalar random variable, \fvola[i], 
+observable at the time the investment decision is
+required to capture \vreti[i+1]. For reasons to be obvious later, it 
+is more convenient to think of \fvola[i] as a `quietude' indicator.
+
+Two simple competing models for conditional heteroskedasticity are
+\begin{align}
+\label{eqn:cond_model_I}
+\mbox{(constant):}\quad \Econd{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-1}\pvmu & \Varcond{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-2} \pvsig,\\
+\label{eqn:cond_model_II}
+\mbox{(floating):}\quad \Econd{\vreti[i+1]}{\fvola[i]} &=
+\pvmu & \Varcond{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-2} \pvsig.
+\end{align}
+Under the model in \eqnref{cond_model_I}, the maximal \txtSR
+is $\sqrt{\qiform{\pvsig}{\pvmu}}$, independent of \fvola[i];
+under \eqnref{cond_model_II}, it is 
+is $\fvola[i]\sqrt{\qiform{\pvsig}{\pvmu}}$. 
+The model names reflect whether or not
+the maximal \txtSR varies conditional on \fvola[i].
+
+The optimal portfolio under both models is the same, as stated
+in the following lemma, the proof of which follows by simply using
+\lemmaref{sr_optimal_portfolio}.
+
+\begin{lemma}[Conditional \txtSR optimal portfolio]%FOLDUP
+\label{lemma:cond_sr_optimal_portfolio_I}
+Under either the model in \eqnref{cond_model_I} or \eqnref{cond_model_II}, 
+conditional on observing \fvola[i], the portfolio optimization problem
+\begin{equation}
+\argmax_{\pportw :\, \Varcond{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i]} \le \Rbuj^2} 
+\frac{\Econd{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i]} -
+\rfr}{\sqrt{\Varcond{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i]}}},
+\label{eqn:cond_sr_optimal_portfolio_problem_I}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+\begin{equation}
+\pportwopt = \frac{\fvola[i] \Rbuj}{\sqrt{\qiform{\pvsig}{\pvmu}}}
+\minvAB{\pvsig}{\pvmu}.
+\end{equation}
+Moreover, this is the unique solution whenever $\rfr > 0$.
+\end{lemma}%UNFOLD
+
+To perform inference on the portfolio \pportwopt from 
+\lemmaref{cond_sr_optimal_portfolio_I}, under the `constant'
+model of \eqnref{cond_model_I}, apply the unconditional techniques
+to the sample second moment of $\fvola[i]\avreti[i+1]$. 
+
+For
+the `floating' model of \eqnref{cond_model_II}, however, some 
+adjustment to the technique is required.
+Define $\aavreti[i+1] \defeq \fvola[i]\avreti[i+1]$; that is,
+$\aavreti[i+1] = \asvec{\fvola[i],\fvola[i]\tr{\vreti[i+1]}}$. 
+Consider the second moment of \aavreti:
+\begin{equation}
+\pvsm[{\fvola}] \defeq \E{\ogram{\aavreti}} = 
+	\twobytwo{\volavar}{\volavar\tr{\pvmu}}{\volavar\pvmu}{\pvsig +
+\qoform{\volavar}{\pvmu}},\quad\mbox{where}\quad
+\volavar \defeq \E{\fvola^2}.
+%\label{eqn:pvsm_def}
+\end{equation}
+The inverse of \pvsm[{\fvola}] is
+\begin{equation}
+\minv{\pvsm[{\fvola}]} 
+= \twobytwo{\volaivar + \qiform{\pvsig}{\pvmu}}{-\tr{\pvmu}\minv{\pvsig}}{-\minv{\pvsig}\pvmu}{\minv{\pvsig}}
+%= \twobytwo{1 + \psnrsqopt}{-\tr{\pportwopt}}{-\pportwopt}{\minv{\pvsig}},
+\label{eqn:new_trick_inversion}
+\end{equation}
+Once again, the optimal portfolio (up to scaling and sign), appears in
+\fvech{\minv{\pvsm[{\fvola}]}}.
+Similarly, define the sample analogue:
+\begin{equation}
+\svsm[{\fvola}] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}.
+\end{equation}
+We can find the asymptotic distribution of \fvech{\svsm[{\fvola}]}
+using the same techniques as in the unconditional case, as in the
+following analogue of \theoremref{inv_distribution}:
+
+\begin{theorem}%FOLDUP
+\label{theorem:cond_inv_distribution}
+Let $\svsm[{\fvola}] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}$,
+based on \ssiz \iid samples of \asvec{\fvola,\tr{\vreti}}.
+Let \pvvar be the variance of $\fvech{\ogram{\aavreti}}$.
+Then, asymptotically in \ssiz, 
+%%\begin{equation}
+%\begin{multline}
+%\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\fvola}]}} -
+%\fvech{\minv{\pvsm[{\fvola}]}}} 
+%\rightsquigarrow \\
+%\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\fvola}]}}}}}}}.
+%\label{eqn:cond_mvclt_isvsm}
+%\end{multline}
+%%\end{equation}
+\begin{equation}
+\label{eqn:cond_mvclt_isvsm}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\fvola}]}} -
+\fvech{\minv{\pvsm[{\fvola}]}}} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\end{equation}
+where
+\begin{equation}
+\Mtx{H} = -\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\fvola}]}}}}.
+\end{equation}
+Furthermore, we may replace \pvvar in this equation with an asymptotically
+consistent estimator, \svvar.
+\end{theorem}%UNFOLD
+
+The only real difference from the unconditional case is that we cannot
+automatically assume that the first row and column of \pvvar is zero
+(unless \fvola is actually constant, which misses the point). Moreover,
+the shortcut for estimating \pvvar under Gaussian returns is not 
+valid without some patching, an exercise left for the reader.
+
+Dependence or independence of maximal \txtSR from 
+volatility is an assumption which, ideally, one could test with
+data. A mixed model containing both characteristics can be written
+as follows:
+\begin{align}
+\label{eqn:cond_model_III}
+\mbox{(mixed):}\quad \Econd{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-1}\pvmu[0] + \pvmu[1] & \Varcond{\vreti[i+1]}{\fvola[i]} &=
+\fvola[i]^{-2} \pvsig.
+\end{align}
+One could then test whether elements of $\pvmu[0]$ or of $\pvmu[1]$ are
+zero. Analyzing this model is somewhat complicated without moving to a
+more general framework, as in the sequel.
+
+%UNFOLD
+\subsection{Conditional Expectation and Heteroskedasticity}%FOLDUP
+
+Suppose you observe random variables $\fvola[i] > 0$, and 
+\nfac-vector $\vfact[i]$ at some time prior to when the investment
+decision is required to capture \vreti[i+1]. It need not be the case
+that \fvola[{}] and \vfact[{}] are independent. The general model
+is now
+\begin{align}
+\label{eqn:cond_model_IV}
+\mbox{(bi-conditional):}\quad 
+\Econd{\vreti[i+1]}{\fvola[i],\vfact[i]} &=
+\pRegco \vfact[i] &
+\Varcond{\vreti[i+1]}{\fvola[i],\vfact[i]} &=
+\fvola[i]^{-2} \pvsig,
+\end{align}
+where \pRegco is some $\nlatf \times \nfac$ matrix. Without the
+\fvola[i] term, these are the `predictive regression' equations
+commonly used in Tactical Asset 
+Allocation.  \cite{connor1997,herold2004TAA,brandt2009portfolio}
+
+By letting
+$\vfact[i] = \asvec{\fvola[i]^{-1},1}$ we recover 
+the mixed model in \eqnref{cond_model_III}; the bi-conditional model
+is considerably more general, however.  The conditionally-optimal portfolio
+is given by the following lemma. Once again, the proof proceeds simply
+by plugging in the conditional expected return and volatility into
+\lemmaref{sr_optimal_portfolio}. 
+
+\begin{lemma}[Conditional \txtSR optimal portfolio]%FOLDUP
+\label{lemma:cond_sr_optimal_portfolio_II}
+Under the model in \eqnref{cond_model_IV},
+conditional on observing \fvola[i] and \vfact[i], 
+the portfolio optimization problem
+\begin{equation}
+\argmax_{\pportw :\, \Varcond{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i],\vfact[i]} \le \Rbuj^2} 
+\frac{\Econd{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i],\vfact[i]} -
+\rfr}{\sqrt{\Varcond{\trAB{\pportw}{\vreti[i+1]}}{\fvola[i],\vfact[i]}}},
+\label{eqn:cond_sr_optimal_portfolio_problem_I}
+\end{equation}
+for $\rfr \ge 0, \Rbuj > 0$ is solved by
+\begin{equation}
+\pportwopt = \frac{\fvola[i]
+\Rbuj}{\sqrt{\qform{\qiform{\pvsig}{\pRegco}}{\vfact[i]}}}
+\minvAB{\pvsig}{\pRegco\vfact[i]}.
+\end{equation}
+Moreover, this is the unique solution whenever $\rfr > 0$.
+\end{lemma}%UNFOLD
+
+\begin{caution}
+It is emphatically \emph{not} the case that 
+investing in the portfolio \pportwopt from 
+\lemmaref{cond_sr_optimal_portfolio_II} at every time step 
+is long-term \txtSR optimal. One may possibly achieve a higher long-term
+\txtSR by down-levering at times when the conditional \txtSR is low.
+The optimal long term investment strategy falls under the 
+rubric of `multiperiod portfolio choice', and is an area of active
+research. \cite{mulvey2003advantages,fabozzi2007robust,brandt2009portfolio}
+%research. \cite{mulvey2003advantages,fabozzi2007robust,bertsimas2008robust}
+\end{caution}
+
+The matrix \minvAB{\pvsig}{\pRegco} is the generalization of the
+Markowitz portfolio: it is the multiplier for a model under which
+the optimal portfolio is linear in the features \vfact[i] (up to
+scaling to satisfy the risk budget). We can think of this matrix
+as the `Markowitz coefficient'. If an entire column of 
+\minvAB{\pvsig}{\pRegco} is zero, it suggests that the 
+corresponding element of \vfact[{}] can be ignored in investment
+decisions; if an entire row of \minvAB{\pvsig}{\pRegco} is zero,
+it suggests the corresponding instrument delivers no return or
+hedging benefit.
+
+Tests on \minvAB{\pvsig}{\pRegco} should be contrasted with
+the so-called Multivariate General Linear Hypothesis (MGLH), 
+which tests the matrix equation
+$\Mtx{A}\pRegco\Mtx{C} = \Mtx{T}$, for conformable 
+$\Mtx{A},\Mtx{C},\Mtx{T}$.  \cite{Rencher2002,Muller1984143}
+
+To perform inference on the Markowitz coefficient, we can proceed
+exactly as above. Let
+\begin{equation}
+\aavreti[i+1] \defeq \asvec{\fvola[i]\tr{\vfact[i]},\fvola[i]\tr{\vreti[i+1]}}.
+\end{equation}
+Consider the second moment of \aavreti:
+\begin{equation}
+\pvsm[{\sfact[]}] \defeq \E{\ogram{\aavreti}} = 
+	\twobytwo{\pfacsig}{\pfacsig\tr{\pRegco}}{\pRegco\pfacsig}{\pvsig +
+\qoform{\pfacsig}{\pRegco}},\quad\mbox{where}\quad
+\pfacsig \defeq \E{\fvola[{}]^2\ogram{\vfact[{}]}}.
+%\label{eqn:pvsm_def}
+\end{equation}
+The inverse of \pvsm[{\sfact[]}] is
+\begin{equation}
+\minv{\pvsm[{\sfact[]}]}
+= \twobytwo{\minv{\pfacsig} +
+\qiform{\pvsig}{\pRegco}}{-\tr{\pRegco}\minv{\pvsig}}{-\minv{\pvsig}\pRegco}{\minv{\pvsig}}
+\label{eqn:new_new_trick_inversion}
+\end{equation}
+Once again, the Markowitz coefficient (up to scaling and sign), appears in
+\fvech{\minv{\pvsm[{\sfact[]}]}}.
+
+The following theorem is an analogue of, and shares a proof with,
+\theoremref{inv_distribution}.
+
+\begin{theorem}%FOLDUP
+\label{theorem:cond_inv_distribution_II}
+Let $\svsm[{\sfact[]}] \defeq \oneby{\ssiz}\sum_i \ogram{\aavreti[i+1]}$,
+based on \ssiz \iid samples of \asvec{\fvola,\tr{\vfact[{}]},\tr{\vreti}},
+where 
+$$
+\aavreti[i+1] \defeq \asvec{\fvola[i]\tr{\vfact[i]},\fvola[i]\tr{\vreti[i+1]}}.
+$$
+Let \pvvar be the variance of $\fvech{\ogram{\aavreti}}$.
+Then, asymptotically in \ssiz, 
+%%\begin{equation}
+%\begin{multline}
+%\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\sfact[]}]}} -
+%\fvech{\minv{\pvsm[{\sfact[]}]}}} 
+%\rightsquigarrow \\
+%\normlaw{0,\qoform{\pvvar}{\wrapBracks{\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\sfact[]}]}}}}}}}.
+%\label{eqn:cond_mvclt_isvsm_II}
+%\end{multline}
+%%\end{equation}
+\begin{equation}
+\sqrt{\ssiz}\wrapParens{\fvech{\minv{\svsm[{\sfact[]}]}} -
+\fvech{\minv{\pvsm[{\sfact[]}]}}} 
+\rightsquigarrow 
+\normlaw{0,\qoform{\pvvar}{\Mtx{H}}},
+\label{eqn:cond_mvclt_isvsm_II}
+\end{equation}
+where
+\begin{equation}
+\Mtx{H} = -\EXD{\wrapParens{\AkronA{\minv{\pvsm[{\sfact[]}]}}}}.
+\end{equation}
+Furthermore, we may replace \pvvar in this equation with an asymptotically
+consistent estimator, \svvar.
+\end{theorem}%UNFOLD
+%UNFOLD
+%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Examples}%FOLDUP
+
+%Empirically, the marginal Wald test for zero weighting in the 
+%\txtMP based on this approximation are nearly
+%identical to the \tstat-statistics produced by the procedure
+%of Britten-Jones, as shown below. \cite{BrittenJones1999} 
+
+%<<'load_data',echo=TRUE>>=
+%fname <- system.file('extdata','gmacro_data.rda',package='SharpeR')
+%if (fname == "") {
+	%fname <- 'gmacro_data.rda'
+%}
+%# poofs ff5.xts ff10.xts fff.xts dp.xts shill.xts
+%load(fname)
+
+%@
+
+%<<'me_vs_bjones',echo=TRUE>>=
+%nday <- 1024
+%nstk <- 5
+
+%# under the null: all returns are zero mean;
+%set.seed(as.integer(charToRaw("7fbb2a84-aa4c-4977-8301-539e48355a35")))
+%rets <- matrix(rnorm(nday * nstk),nrow=nday)
+
+%# t-stat via Britten-Jones procedure
+%bjones.ts <- function(rets) {
+	%ones.vec <- matrix(1,nrow=dim(rets)[1],ncol=1)
+	%bjones.mod <- lm(ones.vec ~ rets - 1)
+	%bjones.sum <- summary(bjones.mod)
+	%retval <- bjones.sum$coefficients[,3]
+%}
+%# wald stat via inverse second moment trick
+%ism.ws <- function(rets,...) {
+%# flipping the sign on returns is idiomatic,
+	%asymv <- ism_vcov(- as.matrix(rets),...)
+	%asymv.mu <- asymv$mu[1:asymv$p]
+	%asymv.Sg <- asymv$Ohat[1:asymv$p,1:asymv$p]
+	%retval <- asymv.mu / sqrt(diag(asymv.Sg))
+%}
+
+%bjones.tstat <- bjones.ts(rets)
+%ism.wald <- ism.ws(rets)
+
+%# compare them:
+%print(bjones.tstat)
+%print(ism.wald)
+
+%# repeat under the alternative;
+%set.seed(as.integer(charToRaw("a5f17b28-436b-4d01-a883-85b3e5b7c218")))
+%zero.rets <- t(matrix(rnorm(nday * nstk),nrow=nday))
+%mu.vals <- (1/sqrt(253)) * seq(-1,1,length.out=nstk) 
+%rets <- t(zero.rets + mu.vals)
+
+%bjones.tstat <- bjones.ts(rets)
+%ism.wald <- ism.ws(rets)
+
+%# compare them:
+%print(bjones.tstat)
+%print(ism.wald)
+%@
+
+%%<<'test_FF3',echo=TRUE>>=
+%%ff3 <- read.csv('http://www.quandl.com/api/v1/datasets/KFRENCH/FACTORS_M.csv?&trim_start=1926-07-31&trim_end=2013-10-31&sort_order=desc', colClasses=c('Month'='Date'))
+
+%%require(sandwich)
+
+%%rfr <- ff3[,'RF']
+%%hml <- ff3[,'HML'] - rfr
+%%smb <- ff3[,'SMB'] - rfr
+
+%%ff.ret <- cbind(mkt=ff3[,'Mkt.RF'],hml,smb)
+
+%%my.ws <- ism.ws(ff.ret)
+%%my.ws2 <- ism.ws(ff.ret,vcov.func=vcovHAC)
+%%my.bt <- bjones.ts(ff.ret)
+
+%%# conditionally?
+%%blahm <- cbind(-ff.ret[(1:(dim(ff.ret)[1]-1)),],ff.ret[(2:dim(ff.ret)[1]),])
+%%# futz from here ... 
+%%XX <- ism_vcov(blahm)
+%%@
+
+%% 2FIX: add examples here ... 
+%%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% bibliography%FOLDUP
+\nocite{markowitz1952portfolio,markowitz1999early,markowitz2012foundations}
+%\bibliographystyle{jss}
+%\bibliographystyle{siam}
+%\bibliographystyle{ieeetr}
+\bibliographystyle{plainnat}
+%\bibliographystyle{acm}
+\bibliography{SharpeR,rauto}
+%\bibliography{AsymptoticMarkowitz}
+%UNFOLD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix%FOLDUP
+
+\section{Confirming the scalar Gaussian case}
+
+\begin{example}%FOLDUP
+To sanity check 
+\theoremref{theta_asym_var_gaussian},
+consider the $\nlatf = 1$ Gaussian case. In this case, 
+$$
+\fvech{\pvsm} = \asvec{1,\pmu,\psig^2 + \pmu^2},\quad\mbox{and}\quad
+\fvech{\minv{\pvsm}} =
+ \asvec{1 + \frac{\pmu^2}{\psig^2},- \frac{\pmu}{\psig^2},\oneby{\psig^2}}.
+$$
+Let $\smu, \ssig^2$ be the unbiased sample estimates. By well 
+known results \cite{spiegel2007schaum}, $\smu$ and $\ssig^2$ are independent,
+and have asymptotic variances of $\psig^2/\ssiz$ and $2\psig^4/\ssiz$ 
+respectively. By the delta method, the asymptotic variance of
+$\Unun \fvech{\svsm}$ and $\fvech{\minv{\svsm}}$ can be computed as
+\begin{equation}
+\begin{split}
+\VAR{\Unun \fvech{\svsm}} &\rightsquigarrow 
+\oneby{\ssiz}\qform{\twobytwossym{\psig^2}{0}{2\psig^4}}{\twobytwo{1}{2\pmu}{0}{1}},\\
+&= \oneby{\ssiz}\twobytwossym{\psig^2}{2\pmu\psig^2}{4\pmu^2\psig^2 +
+2\psig^4}.
+\label{eqn:gauss_confirm_theta}
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+\VAR{\fvech{\minv{\svsm}}} &\rightsquigarrow 
+\oneby{\ssiz}\qform{\twobytwossym{\psig^2}{0}{2\psig^4}}{\twobythree{\frac{2\pmu}{\psig^2}}{-\frac{1}{\psig^2}}{0}{-\frac{\pmu^2}{\psig^4}}{\frac{\pmu}{\psig^4}}{-\frac{1}{\psig^4}}},\\
+&=
+\oneby{\ssiz}\gram{\twobythree{2\psnr}{-\frac{1}{\psig}}{0}{-\sqrt{2}\psnr^2}{\sqrt{2}\frac{\psnr}{\psig}}{-\frac{\sqrt{2}}{\psig^2}}},\\
+&= \oneby{\ssiz}\threebythreessym{2\psnr^2\wrapParens{2 + \psnr^2}}{-\frac{2\psnr}{\psig}\wrapParens{1+\psnr^2}}{2\frac{\psnr^2}{\psig^2}}{\frac{1 +
+2\psnr^2}{\psig^2}}{-\frac{2\psnr}{\psig^3}}{\frac{2}{\psig^4}}.
+\label{eqn:gauss_confirm_itheta}
+\end{split}
+\end{equation}
+
+Now it remains to compute $\VAR{\Unun \fvech{\svsm}}$ via 
+\theoremref{theta_asym_var_gaussian}, and then 
+\VAR{\fvech{\minv{\svsm}}} via
+\theoremref{inv_distribution}, and confirm they match the values above.
+This is a rather tedious computation best left to a computer. Below is 
+an excerpt of an iPython notebook using Sympy \cite{PER-GRA:2007,sympy}
+which performs this computation. 
+This notebook is available online. \cite{SEP2013example}
+
+% SYMPY from here out%FOLDUP
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}1}]:} \PY{c}{\PYZsh{} confirm the asymptotic distribution of Theta}
+        \PY{c}{\PYZsh{} for scalar Gaussian case.}
+        \PY{k+kn}{from} \PY{n+nn}{\PYZus{}\PYZus{}future\PYZus{}\PYZus{}} \PY{k+kn}{import} \PY{n}{division}
+        \PY{k+kn}{from} \PY{n+nn}{sympy} \PY{k+kn}{import} \PY{o}{*}
+        \PY{k+kn}{from} \PY{n+nn}{sympy.physics.quantum} \PY{k+kn}{import} \PY{n}{TensorProduct}
+        \PY{n}{init\PYZus{}printing}\PY{p}{(}\PY{n}{use\PYZus{}unicode}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PY{n}{wrap\PYZus{}line}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PYZbs{}
+                      \PY{n}{no\PYZus{}global}\PY{o}{=}\PY{n+nb+bp}{True}\PY{p}{)}
+        \PY{n}{mu} \PY{o}{=} \PY{n}{symbols}\PY{p}{(}\PY{l+s}{\PYZsq{}}\PY{l+s}{\PYZbs{}}\PY{l+s}{mu}\PY{l+s}{\PYZsq{}}\PY{p}{)}
+        \PY{n}{sg} \PY{o}{=} \PY{n}{symbols}\PY{p}{(}\PY{l+s}{\PYZsq{}}\PY{l+s}{\PYZbs{}}\PY{l+s}{sigma}\PY{l+s}{\PYZsq{}}\PY{p}{)} 
+        \PY{c}{\PYZsh{} the elimination, duplication and U\PYZus{}\PYZob{}\PYZhy{}1\PYZcb{} matrices:}
+        \PY{n}{Elim} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}  \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}   \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        \PY{n}{Dupp} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        \PY{n}{Unun} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}  \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        \PY{k}{def} \PY{n+nf}{Qform}\PY{p}{(}\PY{n}{A}\PY{p}{,}\PY{n}{x}\PY{p}{)}\PY{p}{:}
+            \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}compute the quadratic form x\PYZsq{}Ax\PYZdq{}\PYZdq{}\PYZdq{}}
+            \PY{k}{return} \PY{n}{x}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)} \PY{o}{*} \PY{n}{A} \PY{o}{*} \PY{n}{x}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}2}]:} \PY{n}{Theta} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{n}{mu}\PY{p}{,}\PY{n}{mu}\PY{p}{,}\PY{n}{mu}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{+} \PY{n}{sg}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}
+        \PY{n}{Theta}
+\end{Verbatim}
+\texttt{\color{outcolor}Out[{\color{outcolor}2}]:}
+    
+    
+        \begin{equation*}
+        \left[\begin{matrix}1 & \mu\\\mu & \mu^{2} + \sigma^{2}\end{matrix}\right]
+        \end{equation*}
+
+    
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}3}]:} \PY{c}{\PYZsh{} compute tensor products and }
+        \PY{c}{\PYZsh{} the derivative d vech(Theta\PYZca{}\PYZhy{}1) / d vech(Theta)}
+        \PY{c}{\PYZsh{} see also \theoremref{inv_distribution}}
+        \PY{n}{Theta\PYZus{}Theta} \PY{o}{=} \PY{n}{TensorProduct}\PY{p}{(}\PY{n}{Theta}\PY{p}{,}\PY{n}{Theta}\PY{p}{)}
+        \PY{n}{iTheta\PYZus{}iTheta} \PY{o}{=} \PY{n}{TensorProduct}\PY{p}{(}\PY{n}{Theta}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}\PY{p}{,}\PY{n}{Theta}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        \PY{n}{theta\PYZus{}i\PYZus{}deriv} \PY{o}{=} \PY{n}{Elim} \PY{o}{*} \PY{p}{(}\PY{n}{iTheta\PYZus{}iTheta}\PY{p}{)} \PY{o}{*} \PY{n}{Dupp}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}4}]:} \PY{c}{\PYZsh{} towards \theoremref{theta_asym_var_gaussian}}
+        \PY{n}{DTTD} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
+        \PY{n}{D\PYZus{}DTTD\PYZus{}D} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{DTTD}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{p}{)}
+        \PY{n}{iOmega} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{D\PYZus{}DTTD\PYZus{}D}\PY{p}{,}\PY{n}{Unun}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        \PY{n}{Omega} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{iOmega}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}
+        \PY{n}{simplify}\PY{p}{(}\PY{n}{Omega}\PY{p}{)}
+\end{Verbatim}
+\texttt{\color{outcolor}Out[{\color{outcolor}4}]:}
+    
+    
+        \begin{equation*}
+        \left[\begin{matrix}\sigma^{2} & 2 \mu \sigma^{2}\\2 \mu \sigma^{2} & 2 \sigma^{2} \left(2 \mu^{2} + \sigma^{2}\right)\end{matrix}\right]
+        \end{equation*}
+
+    
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}5}]:} \PY{c}{\PYZsh{} this matches the computation in \eqnref{gauss_confirm_theta}}
+        \PY{c}{\PYZsh{} on to the inverse:}
+        \PY{c}{\PYZsh{} actually use \theoremref{inv_distribution}}
+        \PY{n}{theta\PYZus{}i\PYZus{}deriv\PYZus{}t} \PY{o}{=} \PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}
+        \PY{n}{theta\PYZus{}inv\PYZus{}var} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{Qform}\PY{p}{(}\PY{n}{Omega}\PY{p}{,}\PY{n}{Unun}\PY{p}{)}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv\PYZus{}t}\PY{p}{)}
+        \PY{n}{simplify}\PY{p}{(}\PY{n}{theta\PYZus{}inv\PYZus{}var}\PY{p}{)}
+\end{Verbatim}
+\texttt{\color{outcolor}Out[{\color{outcolor}5}]:}
+    
+    
+        \begin{equation*}
+        \left[\begin{matrix}\frac{2 \mu^{2}}{\sigma^{4}} \left(\mu^{2} + 2 \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{2 \mu^{2}}{\sigma^{4}}\\- \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{1}{\sigma^{4}} \left(2 \mu^{2} + \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}}\\\frac{2 \mu^{2}}{\sigma^{4}} & - \frac{2 \mu}{\sigma^{4}} & \frac{2}{\sigma^{4}}\end{matrix}\right]
+        \end{equation*}
+
+    
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}6}]:} \PY{c}{\PYZsh{} this matches the computation in \eqnref{gauss_confirm_itheta}}
+        \PY{c}{\PYZsh{} now check \conjectureref{theta_asym_var_gaussian}}
+        \PY{n}{conjec} \PY{o}{=} \PY{n}{Qform}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
+        \PY{n}{e1} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
+        \PY{n}{convar} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{p}{(}\PY{n}{conjec}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{e1} \PY{o}{*} \PY{n}{e1}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        \PY{n}{simplify}\PY{p}{(}\PY{n}{convar}\PY{p}{)}
+\end{Verbatim}
+\texttt{\color{outcolor}Out[{\color{outcolor}6}]:}
+    
+    
+        \begin{equation*}
+        \left[\begin{matrix}\frac{2 \mu^{2}}{\sigma^{4}} \left(\mu^{2} + 2 \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{2 \mu^{2}}{\sigma^{4}}\\- \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{1}{\sigma^{4}} \left(2 \mu^{2} + \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}}\\\frac{2 \mu^{2}}{\sigma^{4}} & - \frac{2 \mu}{\sigma^{4}} & \frac{2}{\sigma^{4}}\end{matrix}\right]
+        \end{equation*}
+
+    
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}7}]:} \PY{c}{\PYZsh{} are they the same?}
+        \PY{n}{simplify}\PY{p}{(}\PY{n}{theta\PYZus{}inv\PYZus{}var} \PY{o}{\PYZhy{}} \PY{n}{convar}\PY{p}{)}
+\end{Verbatim}
+\texttt{\color{outcolor}Out[{\color{outcolor}7}]:}
+    
+    
+        \begin{equation*}
+        \left[\begin{matrix}0 & 0 & 0\\0 & 0 & 0\\0 & 0 & 0\end{matrix}\right]
+        \end{equation*}
+
+    
+
+
+    %UNFOLD
+    
+%%  OLD%FOLDUP
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}1}]:} \PY{k+kn}{from} \PY{n+nn}{\PYZus{}\PYZus{}future\PYZus{}\PYZus{}} \PY{k+kn}{import} \PY{n}{division}
+        %\PY{k+kn}{from} \PY{n+nn}{sympy} \PY{k+kn}{import} \PY{o}{*}
+        %\PY{k+kn}{from} \PY{n+nn}{sympy.physics.quantum} \PY{k+kn}{import} \PY{n}{TensorProduct}
+        %\PY{n}{init\PYZus{}printing}\PY{p}{(}\PY{n}{use\PYZus{}unicode}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PY{n}{wrap\PYZus{}line}\PY{o}{=}\PY{n+nb+bp}{False}\PY{p}{,} \PY{n}{no\PYZus{}global}\PY{o}{=}\PY{n+nb+bp}{True}\PY{p}{)}
+        %\PY{n}{mu} \PY{o}{=} \PY{n}{symbols}\PY{p}{(}\PY{l+s}{\PYZsq{}}\PY{l+s}{\PYZbs{}}\PY{l+s}{mu}\PY{l+s}{\PYZsq{}}\PY{p}{)}
+        %\PY{n}{sg} \PY{o}{=} \PY{n}{symbols}\PY{p}{(}\PY{l+s}{\PYZsq{}}\PY{l+s}{\PYZbs{}}\PY{l+s}{sigma}\PY{l+s}{\PYZsq{}}\PY{p}{)} 
+        %\PY{c}{\PYZsh{} the elimination, duplication and U\PYZus{}\PYZob{}\PYZhy{}1\PYZcb{} matrices:}
+        %\PY{n}{Elim} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}  \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}   \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        %\PY{n}{Dupp} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        %\PY{n}{Unun} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}  \PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+        %\PY{k}{def} \PY{n+nf}{quad\PYZus{}form}\PY{p}{(}\PY{n}{A}\PY{p}{,}\PY{n}{x}\PY{p}{)}\PY{p}{:}
+            %\PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}compute the quadratic form x\PYZsq{}Ax\PYZdq{}\PYZdq{}\PYZdq{}}
+            %\PY{k}{return} \PY{n}{x}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)} \PY{o}{*} \PY{n}{A} \PY{o}{*} \PY{n}{x}
+%\end{Verbatim}
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}2}]:} \PY{n}{Theta} \PY{o}{=} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{n}{mu}\PY{p}{,}\PY{n}{mu}\PY{p}{,}\PY{n}{mu}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{+} \PY{n}{sg}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}
+        %\PY{n}{Theta}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}2}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}1 & \mu\\\mu & \mu^{2} + \sigma^{2}\end{matrix}\right]
+        %\end{equation*}
+
+    
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}3}]:} \PY{c}{\PYZsh{} compute tensor products and }
+        %\PY{c}{\PYZsh{} the derivative d vech(Theta\PYZca{}\PYZhy{}1) / d vech(Theta)}
+        %\PY{n}{Theta\PYZus{}Theta} \PY{o}{=} \PY{n}{TensorProduct}\PY{p}{(}\PY{n}{Theta}\PY{p}{,}\PY{n}{Theta}\PY{p}{)}
+        %\PY{n}{iTheta\PYZus{}iTheta} \PY{o}{=} \PY{n}{TensorProduct}\PY{p}{(}\PY{n}{Theta}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}\PY{p}{,}\PY{n}{Theta}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        %\PY{n}{theta\PYZus{}i\PYZus{}deriv} \PY{o}{=} \PY{n}{Elim} \PY{o}{*} \PY{p}{(}\PY{n}{iTheta\PYZus{}iTheta}\PY{p}{)} \PY{o}{*} \PY{n}{Dupp}
+%\end{Verbatim}
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}4}]:} \PY{c}{\PYZsh{} towards thm \ref{theorem:theta_asym_var_gaussian}}
+        %\PY{n}{DTTD} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
+        %\PY{n}{D\PYZus{}DTTD\PYZus{}D} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{DTTD}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{p}{)}
+        %\PY{n}{iOmega} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{D\PYZus{}DTTD\PYZus{}D}\PY{p}{,}\PY{n}{Unun}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        %\PY{n}{Omega} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{n}{iOmega}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)}
+        %\PY{n}{simplify}\PY{p}{(}\PY{n}{Omega}\PY{p}{)}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}4}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}\sigma^{2} & 2 \mu \sigma^{2}\\2 \mu \sigma^{2} & 2 \sigma^{2} \left(2 \mu^{2} + \sigma^{2}\right)\end{matrix}\right]
+        %\end{equation*}
+
+%This matches the computation in \eqnref{gauss_confirm_theta}. On to the
+%inverse:
+    
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}5}]:} \PY{c}{\PYZsh{} now use theorem \ref{theorem:inv_distribution}}
+        %\PY{n}{theta\PYZus{}inv\PYZus{}var} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Omega}\PY{p}{,}\PY{n}{Unun}\PY{p}{)}\PY{p}{,}\PY{n}{theta\PYZus{}i\PYZus{}deriv}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+        %\PY{n}{simplify}\PY{p}{(}\PY{n}{theta\PYZus{}inv\PYZus{}var}\PY{p}{)}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}5}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}\frac{2 \mu^{2}}{\sigma^{4}} \left(\mu^{2} + 2 \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{2 \mu^{2}}{\sigma^{4}}\\- \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{1}{\sigma^{4}} \left(2 \mu^{2} + \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}}\\\frac{2 \mu^{2}}{\sigma^{4}} & - \frac{2 \mu}{\sigma^{4}} & \frac{2}{\sigma^{4}}\end{matrix}\right]
+        %\end{equation*}
+
+%This matches the computation in \eqnref{gauss_confirm_itheta}.  Check
+%the conjecture:
+    
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}6}]:} \PY{c}{\PYZsh{} now conjecture \ref{conjecture:theta_asym_var_gaussian}}
+        %\PY{n}{conjec} \PY{o}{=} \PY{n}{quad\PYZus{}form}\PY{p}{(}\PY{n}{Theta\PYZus{}Theta}\PY{p}{,}\PY{n}{Dupp}\PY{p}{)}
+        %\PY{n}{convar} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{p}{(}\PY{n}{conjec}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{Matrix}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+        %\PY{n}{simplify}\PY{p}{(}\PY{n}{convar}\PY{p}{)}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}6}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}\frac{2 \mu^{2}}{\sigma^{4}} \left(\mu^{2} + 2 \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{2 \mu^{2}}{\sigma^{4}}\\- \frac{2 \mu}{\sigma^{4}} \left(\mu^{2} + \sigma^{2}\right) & \frac{1}{\sigma^{4}} \left(2 \mu^{2} + \sigma^{2}\right) & - \frac{2 \mu}{\sigma^{4}}\\\frac{2 \mu^{2}}{\sigma^{4}} & - \frac{2 \mu}{\sigma^{4}} & \frac{2}{\sigma^{4}}\end{matrix}\right]
+        %\end{equation*}
+
+    
+
+    %\begin{Verbatim}[commandchars=\\\{\}]
+%{\color{incolor}In [{\color{incolor}7}]:} \PY{c}{\PYZsh{} are they the same?}
+        %\PY{n}{simplify}\PY{p}{(}\PY{n}{theta\PYZus{}inv\PYZus{}var} \PY{o}{\PYZhy{}} \PY{n}{convar}\PY{p}{)}
+%\end{Verbatim}
+%\texttt{\color{outcolor}Out[{\color{outcolor}7}]:}
+    
+    
+        %\begin{equation*}
+        %\left[\begin{matrix}0 & 0 & 0\\0 & 0 & 0\\0 & 0 & 0\end{matrix}\right]
+        %\end{equation*}
+
+    %%UNFOLD
+
+\end{example}%UNFOLD
+%UNFOLD
+
+\end{document}
+%for vim modeline: (do not edit)
+% vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=%%s:syn=rnoweb:ft=rnoweb:nu

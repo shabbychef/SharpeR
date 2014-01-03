@@ -1,4 +1,4 @@
-# Copyright 2012-2013 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2014 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -595,90 +595,90 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 
 # lambda prime
 # plambdap, qlambdap#FOLDUP
-#  ' @title The lambda-prime distribution.
-#  '
-#  ' @description 
-#  '
-#  ' Distribution function and quantile function for LeCoutre's
-#  ' lambda-prime distribution with \code{df} degrees of freedom
-#  ' and the observed t-statistic, \code{tstat}.
-#  '
-#  ' @details
-#  '
-#  ' Let \eqn{t}{t} be distributed
-#  ' as a non-central t with \eqn{\nu}{v} degrees of freedom and non-centrality
-#  ' parameter \eqn{\delta}{ncp}. We can view this as
-#  ' \deqn{t = \frac{Z + \delta}{\sqrt{V/\nu}}.}{t = (Z + ncp)/sqrt(V/v)}
-#  ' where \eqn{Z}{Z} is a standard normal, \eqn{\delta}{ncp} is the
-#  ' non-centrality parameter, \eqn{V}{V} is a chi-square RV with \eqn{\nu}{v}
-#  ' degrees of freedom, independent of \eqn{Z}{Z}.  We can rewrite this as
-#  ' \deqn{\delta = t\sqrt{V/\nu} + Z.}{ncp = t sqrt(V/v) + Z}
-#  ' 
-#  ' Thus a 'lambda-prime' random variable with parameters \eqn{t}{t} and
-#  ' \eqn{\nu}{v} is one expressable as a sum
-#  ' \deqn{t\sqrt{V/\nu} + Z}{t sqrt(V/v) + Z}
-#  ' for Chi-square \eqn{V}{V} with \eqn{\nu}{v} d.f., independent from
-#  ' standard normal \eqn{Z}{Z}
-#  '
-#  ' @usage
-#  '
-#  ' plambdap(q, df, tstat, lower.tail = TRUE, log.p = FALSE)
-#  '
-#  ' qlambdap(p, df, tstat, lower.tail = TRUE, log.p = FALSE)
-#  '
-#  ' @param q vector of quantiles.
-#  ' @param p vector of probabilities.
-#  ' @param df the degrees of freedom of the t-statistic.
-#  ' @param tstat the observed (non-central) t-statistic.
-#  ' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
-#  ' @param lower.tail logical; if TRUE (default), probabilities are
-#  '        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
-#  ' @inheritParams qsr
-#  ' @inheritParams psr
-#  ' @inheritParams dsr
-#  ' @keywords distribution 
-#  ' @return \code{dlambdap} gives the density, \code{plambdap} gives the distribution function,
-#  ' \code{qlambdap} gives the quantile function, and \code{rlambdap} generates random deviates.
-#  '
-#  ' Invalid arguments will result in return value \code{NaN} with a warning.
-#  ' @aliases plambdap
-#  ' @aliases qlambdap 
-#  ' @aliases rlambdap
-#  ' @seealso t-distribution functions, \code{\link{dt},\link{pt},\link{qt},\link{rt}}
-#  ' @export 
-#  ' @template etc
-#  ' @family sr
-#  ' @references 
-#  '
-#  ' Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
-#  ' Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107--116.
-#  ' \url{http://www.univ-rouen.fr/LMRS/Persopage/Lecoutre/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
-#  '
-#  ' Lecoutre, Bruno. "Two useful distributions for Bayesian predictive procedures under normal models."
-#  ' Journal of Statistical Planning and Inference 79  (1999): 93--105. 
-#  '
-#  ' @note
-#  ' \code{plambdap} should be an increasing function of the argument \code{q},
-#  ' and decreasing in \code{tstat}. \code{qlambdap} should be increasing
-#  ' in \code{p}
-#  ' @examples 
-#  ' rvs <- rnorm(128)
-#  ' pvs <- plambdap(rvs, 253*6, 0.5)
-#  ' plot(ecdf(pvs))
-#  ' pvs <- plambdap(rvs, 253*6, 1)
-#  ' plot(ecdf(pvs))
-#  ' pvs <- plambdap(rvs, 253*6, -0.5)
-#  ' plot(ecdf(pvs))
-#  ' # test vectorization:
-#  ' qv <- qlambdap(0.1,128,2)
-#  ' qv <- qlambdap(c(0.1),128,2)
-#  ' qv <- qlambdap(c(0.2),128,2)
-#  ' qv <- qlambdap(c(0.2),253,2)
-#  ' qv <- qlambdap(c(0.1,0.2),128,2)
-#  ' qv <- qlambdap(c(0.1,0.2),c(128,253),2)
-#  ' qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4))
-#  ' qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
-#  '
+#' @title The lambda-prime distribution.
+#'
+#' @description 
+#'
+#' Distribution function and quantile function for LeCoutre's
+#' lambda-prime distribution with \code{df} degrees of freedom
+#' and the observed t-statistic, \code{tstat}.
+#'
+#' @details
+#'
+#' Let \eqn{t}{t} be distributed
+#' as a non-central t with \eqn{\nu}{v} degrees of freedom and non-centrality
+#' parameter \eqn{\delta}{ncp}. We can view this as
+#' \deqn{t = \frac{Z + \delta}{\sqrt{V/\nu}}.}{t = (Z + ncp)/sqrt(V/v)}
+#' where \eqn{Z}{Z} is a standard normal, \eqn{\delta}{ncp} is the
+#' non-centrality parameter, \eqn{V}{V} is a chi-square RV with \eqn{\nu}{v}
+#' degrees of freedom, independent of \eqn{Z}{Z}.  We can rewrite this as
+#' \deqn{\delta = t\sqrt{V/\nu} + Z.}{ncp = t sqrt(V/v) + Z}
+#' 
+#' Thus a 'lambda-prime' random variable with parameters \eqn{t}{t} and
+#' \eqn{\nu}{v} is one expressable as a sum
+#' \deqn{t\sqrt{V/\nu} + Z}{t sqrt(V/v) + Z}
+#' for Chi-square \eqn{V}{V} with \eqn{\nu}{v} d.f., independent from
+#' standard normal \eqn{Z}{Z}
+#'
+#' @usage
+#'
+#' plambdap(q, df, tstat, lower.tail = TRUE, log.p = FALSE)
+#'
+#' qlambdap(p, df, tstat, lower.tail = TRUE, log.p = FALSE)
+#'
+#' @param q vector of quantiles.
+#' @param p vector of probabilities.
+#' @param df the degrees of freedom of the t-statistic.
+#' @param tstat the observed (non-central) t-statistic.
+#' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
+#' @inheritParams qsr
+#' @inheritParams psr
+#' @inheritParams dsr
+#' @keywords distribution 
+#' @return \code{dlambdap} gives the density, \code{plambdap} gives the distribution function,
+#' \code{qlambdap} gives the quantile function, and \code{rlambdap} generates random deviates.
+#'
+#' Invalid arguments will result in return value \code{NaN} with a warning.
+#' @aliases plambdap
+#' @aliases qlambdap 
+#' @aliases rlambdap
+#' @seealso t-distribution functions, \code{\link{dt},\link{pt},\link{qt},\link{rt}}
+#' @export 
+#' @template etc
+#' @family sr
+#' @references 
+#'
+#' Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
+#' Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107--116.
+#' \url{http://www.univ-rouen.fr/LMRS/Persopage/Lecoutre/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
+#'
+#' Lecoutre, Bruno. "Two useful distributions for Bayesian predictive procedures under normal models."
+#' Journal of Statistical Planning and Inference 79  (1999): 93--105. 
+#'
+#' @note
+#' \code{plambdap} should be an increasing function of the argument \code{q},
+#' and decreasing in \code{tstat}. \code{qlambdap} should be increasing
+#' in \code{p}
+#' @examples 
+#' rvs <- rnorm(128)
+#' pvs <- plambdap(rvs, 253*6, 0.5)
+#' plot(ecdf(pvs))
+#' pvs <- plambdap(rvs, 253*6, 1)
+#' plot(ecdf(pvs))
+#' pvs <- plambdap(rvs, 253*6, -0.5)
+#' plot(ecdf(pvs))
+#' # test vectorization:
+#' qv <- qlambdap(0.1,128,2)
+#' qv <- qlambdap(c(0.1),128,2)
+#' qv <- qlambdap(c(0.2),128,2)
+#' qv <- qlambdap(c(0.2),253,2)
+#' qv <- qlambdap(c(0.1,0.2),128,2)
+#' qv <- qlambdap(c(0.1,0.2),c(128,253),2)
+#' qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4))
+#' qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
+#'
 plambdap <- function(q,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 	# this is just a silly wrapper on pt
 	retv <- pt(q=tstat,df=df,ncp=q,lower.tail=!lower.tail,log.p=log.p)
@@ -727,7 +727,7 @@ plambdap <- function(q,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 	ncp <- uniroot(zerf,c(flo,fhi))
 	return(ncp$root)
 }
-#  ' @export 
+#' @export 
 qlambdap <- Vectorize(.qlambdap, 
 											vectorize.args = c("p","df","tstat"),
 											SIMPLIFY = TRUE)
@@ -735,109 +735,104 @@ qlambdap <- Vectorize(.qlambdap,
 
 # co-SR^*
 # pco_sropt, qco_sropt#FOLDUP
-#  ' @title The 'confidence distribution' for maximal Sharpe ratio.
-#  '
-#  ' @description 
-#  '
-#  ' Distribution function and quantile function for the 'confidence
-#  ' distribution' of the maximal Sharpe ratio. This is just an inversion
-#  ' to perform inference on \eqn{\zeta_*}{zeta*} given observed statistic 
-#  ' \eqn{z_*}{z*}.
-#  '
-#  ' @details
-#  ' 
-#  ' Suppose \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio} distribution
-#  ' (see \code{\link{package-SharpeR}}) for known degrees of freedom, and 
-#  ' unknown non-centrality parameter \eqn{\zeta_*}{zeta*}. The 
-#  ' 'confidence distribution' views \eqn{\zeta_*}{zeta*} as a random
-#  ' quantity once \eqn{z_*}{z*} is observed. As such, the CDF of
-#  ' the confidence distribution is the same as that of the 
-#  ' Maximal Sharpe ratio (up to a flip of \code{lower.tail});
-#  ' while the quantile function is used to compute confidence
-#  ' intervals on \eqn{\zeta_*}{zeta*} given \eqn{z_*}{z*}.
-#  '
-#  ' @usage
-#  '
-#  ' pco_sropt(q,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE) 
-#  '
-#  ' qco_sropt(p,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
-#  '
-#  ' @param q vector of quantiles.
-#  ' @param p vector of probabilities.
-#  ' @param z.s an observed Sharpe ratio statistic, annualized.
-#  ' @template param-ope
-#  ' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
-#  ' @param lower.tail logical; if TRUE (default), probabilities are
-#  '        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
-#  ' @param lb the lower bound for the output of \code{qco_sropt}.
-#  ' @param ub the upper bound for the output of \code{qco_sropt}.
-#  ' @inheritParams dsropt
-#  ' @inheritParams qsr
-#  ' @inheritParams dsr
-#  ' @inheritParams psr
-#  ' @keywords distribution 
-#  ' @return \code{pco_sropt} gives the distribution function, and
-#  ' \code{qco_sropt} gives the quantile function.
-#  '
-#  ' Invalid arguments will result in return value \code{NaN} with a warning.
-#  ' @aliases qco_sropt 
-#  ' @seealso \code{\link{dsropt},\link{psropt},\link{qsropt},\link{rsropt}}
-#  ' @export 
-#  ' @template etc
-#  ' @family sropt
-#  ' @note
-#  ' When \code{lower.tail} is true, \code{pco_sropt} is monotonic increasing 
-#  ' with respect to \code{q}, and decreasing in \code{sropt}; these are reversed
-#  ' when \code{lower.tail} is false. Similarly, \code{qco_sropt} is increasing
-#  ' in \code{sign(as.double(lower.tail) - 0.5) * p} and
-#  ' \code{- sign(as.double(lower.tail) - 0.5) * sropt}.
-#  '
-#  ' @examples 
-#  '
-#  ' zeta.s <- 2.0
-#  ' ope <- 253
-#  ' ntest <- 2000
-#  ' df1 <- 4
-#  ' df2 <- 6 * ope
-#  ' rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
-#  ' qvs <- seq(0,10,length.out=101)
-#  ' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope)
-#  ' if (require(txtplot))
-#  '  txtplot(qvs,pps)
-#  ' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
-#  ' if (require(txtplot))
-#  '  txtplot(qvs,pps)
-#  ' 
-#  ' # 2FIX: shove these into the unit tests for monotonicity?
-#  ' svs <- seq(0,4,length.out=101)
-#  ' pps <- pco_sropt(2,df1,df2,svs,ope)
-#  ' if (require(txtplot))
-#  '  txtplot(svs,pps)
-#  ' pps <- pco_sropt(2,df1,df2,svs,ope,lower.tail=FALSE)
-#  ' if (require(txtplot))
-#  '  txtplot(svs,pps)
-#  ' 
-#  ' if (require(txtplot))
-#  '  txtplot(qvs,pps)
-#  ' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
-#  ' if (require(txtplot))
-#  '  txtplot(qvs,pps)
-#  ' pco_sropt(-1,df1,df2,rvs[1],ope)
-#  '
-#  ' qvs <- qco_sropt(0.05,df1=df1,df2=df2,z.s=rvs)
-#  ' mean(qvs > zeta.s)
-#  ' qvs <- qco_sropt(0.5,df1=df1,df2=df2,z.s=rvs)
-#  ' mean(qvs > zeta.s)
-#  ' qvs <- qco_sropt(0.95,df1=df1,df2=df2,z.s=rvs)
-#  ' mean(qvs > zeta.s)
-#  ' # test vectorization:
-#  ' qv <- qco_sropt(0.1,df1,df2,rvs)
-#  ' qv <- qco_sropt(c(0.1,0.2),df1,df2,rvs)
-#  ' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),df2,rvs)
-#  ' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
-#  '
-# 2FIX: add ope?
+#' @title The 'confidence distribution' for maximal Sharpe ratio.
+#'
+#' @description 
+#'
+#' Distribution function and quantile function for the 'confidence
+#' distribution' of the maximal Sharpe ratio. This is just an inversion
+#' to perform inference on \eqn{\zeta_*}{zeta*} given observed statistic 
+#' \eqn{z_*}{z*}.
+#'
+#' @details
+#' 
+#' Suppose \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio} distribution
+#' (see \code{\link{SharpeR}}) for known degrees of freedom, and 
+#' unknown non-centrality parameter \eqn{\zeta_*}{zeta*}. The 
+#' 'confidence distribution' views \eqn{\zeta_*}{zeta*} as a random
+#' quantity once \eqn{z_*}{z*} is observed. As such, the CDF of
+#' the confidence distribution is the same as that of the 
+#' Maximal Sharpe ratio (up to a flip of \code{lower.tail});
+#' while the quantile function is used to compute confidence
+#' intervals on \eqn{\zeta_*}{zeta*} given \eqn{z_*}{z*}.
+#'
+#' @usage
+#'
+#' pco_sropt(q,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE) 
+#'
+#' qco_sropt(p,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf) 
+#'
+#' @param q vector of quantiles.
+#' @param p vector of probabilities.
+#' @param z.s an observed Sharpe ratio statistic, annualized.
+#' @template param-ope
+#' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
+#' @param lb the lower bound for the output of \code{qco_sropt}.
+#' @param ub the upper bound for the output of \code{qco_sropt}.
+#' @inheritParams dsropt
+#' @inheritParams qsr
+#' @inheritParams dsr
+#' @inheritParams psr
+#' @keywords distribution 
+#' @return \code{pco_sropt} gives the distribution function, and
+#' \code{qco_sropt} gives the quantile function.
+#'
+#' Invalid arguments will result in return value \code{NaN} with a warning.
+#' @aliases qco_sropt 
+#' @seealso \code{\link{dsropt},\link{psropt},\link{qsropt},\link{rsropt}}
+#' @export 
+#' @template etc
+#' @family sropt
+#' @note
+#' When \code{lower.tail} is true, \code{pco_sropt} is monotonic increasing 
+#' with respect to \code{q}, and decreasing in \code{sropt}; these are reversed
+#' when \code{lower.tail} is false. Similarly, \code{qco_sropt} is increasing
+#' in \code{sign(as.double(lower.tail) - 0.5) * p} and
+#' \code{- sign(as.double(lower.tail) - 0.5) * sropt}.
+#'
+#' @examples 
+#'
+#' zeta.s <- 2.0
+#' ope <- 253
+#' ntest <- 50
+#' df1 <- 4
+#' df2 <- 6 * ope
+#' rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
+#' qvs <- seq(0,10,length.out=51)
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope)
+#' \dontrun{
+#' if (require(txtplot))
+#'  txtplot(qvs,pps)
+#' }
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
+#' \dontrun{
+#' if (require(txtplot))
+#'  txtplot(qvs,pps)
+#' }
+#' 
+#' svs <- seq(0,4,length.out=51)
+#' pps <- pco_sropt(2,df1,df2,svs,ope)
+#' pps <- pco_sropt(2,df1,df2,svs,ope,lower.tail=FALSE)
+#' 
+#' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
+#' pco_sropt(-1,df1,df2,rvs[1],ope)
+#'
+#' qvs <- qco_sropt(0.05,df1=df1,df2=df2,z.s=rvs)
+#' mean(qvs > zeta.s)
+#' qvs <- qco_sropt(0.5,df1=df1,df2=df2,z.s=rvs)
+#' mean(qvs > zeta.s)
+#' qvs <- qco_sropt(0.95,df1=df1,df2=df2,z.s=rvs)
+#' mean(qvs > zeta.s)
+#' # test vectorization:
+#' qv <- qco_sropt(0.1,df1,df2,rvs)
+#' qv <- qco_sropt(c(0.1,0.2),df1,df2,rvs)
+#' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),df2,rvs)
+#' qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
+#'
 pco_sropt <- function(q,df1,df2,z.s,ope=1,lower.tail=TRUE,log.p=FALSE) {
+	# 2FIX: add ope?
 	# 2FIX: do the annualization just once for efficiency?
 	# this is just a silly wrapper on psropt
 	# delegate
@@ -911,7 +906,7 @@ pco_sropt <- function(q,df1,df2,z.s,ope=1,lower.tail=TRUE,log.p=FALSE) {
 	retv <- ifelse(missing(ope),ncp$root,.annualize(ncp$root,ope))
 	return(retv)
 }
-#  ' @export 
+#' @export 
 qco_sropt <- Vectorize(.qco_sropt,
 											vectorize.args = c("p","df1","df2","z.s"),
 											SIMPLIFY = TRUE)

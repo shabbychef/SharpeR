@@ -2,7 +2,7 @@
 \alias{ism_vcov}
 \title{Compute variance covariance of Inverse 'Unified' Second Moment}
 \usage{
-  ism_vcov(X,vcov.func=vcov)
+  ism_vcov(X,vcov.func=vcov,fit.intercept=TRUE)
 }
 \arguments{
   \item{X}{an \eqn{n \times p}{n x p} matrix of observed
@@ -10,7 +10,12 @@
 
   \item{vcov.func}{a function which takes an object of
   class \code{lm}, and computes a variance-covariance
-  matrix.}
+  matrix. If equal to the string "normal", we assume
+  multivariate normal returns.}
+
+  \item{fit.intercept}{a boolean controlling whether we add
+  a column of ones to the data, or fit the raw uncentered
+  second moment.}
 }
 \value{
   a list containing the following components: \item{mu}{a
@@ -50,11 +55,17 @@
   Markowitz portfolio and the precision matrix on \eqn{X}.
   Performing this transform before passing the data to this
   function should be considered idiomatic.
+
+  This function will be deprecated in future releases of
+  this package. Users should migrate at that time to a
+  similar function in the MarkowitzR package.
 }
 \examples{
 X <- matrix(rnorm(1000*3),ncol=3)
 # putting in -X is idiomatic:
 ism <- ism_vcov(-X)
+iSigmas.n <- ism_vcov(-X,vcov.func="normal")
+iSigmas.n <- ism_vcov(-X,fit.intercept=FALSE)
 # compute the marginal Wald test statistics:
 ism.mu <- ism$mu[1:ism$p]
 ism.Sg <- ism$Ohat[1:ism$p,1:ism$p]
@@ -84,6 +95,10 @@ if (require(sandwich)) {
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
+}
+\references{
+  Pav, S. E. "Asymptotic Distribution of the Markowitz
+  Portfolio." 2013 \url{http://arxiv.org/abs/1312.0557}
 }
 \seealso{
   \code{\link{sm_vcov}}, \code{\link{sr_vcov}}

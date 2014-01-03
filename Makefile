@@ -27,7 +27,7 @@ GS_QUALITY 				?= 'ebook'
 
 M4_FILES					?= $(wildcard m4/*.m4)
 
-VERSION 					 = 0.1310
+VERSION 					 = 0.1401
 TODAY 						:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 					:= SharpeR
@@ -53,7 +53,7 @@ R_FLAGS 					?= -q --no-save --no-restore --no-init-file
 
 # packages I need to test this one
 TEST_DEPS  				 = testthat roxygen2 knitr TTR quantmod MASS \
-										 sandwich xtable LambertW
+										 sandwich xtable matrixcalc LambertW
 INSTALLED_DEPS 		 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
 PKG_TESTR 				 = tests/run-all.R
 
@@ -87,6 +87,9 @@ EXTDATA_FILES	 		 = $(PREMAKE_RDA)
 VIGNETTE_D 				 = vignettes
 VIGNETTE_CACHE 		 = $(VIGNETTE_D)/cache
 VIGNETTE_EXTRAS		 = $(VIGNETTE_D)/SharpeRatio.Rnw $(VIGNETTE_D)/SharpeR.sty
+# slight of hand here ... 
+# VIGNETTE_EXTRAS		+= $(VIGNETTE_D)/AsymptoticMarkowitz.Rnw
+NODIST_FILES       += $(VIGNETTE_D)/AsymptoticMarkowitz.Rnw
 VIGNETTE_SRCS  		 = $(VIGNETTE_D)/$(PKG_NAME).Rnw $(VIGNETTE_D)/$(PKG_NAME).bib
 VIGNETTE_PDF   		 = $(VIGNETTE_D)/$(PKG_NAME).pdf
 VIGNETTE_HTML  		 = $(VIGNETTE_D)/index.html
@@ -114,7 +117,7 @@ INSTALL_FLAGS 		?= --preclean --library=$(LOCAL)
 TEST_PRAGMA     	?= release
 
 #GIT_BRANCH 				?= master
-GIT_BRANCH 				?= dev1310
+GIT_BRANCH 				?= dev1311
 
 # for R CMD build
 ifeq ($(TEST_PRAGMA),thorough)
@@ -142,6 +145,7 @@ PRETEX       = TEXINPUTS=$(TEXINPADD):$$TEXINPUTS
 PREBIB       = BSTINPUTS=$(TEXINPADD):$$BSTINPUTS \
                BIBINPUTS=$(TEXINPADD):$$BIBINPUTS 
 BIBTEX      := $(shell which bibtex)
+LATEX       := $(shell which latex)
 
 BASE_DEF_PACKAGES   = "utils,graphics,grDevices,methods,stats,$(PKG_NAME)"
 
@@ -174,6 +178,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 	vignette_cache \
 	the_vignette \
 	static_vignette \
+	the_paper \
 	R
 
 help:
@@ -395,6 +400,27 @@ $(VIGNETTE_CACHE_SENTINEL) : $(VIGNETTE_SRCS) $(LOCAL)/$(PKG_NAME)/INDEX
 
 vignette_cache : $(VIGNETTE_CACHE_SENTINEL)
 
+%.tex : %.Rnw 
+	$(call WARN_DEPS)
+	$(PRETEX) R_LIBS=$(LOCAL) R_PROFILE=load.R \
+				 R_DEFAULT_PACKAGES="$(BASE_DEF_PACKAGES),knitr,TTR" \
+				 FORCE_RECOMPUTE='TRUE' \
+				 $(R) $(R_FLAGS) --slave -e "setwd('$(VIGNETTE_D)');knitr::knit(basename('$<'));"
+
+%.dvi : %.tex 
+		$(PRETEX) $(LATEX) $<
+		if grep Citation $*.log > /dev/null; then $(PREBIB) $(BIBTEX) $*; $(PRETEX) $(LATEX) $*; fi
+		if grep Rerun $*.log > /dev/null; then $(PRETEX) $(LATEX) $*; fi
+		@-cp $*.dvi $(VIGNETTE_D)
+		@-cp $*.aux $(VIGNETTE_D)
+		@-cp $*.log $(VIGNETTE_D)
+
+%.bbl : %.bib
+		$(PREBIB) $(BIBTEX) $*
+		@-cp $*.bbl $(VIGNETTE_D)
+
+the_paper : vignettes/AsymptoticMarkowitz.dvi vignettes/AsymptoticMarkowitz.tex vignettes/AsymptoticMarkowitz.bbl
+
 # make data needed by the vignette. what bother.
 $(EXTDATA_D)/%.rda : $(NODIST_R_DIR)/make_%.R
 	$(call WARN_DEPS)
@@ -424,6 +450,11 @@ newbuild :
 	$(MAKE) docs
 	$(MAKE) tags
 	$(MAKE) build
+
+# Python. well, iPython.
+
+%.tex : %.ipynb
+		ipython nbconvert --to latex --output $* $<
 
 ################################
 # CLEAN UP 
@@ -503,7 +534,23 @@ mactex :
 # cheesy checkin:
 #
 # sleep `jot -r 1 5 55` && git commit -a -m 'working on vignette'
-# git push origin dev1310
+# git push origin dev1311
+
+suggestions : 
+	@-echo 'sleep `jot -r 1 2 57` && git commit -a -m "working on vignette"'
+	@-echo "git push origin $(GIT_BRANCH)"
+
+# for submission to arxiv;
+# what bother;
+#
+# I basically did
+# make vignettes/AsymptoticMarkowitz.tex
+# cd vignettes/
+# make -f ~/sys/etc/MOAMakefile AsymptoticMarkowitz.dvi 
+# and then used the .tex and .bbl files
+arxiv : vignettes/AsymptoticMarkowitz.tex
+	@-echo 'cd vignettes/'
+	@-echo 'make -f ~/sys/etc/MOAMakefile AsymptoticMarkowitz.dvi'
 
 
 #for vim modeline: (do not edit)

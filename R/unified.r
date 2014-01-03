@@ -1,4 +1,4 @@
-# Copyright 2012-2013 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2014 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -40,6 +40,24 @@
 # print(1000*vcov(foomod))
 # print(cov(X))
 
+require(matrixcalc)
+
+# inverse vech operator. wheee#FOLDUP
+ivech <- function(x) { 
+	n <- length(x)
+	p <- (-0.5 + sqrt(2*n + 0.25))
+	myerr <- abs(p - round(p))
+	if (myerr > 1e-3) {
+		stop('wrong size input')
+	}
+	M <- matrix(0,ncol=p,nrow=p)
+	islo <- row(M) >= col(M)
+	M[islo] <- x
+	M <- t(M)
+	M[islo] <- x
+	return(M)
+}#UNFOLD
+
 # variance covariance#FOLDUP
 #' @title Compute variance covariance of 'Unified' Second Moment 
 #'
@@ -63,27 +81,42 @@
 #'
 #' @usage
 #'
-#' sm_vcov(X,vcov.func=vcov)
+#' sm_vcov(X,vcov.func=vcov,fit.intercept=TRUE)
 #'
 #' @param X an \eqn{n \times p}{n x p} matrix of observed returns.
 #' @param vcov.func a function which takes an object of class \code{lm},
-#' and computes a variance-covariance matrix.
+#' and computes a variance-covariance matrix. If equal to the string
+#' "normal", we assume multivariate normal returns.
+#' @param fit.intercept a boolean controlling whether we add a column
+#' of ones to the data, or fit the raw uncentered second moment.
 #' @keywords univar 
 #'
 #' @return a list containing the following components:
 #' \item{mu}{a \eqn{q = p(p+3)/2} vector of the mean, then the vech'd second
 #' moment of the sample data}
-#' \item{Ohat}{the \eqn{q \times q}{q x q} estimated variance covariance matrix.}
+#' \item{Ohat}{the \eqn{q \times q}{q x q} estimated variance covariance 
+#' matrix. Only the informative part is returned: one may assume a row and
+#' column of zeros in the upper left.}
 #' \item{n}{the number of rows in \code{X}.}
 #' \item{p}{the number of assets.}
 #' @seealso \code{\link{ism_vcov}}, \code{\link{sr_vcov}}
 #' @rdname sm_vcov
 #' @export 
 #' @template etc
+#' @template ref-SEP13
+#'
+#' @note
+#'
+#' This function will be deprecated in future releases of this package.
+#' Users should migrate at that time to a similar function in the
+#' MarkowitzR package.
 #'
 #' @examples 
 #' X <- matrix(rnorm(1000*3),ncol=3)
 #' Sigmas <- sm_vcov(X)
+#' Sigmas.n <- sm_vcov(X,vcov.func="normal")
+#' Sigmas.n <- sm_vcov(X,fit.intercept=FALSE)
+#'
 #' # make it fat tailed:
 #' X <- matrix(rt(1000*3,df=5),ncol=3)
 #' Sigmas <- sm_vcov(X)
@@ -102,49 +135,89 @@
 #' }
 #' }
 #'
-sm_vcov <- function(X,vcov.func=vcov) {
+sm_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
 	X <- na.omit(X)
 	n <- dim(X)[1]
 	p <- dim(X)[2]
-	q <- p * (p+3) / 2
-	# fill in Y
-	Y <- cbind(X,matrix(NA,nrow=dim(X)[1],ncol=p*(p+1)/2))
-
-	offs <- 0
-	for (iii in 1:p) {
-		Y[,p+offs+1+(0:(p-iii))] = X[,iii] * X[,iii:p]
-		offs <- offs + (p-iii) + 1
-	}
-
-	# model Y
-	mod2 <- lm(Y ~ 1)
-	rm(Y)
-
-	mu <- mod2$coefficients
-
-	# estimate Sigma hat
-	Ohat = vcov.func(mod2)
-	rm(mod2)
+	#q <- p * (p+3) / 2
+	ptil <- p + as.numeric(fit.intercept)
 
 	# get names;
 	base.names <- if (is.null(colnames(X))) sapply(1:p,function(n) { sprintf("asset_%03d",n) }) else colnames(X)
 	
-	strnames <- base.names
-	offs <- 0
+	# fill in Y#FOLDUP
+	if (fit.intercept) {
+		Y <- cbind(X,matrix(NA,nrow=dim(X)[1],ncol=p*(p+1)/2))
+		offs <- 0
+		strnames <- base.names
+	} else {
+		Y <- matrix(NA,nrow=dim(X)[1],ncol=p*(p+1)/2)
+		offs <- -p
+		strnames <- NULL
+	}
+
 	for (iii in 1:p) {
+		Y[,p+offs+1+(0:(p-iii))] = X[,iii] * X[,iii:p]
+		offs <- offs + (p-iii) + 1
+
 		# inefficient, yes, but whatever.
 		strnames <- c(strnames,
-				unlist(lapply(base.names[iii:p],function(x) { paste(base.names[iii],"x",x) })))
-		offs <- offs + (p-iii) + 1
+				unlist(lapply(base.names[iii:p],
+											function(x) { paste(base.names[iii],"x",x) })))
 	}
+	rm(offs)
+	#UNFOLD
+
+	# model Y and estimate Sigma hat#FOLDUP
+	if (is.character(vcov.func)) {
+		if (vcov.func != "normal") {
+			stop("only understand function or 'normal'")
+		}
+		if (!fit.intercept) {
+			stop("unknown form for gaussian zero mean case?")
+		}
+
+		mu <- colMeans(Y)
+		rm(Y)
+
+		# use Theorem 3.7
+		# not too bad;
+		if (fit.intercept) {
+			Theta <- ivech(c(1,mu))
+		} else {
+			Theta <- ivech(mu)
+		}
+		iTheta <- solve(Theta)
+		Dupp <- matrixcalc::duplication.matrix(ptil)
+		Elim <- matrixcalc::elimination.matrix(ptil)
+		LXD <- Elim %*% (iTheta %x% iTheta) %*% Dupp
+		DLXDU <- Dupp %*% LXD[,2:dim(LXD)[2]]
+		
+		inner <- (Theta %x% Theta) 
+		H <- t(DLXDU) %*% inner %*% DLXDU
+		Ohat <- (2 / n) * solve(H)
+		# if really using this ... 
+		#Ohat <- cbind(0,rbind(0,Ohat))
+	} else {
+		mod2 <- lm(Y ~ 1)
+		rm(Y)
+
+		mu <- mod2$coefficients
+			
+		Ohat = vcov.func(mod2)
+		rm(mod2)
+	}#UNFOLD
 	
-	dim(mu) <- c(q,1)
+	dim(mu) <- c(length(mu),1)
 	rownames(mu) <- strnames
 	rownames(Ohat) <- strnames
 	colnames(Ohat) <- strnames
 	retval <- list(mu=mu,Ohat=Ohat,n=n,p=p)
 	return(retval)
 }
+
+
+
 
 #' @title Compute variance covariance of Inverse 'Unified' Second Moment 
 #'
@@ -174,11 +247,8 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #'
 #' @usage
 #'
-#' ism_vcov(X,vcov.func=vcov)
+#' ism_vcov(X,vcov.func=vcov,fit.intercept=TRUE)
 #'
-#' @param X an \eqn{n \times p}{n x p} matrix of observed returns.
-#' @param vcov.func a function which takes an object of class \code{lm},
-#' and computes a variance-covariance matrix.
 #' @keywords univar 
 #'
 #' @return a list containing the following components:
@@ -188,10 +258,12 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #' covariance matrix.}
 #' \item{n}{the number of rows in \code{X}.}
 #' \item{p}{the number of assets.}
+#' @inheritParams sm_vcov
 #' @seealso \code{\link{sm_vcov}}, \code{\link{sr_vcov}}
 #' @rdname ism_vcov
 #' @export 
 #' @template etc
+#' @template ref-SEP13
 #'
 #' @note
 #'
@@ -201,10 +273,18 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #' this transform before passing the data to this function
 #' should be considered idiomatic.
 #'
+#' @note
+#'
+#' This function will be deprecated in future releases of this package.
+#' Users should migrate at that time to a similar function in the
+#' MarkowitzR package.
+#'
 #' @examples 
 #' X <- matrix(rnorm(1000*3),ncol=3)
 #' # putting in -X is idiomatic:
 #' ism <- ism_vcov(-X)
+#' iSigmas.n <- ism_vcov(-X,vcov.func="normal")
+#' iSigmas.n <- ism_vcov(-X,fit.intercept=FALSE)
 #' # compute the marginal Wald test statistics:
 #' ism.mu <- ism$mu[1:ism$p]
 #' ism.Sg <- ism$Ohat[1:ism$p,1:ism$p]
@@ -232,34 +312,43 @@ sm_vcov <- function(X,vcov.func=vcov) {
 #' }
 #' }
 #'
-ism_vcov <- function(X,vcov.func=vcov) {
+ism_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
 	# delegate
-	sm_est <- sm_vcov(X,vcov.func=vcov.func)
+	sm_est <- sm_vcov(X,vcov.func=vcov.func,
+										fit.intercept=fit.intercept)
+
 	# interpret
 	p <- sm_est$p
-	q <- p * (p + 3) /2
-	mu <- sm_est$mu[1:p]
-	dim(mu) <- c(p,1)
-	Sig2 <- matrix(NA,nrow=p,ncol=p)
-	Sig2[lower.tri(Sig2,diag=TRUE)] <- sm_est$mu[(p+1):length(sm_est$mu)]
-	Sig2 <- t(Sig2)
-	Sig2[lower.tri(Sig2,diag=TRUE)] <- sm_est$mu[(p+1):length(sm_est$mu)]
-	Theta <- cbind(rbind(1,mu),rbind(t(mu),Sig2))
+
+	if (fit.intercept) {
+		Theta <- ivech(c(1,sm_est$mu))
+	} else {
+		Theta <- ivech(sm_est$mu)
+	}
 
 	iTheta <- solve(Theta)
 	deriv <- iTheta %x% iTheta  # kron 
 	
 	# now elimination time
 	elim.idx <- lower.tri(Theta,diag=TRUE)
-	dim(elim.idx) <- c((p+1)*(p+1),1)
-	elim.idx[1] <- FALSE
+	dim(elim.idx) <- c(length(elim.idx),1)
+	if (fit.intercept) 
+		elim.idx[1] <- FALSE
 
-	sub.deriv <- deriv[elim.idx,elim.idx]
-	Ohat <- t(sub.deriv) %*% sm_est$Ohat %*% sub.deriv
+	if (fit.intercept) {
+		Dupp <- matrixcalc::duplication.matrix(p+1)
+	} else {
+		Dupp <- matrixcalc::duplication.matrix(p)
+	}
+	# arg!
+	if (fit.intercept) 
+		Dupp <- Dupp[,2:dim(Dupp)[2]] 
+	sub.deriv <- deriv[elim.idx,] %*% Dupp
+	Ohat <- (sub.deriv) %*% sm_est$Ohat %*% t(sub.deriv)
 
 	mu <- iTheta[elim.idx]
 	strnames <- rownames(sm_est$mu)
-	dim(mu) <- c(q,1)
+	dim(mu) <- c(length(mu),1)
 	rownames(mu) <- strnames
 	rownames(Ohat) <- strnames
 	colnames(Ohat) <- strnames

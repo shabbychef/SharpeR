@@ -1,3 +1,6 @@
+2014-01-03 Steven E. Pav <shabbychef@gmail.com>
+* fix matrix calculus in sm_vcov
+* add 'confidence distribution' functions for sr and sropt
 
 2013-10-30 Steven E. Pav <shabbychef@gmail.com>
 * ism_vcov for variance/covariance on Markowitz portfolio

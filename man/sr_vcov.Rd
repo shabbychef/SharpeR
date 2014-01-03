@@ -96,7 +96,7 @@ if (require(sandwich)) {
   \code{\link{confint.del_sropt}},
   \code{\link{confint.sr}}, \code{\link{confint.sropt}},
   \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{power.sr_test}},
+  \code{\link{plambdap}}, \code{\link{power.sr_test}},
   \code{\link{print.del_sropt}}, \code{\link{print.sr}},
   \code{\link{print.sropt}}, \code{\link{reannualize}},
   \code{\link{reannualize.sr}},

@@ -2,7 +2,7 @@
 \alias{sm_vcov}
 \title{Compute variance covariance of 'Unified' Second Moment}
 \usage{
-  sm_vcov(X,vcov.func=vcov)
+  sm_vcov(X,vcov.func=vcov,fit.intercept=TRUE)
 }
 \arguments{
   \item{X}{an \eqn{n \times p}{n x p} matrix of observed
@@ -10,15 +10,22 @@
 
   \item{vcov.func}{a function which takes an object of
   class \code{lm}, and computes a variance-covariance
-  matrix.}
+  matrix. If equal to the string "normal", we assume
+  multivariate normal returns.}
+
+  \item{fit.intercept}{a boolean controlling whether we add
+  a column of ones to the data, or fit the raw uncentered
+  second moment.}
 }
 \value{
   a list containing the following components: \item{mu}{a
   \eqn{q = p(p+3)/2} vector of the mean, then the vech'd
   second moment of the sample data} \item{Ohat}{the \eqn{q
-  \times q}{q x q} estimated variance covariance matrix.}
-  \item{n}{the number of rows in \code{X}.} \item{p}{the
-  number of assets.}
+  \times q}{q x q} estimated variance covariance matrix.
+  Only the informative part is returned: one may assume a
+  row and column of zeros in the upper left.} \item{n}{the
+  number of rows in \code{X}.} \item{p}{the number of
+  assets.}
 }
 \description{
   Computes the variance covariance matrix of sample mean
@@ -38,9 +45,17 @@
   estimator, like \code{sandwich:vcovHAC},
   \code{sandwich:vcovHC}, \emph{etc.}
 }
+\note{
+  This function will be deprecated in future releases of
+  this package. Users should migrate at that time to a
+  similar function in the MarkowitzR package.
+}
 \examples{
 X <- matrix(rnorm(1000*3),ncol=3)
 Sigmas <- sm_vcov(X)
+Sigmas.n <- sm_vcov(X,vcov.func="normal")
+Sigmas.n <- sm_vcov(X,fit.intercept=FALSE)
+
 # make it fat tailed:
 X <- matrix(rt(1000*3,df=5),ncol=3)
 Sigmas <- sm_vcov(X)
@@ -61,6 +76,10 @@ if (require(sandwich)) {
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}
+}
+\references{
+  Pav, S. E. "Asymptotic Distribution of the Markowitz
+  Portfolio." 2013 \url{http://arxiv.org/abs/1312.0557}
 }
 \seealso{
   \code{\link{ism_vcov}}, \code{\link{sr_vcov}}

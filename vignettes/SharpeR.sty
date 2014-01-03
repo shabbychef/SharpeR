@@ -27,6 +27,11 @@
 \providecommand{\secref}[1]{Section\nobreakspace\ref{sec:#1}}
 \providecommand{\subsecref}[1]{Section\nobreakspace\ref{subsec:#1}}
 \providecommand{\tabref}[1]{Table\nobreakspace\ref{tab:#1}}
+\providecommand{\lemmaref}[1]{Lemma\nobreakspace\ref{lemma:#1}}
+\providecommand{\theoremref}[1]{Theorem\nobreakspace\ref{theorem:#1}}
+\providecommand{\definitionref}[1]{Definition\nobreakspace\ref{definition:#1}}
+\providecommand{\corollaryref}[1]{Corollary\nobreakspace\ref{corollary:#1}}
+\providecommand{\conjectureref}[1]{Conjecture\nobreakspace\ref{conjecture:#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % meta meta commands
@@ -73,8 +78,9 @@
 
 % yes, I am lazy.
 \providecommand{\txtSR}{Sharpe ratio\xspace}
-\providecommand{\txtSNR}{Signal-noise ratio\xspace}
-
+\providecommand{\txtSNR}{signal-noise ratio\xspace}
+\providecommand{\txtMwtz}{Markowitz\xspace}
+\providecommand{\txtMP}{Markowitz portfolio\xspace}
 
 % abbreviations
 \providecommand{\myabrvc}[1]{\emph{#1},\xspace}
@@ -89,11 +95,12 @@
 \providecommand{\etc}{\myabrv{etc.}}
 \providecommand{\etal}{\myabrv{et al.}}
 \providecommand{\cf}{\myabrv{cf.}}
+\providecommand{\WLOG}{without loss of generality, }
 
 
 \providecommand{\setwo}[2]{\MATHIT{\left\{ #1 \left|\; {#2} \right.\right\}}}
 
-\providecommand{\defeq}{=_{\mbox{df}}}
+\providecommand{\defeq}{=_{\operatorname{df}}}
 \providecommand{\kth}[1]{\MATHIT{#1^{\text{th}}}}
 
 
@@ -117,28 +124,45 @@
 
 % all commands%FOLDUP
 % vector operator
-\providecommand{\vecop}[1]{\funcit{\mbox{vec}}{#1}}
+\providecommand{\vecop}[1]{\funcit{\operatorname{vec}}{#1}}
 %\providecommand{\vec}[1]{\funcit{\mbox{vec}}{#1}}
-\providecommand{\vech}[1]{\funcit{\mbox{vech}}{#1}}  % Magnus writes as v( )
+\providecommand{\vech}[1]{\funcit{\operatorname{vech}}{#1}}  % Magnus writes as v( )
 
 \providecommand{\fvec}[1]{\vecop{#1}}
 \providecommand{\fvech}[1]{\vech{#1}}
 \providecommand{\Elim}[1][{}]{\MtxUL{L}{}{#1}}
 \providecommand{\Dupp}[1][{}]{\MtxUL{D}{}{#1}}
+\providecommand{\Unun}[1][{-1}]{\MtxUL{U}{}{#1}}
 \providecommand{\kron}{\MATHIT{\otimes}}
 
-\providecommand{\AkronA}[1]{\MATHIT{#1 \kron #1}}
+\providecommand{\qfElim}[1]{\qform{#1}{\Elim}}
+\providecommand{\qoElim}[1]{\qoform{#1}{\Elim}}
+\providecommand{\EXD}[1]{\MATHIT{\Elim {#1} \Dupp}}
+
+
+\providecommand{\AkronA}[1]{\MATHIT{{#1} \kron {#1}}}
+\providecommand{\AtkronA}[1]{\MATHIT{\tr{#1} \kron {#1}}}
+\providecommand{\AkronAt}[1]{\MATHIT{{#1} \kron \tr{#1}}}
 
 \providecommand{\trace}[1]{\funcit{\mbox{tr}}{#1}}
 % is this replicated elsewhere?
 \providecommand{\det}[1]{\abs{#1}}
+\renewcommand{\det}[1]{\abs{#1}}
+\providecommand{\detpow}[2]{\neUL{\det{#1}}{#2}{}}
+% functional det
+\providecommand{\fdet}[1]{\funcit{\operatorname{det}}{#1}}
+\renewcommand{\fdet}[1]{\funcit{\operatorname{det}}{#1}}
 \providecommand{\logdet}[1]{\MATHIT{\log\det{#1}}}
+\providecommand{\sign}[1]{\funcit{\operatorname{sign}}{#1}}
+
 
 % as vector, a column.
-\providecommand{\asvec}[1]{\tr{\wrapBracks{#1}}}
+\providecommand{\asrowvec}[1]{\wrapBracks{#1}}
+\providecommand{\asvec}[1]{\tr{\asrowvec{#1}}}
 \providecommand{\vcat}[2]{\asvec{\tr{#1},\tr{#2}}}
 
 \providecommand{\diag}[1]{\funcit{\operatorname{diag}}{#1}}
+\providecommand{\fsymd}[1]{\funcit{f_{\mbox{sym}}}{#1}}
 
 \providecommand{\threebythree}[9]{\wrapBracks{\begin{array}{ccc}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\\{#7}&{#8}&{#9}\end{array}}}
 \providecommand{\twotwosys}[6]{\wrapBracks{\begin{array}{cc|c}{#1}&{#2}&{#3}\\{#4}&{#5}&{#6}\end{array}}}
@@ -150,6 +174,9 @@
 \providecommand{\threebytwo}[6]{\wrapBracks{\begin{array}{cc}{#1}&{#2}\\{#3}&{#4}\\{#5}&{#6}\end{array}}}
 \providecommand{\threebyone}[3]{\wrapBracks{\begin{array}{r}{#1}\\{#2}\\{#3}\end{array}}}
 \providecommand{\onebytwo}[2]{\wrapBracks{\begin{array}{rr}{#1}&{#2}\end{array}}}
+
+\providecommand{\threebythreesym}[6]{\threebythree{#1}{#2}{#3}{\tr{#2}}{#4}{#5}{\tr{#3}}{\tr{#5}}{#6}}
+\providecommand{\threebythreessym}[6]{\threebythree{#1}{#2}{#3}{#2}{#4}{#5}{#3}{#5}{#6}}
 
 
 % idealized and conditional SNR functions
@@ -164,12 +191,22 @@
 \providecommand{\SNRfuncu}[1]{\pSNRfoo{u}{#1}}
 \providecommand{\SNRfuncc}[1]{\pSNRfoo{c}{#1}}
 
-
-
 % transpose and inverse
 \providecommand{\tr}[1]{\mathSUP{#1}{\top}}
 \providecommand{\minv}[1]{\mathSUP{#1}{-1}}
 \providecommand{\trminv}[1]{\mathSUP{#1}{-\top}}
+\providecommand{\minvAB}[2]{\MATHIT{\minv{#1}{#2}}}
+
+% Hermitian and pseudoinverse
+\providecommand{\htr}[1]{\mathSUP{#1}{*}}
+\providecommand{\pinv}[1]{\mathSUP{#1}{+}}
+
+\providecommand{\bottom}{\bot}
+
+% Complement
+%\providecommand{\cmpl}[1]{\mathSUP{#1}{\mathcal{C}}}
+\providecommand{\cmpl}[1]{\mathSUP{#1}{\bot}}
+
 % cholesky 
 \providecommand{\chol}[1]{\mathSUP{#1}{1/2}}
 \providecommand{\trchol}[1]{\mathSUP{#1}{\top/2}}
@@ -231,9 +268,16 @@
 \providecommand{\vreta}[1][]{\vectUL{\prvsyma}{}{#1}}
 \providecommand{\vretg}[1][]{\vectUL{\prvsymg}{}{#1}}
 
+% heteroskedasticity
+\providecommand{\fvola}[1][]{\mathSUB{q}{#1}}
+\providecommand{\volafoo}[2]{\mathUL{\gamma}{#1}{#2}}
+\providecommand{\volavar}[1][]{\volafoo{2}{#1}}
+\providecommand{\volaivar}[1][]{\volafoo{-2}{#1}}
+
 % augmented
 \providecommand{\avreti}[1][]{\vectUL{\tilde{\prvsymi}}{}{#1}}
 \providecommand{\amreti}[1][]{\MtxUL{\tilde{\MakeUppercase{\prvsymi}}}{}{#1}}
+\providecommand{\aavreti}[1][]{\vectUL{\tilde{\tilde{\prvsymi}}}{}{#1}}
 
 % transpose of same
 \providecommand{\trvreti}[1][]{\vectUL{\prvsymi}{\top}{#1}}
@@ -261,14 +305,18 @@
 \providecommand{\trvfact}[1][t]{\vectUL{\prvsymf}{\top}{#1}}
 \providecommand{\mfact}[1][]{\MtxUL{\MakeUppercase{\prvsymf}}{}{#1}}
 
+% index. i or t?
+\providecommand{\idx}{\MATHIT{t}}
+
+
 % distribution of factor
-\providecommand{\pfacmu}{\vectUL{\mu}{}{f}}
-\providecommand{\trpfacmu}{\vectUL{\mu}{\top}{f}}
+\providecommand{\pfacmu}{\vectUL{\prvMean}{}{f}}
+\providecommand{\trpfacmu}{\vectUL{\prvMean}{\top}{f}}
 \providecommand{\pfacsig}{\MtxUL{\Gamma}{}{f}}
 \providecommand{\pfacgram}[1][]{\MATHIT{\pfacsig + #1\pfacmu\trpfacmu}}
 
-\providecommand{\sfacmu}{\vectUL{\hat{\mu}}{}{f}}
-\providecommand{\trsfacmu}{\vectUL{\hat{\mu}}{\top}{f}}
+\providecommand{\sfacmu}{\vectUL{\hat{\prvMean}}{}{f}}
+\providecommand{\trsfacmu}{\vectUL{\hat{\prvMean}}{\top}{f}}
 \providecommand{\sfacsig}{\MtxUL{\hat{\Gamma}}{}{f}}
 
 % the error or residual
@@ -314,7 +362,15 @@
 
 \providecommand{\hejG}{\Mtx{G}}
 \providecommand{\hejg}{\vect{g}}
+\providecommand{\hejGt}{\MATHIT{\tilde{\hejG}}}
+\providecommand{\Delhej}{\mathUL{\Delta}{}{\hejG}}
 \providecommand{\nstrathej}{\nstrat[g]}
+\providecommand{\nlatfhej}{\nlatf[g]}
+
+\providecommand{\zerJ}{\Mtx{J}}
+\providecommand{\zerJc}{\cmpl{\zerJ}}
+\providecommand{\zerJt}{\MATHIT{\tilde{\zerJ}}}
+\providecommand{\nlatfzer}{\nlatf[j]}
 
 % unified second moment stuff.
 \providecommand{\pvsm}[1][{}]{\mathSUB{\Mtx{\Theta}}{#1}}
@@ -348,9 +404,18 @@
 \providecommand{\qoiform}[2]{\qoform{\minv{#1}}{#2}}
 \providecommand{\crossp}[1]{\gram{\wrapNeParens{#1}}}
 
+\providecommand{\qqform}[3]{\qform{\qform{#1}{#2}}{#3}}
+\providecommand{\qqqform}[4]{\qform{\qform{\qform{#1}{#2}}{#3}}{#4}}
+
+\providecommand{\wrapProj}[2]{\qiform{\wrapParens{\qoform{#1}{#2}}}{#2}}
+
+
+
 % a conditional on b
 %\providecommand{\acondb}[2]{\MATHIT{#1\,\left|\,#2\right.}}
 \providecommand{\acondb}[2]{\MATHIT{#1\left|\,#2\right.}}
+\providecommand{\Econd}[2]{\E{\acondb{#1}{#2}}}
+\providecommand{\Varcond}[2]{\VAR{\acondb{#1}{#2}}}
 
 % sample statistics%FOLDUP
 \providecommand{\smean}[1]{\MATHIT{\bar{#1}}}
@@ -366,6 +431,7 @@
 \providecommand{\prvStd}[0]{\sigma}
 \providecommand{\prvPrec}[0]{\lambda}
 \providecommand{\prvCov}[0]{\Sigma}
+\providecommand{\prviCov}[0]{\Lambda}
 
 % raw, zero-centered moment.
 \providecommand{\prvRawMom}[0]{\kappa}
@@ -489,6 +555,7 @@
 \providecommand{\sMGLHE}[1][]{\MtxUL{\hat{E}}{}{#1}}
 
 \providecommand{\eye}[1][]{\MtxUL{I}{}{#1}}
+\providecommand{\mzero}[1][]{\MtxUL{0}{}{#1}}
 
 
 %CDF and quantile%FOLDUP
@@ -533,7 +600,7 @@
 \providecommand{\chisqqnt}[2]{\FOOqnt{\prvchisq}{#1}{#2}}
 \providecommand{\chisqlaw}[1]{\makelaw{\prvchisq}{#1}}
 
-% gamma
+% gamma distribution
 \providecommand{\prvgamma}{\Gamma}
 \providecommand{\gammacdf}[2]{\FOOcdf{\prvgamma}{#1}{#2}}
 \providecommand{\gammaqnt}[2]{\FOOqnt{\prvgamma}{#1}{#2}}
@@ -585,10 +652,12 @@
 \providecommand{\serr}[1][]{\mathSUB{\hat{\epsilon}}{#1}}
 
 % multivariate regression;
-\providecommand{\pRegco}[1][]{\mathSUB{B}{#1}}
+\providecommand{\prvRegsym}{B}
+\providecommand{\pRegco}[1][]{\MtxUL{\prvRegsym}{}{#1}}
+\providecommand{\sRegco}[1][]{\MtxUL{\hat{\prvRegsym}}{}{#1}}
+
 \providecommand{\pErr}[1][]{\mathSUB{E}{#1}}
 \providecommand{\pErrt}[1][t]{\pErr[#1]}
-\providecommand{\sRegco}[1][]{\mathSUB{\hat{B}}{#1}}
 \providecommand{\sErr}[1][]{\mathSUB{\hat{E}}{#1}}
 
 %UNFOLD
@@ -618,7 +687,7 @@
 %\providecommand{\E}[1]{\MATHIT{\mbox{\large E}\wrapNeBracks{#1}}}
 %%\providecommand{\E}[1]{\ensuremath{\operatorname{E}\left[#1\right]}}
 \providecommand{\E}[1]{\MATHIT{\operatorname{E}\wrapNeBracks{#1}}}
-\providecommand{\VAR}[1]{\funcit{\mbox{Var}}{#1}}
+\providecommand{\VAR}[1]{\funcit{\operatorname{Var}}{#1}}
 \providecommand{\GAM}[1]{\MATHIT{\Gamma\wrapNeParens{#1}}}
 \providecommand{\skewness}[1]{\funcit{\mbox{skew}}{#1}}
 \providecommand{\exkurt}[1]{\funcit{\mbox{ex\,kurtosis}}{#1}}
@@ -664,14 +733,28 @@
 %aspect ratio
 \providecommand{\arat}[1][a]{\mathSUB{c}{#1}}
 
+% portfolios
+\providecommand{\prvPortfolio}[0]{\nu}
+
 \providecommand{\portw}[1][{}]{\vectUL{w}{}{#1}}
-\providecommand{\pportw}[1][{}]{\vectUL{\nu}{}{#1}}
-\providecommand{\sportw}[1][{}]{\vectUL{\hat{w}}{}{#1}}
-\providecommand{\sportwopt}{\sportw[*]}
-\providecommand{\pportwopt}{\pportw[*]}
+
+\providecommand{\pportw}[1][{}]{\vectUL{\prvPortfolio}{}{#1}}
+\providecommand{\sportw}[1][{}]{\vectUL{\hat{\prvPortfolio}}{}{#1}}
+\providecommand{\sportwoptFoo}[1]{\sportw[{#1}*]}
+\providecommand{\pportwoptFoo}[1]{\pportw[{#1}*]}
+\providecommand{\sportwopt}{\sportwoptFoo{}}
+\providecommand{\pportwopt}{\pportwoptFoo{}}
+\providecommand{\sportwoptR}{\sportwoptFoo{\Rbuj,}}
+\providecommand{\pportwoptR}{\pportwoptFoo{\Rbuj,}}
 
 \providecommand{\sportwoptG}[1]{\sportw[*,#1]}
 \providecommand{\pportwoptG}[1]{\pportw[*,#1]}
+
+\providecommand{\sportv}[1][{}]{\vectUL{\hat{v}}{}{#1}}
+\providecommand{\sportvopt}{\sportv[*]}
+
+\providecommand{\pportx}[1][{}]{\vectUL{\xi}{}{#1}}
+\providecommand{\sportx}[1][{}]{\vectUL{\hat{\xi}}{}{#1}}
 
 
 % basis vectors
@@ -725,6 +808,7 @@
 \providecommand{\drbydr}[3][{}]{\@SEPCrbyr{\@SEPCdiffl}{#1}{#2}{#3}}
 \providecommand{\dbyd}[3][{}]{\@SEPCrbyr{\@SEPCdiffl}{#1}{#2}{#3}}
 \providecommand{\dydx}{\dbyd{y}{x}}
+\providecommand{\dvecbydvec}[3][{}]{\dbyd[#1]{\fvec{#2}}{\fvec{#3}}}
 
 %with partials d^1 2 / 3
 \providecommand{\prby}[3][{}]{\@SEPCrby{\@SEPCpartl}{#1}{#2}{#3}}
@@ -738,6 +822,12 @@
 \providecommand{\condl}[1]{\MATHIT{\left|{#1}\right.}}
 \providecommand{\condtwo}[2]{\MATHIT{{#1}\condl{#2}}}
 
+\providecommand{\NORMM}[2]{\ensuremath{\left\|{#2}\right\|_{#1}}\xspace}
+\providecommand{\norm}[2][2]{\NORMM{#1}{#2}}
+
+\providecommand{\txtMLE}{\mbox{MLE}}
+\providecommand{\FishI}[1][{}]{\mathSUB{\mathcal{I}}{#1}}
+\providecommand{\FishIf}[2][{}]{\funcit{\mathSUB{\mathcal{I}}{#1}}{#2}}
 %
 %for vim modeline: (do not edit)
 % vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=%%s:syn=latex:ft=latex

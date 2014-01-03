@@ -1,4 +1,4 @@
-# Copyright 2012-2013 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2014 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -195,6 +195,13 @@ NULL
 #'
 #' \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
+#'
+#' @section Changes in \SharpeR{} Version 0.1401 (2014-01-05) :
+#'
+#' \itemize{
+#' \item fix second moment asymptotic covariance.
+#' \item add confidence distribution functions for sr, sr.opt.
+#' }
 #'
 #' @section Changes in \SharpeR{} Version 0.1310 (2013-10-30) :
 #'
