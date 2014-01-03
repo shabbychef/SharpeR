@@ -105,6 +105,12 @@ ivech <- function(x) {
 #' @template etc
 #' @template ref-SEP13
 #'
+#' @note
+#'
+#' This function will be deprecated in future releases of this package.
+#' Users should migrate at that time to a similar function in the
+#' MarkowitzR package.
+#'
 #' @examples 
 #' X <- matrix(rnorm(1000*3),ncol=3)
 #' Sigmas <- sm_vcov(X)
@@ -259,7 +265,6 @@ sm_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
 #' @template etc
 #' @template ref-SEP13
 #'
-#'
 #' @note
 #'
 #' By flipping the sign of \eqn{X}, the inverse of 
@@ -267,6 +272,12 @@ sm_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
 #' portfolio and the precision matrix on \eqn{X}. Performing
 #' this transform before passing the data to this function
 #' should be considered idiomatic.
+#'
+#' @note
+#'
+#' This function will be deprecated in future releases of this package.
+#' Users should migrate at that time to a similar function in the
+#' MarkowitzR package.
 #'
 #' @examples 
 #' X <- matrix(rnorm(1000*3),ncol=3)
