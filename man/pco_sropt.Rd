@@ -79,11 +79,11 @@
 \examples{
 zeta.s <- 2.0
 ope <- 253
-ntest <- 100
+ntest <- 50
 df1 <- 4
 df2 <- 6 * ope
 rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
-qvs <- seq(0,10,length.out=101)
+qvs <- seq(0,10,length.out=51)
 pps <- pco_sropt(qvs,df1,df2,rvs[1],ope)
 \dontrun{
 if (require(txtplot))
@@ -95,8 +95,7 @@ if (require(txtplot))
  txtplot(qvs,pps)
 }
 
-# 2FIX: these should be put into monotonicity unit tests
-svs <- seq(0,4,length.out=101)
+svs <- seq(0,4,length.out=51)
 pps <- pco_sropt(2,df1,df2,svs,ope)
 pps <- pco_sropt(2,df1,df2,svs,ope,lower.tail=FALSE)
 
