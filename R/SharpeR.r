@@ -186,9 +186,9 @@
 #' \item Portfolio spanning tests.
 #' \item Tests on portfolio weights.
 #' }
-#' 
 #' This package is maintained as a hobby. 
 #'
+#' @import matrixcalc xtable
 NULL
 
 #' @title News for package 'SharpeR':

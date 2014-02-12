@@ -12,9 +12,7 @@
   and autocorrelation. \item Tests on Sharpe under
   positivity constraint. (\emph{c.f.} Silvapulle) \item
   Portfolio spanning tests. \item Tests on portfolio
-  weights. }
-
-  This package is maintained as a hobby.
+  weights. } This package is maintained as a hobby.
 }
 \section{Sharpe Ratio}{
   Suppose \eqn{x_i}{xi} are \eqn{n} independent draws of a

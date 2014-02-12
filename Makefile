@@ -27,7 +27,7 @@ GS_QUALITY 				?= 'ebook'
 
 M4_FILES					?= $(wildcard m4/*.m4)
 
-VERSION 					 = 0.1401
+VERSION 					 = 0.1402
 TODAY 						:= $(shell date +%Y-%m-%d)
 
 PKG_NAME 					:= SharpeR
@@ -116,8 +116,8 @@ INSTALL_FLAGS 		?= --preclean --library=$(LOCAL)
 
 TEST_PRAGMA     	?= release
 
-#GIT_BRANCH 				?= master
-GIT_BRANCH 				?= dev1311
+GIT_BRANCH 				?= master
+#GIT_BRANCH 				?= dev1402
 
 # for R CMD build
 ifeq ($(TEST_PRAGMA),thorough)

@@ -5,14 +5,14 @@ year = sub('.*(2[[:digit:]]{3})-.*', '\\1', meta$Date, perl = TRUE)
 vers = paste('R package version', meta$Version)
 
 citEntry(
-  entry = 'manual',
-	key = paste(meta$Package,'-Manual',sep=''),
-  title = paste(meta$Package, ': ', meta$Title,sep=''),
+  entry = "manual",
+	key = paste0(meta$Package,"-Manual"),
+  title = paste0("{", meta$Package, "}: ", sub("Sharpe","{S}harpe",meta$Title)),
   author = as.person(meta$Author),
   year = year,
   note = vers,
   url = meta$URL,
-  textVersion = paste('Steven E. Pav (', year, '). ', meta$Package, ': ', meta$Title, '. ', vers, '.', sep = '')
+  textVersion = paste0("Steven E. Pav (", year, "). ", meta$Package, ": ", meta$Title, ". ", vers, ".")
 )
 
 #for vim modeline: (do not edit)

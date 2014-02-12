@@ -4,7 +4,6 @@ include(basedefs.m4)
 divert(0)dnl
 Package: PKG_NAME()
 Maintainer: Steven E. Pav <shabbychef@gmail.com>
-Author: Steven E. Pav
 Authors@R: c(person(c("Steven", "E."), "Pav", role=c("aut","cre"), 
     email="shabbychef@gmail.com"))
 Version: VERSION()
@@ -15,7 +14,8 @@ BugReports: https://github.com/shabbychef/SharpeR/issues
 Description: a collection of tools for analyzing significance of trading 
     strategies, based on the Sharpe ratio and overfit of the same.
 Depends: 
-    R (>= 3.0.0),
+    R (>= 3.0.0)
+Imports: 
     matrixcalc,
 		xtable
 Suggests: 
