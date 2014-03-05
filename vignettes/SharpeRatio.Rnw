@@ -136,7 +136,7 @@ A most remarkable fact about the \txtSR, of which most practicioners seem entire
 it is, up to a scaling, merely the Student \tstat-statistic for testing whether the mean of a random variable is
 zero.\sidenote{Sharpe himself seems to not make the connection, even though he quotes 
 \tstat-statistics for a regression fit in his original paper!\cite{Sharpe:1966}}
-In fact, the \txtSR-test we now use, defined as 
+In fact, the \tstat-test we now use, defined as 
 \begin{equation}
 \label{eqn:tstat_def}
 \tstat \defeq \frac{\smu}{\ssig / \sqrt{\ssiz}} = \sqrt{\ssiz} \ssr,

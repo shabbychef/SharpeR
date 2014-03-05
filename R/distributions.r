@@ -465,7 +465,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
 #'        that \code{drag} has been annualized, \emph{i.e.} is given in the
 #'        same units as \code{x} and \code{q}.
-#' @param log logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
+#' @param log logical; if TRUE, densities \eqn{f} are given as \eqn{\mbox{log}(f)}{log(f)}.
 #' @param ... arguments passed on to the respective Hotelling \eqn{T^2} functions.
 #' @keywords distribution 
 #' @return \code{dsropt} gives the density, \code{psropt} gives the distribution function,
