@@ -9,9 +9,9 @@ Authors@R: c(person(c("Steven", "E."), "Pav", role=c("aut","cre"),
 Version: VERSION()
 Date: DATE()
 License: LGPL-3
-Title: Statistical significance of Sharpe ratio
+Title: Statistical Significance of the Sharpe Ratio
 BugReports: https://github.com/shabbychef/SharpeR/issues
-Description: a collection of tools for analyzing significance of trading 
+Description: A collection of tools for analyzing significance of trading 
     strategies, based on the Sharpe ratio and overfit of the same.
 Depends: 
     R (>= 3.0.0)
@@ -25,7 +25,7 @@ Suggests:
     testthat, 
     sandwich,
     knitr
-URL: http://www.r-project.org, https://github.com/shabbychef/SharpeR
+URL: https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
 Collate:
 m4_R_FILES()
