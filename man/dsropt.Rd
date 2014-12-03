@@ -44,8 +44,8 @@
   \emph{i.e.} is given in the same units as \code{x} and
   \code{q}.}
 
-  \item{log}{logical; if TRUE, probabilities p are given as
-  \eqn{\mbox{log}(p)}{log(p)}.}
+  \item{log}{logical; if TRUE, densities \eqn{f} are given
+  as \eqn{\mbox{log}(f)}{log(f)}.}
 
   \item{...}{arguments passed on to the respective
   Hotelling \eqn{T^2} functions.}

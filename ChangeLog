@@ -1,3 +1,6 @@
+2014-11-30 Steven E. Pav <shabbychef@gmail.com>
+* add rlambdap, variates from the lambda-prime distribution
+
 2014-01-03 Steven E. Pav <shabbychef@gmail.com>
 * fix matrix calculus in sm_vcov
 * add 'confidence distribution' functions for sr and sropt

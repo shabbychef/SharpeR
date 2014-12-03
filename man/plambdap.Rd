@@ -7,11 +7,16 @@
   plambdap(q, df, tstat, lower.tail = TRUE, log.p = FALSE)
 
   qlambdap(p, df, tstat, lower.tail = TRUE, log.p = FALSE)
+
+  rlambdap(n, df, tstat)
 }
 \arguments{
   \item{q}{vector of quantiles.}
 
   \item{p}{vector of probabilities.}
+
+  \item{n}{number of observations. If 'length(n) > 1', the
+  length is taken to be the number required.}
 
   \item{df}{the degrees of freedom of the t-statistic.}
 
@@ -79,6 +84,8 @@ qv <- qlambdap(c(0.1,0.2),128,2)
 qv <- qlambdap(c(0.1,0.2),c(128,253),2)
 qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4))
 qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
+# random generation
+rv <- rlambdap(1000,252,2)
 }
 \author{
   Steven E. Pav \email{shabbychef@gmail.com}

@@ -594,7 +594,7 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 # 'confidence distributions'
 
 # lambda prime
-# plambdap, qlambdap#FOLDUP
+# plambdap, qlambdap, rlambdap#FOLDUP
 #' @title The lambda-prime distribution.
 #'
 #' @description 
@@ -626,8 +626,12 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 #'
 #' qlambdap(p, df, tstat, lower.tail = TRUE, log.p = FALSE)
 #'
+#' rlambdap(n, df, tstat)
+#'
 #' @param q vector of quantiles.
 #' @param p vector of probabilities.
+#' @param n number of observations. If 'length(n) > 1', the length is
+#' taken to be the number required.
 #' @param df the degrees of freedom of the t-statistic.
 #' @param tstat the observed (non-central) t-statistic.
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
@@ -678,6 +682,8 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 #' qv <- qlambdap(c(0.1,0.2),c(128,253),2)
 #' qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4))
 #' qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
+#' # random generation
+#' rv <- rlambdap(1000,252,2)
 #'
 plambdap <- function(q,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 	# this is just a silly wrapper on pt
@@ -731,6 +737,10 @@ plambdap <- function(q,df,tstat,lower.tail=TRUE,log.p=FALSE) {
 qlambdap <- Vectorize(.qlambdap, 
 											vectorize.args = c("p","df","tstat"),
 											SIMPLIFY = TRUE)
+#' @export 
+rlambdap <- function(n, df, tstat) {
+	rvs <- rnorm(n) + tstat * sqrt(rchisq(n, df=df) / df)
+}
 #UNFOLD
 
 # co-SR^*

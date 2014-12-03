@@ -361,7 +361,7 @@ test_that("psr/rsr uniform generation",{#FOLDUP
 	}
 })#UNFOLD
 
-test_that("pT2/qT2 uniform generation",{#FOLDUP
+test_that("pT2/rT2 uniform generation",{#FOLDUP
 	set.char.seed("66ff5482-e5e5-4443-881d-6a9e6fd6fc8d")
 	
 	# pT2
@@ -376,7 +376,7 @@ test_that("pT2/qT2 uniform generation",{#FOLDUP
 	}
 })#UNFOLD
 
-test_that("psropt/qsropt uniform generation",{#FOLDUP
+test_that("psropt/rsropt uniform generation",{#FOLDUP
 	set.char.seed("b7cd77c2-f197-411c-8d14-a37ab4694944")
 	
 	# psropt
@@ -391,6 +391,18 @@ test_that("psropt/qsropt uniform generation",{#FOLDUP
 					}
 				}
 			}
+		}
+	}
+})#UNFOLD
+
+test_that("plambdap/rlambdap uniform generation",{#FOLDUP
+	set.char.seed("05a8caf6-35cf-40da-9c7f-57045c4809d4")
+	
+	for (df in c(256,1024)) {
+		for (tstat in c(0,1,2)) {
+			rvs <- rlambdap(ngen, df, tstat)
+			aps <- plambdap(rvs,  df, tstat)
+			expect_true(is.appx.uniform(aps,slop=alpha.slop))
 		}
 	}
 })#UNFOLD
