@@ -67,9 +67,18 @@
 #UNFOLD
 
 # class utils#FOLDUP
-.infer_ope_xts <- function(anxts) {
+# infer the total time from an xts object,
+# as a difftime
+.infer_delt_xts <- function(anxts) {
 	TEO <- time(anxts)
-	days.per.row <- as.double((TEO[length(TEO)] - TEO[1]) / (length(TEO) - 1))
+	delt <- difftime(TEO[length(TEO)],TEO[1],units='days')
+	return(delt)
+}
+# infer the observations per epoch from an xts object
+.infer_ope_xts <- function(anxts) {
+	delt <- .infer_delt_xts(anxts)
+	n.row <- dim(anxts)[1]
+	days.per.row <- as.numeric(delt) / (n.row - 1)
 	ope <- 365.25 / days.per.row
 	return(ope)
 }
