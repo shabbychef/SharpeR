@@ -36,3 +36,5 @@ SharpeR.log
 *.bbl
 *.blg
 cache/
+
+inst/extdata/*.rda
