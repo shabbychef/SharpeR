@@ -271,7 +271,7 @@ deps: $(INSTALLED_DEPS)
 # roxygen it.
 man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
 	$(call WARN_DEPS)
-	$(R_LOCALLY) --slave -e "require(roxygen2); roxygenize('.', '.', overwrite=TRUE, unlink.target=TRUE)"
+	$(R_LOCALLY) --slave -e "require(roxygen2); roxygenize('.', clean=TRUE)"
 	touch $@
 
 docs: README.md DESCRIPTION man/$(PKG_NAME).Rd 
@@ -431,6 +431,9 @@ $(EXTDATA_D)/%.rda : $(NODIST_R_DIR)/make_%.R
 				 "setwd('$(NODIST_R_DIR)');source(basename('$<'));"
 	# horribly hacky!
 	mv $(NODIST_R_DIR)/*.rda $(EXTDATA_D)
+
+$(NODIST_R_DIR)/sp500_data.csv : 
+	curl -o $@ 'https://raw.github.com/datasets/s-and-p-500/master/data/data.csv'
 
 $(VIGNETTE_D)/rauto.bib : $(NODIST_R_DIR)/gen_bib.R
 	$(call WARN_DEPS)
