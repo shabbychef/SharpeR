@@ -473,9 +473,7 @@ rT2 <- function(n, df1, df2, delta2) {
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
 #' @rdname dsropt
-#' @aliases psropt
-#' @aliases qsropt 
-#' @aliases rsropt
+#' @aliases psropt qsropt rsropt
 #' @seealso F-distribution functions, \code{\link{df}, \link{pf}, \link{qf}, \link{rf}}, 
 #' Sharpe ratio distribution, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}.
 #' @export 
@@ -645,9 +643,7 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 #' \code{qlambdap} gives the quantile function, and \code{rlambdap} generates random deviates.
 #'
 #' Invalid arguments will result in return value \code{NaN} with a warning.
-#' @aliases plambdap
-#' @aliases qlambdap 
-#' @aliases rlambdap
+#' @aliases plambdap qlambdap rlambdap
 #' @seealso t-distribution functions, \code{\link{dt},\link{pt},\link{qt},\link{rt}}
 #' @export 
 #' @template etc
