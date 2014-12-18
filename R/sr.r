@@ -296,7 +296,13 @@ as.sr.xts <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 #' @method as.sr timeSeries
 #' @S3method as.sr timeSeries
 as.sr.timeSeries <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
-	retval <- as.sr.xts(as.xts(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
+	# you want to do this, but requires xts package. oops.
+	#retval <- as.sr.xts(as.xts(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
+	if (missing(ope) && missing(epoch)) {
+		ope <- .infer_ope_xts(x)
+		epoch <- "yr"
+	}
+	retval <- as.sr.data.frame(as.data.frame(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
 	return(retval)
 }
 #' @title Is this in the "sr" class?
