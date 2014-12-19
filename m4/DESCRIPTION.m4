@@ -16,9 +16,10 @@ Description: A collection of tools for analyzing significance of trading
 Depends: 
     R (>= 3.0.0)
 Imports: 
-    matrixcalc,
-		xtable
+    matrixcalc
 Suggests: 
+    xtable,
+    xts,
     quantmod,
     MASS,
     TTR,

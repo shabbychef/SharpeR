@@ -188,7 +188,7 @@
 #' }
 #' This package is maintained as a hobby. 
 #'
-#' @import matrixcalc xtable
+#' @import matrixcalc 
 NULL
 
 #' @title News for package 'SharpeR':
