@@ -199,6 +199,7 @@ NULL
 #' @section Changes in \SharpeR{} Version 0.1501 (2014-12-06) :
 #'
 #' \itemize{
+#' \item fix inference of mark frequency from e.g. xts objects.
 #' \item add rlambdap.
 #' }
 #'

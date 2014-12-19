@@ -1,4 +1,5 @@
-2014-11-30 Steven E. Pav <shabbychef@gmail.com>
+2014-12-06 Steven E. Pav <shabbychef@gmail.com>
+* fix inference of frequency from xts objects
 * add rlambdap, variates from the lambda-prime distribution
 
 2014-01-03 Steven E. Pav <shabbychef@gmail.com>
