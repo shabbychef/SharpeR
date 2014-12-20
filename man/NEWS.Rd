@@ -16,6 +16,7 @@ News for package 'SharpeR':
 
 
 \itemize{
+\item fix inference of mark frequency from e.g. xts objects.
 \item add rlambdap.
 }
 }
