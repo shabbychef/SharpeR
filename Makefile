@@ -433,7 +433,7 @@ $(EXTDATA_D)/%.rda : $(NODIST_R_DIR)/make_%.R
 	mv $(NODIST_R_DIR)/*.rda $(EXTDATA_D)
 
 $(NODIST_R_DIR)/sp500_data.csv : 
-	curl -o $@ 'https://raw.github.com/datasets/s-and-p-500/master/data/data.csv'
+	curl -o $@ 'https://raw.githubusercontent.com/datasets/s-and-p-500/master/data/data.csv'
 
 $(VIGNETTE_D)/rauto.bib : $(NODIST_R_DIR)/gen_bib.R
 	$(call WARN_DEPS)
