@@ -34,6 +34,118 @@ set.char.seed <- function(str) {
 THOROUGHNESS <- getOption('test.thoroughness',1.0)
 #UNFOLD
 
+context("code runs at all")#FOLDUP
+test_that("sr_test",{#FOLDUP
+	set.char.seed("0b144107-4de8-4e00-95f7-d746db3aef8e")
+	X <- matrix(rnorm(1000*1),ncol=1)
+	Y <- matrix(rnorm(length(X)),ncol=1)
+	Y2 <- matrix(rnorm(2*length(X)),ncol=1)
+
+	fooz <- sr_test(X,alternative="two.sided")
+	fooz <- sr_test(X,alternative="less")
+	fooz <- sr_test(X,alternative="greater")
+
+	fooz <- sr_test(as.sr(X),alternative="two.sided")
+
+	# with a zeta
+	zeta <- 1.0
+	fooz <- sr_test(X,zeta=zeta,alternative="two.sided")
+	fooz <- sr_test(X,zeta=zeta,alternative="less")
+	fooz <- sr_test(X,zeta=zeta,alternative="greater")
+
+	# and an ope
+	ope <- 252
+	fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="two.sided")
+	fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="less")
+	fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="greater")
+
+	# X and Y
+	fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="two.sided")
+	fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="less")
+	fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="greater")
+
+	fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="two.sided")
+	fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="less")
+	fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="greater")
+
+	fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="two.sided")
+	fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="less")
+	fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="greater")
+
+	# sentinel
+	expect_true(TRUE)
+})#UNFOLD
+test_that("sr_equality_test",{#FOLDUP
+	set.char.seed("0b144107-4de8-4e00-95f7-d746db3aef8e")
+	X <- matrix(rnorm(1000*5),ncol=5)
+	Con = matrix(rnorm(dim(X)[2]),nrow=1)
+	fooz <- sr_equality_test(X,type="chisq")
+	fooz <- sr_equality_test(X,type="F")
+	fooz <- sr_equality_test(X,type="t",contrasts=Con)
+
+	# sentinel
+	expect_true(TRUE)
+})#UNFOLD
+test_that("sropt_test",{#FOLDUP
+	set.char.seed("02a77746-3f08-4320-9696-46521ab4de37")
+	X <- matrix(rnorm(1000*10),ncol=10)
+
+	fooz <- sropt_test(X,alternative="two.sided")
+	fooz <- sropt_test(X,alternative="less")
+	fooz <- sropt_test(X,alternative="greater")
+
+	fooz <- sropt_test(as.sropt(X),alternative="two.sided")
+	fooz <- sropt_test(as.sropt(X),alternative="less")
+	fooz <- sropt_test(as.sropt(X),alternative="greater")
+
+	# with a zeta
+	zeta.s <- 1.0
+	fooz <- sropt_test(X,zeta.s=zeta.s,alternative="two.sided")
+	fooz <- sropt_test(X,zeta.s=zeta.s,alternative="less")
+	fooz <- sropt_test(X,zeta.s=zeta.s,alternative="greater")
+
+	# and an ope
+	ope <- 252
+	fooz <- sr_test(X,zeta.s=zeta.s,ope=ope,alternative="two.sided")
+	fooz <- sr_test(X,zeta.s=zeta.s,ope=ope,alternative="less")
+	fooz <- sr_test(X,zeta.s=zeta.s,ope=ope,alternative="greater")
+
+	# sentinel
+	expect_true(TRUE)
+})#UNFOLD
+test_that("power_sr_test",{#FOLDUP
+	set.char.seed("5e24476e-4001-472d-bd63-8a660c3737b4")
+
+	ope <- 252
+	apo <- power.sr_test(n=1000,zeta=1.0,sig.level=0.05,alternative="one.sided",ope=ope)
+	apo <- power.sr_test(n=1000,power=0.3,sig.level=0.05,alternative="one.sided",ope=ope)
+	# this is dumb:
+	#apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,alternative="one.sided",ope=ope)
+	apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,sig.level=NULL,alternative="one.sided",ope=ope)
+
+	apo <- power.sr_test(n=1000,zeta=1.0,sig.level=0.05,alternative="two.sided",ope=ope)
+	apo <- power.sr_test(n=1000,power=0.3,sig.level=0.05,alternative="two.sided",ope=ope)
+	# this is dumb:
+	#apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,alternative="two.sided",ope=ope)
+	apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,sig.level=NULL,alternative="two.sided",ope=ope)
+
+	# sentinel
+	expect_true(TRUE)
+})#UNFOLD
+test_that("power_sropt_test",{#FOLDUP
+	set.char.seed("d486234e-e897-4dc9-ae8b-c4312b48c8b4")
+
+	ope <- 1
+	apo <- power.sropt_test(df1=10,df2=1000,zeta.s=1.0,sig.level=0.05,power=NULL,ope=ope)
+	apo <- power.sropt_test(df1=10,df2=1000,zeta.s=2.0,sig.level=NULL,power=0.9,ope=ope)
+	apo <- power.sropt_test(df1=10,df2=1000,zeta.s=NULL,sig.level=0.05,power=0.9,ope=ope)
+	#apo <- power.sropt_test(df1=10,df2=NULL,zeta.s=1.0,sig.level=0.05,power=0.3,ope=ope)
+	#apo <- power.sropt_test(df1=NULL,df2=1000,zeta.s=1.0,sig.level=0.05,power=0.4,ope=ope)
+
+	# sentinel
+	expect_true(TRUE)
+})#UNFOLD
+#UNFOLD
 context("test hypothesis tests")#FOLDUP
 test_that("sr_equality_test uniformity",{#FOLDUP
 	ngen <- ceiling(THOROUGHNESS * 32)

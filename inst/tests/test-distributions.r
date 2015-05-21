@@ -48,6 +48,124 @@ set.char.seed <- function(str) {
 THOROUGHNESS <- getOption('test.thoroughness',1.0)
 #UNFOLD
 
+context("do they run?")#FOLDUP
+
+test_that("sr functions",{#FOLDUP
+	zeta <- 1.1
+	ope <- 252
+	df <- 5*ope - 1
+
+	# sample:
+	set.char.seed("dee9af9b-cb59-474f-ac3b-acd60faa8ba2")
+	rvs <- rsr(500, df=df, zeta=zeta, ope=ope)
+
+	dens <- dsr(rvs, df=df, zeta=zeta, ope=ope)
+	expect_true(all(dens >= 0))
+	dens <- dsr(rvs, df=df, zeta=zeta, ope=ope, log=TRUE)
+
+	pvs <- psr(rvs, df=df, zeta=zeta, ope=ope)
+	expect_true(all(pvs >= 0) && all(pvs <= 1))
+	pvs <- psr(rvs, df=df, zeta=zeta, ope=ope, lower.tail=FALSE)
+	pvs <- psr(rvs, df=df, zeta=zeta, ope=ope, lower.tail=FALSE, log.p=TRUE)
+
+	qvs <- qsr(ppoints(100), df=df, zeta=zeta, ope=ope)
+	qvs <- qsr(ppoints(100), df=df, zeta=zeta, ope=ope, lower.tail=FALSE)
+	qvs <- qsr(log(ppoints(100)), df=df, zeta=zeta, ope=ope, lower.tail=FALSE, log.p=TRUE)
+
+	# once again, without optional zeta
+	set.char.seed("7166310f-7462-4890-bdd0-0df9ca5d97bd")
+	rvs <- rsr(500, df=df, ope=ope)
+
+	dens <- dsr(rvs, df=df, ope=ope)
+	expect_true(all(dens >= 0))
+	dens <- dsr(rvs, df=df, ope=ope, log=TRUE)
+
+	pvs <- psr(rvs, df=df, ope=ope)
+	expect_true(all(pvs >= 0) && all(pvs <= 1))
+	pvs <- psr(rvs, df=df, ope=ope, lower.tail=FALSE)
+	pvs <- psr(rvs, df=df, ope=ope, lower.tail=FALSE, log.p=TRUE)
+
+	qvs <- qsr(ppoints(100), df=df, ope=ope)
+	qvs <- qsr(ppoints(100), df=df, ope=ope, lower.tail=FALSE)
+	qvs <- qsr(log(ppoints(100)), df=df, ope=ope, lower.tail=FALSE, log.p=TRUE)
+	
+	# sentinel:
+	expect_true(TRUE)
+})#UNFOLD
+
+test_that("sropt functions",{#FOLDUP
+	ngen <- 128
+	ope <- 252
+	df1 <- 8
+	df2 <- ope * 10
+	drag <- 0
+	zeta.s <- 1.1
+
+	# sample:
+	set.char.seed("fc90523d-abb4-4543-8476-d48e3a6f28a3")
+	rvs <- rsropt(ngen, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
+
+	dens <- dsropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
+	expect_true(all(dens >= 0))
+	dens <- dsropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, log=TRUE)
+	expect_false(all(dens >= 0))
+
+	pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
+	expect_true(all(pvs >= 0) && all(pvs <= 1))
+	pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE)
+	pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, log.p=TRUE)
+	pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+
+	qvs <- qsropt(ppoints(100), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
+	qvs <- qsropt(ppoints(100), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE)
+	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+
+	# once again, without optional zeta.s
+	set.char.seed("7166310f-7462-4890-bdd0-0df9ca5d97bd")
+	rvs <- rsropt(ngen, df1=df1, df2=df2, ope=ope, drag=drag)
+
+	dens <- dsropt(rvs, df1=df1, df2=df2, ope=ope, drag=drag)
+	expect_true(all(dens >= 0))
+	dens <- dsropt(rvs, df1=df1, df2=df2, ope=ope, drag=drag, log=TRUE)
+	expect_false(all(dens >= 0))
+
+	pvs <- psropt(rvs, df1=df1, df2=df2, ope=ope, drag=drag)
+	expect_true(all(pvs >= 0) && all(pvs <= 1))
+	pvs <- psropt(rvs, df1=df1, df2=df2, ope=ope, drag=drag, lower.tail=FALSE)
+	pvs <- psropt(rvs, df1=df1, df2=df2, ope=ope, drag=drag, log.p=TRUE)
+	pvs <- psropt(rvs, df1=df1, df2=df2, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+
+	qvs <- qsropt(ppoints(100), df1=df1, df2=df2, ope=ope, drag=drag)
+	qvs <- qsropt(ppoints(100), df1=df1, df2=df2, ope=ope, drag=drag, lower.tail=FALSE)
+	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+
+	# once again, with optional drag
+	set.char.seed("7166310f-7462-4890-bdd0-0df9ca5d97bd")
+	rvs <- rsropt(ngen, df1=df1, df2=df2, ope=ope)
+
+	dens <- dsropt(rvs, df1=df1, df2=df2, ope=ope)
+	expect_true(all(dens >= 0))
+	dens <- dsropt(rvs, df1=df1, df2=df2, ope=ope, log=TRUE)
+	expect_false(all(dens >= 0))
+
+	pvs <- psropt(rvs, df1=df1, df2=df2, ope=ope)
+	expect_true(all(pvs >= 0) && all(pvs <= 1))
+	pvs <- psropt(rvs, df1=df1, df2=df2, ope=ope, lower.tail=FALSE)
+	pvs <- psropt(rvs, df1=df1, df2=df2, ope=ope, log.p=TRUE)
+	pvs <- psropt(rvs, df1=df1, df2=df2, ope=ope, lower.tail=FALSE, log.p=TRUE)
+
+	qvs <- qsropt(ppoints(100), df1=df1, df2=df2, ope=ope)
+	qvs <- qsropt(ppoints(100), df1=df1, df2=df2, ope=ope, lower.tail=FALSE)
+	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, ope=ope, lower.tail=FALSE, log.p=TRUE)
+	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, ope=ope, lower.tail=FALSE, log.p=TRUE)
+
+	# sentinel:
+	expect_true(TRUE)
+})#UNFOLD
+#UNFOLD
+
 context("distribution functions: basic monotonicity")#FOLDUP
 
 test_that("psr/qsr monotonicity",{#FOLDUP

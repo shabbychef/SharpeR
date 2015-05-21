@@ -34,6 +34,121 @@ set.char.seed <- function(str) {
 THOROUGHNESS <- getOption('test.thoroughness',1.0)
 #UNFOLD
 
+context("code runs at all")#FOLDUP
+test_that("basic sr functionality",{
+	set.char.seed("50e02c82-fdfc-4423-93ef-cbd350a65391")
+	x <- matrix(rnorm(100*2),ncol=4)
+	mysr <- as.sr(x)
+	print(mysr)
+	print(format(mysr))
+	dummy <- reannualize(mysr,new.ope=2)
+	expect_true(is.sr(mysr))
+	myse <- se(mysr,"t")
+	myse <- se(mysr,"Lo")
+
+	ci1 <- confint(mysr)
+	ci2 <- confint(mysr, level=0.9)
+	ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95)
+	ci4 <- confint(mysr, type="exact")
+	ci5 <- confint(mysr, type="t")
+	ci6 <- confint(mysr, type="Z")
+
+	# via data.frame
+	xdf <- data.frame(a=rnorm(500,1),b=rnorm(500,1));
+	mysr <- as.sr(xdf)
+	print(mysr)
+	print(format(mysr))
+	expect_true(is.sr(mysr))
+
+	# via lm
+	xdf <- data.frame(AAPL=rnorm(500,1),SPY=rnorm(500,1));
+	mylm <- lm(AAPL ~ SPY,data=xdf)
+	mysr <- as.sr(mylm)
+	print(mysr)
+	print(format(mysr))
+	expect_true(is.sr(mysr))
+
+	# via xts
+	if (require(xts)) {
+		xxts <- xts(x,order.by=as.Date(1:(dim(x)[1]),origin="1990-01-01"))
+		mysr <- as.sr(xxts)
+		print(mysr)
+		print(format(mysr))
+		expect_true(is.sr(mysr))
+		dummy <- reannualize(mysr,new.ope=2)
+
+		if (require(timeSeries)) {
+			ats <- as.timeSeries(xxts)
+			mysr <- as.sr(ats)
+			print(mysr)
+			print(format(mysr))
+			expect_true(is.sr(mysr))
+			dummy <- reannualize(mysr,new.ope=2)
+		}
+	}
+
+	expect_true(TRUE)
+})
+
+test_that("basic sropt functionality",{
+	set.char.seed("943c439d-8f66-4f5e-a2a5-a9af7cf1b787")
+	x <- matrix(rnorm(1000*10),ncol=10)
+	mysr <- as.sropt(x)
+	print(mysr)
+	print(format(mysr))
+	dummy <- reannualize(mysr,new.ope=2)
+	expect_true(is.sropt(mysr))
+	ci1 <- confint(mysr)
+	ci2 <- confint(mysr, level=0.9)
+	ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95)
+
+	z1 <- inference(mysr, type="KRS")
+	z2 <- inference(mysr, type="MLE")
+	z3 <- inference(mysr, type="unbiased")
+
+	# via xts
+	if (require(xts)) {
+		xxts <- xts(x,order.by=as.Date(1:(dim(x)[1]),origin="1990-01-01"))
+		mysr <- as.sropt(xxts)
+		print(mysr)
+		print(format(mysr))
+		expect_true(is.sropt(mysr))
+		dummy <- reannualize(mysr,new.ope=2)
+	}
+
+	expect_true(TRUE)
+})
+test_that("basic del_sropt functionality",{
+	set.char.seed("cdbfbd76-29f4-454f-b8a1-e3502ba287d7")
+	x <- matrix(rnorm(1000*10,mean=3e-4),ncol=10)
+	G <- matrix(rnorm(2*10),ncol=10)
+	mysr <- as.del_sropt(x,G,drag=0,ope=1,epoch="yr")
+	print(mysr)
+	print(format(mysr))
+	# not yet:
+	#dummy <- reannualize(mysr,new.ope=2)
+	expect_true(is.del_sropt(mysr))
+	ci1 <- confint(mysr)
+	ci2 <- confint(mysr, level=0.9)
+	ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95)
+
+	z1 <- inference(mysr, type="KRS")
+	z2 <- inference(mysr, type="MLE")
+	z3 <- inference(mysr, type="unbiased")
+
+	# via xts
+	if (require(xts)) {
+		xxts <- xts(x,order.by=as.Date(1:(dim(x)[1]),origin="1990-01-01"))
+		mysr <- as.del_sropt(x,G,drag=0,ope=1,epoch="yr")
+		print(mysr)
+		print(format(mysr))
+		expect_true(is.del_sropt(mysr))
+		#dummy <- reannualize(mysr,new.ope=2)
+	}
+
+	expect_true(TRUE)
+})
+#UNFOLD
 context("estimation functions: confint coverage")#FOLDUP
 test_that("confint.sr coverage",{#FOLDUP
 	set.char.seed("066dfa96-6dd7-4d14-ab74-49e81b3afd83")
