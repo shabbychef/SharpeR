@@ -106,9 +106,9 @@ test_that("sropt_test",{#FOLDUP
 
 	# and an ope
 	ope <- 252
-	fooz <- sr_test(X,zeta.s=zeta.s,ope=ope,alternative="two.sided")
-	fooz <- sr_test(X,zeta.s=zeta.s,ope=ope,alternative="less")
-	fooz <- sr_test(X,zeta.s=zeta.s,ope=ope,alternative="greater")
+	fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="two.sided")
+	fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="less")
+	fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="greater")
 
 	# sentinel
 	expect_true(TRUE)

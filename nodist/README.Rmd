@@ -32,6 +32,7 @@ opts_chunk$set(tidy=TRUE,tidy.opts=list(width.cutoff=50,keep.blank.line=TRUE))
 
 # SharpeR
 
+[![Build Status](https://travis-ci.org/shabbychef/SharpeR.png)](https://travis-ci.org/shabbychef/SharpeR)
 [![codecov.io](http://codecov.io/github/shabbychef/SharpeR/coverage.svg?branch=master)](http://codecov.io/github/shabbychef/SharpeR?branch=master)
 
 A number of utilities for dealing with Sharpe ratio, the Sharpe ratio of the
@@ -42,16 +43,23 @@ Markowitz portfolio, and, in general, overfit of trading strategies based on
 
 ## Installation
 
-This package may be installed from CRAN; the latest version may be
-found on [github](https://www.github.com/shabbychef/SharpeR "SharpeR")
-via devtools:
+This package may be installed from CRAN; the latest development version may be
+installed via [drat](https://github.com/eddelbuettel/drat "drat"), or built from
+[github](https://www.github.com/shabbychef/SharpeR "SharpeR"):
 
 ```{r install,eval=FALSE,echo=TRUE}
+# install via CRAN:
+install.packages('SharpeR')
+
+# get latest dev release via drat:
+if (require(drat)) {
+	drat:::add('shabbychef')
+	install.packages('SharpeR')
+}
+
+# get snapshot from github (may be buggy)
 if (require(devtools)) {
-	# latest greatest
-	install_github(repo='SharpeR',username='shabbychef',ref='master')
-	# last release:
-	install_github(repo='SharpeR',username='shabbychef',ref='r0.1310')
+	install_github('shabbychef/SharpeR')
 }
 ```
 

@@ -2,6 +2,7 @@
 
 # SharpeR
 
+[![Build Status](https://travis-ci.org/shabbychef/SharpeR.png)](https://travis-ci.org/shabbychef/SharpeR)
 [![codecov.io](http://codecov.io/github/shabbychef/SharpeR/coverage.svg?branch=master)](http://codecov.io/github/shabbychef/SharpeR?branch=master)
 
 A number of utilities for dealing with Sharpe ratio, the Sharpe ratio of the
@@ -12,19 +13,24 @@ Markowitz portfolio, and, in general, overfit of trading strategies based on
 
 ## Installation
 
-This package may be installed from CRAN; the latest version may be
-found on [github](https://www.github.com/shabbychef/SharpeR "SharpeR")
-via devtools:
+This package may be installed from CRAN; the latest development version may be
+installed via [drat](https://github.com/eddelbuettel/drat "drat"), or built from
+[github](https://www.github.com/shabbychef/SharpeR "SharpeR"):
 
 
 ```r
+# install via CRAN:
+install.packages("SharpeR")
+
+# get latest dev release via drat:
+if (require(drat)) {
+    drat:::add("shabbychef")
+    install.packages("SharpeR")
+}
+
+# get snapshot from github (may be buggy)
 if (require(devtools)) {
-    # latest greatest
-    install_github(repo = "SharpeR", username = "shabbychef", 
-        ref = "master")
-    # last release:
-    install_github(repo = "SharpeR", username = "shabbychef", 
-        ref = "r0.1310")
+    install_github("shabbychef/SharpeR")
 }
 ```
 
@@ -99,8 +105,8 @@ print(as.sr(some.rets))
 
 ```
 ##      SR/sqrt(yr) Std. Error t value  Pr(>t)    
-## IBM         0.43       0.32     1.3 0.08950 .  
-## AAPL        1.05       0.32     3.3 0.00056 ***
+## IBM         0.43       0.32     1.3 0.08949 .  
+## AAPL        1.05       0.32     3.3 0.00057 ***
 ## XOM         0.42       0.32     1.3 0.09601 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -142,7 +148,7 @@ print(t(wald.stats))
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.22  2.9 0.15
+## [1,] -0.22  2.9 0.16
 ```
 
 ```r
@@ -154,5 +160,5 @@ if (require(sandwich)) {
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.21  2.8 0.16
+## [1,] -0.21  2.8 0.17
 ```
