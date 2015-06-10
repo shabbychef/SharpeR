@@ -458,6 +458,13 @@ newbuild :
 	$(MAKE) tags
 	$(MAKE) build
 
+# http://krisjordan.com/essays/encrypting-with-rsa-key-pairs
+token : .codecov_token
+	< $< openssl rsautl -decrypt -inkey ~/.ssh/id_rsa | tee $@
+
+codecov : token
+	. token && Rscript -e 'library(covr);codecov()'
+
 # Python. well, iPython.
 
 %.tex : %.ipynb

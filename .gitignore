@@ -22,6 +22,9 @@ convoluted_build.sh
 # screwing around
 fooz.R
 
+# codecov
+token
+
 # automagically generated?
 # ah, but these are needed for install_github:
 #NAMESPACE

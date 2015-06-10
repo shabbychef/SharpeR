@@ -123,10 +123,15 @@ gen_t <- function(n,df = 10,mu = 0,sg = 1) {
 gen_tukey_h <- function(n,h = 0.1,mu = 0,sg = 1) {
 	Gauss_input = create_LambertW_input("normal", beta=c(0,1))
 	params = list(delta = c(h))
-	LW.Gauss = create_LambertW_output(input = Gauss_input, theta = params)
+	LW.Gauss = create_LambertW_output(Gauss_input, theta = params)
 	#get the moments of this distribution
 	moms <- mLambertW(beta=c(0,1),distname=c("normal"),delta = h,gamma = 0, alpha = 1)
-	samp <- LW.Gauss$rY(params)(n=n)
+	if (!is.null(LW.Gauss$r)) {
+		# API changed in 0.5:
+		samp <- LW.Gauss$r(n=n)
+	} else {
+		samp <- LW.Gauss$rY(params)(n=n)
+	}
 	samp <- mu  + (sg/moms$sd) * (samp - moms$mean)
 }
 
@@ -134,10 +139,15 @@ gen_tukey_h <- function(n,h = 0.1,mu = 0,sg = 1) {
 gen_lambert_w <- function(n,dl = 0.1,mu = 0,sg = 1) {
 	Gauss_input = create_LambertW_input("normal", beta=c(0,1))
 	params = list(delta = c(0), gamma=c(dl), alpha = 1)
-	LW.Gauss = create_LambertW_output(input = Gauss_input, theta = params)
+	LW.Gauss = create_LambertW_output(Gauss_input, theta = params)
 	#get the moments of this distribution
 	moms <- mLambertW(beta=c(0,1),distname=c("normal"),delta = 0,gamma = dl, alpha = 1)
-	samp <- LW.Gauss$rY(params)(n=n)
+	if (!is.null(LW.Gauss$r)) {
+		# API changed in 0.5:
+		samp <- LW.Gauss$r(n=n)
+	} else {
+		samp <- LW.Gauss$rY(params)(n=n)
+	}
 	samp <- mu  + (sg/moms$sd) * (samp - moms$mean)
 }
 
@@ -182,7 +192,7 @@ moms_t <- function(df = 10,mu = 0,sg = 1) {
 moms_tukey_h <- function(h = 0.1,mu = 0,sg = 1) {
 	Gauss_input = create_LambertW_input("normal", beta=c(0,1))
 	params = list(delta = c(h))
-	LW.Gauss = create_LambertW_output(input = Gauss_input, theta = params)
+	LW.Gauss = create_LambertW_output(Gauss_input, theta = params)
 	#get the moments of this distribution
 	moms <- mLambertW(beta=c(0,1),distname=c("normal"),delta = h,gamma = 0, alpha = 1)
 	moms$mean <- mu
@@ -192,7 +202,7 @@ moms_tukey_h <- function(h = 0.1,mu = 0,sg = 1) {
 moms_lambert_w <- function(dl = 0.1,mu = 0,sg = 1) {
 	Gauss_input = create_LambertW_input("normal", beta=c(0,1))
 	params = list(delta = c(0), gamma=c(dl), alpha = 1)
-	LW.Gauss = create_LambertW_output(input = Gauss_input, theta = params)
+	LW.Gauss = create_LambertW_output(Gauss_input, theta = params)
 	#get the moments of this distribution
 	moms <- mLambertW(beta=c(0,1),distname=c("normal"),delta = 0,gamma = dl, alpha = 1)
 	moms$mean <- mu

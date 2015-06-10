@@ -1,7 +1,8 @@
 
 
-
 # SharpeR
+
+[![codecov.io](http://codecov.io/github/shabbychef/SharpeR/coverage.svg?branch=master)](http://codecov.io/github/shabbychef/SharpeR?branch=master)
 
 A number of utilities for dealing with Sharpe ratio, the Sharpe ratio of the
 Markowitz portfolio, and, in general, overfit of trading strategies based on
@@ -27,7 +28,6 @@ if (require(devtools)) {
 }
 ```
 
-
 # Basic Usage
 
 ## Using sr
@@ -49,7 +49,6 @@ print(my.sr)
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
-
 
 And using real data:
 
@@ -92,7 +91,6 @@ get.rets <- function(syms, ...) {
 
 
 
-
 ```r
 some.rets <- get.rets(c("IBM", "AAPL", "XOM"), from = "2004-01-01", 
     to = "2013-08-01")
@@ -101,13 +99,12 @@ print(as.sr(some.rets))
 
 ```
 ##      SR/sqrt(yr) Std. Error t value  Pr(>t)    
-## IBM         0.43       0.32     1.3 0.08948 .  
+## IBM         0.43       0.32     1.3 0.08950 .  
 ## AAPL        1.05       0.32     3.3 0.00056 ***
-## XOM         0.42       0.32     1.3 0.09606 .  
+## XOM         0.42       0.32     1.3 0.09601 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
-
 
 ## Inference on the Markowitz Portfolio
 
@@ -149,7 +146,6 @@ print(t(wald.stats))
 ```
 
 ```r
-
 if (require(sandwich)) {
     wald.stats <- ism.wald(some.rets, vcov.func = sandwich::vcovHAC)
     print(t(wald.stats))
@@ -160,4 +156,3 @@ if (require(sandwich)) {
 ##        IBM AAPL  XOM
 ## [1,] -0.21  2.8 0.16
 ```
-
