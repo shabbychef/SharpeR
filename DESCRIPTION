@@ -7,28 +7,28 @@ Date: 2015-06-09
 License: LGPL-3
 Title: Statistical Significance of the Sharpe Ratio
 BugReports: https://github.com/shabbychef/SharpeR/issues
-Description: A collection of tools for analyzing significance of trading
+Description: A collection of tools for analyzing significance of trading 
     strategies, based on the Sharpe ratio and overfit of the same.
-Depends:
+Depends: 
     R (>= 3.0.0)
-Imports:
+Imports: 
     matrixcalc
-Suggests:
+Suggests: 
     xtable,
     xts,
     quantmod,
     MASS,
     TTR,
-    testthat,
+    testthat, 
     sandwich,
     knitr
 URL: https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
 Collate:
-    'SharpeR.r'
-    'utils.r'
     'distributions.r'
-    'sr.r'
     'estimation.r'
+    'SharpeR.r'
+    'sr.r'
     'tests.r'
     'unified.r'
+    'utils.r'
