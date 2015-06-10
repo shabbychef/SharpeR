@@ -6,6 +6,7 @@
 .R_tags
 .staging
 .tags
+.travis.yml
 aux$
 log$
 out$
