@@ -269,9 +269,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #'
 #' For unpaired (and independent) observations, tests
 #' \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
-#' against two or one-sided alternatives via a normal approximation 
-#' (which is probably not very good for small sample sizes). At some point, the
-#' procedure of Ghosh (1975) or variant thereof should perhaps be employed?
+#' against two or one-sided alternatives via the upsilon distribution.
 #' 
 #' @usage
 #'
@@ -306,6 +304,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' @export 
 #' @template etc
 #' @template sr
+#' @template ref-upsilon
 #' @rdname sr_test
 #' @references 
 #'
@@ -391,34 +390,39 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			pval <- subtest$p.value
 		} #UNFOLD
 		else {#FOLDUP
-			# via Z-approximation. sigh.
-			srx <- as.sr(x,c0=0)
-			sry <- as.sr(y,c0=0)
+			# upsilon FTW!
 
+			# via Z-approximation. sigh.
+			srx <- as.sr(x,c0=0,ope=1)
+			sry <- as.sr(y,c0=0,ope=1)
+
+			# worries later about ope and annualization?
 			sx <- srx$sr
 			sy <- sry$sr
-			nx <- srx$df
-			ny <- sry$df
+			nx <- srx$df + 1
+			ny <- sry$df + 1
+			cons <- sqrt(nx * ny / (nx + ny))
+			ut <- cons * c(sx,-sy)
+			udf <- c(nx-1,ny-1)
 
-			se.x <- se(srx,type="t")
-			se.y <- se(sry,type="t")
-			se.z <- sqrt(se.x^2 + se.y^2)
-			estimate <- sx - sy
-			zeta <- .deannualize(zeta,ope)
 			if (alternative == "less") {
-				pval <- pnorm(estimate, mean = zeta, sd = se.z)
+#2FIX: lower tail here?
+				pval <- pupsilon(0,df=udf,t=ut,lower.tail=TRUE)
 			}
 			else if (alternative == "greater") {
-				pval <- pnorm(estimate, mean = zeta, sd = se.z, lower.tail = FALSE)
+#2FIX: lower tail here?
+				pval <- pupsilon(0,df=udf,t=ut,lower.tail=FALSE)
 			}
 			else {
-				pval <- .oneside2two(pnorm(estimate, mean = zeta, sd = se.z))
+#2FIX: lower tail here?
+				pval <- .oneside2two(pupsilon(0,df=udf,t=ut,lower.tail=FALSE))
 			}
-			statistic <- (sx - sy - zeta) / se.z
-			names(statistic) <- "Z"
+			statistic <- ut
+			names(statistic) <- "upsilon t"
 			# ??
-			df <- nx + ny - 2 
+			df <- udf
 
+			# 2FIX: estimate the difference in SR here...
 			estimate <- .annualize(estimate,ope)
 			method <- "unpaired sr-test"
 		}#UNFOLD

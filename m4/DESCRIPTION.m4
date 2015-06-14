@@ -16,7 +16,8 @@ Description: A collection of tools for analyzing significance of trading
 Depends: 
     R (>= 3.0.0)
 Imports: 
-    matrixcalc
+    matrixcalc,
+		sadists (>= 0.2.0)
 Suggests: 
     xtable,
     xts,

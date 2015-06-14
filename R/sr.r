@@ -234,7 +234,8 @@ as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 		df <- apply(!is.na(x),2,sum)
 	else
 		df <- dim(x)[1]
-
+	
+	# n.b. sr$df is n-1
 	retval <- sr(z,df=df-1,c0=c0,ope=ope,
 							 rescal=1/sqrt(df),epoch=epoch)
 	return(retval)
