@@ -423,6 +423,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			df <- udf
 
 			# 2FIX: estimate the difference in SR here...
+			estimate <- sx - sy
 			estimate <- .annualize(estimate,ope)
 			method <- "unpaired sr-test"
 		}#UNFOLD
