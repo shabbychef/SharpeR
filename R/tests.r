@@ -407,15 +407,15 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 
 			if (alternative == "less") {
 #2FIX: lower tail here?
-				pval <- pupsilon(0,df=udf,t=ut,lower.tail=TRUE)
+				pval <- sadists::pupsilon(0,df=udf,t=ut,lower.tail=FALSE)
 			}
 			else if (alternative == "greater") {
 #2FIX: lower tail here?
-				pval <- pupsilon(0,df=udf,t=ut,lower.tail=FALSE)
+				pval <- sadists::pupsilon(0,df=udf,t=ut,lower.tail=TRUE)
 			}
 			else {
 #2FIX: lower tail here?
-				pval <- .oneside2two(pupsilon(0,df=udf,t=ut,lower.tail=FALSE))
+				pval <- .oneside2two(sadists::pupsilon(0,df=udf,t=ut,lower.tail=FALSE))
 			}
 			statistic <- ut
 			names(statistic) <- "upsilon t"
