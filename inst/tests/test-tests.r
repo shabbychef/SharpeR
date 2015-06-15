@@ -193,8 +193,7 @@ test_that("sr_equality_test uniformity",{#FOLDUP
 
 
 })#UNFOLD
-
-test_that("sr_test uniformity",{#FOLDUP
+test_that("sr_test one sample uniformity under null",{#FOLDUP
 	ngen <- ceiling(THOROUGHNESS * 64)
 	alpha.floor = 0.001 + 0.003 * (THOROUGHNESS / (1 + THOROUGHNESS))
 
@@ -212,6 +211,136 @@ test_that("sr_test uniformity",{#FOLDUP
 				}
 				meta.test <- ks.test(pvs,punif)
 				expect_true(meta.test$p.value > alpha.floor)
+			}
+		}
+	}
+})#UNFOLD
+test_that("sr_test two sample unpaired uniformity under null",{#FOLDUP
+	ngen <- ceiling(THOROUGHNESS * 64)
+	alpha.floor = 0.001 + 0.003 * (THOROUGHNESS / (1 + THOROUGHNESS))
+
+	set.char.seed("43af0f33-ef6b-4c1a-ba78-a3e4ec190644")
+	ope <- 253
+	for (nyr in c(2,4)) {
+		nday <- ceiling(ope * nyr)
+		for (psi in c(0,0.1)) {
+			for (sg in c(0.01,0.02)) {
+				pvs <- rep(0,ngen)
+				for (iii in (1:ngen)) {
+					x <- rnorm(nday,mean=psi*sg,sd=sg)
+					y <- rnorm(nday+20,mean=psi*sg,sd=sg)
+					etc <- sr_test(x,y,paired=FALSE)
+					pvs[iii] <- etc$p.value
+				}
+				meta.test <- ks.test(pvs,punif)
+				expect_true(meta.test$p.value > alpha.floor)
+			}
+		}
+	}
+})#UNFOLD
+test_that("sr_test two sample paired uniformity under null",{#FOLDUP
+	ngen <- ceiling(THOROUGHNESS * 64)
+	alpha.floor = 0.001 + 0.003 * (THOROUGHNESS / (1 + THOROUGHNESS))
+
+	set.char.seed("68d2825b-e645-4bbe-94d0-566cd7d4d8e1")
+	ope <- 253
+	for (nyr in c(2,4)) {
+		nday <- ceiling(ope * nyr)
+		for (psi in c(0,0.1)) {
+			for (sg in c(0.01,0.02)) {
+				pvs <- rep(0,ngen)
+				for (iii in (1:ngen)) {
+					x <- rnorm(nday,mean=psi*sg,sd=sg)
+					y <- rnorm(nday,mean=psi*sg,sd=sg)
+					etc <- sr_test(x,y,paired=TRUE)
+					pvs[iii] <- etc$p.value
+				}
+				meta.test <- ks.test(pvs,punif)
+				expect_true(meta.test$p.value > alpha.floor)
+			}
+		}
+	}
+})#UNFOLD
+
+test_that("sr_test one sample power under alternative",{#FOLDUP
+	ngen <- ceiling(THOROUGHNESS * 32)
+	alpha.floor = 0.001 + 0.003 * (THOROUGHNESS / (1 + THOROUGHNESS))
+
+	set.char.seed("56a7e85d-516b-47b4-a98f-08127b57d13d")
+	ope <- 253
+	for (nyr in c(2,4)) {
+		nday <- ceiling(ope * nyr)
+		for (psi in c(0,0.1)) {
+			for (sg in c(0.01,0.02)) {
+				pvs.lo <- rep(0,ngen)
+				pvs.hi <- rep(0,ngen)
+				for (iii in (1:ngen)) {
+					X <- rnorm(nday,mean=psi*sg,sd=sg)
+					etc <- sr_test(X,zeta=psi-0.2,alternative='greater')
+					pvs.lo[iii] <- etc$p.value
+					etc <- sr_test(X,zeta=psi-0.2,alternative='less')
+					pvs.hi[iii] <- etc$p.value
+				}
+				# these should imply each other, but it is a test.
+				expect_true(max(pvs.lo) < 0.5)
+				expect_true(min(pvs.hi) > 0.5)
+				expect_true(max(abs(pvs.lo + pvs.hi - 1.0)) < 0.01)
+			}
+		}
+	}
+})#UNFOLD
+test_that("sr_test two sample unpaired power under alternative",{#FOLDUP
+	ngen <- ceiling(THOROUGHNESS * 32)
+	alpha.floor = 0.001 + 0.003 * (THOROUGHNESS / (1 + THOROUGHNESS))
+
+	set.char.seed("1ff5561a-90d7-4f95-a0a6-a60c8aaa31f5")
+	ope <- 253
+	for (nyr in c(2,4)) {
+		nday <- ceiling(ope * nyr)
+		for (psi in c(0,0.1)) {
+			for (sg in c(0.01,0.02)) {
+				pvs.lo <- rep(0,ngen)
+				pvs.hi <- rep(0,ngen)
+				for (iii in (1:ngen)) {
+					x <- rnorm(nday,mean=psi*sg,sd=sg)
+					y <- rnorm(nday+20,mean=(psi-0.2)*sg,sd=sg)
+					etc <- sr_test(x,y,paired=FALSE,alternative='greater')
+					pvs.lo[iii] <- etc$p.value
+					etc <- sr_test(x,y,paired=FALSE,alternative='less')
+					pvs.hi[iii] <- etc$p.value
+				}
+				# these should imply each other, but it is a test.
+				expect_true(max(pvs.lo) < 0.5)
+				expect_true(min(pvs.hi) > 0.5)
+				expect_true(max(abs(pvs.lo + pvs.hi - 1.0)) < 0.01)
+			}
+		}
+	}
+})#UNFOLD
+test_that("sr_test two sample paired power under alternative",{#FOLDUP
+	ngen <- ceiling(THOROUGHNESS * 64)
+	alpha.floor = 0.001 + 0.003 * (THOROUGHNESS / (1 + THOROUGHNESS))
+
+	set.char.seed("b3e4d157-a618-4a8d-8556-600566afc741")
+	ope <- 253
+	for (nyr in c(2,4)) {
+		nday <- ceiling(ope * nyr)
+		for (psi in c(0,0.1)) {
+			for (sg in c(0.01,0.02)) {
+				pvs.lo <- rep(0,ngen)
+				pvs.hi <- rep(0,ngen)
+				for (iii in (1:ngen)) {
+					x <- rnorm(nday,mean=psi*sg,sd=sg)
+					y <- rnorm(nday,mean=(psi-0.25)*sg,sd=sg)
+					etc <- sr_test(x,y,paired=TRUE,alternative='greater')
+					pvs.lo[iii] <- etc$p.value
+					etc <- sr_test(x,y,paired=TRUE,alternative='less')
+					pvs.hi[iii] <- etc$p.value
+				}
+				# these should imply each other, but it is a test.
+				expect_true(max(pvs.lo) < 0.5)
+				expect_true(min(pvs.hi) > 0.5)
+				expect_true(max(abs(pvs.lo + pvs.hi - 1.0)) < 0.01)
 			}
 		}
 	}

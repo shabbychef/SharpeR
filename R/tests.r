@@ -417,10 +417,10 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #2FIX: lower tail here?
 				pval <- .oneside2two(sadists::pupsilon(0,df=udf,t=ut,lower.tail=FALSE))
 			}
-			statistic <- ut
+			statistic <- sum(ut)
 			names(statistic) <- "upsilon t"
 			# ??
-			df <- udf
+			df <- mean(udf)
 
 			# 2FIX: estimate the difference in SR here...
 			estimate <- sx - sy
