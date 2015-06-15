@@ -434,6 +434,103 @@ confint.del_sropt <- function(object,parm,level=0.95,
 }
 #UNFOLD
 
+# prediction intervals on the Sharpe ratio#FOLDUP
+#' @title prediction interval for Sharpe ratio
+#'
+#' @description 
+#'
+#' Computes the prediction interval for Sharpe ratio.
+#'
+#' @details 
+#'
+#' Given \eqn{n_0}{n_0} observations \eqn{x_i}{xi} from a normal random variable,
+#' with mean \eqn{\mu}{mu} and standard deviation \eqn{\sigma}{sigma}, computes
+#' an interval \eqn{[y_1,y_2]}{[y_1,y_2]} such that with a fixed probability,
+#' the sample Sharpe ratio over \eqn{n}{n} future observations will fall in the
+#' given interval. The coverage is over repeated draws of both the past and
+#' future data, thus this computation takes into account error in both the
+#' estimate of Sharpe and the as yet unrealized returns.
+#' 
+#' @usage
+#'
+#' predict(x,n,ope=1,level=0.95,
+#'				 level.lo=(1-level)/2,level.hi=1-level.lo)
+#'
+#' @param x a (non-empty) numeric vector of data values, or an
+#'    object of class \code{sr}.
+#' @param n the number of future observations.
+#' @param level the confidence level required.
+#' @param level.lo the lower confidence level required.
+#' @param level.hi the upper confidence level required.
+#' @template param-ope
+#' @return A matrix (or vector) with columns giving lower and upper
+#' confidence limits for the parameter. These will be labelled as
+#' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
+#' @seealso \code{\link{confint.sr}}.
+#' @export 
+#' @template etc
+#' @template sr
+#' @template ref-upsilon
+#' @examples 
+#'
+#' # should reject null
+#' etc <- predict(rnorm(1000,mean=0.5,sd=0.1),n=128,ope=1)
+#' etc <- predict(matrix(rnorm(1000*5,mean=0.05),ncol=5),n=64,ope=1)
+#'
+#' # check coverage
+#' mu <- 0.0005
+#' sg <- 0.013
+#' n1 <- 512
+#' n2 <- 256
+#' p  <- 100
+#' x1 <- matrix(rnorm(n1*p,mean=mu,sd=sg),ncol=p)
+#' x2 <- matrix(rnorm(n2*p,mean=mu,sd=sg),ncol=p)
+#' sr1 <- as.sr(x1)
+#' sr2 <- as.sr(x2)
+#' \dontrun{
+#' # takes too long to run ... 
+#' etc1 <- predict(sr1,n=n2,level=0.95)
+#' is.ok <- (etc1[,1] <= sr2$sr) & (sr2$sr <= etc1[,2])
+#' covr <- mean(is.ok)
+#' }
+#'
+#' @export
+predict <- function(x,n,ope=1,level=0.95,
+							 level.lo=(1-level)/2,level.hi=1-level.lo) {
+	if (is.sr(x)) {
+		srx <- x
+	} else {
+		srx <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
+	}
+	cols <- mapply(function(sx,n0) {
+		cons <- sqrt(n0 * n / (n0 + n))
+		udf <- c(n0-1,n-1)
+		pfunc <- function(y,lvl) { 
+			ut <- cons * c(sx,-y)
+			retv <- lvl - sadists::pupsilon(0,df=udf,t=ut,lower.tail=TRUE)
+		}
+		ci <- lapply(c(level.lo,level.hi),function(lvl) {
+			if ((0 < lvl) && (lvl < 1)) {
+				# this is the only part that needs to be fixed:
+				# how to guess the interval.
+				# 2FIX
+				etc <- uniroot(pfunc,c(sx-1,sx+1),lvl=lvl)
+				yval <- .annualize(etc$root,ope)
+			} else {
+				yval <- ifelse(lvl >= 1,Inf,-Inf)
+			}
+		})
+		retval <- matrix(ci,nrow=1)
+	},srx$sr,1+srx$df)
+	retval <- t(cols)
+	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+
+	rownames(retval) <- .get_strat_names(srx$sr)
+	retval
+}
+#UNFOLD
+
+
 # point inference on sropt/ncp of F#FOLDUP
 
 # compute an unbiased estimator of the non-centrality parameter

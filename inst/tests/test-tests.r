@@ -284,7 +284,6 @@ test_that("sr_test one sample power under alternative",{#FOLDUP
 				# these should imply each other, but it is a test.
 				expect_true(max(pvs.lo) < 0.5)
 				expect_true(min(pvs.hi) > 0.5)
-				expect_true(max(abs(pvs.lo + pvs.hi - 1.0)) < 0.01)
 			}
 		}
 	}
@@ -312,7 +311,6 @@ test_that("sr_test two sample unpaired power under alternative",{#FOLDUP
 				# these should imply each other, but it is a test.
 				expect_true(max(pvs.lo) < 0.5)
 				expect_true(min(pvs.hi) > 0.5)
-				expect_true(max(abs(pvs.lo + pvs.hi - 1.0)) < 0.01)
 			}
 		}
 	}
