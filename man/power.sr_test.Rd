@@ -97,7 +97,7 @@ Other sr: \code{\link{as.sr}},
   \code{\link{dsr}}, \code{\link{psr}}, \code{\link{qsr}},
   \code{\link{rsr}}; \code{\link{is.sr}};
   \code{\link{plambdap}}, \code{\link{qlambdap}},
-  \code{\link{rlambdap}}; \code{\link{predict}};
+  \code{\link{rlambdap}}; \code{\link{predint}};
   \code{\link{print.del_sropt}}, \code{\link{print.sr}},
   \code{\link{print.sropt}}; \code{\link{reannualize}},
   \code{\link{reannualize.sr}},

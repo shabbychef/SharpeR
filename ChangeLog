@@ -1,3 +1,9 @@
+
+2015-07-01 Steven E. Pav <shabbychef@gmail.com>
+* rely on upsilon for unpaired 2 sample test of Sharpe.
+* prediction intervals for Sharpe based on upsilon.
+* more tests.
+
 2014-12-06 Steven E. Pav <shabbychef@gmail.com>
 * fix inference of frequency from xts objects
 * add rlambdap, variates from the lambda-prime distribution

@@ -212,7 +212,7 @@ test_that("predict runs at all",{#FOLDUP
 			x <- rnorm(200,mean=(zeta/sqrt(ope))*sg,sd=sg)
 			y <- rnorm(100,mean=(zeta/sqrt(ope))*sg,sd=sg)
 			for (nominal.coverage in c(0.90,0.95)) {
-				aci <- predict(x,length(y),ope=1,level=nominal.coverage)
+				aci <- predint(x,length(y),ope=1,level=nominal.coverage)
 			}
 		}
 	}

@@ -152,12 +152,12 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 
 # this is for shit b/c it can be negative. ditch it.
 # See Walck, section 33.3
-.t_se_weird <- function(tstat,df) {
-	cn <- .tbias(df)
-	dn <- tstat / cn
-	se <- sqrt(((1+(dn*dn)) * (df/df-2)) - (tstat*tstat))
-	return(se)
-}
+#.t_se_weird <- function(tstat,df) {
+	#cn <- .tbias(df)
+	#dn <- tstat / cn
+	#se <- sqrt(((1+(dn*dn)) * (df/df-2)) - (tstat*tstat))
+	#return(se)
+#}
 # See Walck, section 33.5
 .t_se_normal <- function(tstat,df) {
 	se <- sqrt(1 + (tstat**2) / (2*df))
@@ -170,7 +170,6 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 	se <- switch(type,
 							 t = .t_se_normal(t,df),
 							 Lo = .t_se_normal(t,df))
-							 #exact = .t_se_weird(t,df))
 	return(se)
 }
 # confidence intervals on the non-centrality parameter of a t-stat
@@ -453,7 +452,7 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #' 
 #' @usage
 #'
-#' predict(x,n,ope=1,level=0.95,
+#' predint(x,n,ope=1,level=0.95,
 #'				 level.lo=(1-level)/2,level.hi=1-level.lo)
 #'
 #' @param x a (non-empty) numeric vector of data values, or an
@@ -474,8 +473,8 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #' @examples 
 #'
 #' # should reject null
-#' etc <- predict(rnorm(1000,mean=0.5,sd=0.1),n=128,ope=1)
-#' etc <- predict(matrix(rnorm(1000*5,mean=0.05),ncol=5),n=64,ope=1)
+#' etc <- predint(rnorm(1000,mean=0.5,sd=0.1),n=128,ope=1)
+#' etc <- predint(matrix(rnorm(1000*5,mean=0.05),ncol=5),n=64,ope=1)
 #'
 #' # check coverage
 #' mu <- 0.0005
@@ -489,13 +488,13 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #' sr2 <- as.sr(x2)
 #' \dontrun{
 #' # takes too long to run ... 
-#' etc1 <- predict(sr1,n=n2,level=0.95)
+#' etc1 <- predint(sr1,n=n2,level=0.95)
 #' is.ok <- (etc1[,1] <= sr2$sr) & (sr2$sr <= etc1[,2])
 #' covr <- mean(is.ok)
 #' }
 #'
 #' @export
-predict <- function(x,n,ope=1,level=0.95,
+predint <- function(x,n,ope=1,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo) {
 	if (is.sr(x)) {
 		srx <- x
@@ -514,7 +513,9 @@ predict <- function(x,n,ope=1,level=0.95,
 				# this is the only part that needs to be fixed:
 				# how to guess the interval.
 				# 2FIX
-				etc <- uniroot(pfunc,c(sx-1,sx+1),lvl=lvl)
+				#invl <- sx + c(-1,1)
+				invl <- sx + (1/cons) * qnorm(0.5 * (lvl + c(0,1)))
+				etc <- uniroot(pfunc,interval=invl,lvl=lvl)
 				yval <- .annualize(etc$root,ope)
 			} else {
 				yval <- ifelse(lvl >= 1,Inf,-Inf)
