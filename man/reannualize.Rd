@@ -65,11 +65,11 @@ Other sr: \code{\link{as.sr}},
   \code{\link{rsr}}; \code{\link{is.sr}};
   \code{\link{plambdap}}, \code{\link{qlambdap}},
   \code{\link{rlambdap}}; \code{\link{power.sr_test}};
-  \code{\link{print.del_sropt}}, \code{\link{print.sr}},
-  \code{\link{print.sropt}}; \code{\link{se}},
-  \code{\link{se.sr}}; \code{\link{sr_equality_test}};
-  \code{\link{sr_test}}; \code{\link{sr_vcov}};
-  \code{\link{sr}}
+  \code{\link{predict}}; \code{\link{print.del_sropt}},
+  \code{\link{print.sr}}, \code{\link{print.sropt}};
+  \code{\link{se}}, \code{\link{se.sr}};
+  \code{\link{sr_equality_test}}; \code{\link{sr_test}};
+  \code{\link{sr_vcov}}; \code{\link{sr}}
 
 Other sropt: \code{\link{as.sropt}},
   \code{\link{as.sropt.default}},

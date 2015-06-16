@@ -46,6 +46,12 @@ test_that("sm/ism_vcov runs",{#FOLDUP
 	baz <- ism_vcov(X,fit.intercept=FALSE)
 	foo <- sm_vcov(X,vcov.func="normal")
 	baz <- ism_vcov(X,vcov.func="normal")
+
+	expect_error(sm_vcov(X,vcov.func="fnordmal"))
+	expect_error(sm_vcov(X,vcov.func="normal",fit.intercept=FALSE))
+
+	# sentinel
+	expect_true(TRUE)
 })#UNFOLD
 
 #UNFOLD

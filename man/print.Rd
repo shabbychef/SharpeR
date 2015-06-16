@@ -69,7 +69,8 @@ Other sr: \code{\link{as.sr}},
   \code{\link{rsr}}; \code{\link{is.sr}};
   \code{\link{plambdap}}, \code{\link{qlambdap}},
   \code{\link{rlambdap}}; \code{\link{power.sr_test}};
-  \code{\link{reannualize}}, \code{\link{reannualize.sr}},
+  \code{\link{predict}}; \code{\link{reannualize}},
+  \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}; \code{\link{se}},
   \code{\link{se.sr}}; \code{\link{sr_equality_test}};
   \code{\link{sr_test}}; \code{\link{sr_vcov}};

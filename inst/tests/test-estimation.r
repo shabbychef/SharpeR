@@ -139,7 +139,7 @@ test_that("basic del_sropt functionality",{
 	# via xts
 	if (require(xts)) {
 		xxts <- xts(x,order.by=as.Date(1:(dim(x)[1]),origin="1990-01-01"))
-		mysr <- as.del_sropt(x,G,drag=0,ope=1,epoch="yr")
+		mysr <- as.del_sropt(xxts,G,drag=0,ope=1,epoch="yr")
 		print(mysr)
 		print(format(mysr))
 		expect_true(is.del_sropt(mysr))

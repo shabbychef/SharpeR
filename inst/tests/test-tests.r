@@ -82,6 +82,11 @@ test_that("sr_equality_test",{#FOLDUP
 	fooz <- sr_equality_test(X,type="chisq")
 	fooz <- sr_equality_test(X,type="F")
 	fooz <- sr_equality_test(X,type="t",contrasts=Con)
+	fooz <- sr_equality_test(X,type="t",contrasts=Con,alternative='less')
+	fooz <- sr_equality_test(X,type="t",contrasts=Con,alternative='greater')
+
+	expect_warning(sr_equality_test(X,type="F",alternative='less'))
+	expect_warning(sr_equality_test(X,type="F",alternative='greater'))
 
 	# sentinel
 	expect_true(TRUE)

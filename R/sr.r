@@ -415,10 +415,11 @@ print.sr <- function(x,...) {
 	retv <- prt(q$sr,df=q$df,K=(q$rescal * sqrt(q$ope)),rho=zeta,...)
 	return(retv)
 }
-.dsr <- function(q,zeta,...) {
-	retv <- drt(q$sr,df=q$df,K=(q$rescal * sqrt(q$ope)),rho=zeta,...)
-	return(retv)
-}
+# no longer needed?
+#.dsr <- function(q,zeta,...) {
+	#retv <- drt(q$sr,df=q$df,K=(q$rescal * sqrt(q$ope)),rho=zeta,...)
+	#return(retv)
+#}
 
 #' @title Change the annualization of a Sharpe ratio.
 #'

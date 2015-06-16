@@ -21,6 +21,7 @@ Imports:
 Suggests: 
     xtable,
     xts,
+    timeSeries,
     quantmod,
     MASS,
     TTR,

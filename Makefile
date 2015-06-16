@@ -57,7 +57,7 @@ R_FLAGS 					?= -q --no-save --no-restore --no-init-file
 
 # packages I need to test this one
 TEST_DEPS  				 = testthat roxygen2 knitr TTR quantmod MASS \
-										 sandwich xtable matrixcalc LambertW sadists
+										 sandwich xtable matrixcalc LambertW sadists xts timeSeries
 INSTALLED_DEPS 		 = $(patsubst %,$(LOCAL)/%/DESCRIPTION,$(TEST_DEPS)) 
 PKG_TESTR 				 = tests/run-all.R
 
@@ -204,6 +204,7 @@ help:
 	@echo "  the_vignette   Build the vignette in the local context."
 	@echo "  clean      Do some cleanup."
 	@echo "  realclean  Do lots of cleanup."
+	@echo "  codecov    Code coverage."
 	@echo ""
 	@echo "  subadvice  CRAN submission advice."
 	@echo "  submit     Submit to CRAN."

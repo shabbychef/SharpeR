@@ -711,36 +711,36 @@ sropt_test <- function(X,alternative=c("greater","two.sided","less"),
 
 # power of tests:#FOLDUP
 
-# 2FIX: should this be expanded in its own right?
-power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) {
-	# stolen from power.anova.test
-	if (sum(sapply(list(df1, df2, ncp, power, sig.level), is.null)) != 1) 
-		stop("exactly one of 'df1', 'df2', 'ncp', 'power', and 'sig.level' must be NULL")
-	if (!is.null(sig.level) && !is.numeric(sig.level) || any(0 > 
-		sig.level | sig.level > 1)) 
-		stop("'sig.level' must be numeric in [0, 1]")
-	p.body <- quote({
-		delta2 <- df2 * ncp
-		pT2(qT2(sig.level, df1, df2, lower.tail = FALSE), df1, df2, delta2, lower.tail = FALSE)
-	})
-	if (is.null(power)) 
-		power <- eval(p.body)
-	else if (is.null(df1)) 
-		df1 <- uniroot(function(df1) eval(p.body) - power, c(1, 3e+03))$root
-	else if (is.null(df2)) 
-		df2 <- uniroot(function(df2) eval(p.body) - power, c(3, 1e+06))$root
-	else if (is.null(ncp))
-		ncp <- uniroot(function(ncp) eval(p.body) - power, c(0, 3e+01))$root
-	else if (is.null(sig.level)) 
-		sig.level <- uniroot(function(sig.level) eval(p.body) - power, c(1e-10, 1 - 1e-10))$root
-	else stop("internal error")
-	NOTE <- "one sided test"
-	METHOD <- "Hotelling test"
-	retval <- structure(list(df1 = df1, df2 = df2, ncp = ncp, delta2 = df2 * ncp,
-								 sig.level = sig.level, power = power, 
-								 note = NOTE, method = METHOD), class = "power.htest")
-	return(retval)
-}
+## this could live on its own, but no longer belongs here.
+#power.T2.test <- function(df1=NULL,df2=NULL,ncp=NULL,sig.level=0.05,power=NULL) {
+	## stolen from power.anova.test
+	#if (sum(sapply(list(df1, df2, ncp, power, sig.level), is.null)) != 1) 
+		#stop("exactly one of 'df1', 'df2', 'ncp', 'power', and 'sig.level' must be NULL")
+	#if (!is.null(sig.level) && !is.numeric(sig.level) || any(0 > 
+		#sig.level | sig.level > 1)) 
+		#stop("'sig.level' must be numeric in [0, 1]")
+	#p.body <- quote({
+		#delta2 <- df2 * ncp
+		#pT2(qT2(sig.level, df1, df2, lower.tail = FALSE), df1, df2, delta2, lower.tail = FALSE)
+	#})
+	#if (is.null(power)) 
+		#power <- eval(p.body)
+	#else if (is.null(df1)) 
+		#df1 <- uniroot(function(df1) eval(p.body) - power, c(1, 3e+03))$root
+	#else if (is.null(df2)) 
+		#df2 <- uniroot(function(df2) eval(p.body) - power, c(3, 1e+06))$root
+	#else if (is.null(ncp))
+		#ncp <- uniroot(function(ncp) eval(p.body) - power, c(0, 3e+01))$root
+	#else if (is.null(sig.level)) 
+		#sig.level <- uniroot(function(sig.level) eval(p.body) - power, c(1e-10, 1 - 1e-10))$root
+	#else stop("internal error")
+	#NOTE <- "one sided test"
+	#METHOD <- "Hotelling test"
+	#retval <- structure(list(df1 = df1, df2 = df2, ncp = ncp, delta2 = df2 * ncp,
+								 #sig.level = sig.level, power = power, 
+								 #note = NOTE, method = METHOD), class = "power.htest")
+	#return(retval)
+#}
 #' @title Power calculations for optimal Sharpe ratio tests
 #'
 #' @description 

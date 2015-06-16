@@ -123,7 +123,7 @@ Other sr: \code{\link{as.sr}},
   \code{\link{confint.sr}}, \code{\link{confint.sropt}};
   \code{\link{is.sr}}; \code{\link{plambdap}},
   \code{\link{qlambdap}}, \code{\link{rlambdap}};
-  \code{\link{power.sr_test}};
+  \code{\link{power.sr_test}}; \code{\link{predict}};
   \code{\link{print.del_sropt}}, \code{\link{print.sr}},
   \code{\link{print.sropt}}; \code{\link{reannualize}},
   \code{\link{reannualize.sr}},
