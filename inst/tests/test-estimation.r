@@ -217,7 +217,7 @@ test_that("predict runs at all",{#FOLDUP
 		}
 	}
 	# sentinel
-	expect_that(TRUE)
+	expect_true(TRUE)
 })#UNFOLD
 #UNFOLD
 
