@@ -210,7 +210,7 @@ test_that("predict runs at all",{#FOLDUP
 		df <- ceiling(ope * nyr)
 		for (zeta in c(-1.0,0.0,1.0,2.0)) {
 			x <- rnorm(200,mean=(zeta/sqrt(ope))*sg,sd=sg)
-			#y <- rnorm(100,mean=(zeta/sqrt(ope))*sg,sd=sg)
+			y <- rnorm(100,mean=(zeta/sqrt(ope))*sg,sd=sg)
 			for (nominal.coverage in c(0.90,0.95)) {
 				aci <- predict(x,length(y),ope=1,level=nominal.coverage)
 			}
