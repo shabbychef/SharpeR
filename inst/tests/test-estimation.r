@@ -172,7 +172,6 @@ test_that("confint.sr coverage",{#FOLDUP
 		}
 	}
 })#UNFOLD
-
 test_that("confint.sropt coverage",{#FOLDUP
 	set.char.seed("50c7aa74-9cec-4fef-980e-c25bfede8260")
 
@@ -196,6 +195,29 @@ test_that("confint.sropt coverage",{#FOLDUP
 			}
 		}
 	}
+})#UNFOLD
+#UNFOLD
+context("estimation functions: prediction coverage")#FOLDUP
+test_that("predict runs at all",{#FOLDUP
+	set.char.seed("080c6f73-834e-4d10-a6fa-4b27dc266b24")
+
+	ngen <- ceiling(THOROUGHNESS * 32)
+	alpha.tol = 0.05 + 0.10 / THOROUGHNESS
+
+	ope <- 253
+	sg <- 0.013
+	for (nyr in c(3,6,9)) {
+		df <- ceiling(ope * nyr)
+		for (zeta in c(-1.0,0.0,1.0,2.0)) {
+			x <- rnorm(200,mean=(zeta/sqrt(ope))*sg,sd=sg)
+			#y <- rnorm(100,mean=(zeta/sqrt(ope))*sg,sd=sg)
+			for (nominal.coverage in c(0.90,0.95)) {
+				aci <- predict(x,length(y),ope=1,level=nominal.coverage)
+			}
+		}
+	}
+	# sentinel
+	expect_that(TRUE)
 })#UNFOLD
 #UNFOLD
 
