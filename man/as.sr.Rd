@@ -141,8 +141,8 @@ Other sr: \code{\link{confint.del_sropt}},
   \code{\link{reannualize}}, \code{\link{reannualize.sr}},
   \code{\link{reannualize.sropt}}; \code{\link{se}},
   \code{\link{se.sr}}; \code{\link{sr_equality_test}};
-  \code{\link{sr_test}}; \code{\link{sr_vcov}};
-  \code{\link{sr}}
+  \code{\link{sr_test}}; \code{\link{sr_unpaired_test}};
+  \code{\link{sr_vcov}}; \code{\link{sr}}
 }
 \keyword{univar}
 
