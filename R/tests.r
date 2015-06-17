@@ -296,7 +296,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' \item{statistic}{the value of the t- or Z-statistic.}
 #' \item{parameter}{the degrees of freedom for the statistic.}
 #' \item{p.value}{the p-value for the test.}
-#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
+#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
 #' \item{estimate}{the estimated Sharpe or difference in Sharpes depending on whether it was a one-sample test or a two-sample test. Annualized}
 #' \item{null.value}{the specified hypothesized value of the Sharpe or difference of Sharpes depending on whether it was a one-sample test or a two-sample test.}
 #' \item{alternative}{a character string describing the alternative hypothesis.}
@@ -494,7 +494,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' \item{statistic}{\code{NULL} here.}
 #' \item{parameter}{a list of upsilon parameters.}
 #' \item{p.value}{the p-value for the test.}
-#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
+#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
 #' \item{estimate}{the estimated equation value, just the weighted sum of the sample Sharpe ratios. Annualized}
 #' \item{null.value}{the specified hypothesized value of the sum of Sharpes.}
 #' \item{alternative}{a character string describing the alternative hypothesis.}
@@ -568,7 +568,7 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 		pval <- .oneside2two(sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=FALSE))
 	}
 	statistic <- NULL 
-	names(statistic) <- "null"
+	#names(statistic) <- "null"
 
 	estimate <- sum(contrasts * vals.sr)
 	estimate <- .annualize(estimate,ope)
@@ -576,14 +576,15 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 	names(estimate) <- "equation on Sharpe ratios"
 
 	# later
-	pval <- NULL
+	cint <- NULL
+	#attr(cint, "conf.level") <- conf.level
 
 	# 2FIX:
 	names(ups.df) <- "df"
-	#attr(cint, "conf.level") <- conf.level
 	retval <- list(statistic = statistic, parameter = ups.df,
 								 estimate = estimate, p.value = pval, 
 								 alternative = alternative, null.value = null.value,
+								 conf.int = cint,
 								 method = method, data.name = dname)
 	class(retval) <- "htest"
 	return(retval)
