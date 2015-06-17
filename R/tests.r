@@ -331,13 +331,17 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' @export
 sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 										zeta=0,ope=1,paired=FALSE,conf.level=0.95) {
-	# all this stolen from t.test.default:
+	# much of this stolen from t.test.default:
 	alternative <- match.arg(alternative)
+	# 2FIX: allow x and y to be given sr objects for the unpaired test.
+	# 2FIX: use the rescal in that case
+	# 2FIX: and do not assume single sample.
 	if (is.sr(x)) {
 		retv <- .sr_test_on_sr(z=x,alternative=alternative,
 													 zeta=zeta,conf.level=conf.level)
 		return(retv)
 	}
+	# much of this stolen from t.test.default:
 	if (!missing(zeta) && (length(zeta) != 1 || is.na(zeta))) 
 		stop("'zeta' must be a single number")
 	if (!missing(conf.level) && (length(conf.level) != 1 || !is.finite(conf.level) || 

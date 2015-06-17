@@ -501,6 +501,7 @@ predint <- function(x,n,ope=1,level=0.95,
 	} else {
 		srx <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
 	}
+	# 2FIX: should use srx$rescal to do the rescaling...
 	cols <- mapply(function(sx,n0) {
 		cons <- sqrt(n0 * n / (n0 + n))
 		udf <- c(n0-1,n-1)
@@ -514,8 +515,20 @@ predint <- function(x,n,ope=1,level=0.95,
 				# how to guess the interval.
 				# 2FIX
 				#invl <- sx + c(-1,1)
+				alps <- 0.5 * (lvl + c(0,1))
+				invl <- sx + (1/cons) * qnorm(alps)
+				falps <- unlist(lapply(invl,pfunc,lvl=lvl))
+				itr <- 0
+				while ((prod(sign(falps)) > 0) && (itr < 60)) {
+					alps <- 0.5 * (alps + c(0,1))
+					invl <- sx + (1/cons) * qnorm(alps)
+					falps <- unlist(lapply(invl,pfunc,lvl=lvl))
+					itr <- itr + 1
+				}
 				invl <- sx + (1/cons) * qnorm(0.5 * (lvl + c(0,1)))
-				etc <- uniroot(pfunc,interval=invl,lvl=lvl)
+				etc <- uniroot(pfunc,interval=invl,
+											 lower=invl[1],upper=invl[2],
+											 f.lower=falps[1],f.upper=falps[2],lvl=lvl)
 				yval <- .annualize(etc$root,ope)
 			} else {
 				yval <- ifelse(lvl >= 1,Inf,-Inf)

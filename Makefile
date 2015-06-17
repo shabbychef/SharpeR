@@ -205,6 +205,7 @@ help:
 	@echo "  clean      Do some cleanup."
 	@echo "  realclean  Do lots of cleanup."
 	@echo "  codecov    Code coverage."
+	@echo "  suggestions whee."
 	@echo ""
 	@echo "  subadvice  CRAN submission advice."
 	@echo "  submit     Submit to CRAN."
