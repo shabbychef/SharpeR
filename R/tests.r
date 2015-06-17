@@ -397,37 +397,6 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 																 alternative=alternative,
 																 ope=ope,conf.level=conf.level)
 			return(retval)
-
-			# worries later about ope and annualization?
-			sx <- srx$sr
-			sy <- sry$sr
-			nx <- srx$df + 1
-			ny <- sry$df + 1
-			cons <- sqrt(nx * ny / (nx + ny))
-			ut <- cons * c(sx,-sy)
-			udf <- c(nx-1,ny-1)
-
-			if (alternative == "less") {
-#2FIX: lower tail here?
-				pval <- sadists::pupsilon(0,df=udf,t=ut,lower.tail=FALSE)
-			}
-			else if (alternative == "greater") {
-#2FIX: lower tail here?
-				pval <- sadists::pupsilon(0,df=udf,t=ut,lower.tail=TRUE)
-			}
-			else {
-#2FIX: lower tail here?
-				pval <- .oneside2two(sadists::pupsilon(0,df=udf,t=ut,lower.tail=FALSE))
-			}
-			statistic <- sum(ut)
-			names(statistic) <- "upsilon t"
-			# ??
-			df <- mean(udf)
-
-			# 2FIX: estimate the difference in SR here...
-			estimate <- sx - sy
-			estimate <- .annualize(estimate,ope)
-			method <- "unpaired sr-test"
 		}#UNFOLD
 		names(estimate) <- "difference in Sharpe ratios"
 	}#UNFOLD
