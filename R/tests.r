@@ -393,7 +393,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 		else {#FOLDUP
 			srx <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
 			sry <- as.sr(y,c0=0,ope=1,na.rm=TRUE)
-			retval <- sr_unpaired_test(c(srx,sry),c(1,-1),0,
+			retval <- sr_unpaired_test(list(srx,sry),c(1,-1),0,
 																 alternative=alternative,
 																 ope=ope,conf.level=conf.level)
 			return(retval)
@@ -543,6 +543,7 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 	if (is.null(contrasts)) { contrasts <- (-1)^(1 + seq_len(nterm)) }
 	stopifnot(nterm == length(contrasts))
 
+	# get rid of matrix, vector, etc:
 	contrasts <- c(contrasts)
 	vals.sr <- c(vals.sr)
 

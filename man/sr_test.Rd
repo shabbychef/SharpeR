@@ -42,7 +42,7 @@ A list with class \code{"htest"} containing the following components:
 \item{statistic}{the value of the t- or Z-statistic.}
 \item{parameter}{the degrees of freedom for the statistic.}
 \item{p.value}{the p-value for the test.}
-\item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
+\item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
 \item{estimate}{the estimated Sharpe or difference in Sharpes depending on whether it was a one-sample test or a two-sample test. Annualized}
 \item{null.value}{the specified hypothesized value of the Sharpe or difference of Sharpes depending on whether it was a one-sample test or a two-sample test.}
 \item{alternative}{a character string describing the alternative hypothesis.}

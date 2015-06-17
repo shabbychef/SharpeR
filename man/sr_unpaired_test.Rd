@@ -40,7 +40,7 @@ A list with class \code{"htest"} containing the following components:
 \item{statistic}{\code{NULL} here.}
 \item{parameter}{a list of upsilon parameters.}
 \item{p.value}{the p-value for the test.}
-\item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
+\item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
 \item{estimate}{the estimated equation value, just the weighted sum of the sample Sharpe ratios. Annualized}
 \item{null.value}{the specified hypothesized value of the sum of Sharpes.}
 \item{alternative}{a character string describing the alternative hypothesis.}
