@@ -505,6 +505,7 @@ predint <- function(x,n,ope=1,level=0.95,
 	cols <- mapply(function(sx,n0) {
 		cons <- sqrt(n0 * n / (n0 + n))
 		udf <- c(n0-1,n-1)
+		# eventually this guesswork will be replaced by another distribution...
 		pfunc <- function(y,lvl) { 
 			ut <- cons * c(sx,-y)
 			retv <- lvl - sadists::pupsilon(0,df=udf,t=ut,lower.tail=TRUE)
