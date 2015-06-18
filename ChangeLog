@@ -1,6 +1,7 @@
 
-2015-07-01 Steven E. Pav <shabbychef@gmail.com>
-* rely on upsilon for unpaired 2 sample test of Sharpe.
+2015-06-18 Steven E. Pav <shabbychef@gmail.com>
+* unpaired k sample test of Sharpe.
+* rely on same for unpaired 2 sample test.
 * prediction intervals for Sharpe based on upsilon.
 * more tests.
 

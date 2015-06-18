@@ -196,11 +196,12 @@ NULL
 #' \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 #'
-#' @section Changes in \SharpeR{} Version 1.0.0 (2015-07-01) :
+#' @section Changes in \SharpeR{} Version 1.0.0 (2015-06-18) :
 #'
 #' \itemize{
 #' \item sane version numbers.
-#' \item rely on upsilon for unpaired 2 sample test of Sharpe.
+#' \item unpaired k sample test of Sharpe.
+#' \item rely on same for unpaired 2 sample test.
 #' \item prediction intervals for Sharpe based on upsilon.
 #' \item more tests.
 #' }
