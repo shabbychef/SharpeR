@@ -55,14 +55,14 @@
 # http://mathworld.wolfram.com/StandardDeviationDistribution.html
 # http://finzi.psych.upenn.edu/R/library/IQCC/html/c4.html
 # http://math.stackexchange.com/questions/71573/the-limit-of-the-ratio-of-two-gammax-functions
-.tbias <- function(df) { 
-	retv <- sqrt(df / 2) * exp(lgamma((df-1)/2) - lgamma(df/2))
-	return(retv)
-}
+#.tbias <- function(df) { 
+	#retv <- sqrt(df / 2) * exp(lgamma((df-1)/2) - lgamma(df/2))
+	#return(retv)
+#}
 # same, but for sr:
-.srbias <- function(df) { 
-	return(.tbias(df-1))
-}
+#.srbias <- function(df) { 
+	#return(.tbias(df-1))
+#}
 #UNFOLD
 
 # rescaled t-distributions

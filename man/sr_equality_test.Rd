@@ -117,7 +117,7 @@ Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-13
 Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
 equality of multiple Sharpe ratios and its application on the evaluation
 of iShares." J. Risk. to appear.
-\url{http://www.sta.cuhk.edu.hk/scpy/Preprints/John\%20Wright/A\%20test\%20for\%20the\%20equality\%20of\%20multiple\%20Sharpe\%20ratios.pdf}
+\url{http://www.risk.net/journal-of-risk/technical-paper/2340067/a-test-for-the-equality-of-multiple-sharpe-ratios}
 
 Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with
 application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15--30.

@@ -6,7 +6,7 @@
 \usage{
 sr_unpaired_test(srs,contrasts=NULL,null.value=0,
   alternative=c("two.sided","less","greater"),
-  ope=1,conf.level=0.95)
+  ope=NULL,conf.level=0.95)
 }
 \arguments{
 \item{srs}{a (non-empty) list of objects of class \code{sr}, each containing
@@ -33,14 +33,6 @@ thrown.}
 
 \item{conf.level}{confidence level of the interval.}
 
-\item{ope}{the number of observations per 'epoch'. For convenience of
-interpretation, The Sharpe ratio is typically quoted in 'annualized'
-units for some epoch, that is, 'per square root epoch', though returns
-are observed at a frequency of \code{ope} per epoch.
-The default value is 1, meaning the code will not attempt to guess
-what the observation frequency is, and no annualization adjustments
-will be made.}
-
 \item{...}{further arguments to be passed to or from methods.}
 }
 \value{
@@ -48,7 +40,7 @@ A list with class \code{"htest"} containing the following components:
 \item{statistic}{\code{NULL} here.}
 \item{parameter}{a list of upsilon parameters.}
 \item{p.value}{the p-value for the test.}
-\item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
+\item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
 \item{estimate}{the estimated equation value, just the weighted sum of the sample Sharpe ratios. Annualized}
 \item{null.value}{the specified hypothesized value of the sum of Sharpes.}
 \item{alternative}{a character string describing the alternative hypothesis.}
@@ -74,15 +66,20 @@ set.seed(as.integer(charToRaw("set the seed")))
 etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*6,mean=0.02,sd=0.1),ncol=6)))
 print(etc)
 
-etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),alternative='greater')
+etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),
+  alternative='greater')
 print(etc)
 
-etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),contrasts=c(1,1,1,1),null.value=-0.1,alternative='greater')
+etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),
+  contrasts=c(1,1,1,1),null.value=-0.1,alternative='greater')
 print(etc)
 
-etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),as.sr(rnorm(30)),as.sr(rnorm(100))))
+inp <- list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),
+            as.sr(rnorm(30)),as.sr(rnorm(100)))
+etc <- sr_unpaired_test(inp)
 
-etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(rnorm(100,mean=0.2))),contrasts=c(1,1),null.value=0.2)
+inp <- list(as.sr(rnorm(500)),as.sr(rnorm(100,mean=0.2,sd=1)))
+etc <- sr_unpaired_test(inp,contrasts=c(1,1),null.value=0.2)
 etc$conf.int
 }
 \author{
@@ -97,8 +94,6 @@ Arxiv (2015).
 \url{http://arxiv.org/abs/1505.00829}
 }
 \seealso{
-\code{\link{reannualize}}
-
 \code{\link{sr_equality_test}}, \code{\link{sr_test}}, \code{\link{t.test}}.
 
 Other sr: \code{\link{as.sr}},

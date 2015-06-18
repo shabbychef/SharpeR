@@ -237,7 +237,7 @@ okvals <- replicate(500, {
 	inp <- as.sr(X[1:n1])
 	oos <- as.sr(X[n1 + (1:n2)])
 
-	pint <- predint(inp,n=n2,ope=1)
+	pint <- predint(inp,oosdf=n2-1,ope=1)
 	is.ok <- (pint[,1] <= oos$sr) & (oos$sr <= pint[,2])
 	is.ok
 })
@@ -245,6 +245,59 @@ coverage <- mean(okvals)
 print(coverage)
 
 ```
+
+![nominal coverage](github_extra/figure/borat_coverage.jpg)
+
+For a more complicated example, consider the 'Sharpe' under the attribution
+model. Here we download the _daily_ data of the three Fama French factors, then
+perform an attribution of SMB against the market and HML. We compute the
+factor model Sharpe for the first nine months of each year, and of the last three
+months separately. Using the first three quarters, we compute a prediction interval 
+for the fourth quarter, then check coverage:
+
+```{r ff_predint_check,eval=TRUE,echo=TRUE}
+library(xts)
+library(Quandl)
+
+# auth-fu
+quandl.auth <- Sys.getenv('QUANDL_AUTH')
+options(quandl.auth = ifelse(nchar(quandl.auth),quandl.auth,""))
+rm(quandl.auth)
+Quandl.auth(options()$quandl.auth)
+
+# get data!
+fff.xts <- Quandl("KFRENCH/FACTORS_D",
+	start_date="1927-01-31",end_date="2014-12-31",
+	type="xts")
+fff.xts$Mkt <- fff.xts[,"Mkt-RF"] + fff.xts[,"RF"]
+
+# shoot me if this is how to get the year number from a time index.
+yrno <- as.numeric(floor(as.yearmon(index(fff.xts))))
+qname <- quarters(index(fff.xts))
+
+is.q4 <- (qname == 'Q4')
+
+okvals <- lapply(unique(yrno),function(yr) { 
+	isi <- (yrno == yr) & !is.q4
+	oosi <- (yrno == yr) & is.q4
+	mod.is <- lm(SMB ~ Mkt + HML,data=fff.xts[isi,])
+	mod.oos <- lm(SMB ~ Mkt + HML,data=fff.xts[oosi,])
+	sr.is <- as.sr(mod.is)
+	sr.oos <- as.sr(mod.oos)
+	# compute prediction intervals
+	pint <- predint(sr.is,oosdf=sr.oos$df,oosrescal=sr.oos$rescal,ope=sr.oos$ope)
+	is.ok <- (pint[,1] <= sr.oos$sr) & (sr.oos$sr <= pint[,2])
+	is.ok
+})
+coverage <- mean(unlist(okvals))
+print(coverage)
+
+```
+
+It is not clear if non-normality or omitted variable bias (or broken code!) 
+is to blame for the apparent conservatism of the prediction intervals in this case.
+
+![no nominal coverage](github_extra/figure/yuno.jpg)
 
 ## Inference on the Markowitz Portfolio
 

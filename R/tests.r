@@ -126,7 +126,7 @@
 #' Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
 #' equality of multiple Sharpe ratios and its application on the evaluation
 #' of iShares." J. Risk. to appear. 
-#' \url{http://www.sta.cuhk.edu.hk/scpy/Preprints/John\%20Wright/A\%20test\%20for\%20the\%20equality\%20of\%20multiple\%20Sharpe\%20ratios.pdf}
+#' \url{http://www.risk.net/journal-of-risk/technical-paper/2340067/a-test-for-the-equality-of-multiple-sharpe-ratios}
 #'
 #' Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with 
 #' application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15--30.
@@ -297,7 +297,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' \item{statistic}{the value of the t- or Z-statistic.}
 #' \item{parameter}{the degrees of freedom for the statistic.}
 #' \item{p.value}{the p-value for the test.}
-#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
+#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI for some cases.}
 #' \item{estimate}{the estimated Sharpe or difference in Sharpes depending on whether it was a one-sample test or a two-sample test. Annualized}
 #' \item{null.value}{the specified hypothesized value of the Sharpe or difference of Sharpes depending on whether it was a one-sample test or a two-sample test.}
 #' \item{alternative}{a character string describing the alternative hypothesis.}
@@ -477,7 +477,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #'
 #' sr_unpaired_test(srs,contrasts=NULL,null.value=0,
 #'   alternative=c("two.sided","less","greater"),
-#'   ope=1,conf.level=0.95)
+#'   ope=NULL,conf.level=0.95)
 #'
 #' @param srs a (non-empty) list of objects of class \code{sr}, each containing
 #'  a scalar sample Sharpe estimate. Or a single object of class \code{sr} with
@@ -494,14 +494,13 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #'   object, if it is unambiguous. Otherwise, it defaults to 1, with a warning
 #'   thrown.
 #' @inheritParams sr_test
-#' @template param-ope
 #' @template param-ellipsis
 #' @keywords htest
 #' @return A list with class \code{"htest"} containing the following components:
 #' \item{statistic}{\code{NULL} here.}
 #' \item{parameter}{a list of upsilon parameters.}
 #' \item{p.value}{the p-value for the test.}
-#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis. NYI.}
+#' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
 #' \item{estimate}{the estimated equation value, just the weighted sum of the sample Sharpe ratios. Annualized}
 #' \item{null.value}{the specified hypothesized value of the sum of Sharpes.}
 #' \item{alternative}{a character string describing the alternative hypothesis.}
@@ -520,15 +519,20 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*6,mean=0.02,sd=0.1),ncol=6)))
 #' print(etc)
 #'
-#' etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),alternative='greater')
+#' etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),
+#'   alternative='greater')
 #' print(etc)
 #'
-#' etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),contrasts=c(1,1,1,1),null.value=-0.1,alternative='greater')
+#' etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),
+#'   contrasts=c(1,1,1,1),null.value=-0.1,alternative='greater')
 #' print(etc)
 #'
-#' etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),as.sr(rnorm(30)),as.sr(rnorm(100))))
+#' inp <- list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),
+#'             as.sr(rnorm(30)),as.sr(rnorm(100)))
+#' etc <- sr_unpaired_test(inp)
 #'
-#' etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(rnorm(100,mean=0.2))),contrasts=c(1,1),null.value=0.2)
+#' inp <- list(as.sr(rnorm(500)),as.sr(rnorm(100,mean=0.2,sd=1)))
+#' etc <- sr_unpaired_test(inp,contrasts=c(1,1),null.value=0.2)
 #' etc$conf.int
 #'
 #' @export

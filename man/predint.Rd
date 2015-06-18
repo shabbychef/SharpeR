@@ -4,22 +4,28 @@
 \alias{predint}
 \title{prediction interval for Sharpe ratio}
 \usage{
-predint(x,n,ope=1,level=0.95,
+predint(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 				 level.lo=(1-level)/2,level.hi=1-level.lo)
 }
 \arguments{
 \item{x}{a (non-empty) numeric vector of data values, or an
 object of class \code{sr}.}
 
-\item{n}{the number of future observations.}
+\item{oosdf}{the future (or 'out of sample', thus 'oos') degrees of freedom.
+In the vanilla Sharpe case, this is the number of future observations
+\emph{minus one}.}
+
+\item{oosrescal}{the rescaling parameter for the future Sharpe ratio. The default value
+holds for the case of unattributed models ('vanilla Shape'), but can be set
+to some other value to deal with the magnitude of attribution factors in the
+future period.}
 
 \item{ope}{the number of observations per 'epoch'. For convenience of
 interpretation, The Sharpe ratio is typically quoted in 'annualized'
 units for some epoch, that is, 'per square root epoch', though returns
 are observed at a frequency of \code{ope} per epoch.
-The default value is 1, meaning the code will not attempt to guess
-what the observation frequency is, and no annualization adjustments
-will be made.}
+The default value is to take the same \code{ope} from the input \code{x}
+object, if it is unambiguous.}
 
 \item{level}{the confidence level required.}
 
@@ -46,8 +52,8 @@ estimate of Sharpe and the as yet unrealized returns.
 }
 \examples{
 # should reject null
-etc <- predint(rnorm(1000,mean=0.5,sd=0.1),n=128,ope=1)
-etc <- predint(matrix(rnorm(1000*5,mean=0.05),ncol=5),n=64,ope=1)
+etc <- predint(rnorm(1000,mean=0.5,sd=0.1),oosdf=127,ope=1)
+etc <- predint(matrix(rnorm(1000*5,mean=0.05),ncol=5),oosdf=63,ope=1)
 
 # check coverage
 mu <- 0.0005
@@ -61,7 +67,7 @@ sr1 <- as.sr(x1)
 sr2 <- as.sr(x2)
 \dontrun{
 # takes too long to run ...
-etc1 <- predint(sr1,n=n2,level=0.95)
+etc1 <- predint(sr1,oosdf=n2-1,level=0.95)
 is.ok <- (etc1[,1] <= sr2$sr) & (sr2$sr <= etc1[,2])
 covr <- mean(is.ok)
 }
@@ -78,8 +84,6 @@ Arxiv (2015).
 \url{http://arxiv.org/abs/1505.00829}
 }
 \seealso{
-\code{\link{reannualize}}
-
 \code{\link{confint.sr}}.
 
 Other sr: \code{\link{as.sr}},
