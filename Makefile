@@ -43,6 +43,7 @@ PKG_TGZ 					 = $(PKG_NAME)_$(PKG_VERSION).tar.gz
 LOCAL 						:= .local
 RCHECK 						 = $(PKG_NAME).Rcheck
 RCHECK_SENTINEL 	 = $(RCHECK)/$(PKG_NAME)/DESCRIPTION
+DRAT_SENTINEL   	 = .drat_$(PKG_TGZ)
 
 # Specify the directory holding R binaries. To use an alternate R build (say a
 # pre-prelease version) use `make RBIN=/path/to/other/R/` or `export RBIN=...`
