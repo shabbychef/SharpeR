@@ -175,7 +175,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 
 # these are phony targets
 .PHONY: help tags all \
-	gitpull gitpush staged \
+	gitpull gitpush dratit staged \
 	news docs build install testthat tests \
 	staging_d local_d \
 	clean realclean \
@@ -215,6 +215,7 @@ help:
 	@echo "---------------"
 	@echo "  check      Make build, then R CMD check the package as CRAN."
 	@echo "  gitpush    Yes, I am lazy"
+	@echo "  dratit     Make build, then upload package to my drat repo."
 	@echo ""
 	@echo "Using R in: $(RBIN)"
 	@echo "Set the RBIN environment variable to change this."
@@ -345,6 +346,12 @@ check: $(RCHECK_SENTINEL)
 
 checksee : $(RCHECK_SENTINEL)
 	okular $(RCHECK)/$(PKG_NAME)-manual.pdf
+
+$(DRAT_SENTINEL) : $(PKG_TGZ)
+	$(call WARN_DEPS)
+	$(R) --slave -e "drat:::insertPackage('$<',repodir='~/github/drat',commit=TRUE)"
+
+dratit : $(DRAT_SENTINEL)
 
 #$(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf : $(VIGNETTE_SRCS) $(RCHECK_SENTINEL)
 
