@@ -18,6 +18,7 @@ nodist
 rebuildTags.sh
 SharpeR_\d.\d+.tar.gz
 SharpeR.Rcheck
+^github_extra
 unit_test.log
 asymarko_example.ipynb
 fooz.R

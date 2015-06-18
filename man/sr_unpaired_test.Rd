@@ -27,11 +27,19 @@ must be one of \code{"two.sided"} (default), \code{"greater"} or
 interpretation, The Sharpe ratio is typically quoted in 'annualized'
 units for some epoch, that is, 'per square root epoch', though returns
 are observed at a frequency of \code{ope} per epoch.
-The default value is 1, meaning the code will not attempt to guess,
-what the observation frequency is, and no annualization adjustments
-will be made.}
+The default value is to take the same \code{ope} from the input \code{srs}
+object, if it is unambiguous. Otherwise, it defaults to 1, with a warning
+thrown.}
 
 \item{conf.level}{confidence level of the interval.}
+
+\item{ope}{the number of observations per 'epoch'. For convenience of
+interpretation, The Sharpe ratio is typically quoted in 'annualized'
+units for some epoch, that is, 'per square root epoch', though returns
+are observed at a frequency of \code{ope} per epoch.
+The default value is 1, meaning the code will not attempt to guess
+what the observation frequency is, and no annualization adjustments
+will be made.}
 
 \item{...}{further arguments to be passed to or from methods.}
 }
@@ -60,9 +68,22 @@ code tests the null hypothesis
 against two or one sided alternatives.
 }
 \examples{
-# should reject null
-x <- sr_unpaired_test(as.sr(matrix(rnorm(1000*5,mean=0.02,sd=0.1),ncol=5)))
-x <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),as.sr(rnorm(30))))
+# basic usage
+set.seed(as.integer(charToRaw("set the seed")))
+# default contrast is 1,-1,1,-1,1,-1
+etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*6,mean=0.02,sd=0.1),ncol=6)))
+print(etc)
+
+etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),alternative='greater')
+print(etc)
+
+etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),contrasts=c(1,1,1,1),null.value=-0.1,alternative='greater')
+print(etc)
+
+etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),as.sr(rnorm(30)),as.sr(rnorm(100))))
+
+etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(rnorm(100,mean=0.2)),contrasts=c(1,1),null.value=0.2)
+etc$conf.int
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

@@ -105,11 +105,169 @@ print(as.sr(some.rets))
 
 ```
 ##      SR/sqrt(yr) Std. Error t value  Pr(>t)    
-## IBM         0.43       0.32     1.3 0.08949 .  
-## AAPL        1.05       0.32     3.3 0.00057 ***
+## IBM         0.43       0.32     1.3 0.08950 .  
+## AAPL        1.05       0.32     3.3 0.00056 ***
 ## XOM         0.42       0.32     1.3 0.09601 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+## Unpaired test for Sharpe Ratio
+
+A single equation on multiple signal-noise ratios with independent samples
+can be computed using the `sr_unpaired_test` function. This code performs
+inference via the [Upsilon distribution](http://arxiv.org/abs/1505.00829).
+The `sr_test` also acts as a frontend for this code, for the two sample
+case.
+
+First we perform this test under the null, using randomly generated data.
+We are testing the sum of three differences of Sharpes here.
+
+```r
+set.seed(9001)
+pvals <- replicate(1000, {
+    X <- matrix(rnorm(500 * 6), ncol = 6)
+    inp <- as.sr(X)
+    etc <- sr_unpaired_test(inp)
+    etc$p.value
+})
+require(ggplot2)
+
+data <- data.frame(pvals = pvals)
+# empirical CDF of the p-values; should be uniform
+ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist = qunif) + 
+    geom_abline(slope = 1, intercept = 0, colour = "red") + 
+    theme(text = element_text(size = 8)) + labs(title = "P-P plot")
+
+print(ph)
+```
+
+<img src="github_extra/figure/unpaired_null-1.png" title="plot of chunk unpaired_null" alt="plot of chunk unpaired_null" width="700px" height="600px" />
+
+Now we repeat for non-zero null value:
+
+```r
+set.seed(9002)
+pvals <- replicate(1000, {
+    zeta <- 0.1
+    sg <- 0.01
+    X <- matrix(rnorm(500 * 6, mean = zeta * sg, sd = sg), 
+        ncol = 6)
+    inp <- as.sr(X)
+    etc <- sr_unpaired_test(inp, contrasts = rep(1, 
+        dim(X)[2]), null.value = dim(X)[2] * zeta)
+    etc$p.value
+})
+require(ggplot2)
+
+data <- data.frame(pvals = pvals)
+# empirical CDF of the p-values; should be uniform
+ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist = qunif) + 
+    geom_abline(slope = 1, intercept = 0, colour = "red") + 
+    theme(text = element_text(size = 8)) + labs(title = "P-P plot")
+
+print(ph)
+```
+
+<img src="github_extra/figure/unpaired_null_two-1.png" title="plot of chunk unpaired_null_two" alt="plot of chunk unpaired_null_two" width="700px" height="600px" />
+
+Now for real data.  We download monthly returns of the three Fama French factors plus momentum 
+(the original Fifth Beatle), then divide into January and non-January periods. We regress
+Momentum against the other three factors, then convert the linear regression to a Sharpe ratio
+estimate. The two Sharpe ratios are then thrown into an unpaired sample test. We reject the null
+of equal idiosyncratic momentum in January versus the rest of the year at the 0.05 level.
+Is this 'the January Effect'? Perhaps.
+
+
+```r
+library(xts)
+library(Quandl)
+
+# auth-fu
+quandl.auth <- Sys.getenv("QUANDL_AUTH")
+options(quandl.auth = ifelse(nchar(quandl.auth), quandl.auth, 
+    ""))
+rm(quandl.auth)
+Quandl.auth(options()$quandl.auth)
+
+# get data!
+fff.xts <- Quandl("KFRENCH/FACTORS_M", start_date = "1927-01-31", 
+    end_date = "2014-12-31", type = "xts")
+
+mom.xts <- Quandl("KFRENCH/MOMENTUM_M", start_date = "1927-01-31", 
+    end_date = "2014-12-31", type = "xts")
+colnames(mom.xts) <- c("UMD")
+
+# munge data!
+ff4.xts <- cbind(fff.xts[, c("SMB", "HML", "RF")], 
+    mom.xts)
+ff4.xts$Mkt <- fff.xts[, "Mkt-RF"] + fff.xts[, "RF"]
+# re-sort
+ff4.xts <- ff4.xts[, c("Mkt", "SMB", "HML", "UMD", 
+    "RF")]
+
+# January or not
+is.jan <- months(index(ff4.xts)) == "January"
+
+# perform linear regression
+mod.jan <- lm(UMD ~ Mkt + SMB + HML, data = ff4.xts[is.jan, 
+    ])
+mod.rem <- lm(UMD ~ Mkt + SMB + HML, data = ff4.xts[!is.jan, 
+    ])
+
+# convert lm models to Sharpes
+sr.jan <- as.sr(mod.jan)
+sr.rem <- as.sr(mod.rem)
+
+# perform unpaired test
+etc <- sr_unpaired_test(list(sr.jan, sr.rem), contrasts = c(1, 
+    -1), null.value = 0, ope = 12)
+print(etc)
+```
+
+```
+## 
+## 	unpaired k-sample sr-test
+## 
+## data:  list(sr.jan, sr.rem)
+## df = 80, NA = 1000, p-value = 0.002
+## alternative hypothesis: true weighted sum of signal-noise ratios is not equal to 0
+## 95 percent confidence interval:
+##  -2.44 -0.57
+## sample estimates:
+## equation on Sharpe ratios 
+##                      -1.5
+```
+
+## Prediction Intervals
+
+Using the [Upsilon distribution](http://arxiv.org/abs/1505.00829), we can
+compute prediction intervals for future realized Sharpe ratio, with coverage
+frequency over the full experiment. Here is an example on fake data:
+
+
+```r
+set.seed(9003)
+n1 <- 500
+n2 <- 100
+okvals <- replicate(500, {
+    zeta <- 0.1
+    sg <- 0.01
+    X <- rnorm(n1 + n2, mean = zeta * sg, sd = sg)
+    inp <- as.sr(X[1:n1])
+    oos <- as.sr(X[n1 + (1:n2)])
+    
+    pint <- predint(inp, n = n2, ope = 1)
+    is.ok <- (pint[, 1] <= oos$sr) & (oos$sr <= pint[, 
+        2])
+    is.ok
+})
+coverage <- mean(okvals)
+print(coverage)
+```
+
+```
+## [1] 0.95
 ```
 
 ## Inference on the Markowitz Portfolio
@@ -148,7 +306,7 @@ print(t(wald.stats))
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.22  2.9 0.16
+## [1,] -0.22  2.9 0.15
 ```
 
 ```r
@@ -160,5 +318,5 @@ if (require(sandwich)) {
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.21  2.8 0.17
+## [1,] -0.21  2.8 0.16
 ```

@@ -22,7 +22,7 @@ qco_sropt(p,df1,df2,z.s,ope,lower.tail=TRUE,log.p=FALSE,lb=0,ub=Inf)
 interpretation, The Sharpe ratio is typically quoted in 'annualized'
 units for some epoch, that is, 'per square root epoch', though returns
 are observed at a frequency of \code{ope} per epoch.
-The default value is 1, meaning the code will not attempt to guess,
+The default value is 1, meaning the code will not attempt to guess
 what the observation frequency is, and no annualization adjustments
 will be made.}
 

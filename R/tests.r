@@ -248,6 +248,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 
 # SR test#FOLDUP
 #getAnywhere("t.test.default")
+#getAnywhere("print.htest")
 #' @title test for Sharpe ratio
 #'
 #' @description 
@@ -448,7 +449,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 
 	names(df) <- "df"
 	names(zeta) <- "signal-noise ratio"
-	#attr(cint, "conf.level") <- conf.level
+	attr(cint, "conf.level") <- conf.level
 	retval <- list(statistic = statistic, parameter = df,
 								 estimate = estimate, p.value = pval, 
 								 alternative = alternative, null.value = zeta,
@@ -485,8 +486,14 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #'  Defaults to \code{c(1,-1,1,...)}.
 #' @param null.value the constant null value, the \eqn{b}{b}.
 #'  Defaults to 0.
+#' @param ope the number of observations per 'epoch'. For convenience of
+#'   interpretation, The Sharpe ratio is typically quoted in 'annualized' 
+#'   units for some epoch, that is, 'per square root epoch', though returns 
+#'   are observed at a frequency of \code{ope} per epoch. 
+#'   The default value is to take the same \code{ope} from the input \code{srs}
+#'   object, if it is unambiguous. Otherwise, it defaults to 1, with a warning
+#'   thrown.
 #' @inheritParams sr_test
-#' @param conf.level confidence level of the interval. 
 #' @template param-ope
 #' @template param-ellipsis
 #' @keywords htest
@@ -507,13 +514,26 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @template ref-upsilon
 #' @rdname sr_unpaired_test
 #' @examples 
-#' # should reject null
-#' x <- sr_unpaired_test(as.sr(matrix(rnorm(1000*5,mean=0.02,sd=0.1),ncol=5)))
-#' x <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),as.sr(rnorm(30))))
+#' # basic usage
+#' set.seed(as.integer(charToRaw("set the seed")))
+#' # default contrast is 1,-1,1,-1,1,-1
+#' etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*6,mean=0.02,sd=0.1),ncol=6)))
+#' print(etc)
+#'
+#' etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),alternative='greater')
+#' print(etc)
+#'
+#' etc <- sr_unpaired_test(as.sr(matrix(rnorm(1000*4,mean=0.0005,sd=0.01),ncol=4)),contrasts=c(1,1,1,1),null.value=-0.1,alternative='greater')
+#' print(etc)
+#'
+#' etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),as.sr(rnorm(30)),as.sr(rnorm(100))))
+#'
+#' etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(rnorm(100,mean=0.2)),contrasts=c(1,1),null.value=0.2)
+#' etc$conf.int
 #'
 #' @export
 sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.sided","less","greater"),
-														 ope=1,conf.level=0.95) {
+														 ope=NULL,conf.level=0.95) {
 	# much of this stolen from t.test.default:
 	alternative <- match.arg(alternative)
 	if (!missing(null.value) && (length(null.value) != 1 || is.na(null.value))) 
@@ -546,6 +566,18 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 	# get rid of matrix, vector, etc:
 	contrasts <- c(contrasts)
 	vals.sr <- c(vals.sr)
+	vals.ope <- c(vals.ope)
+
+	# guess ope
+	if (is.null(ope)) {
+		uni.ope <- unique(vals.ope)
+		if (length(uni.ope) == 1) {
+			ope <- uni.ope
+		} else {
+			warning("ambiguous ope, guessing 1")
+			ope <- 1.0
+		}
+	}
 
 	# nb. the Sharpe is tstat * sqrt(ope) * rescal
 	# deannualize
@@ -556,36 +588,41 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 	ups.df <- c(vals.df)
 	ups.val <- conval * null.value
 	
+	#2FIX: lower tail here?
+	less.lt <- FALSE
 	if (alternative == "less") {
-		#2FIX: lower tail here?
-		pval <- sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=FALSE)
+		pval <- sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=less.lt)
+		ciq <- c(0.0,conf.level)
 	}
 	else if (alternative == "greater") {
-		#2FIX: lower tail here?
-		pval <- sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=TRUE)
+		pval <- sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=! less.lt)
+		ciq <- c(1.0-conf.level,1.0)
 	}
 	else {
-		#2FIX: lower tail here?
-		pval <- .oneside2two(sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=FALSE))
+		pval <- .oneside2two(sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=less.lt))
+		ciq <- 0.5 * (1 + conf.level * c(-1.0,1.0))
 	}
+	# figure out cis
+	cint <- sadists::qupsilon(ciq,df=ups.df,t=ups.t)
+	# convert back
+	cint <- cint / conval
+	cint <- .annualize(cint,ope)
+	attr(cint, "conf.level") <- conf.level
+
 	statistic <- NULL 
 	#names(statistic) <- "null"
+	names(null.value) <- "weighted sum of signal-noise ratios"
 
 	estimate <- sum(contrasts * vals.sr)
 	estimate <- .annualize(estimate,ope)
 	method <- "unpaired k-sample sr-test"
 	names(estimate) <- "equation on Sharpe ratios"
 
-	# later
-	cint <- NULL
-	#attr(cint, "conf.level") <- conf.level
-
 	# 2FIX:
 	names(ups.df) <- "df"
 	retval <- list(statistic = statistic, parameter = ups.df,
 								 estimate = estimate, p.value = pval, 
-								 alternative = alternative, null.value = null.value,
-								 conf.int = cint,
+								 alternative = alternative, null.value = null.value, conf.int = cint,
 								 method = method, data.name = dname)
 	class(retval) <- "htest"
 	return(retval)

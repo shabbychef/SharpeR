@@ -75,6 +75,38 @@ test_that("sr_test",{#FOLDUP
 	# sentinel
 	expect_true(TRUE)
 })#UNFOLD
+test_that("sr_unpaired_test",{#FOLDUP
+	set.char.seed("6036d6e3-b3e9-415a-bd2b-bfc19dbd45ea")
+	X <- matrix(rnorm(1000*6),ncol=6)
+	inp <- as.sr(X)
+	nv <- dim(X)[2]
+	etc <- sr_unpaired_test(inp)
+	etc <- sr_unpaired_test(inp,alternative='two.sided')
+	etc <- sr_unpaired_test(inp,alternative='less')
+	etc <- sr_unpaired_test(inp,alternative='greater')
+	etc <- sr_unpaired_test(inp,ope=1)
+	etc <- sr_unpaired_test(inp,ope=10)
+	etc <- sr_unpaired_test(inp,contrasts=runif(nv))
+	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5)
+	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='less')
+	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='greater')
+
+	inp <- apply(X,2,as.sr)
+	nv <- length(inp)
+	etc <- sr_unpaired_test(inp)
+	etc <- sr_unpaired_test(inp,alternative='two.sided')
+	etc <- sr_unpaired_test(inp,alternative='less')
+	etc <- sr_unpaired_test(inp,alternative='greater')
+	etc <- sr_unpaired_test(inp,ope=1)
+	etc <- sr_unpaired_test(inp,ope=10)
+	etc <- sr_unpaired_test(inp,contrasts=runif(nv))
+	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5)
+	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='less')
+	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='greater')
+
+	# sentinel
+	expect_true(TRUE)
+})#UNFOLD
 test_that("sr_equality_test",{#FOLDUP
 	set.char.seed("0b144107-4de8-4e00-95f7-d746db3aef8e")
 	X <- matrix(rnorm(1000*5),ncol=5)

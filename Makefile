@@ -204,7 +204,8 @@ help:
 	@echo "  the_vignette   Build the vignette in the local context."
 	@echo "  clean      Do some cleanup."
 	@echo "  realclean  Do lots of cleanup."
-	@echo "  codecov    Code coverage."
+	@echo "  codecov    Code coverage, uploaded to codecov.io."
+	@echo "  shinecov   Code coverage in local shiny window."
 	@echo "  suggestions whee."
 	@echo ""
 	@echo "  subadvice  CRAN submission advice."
@@ -251,6 +252,7 @@ TAGS:
 
 README.md : $(NODIST_R_DIR)/README.md
 	mv $< $@
+	rsync -av --delete $(NODIST_R_DIR)/github_extra/ ./github_extra/
 
 # macro for local R
 R_LOCALLY  						= R_LIBS=$(LOCAL) $(R) $(R_FLAGS)
@@ -459,6 +461,9 @@ newbuild :
 	$(MAKE) docs
 	$(MAKE) tags
 	$(MAKE) build
+
+shinecov : 
+	Rscript -e 'library(covr);shine(package_coverage())'
 
 # http://krisjordan.com/essays/encrypting-with-rsa-key-pairs
 token : .codecov_token
