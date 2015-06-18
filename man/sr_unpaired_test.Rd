@@ -82,7 +82,7 @@ print(etc)
 
 etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(runif(200)-0.5),as.sr(rnorm(30)),as.sr(rnorm(100))))
 
-etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(rnorm(100,mean=0.2)),contrasts=c(1,1),null.value=0.2)
+etc <- sr_unpaired_test(list(as.sr(rnorm(500)),as.sr(rnorm(100,mean=0.2))),contrasts=c(1,1),null.value=0.2)
 etc$conf.int
 }
 \author{
