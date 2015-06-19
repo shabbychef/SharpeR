@@ -513,6 +513,7 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 		srx <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
 	}
 	if (is.null(ope)) { ope <- srx$ope }
+	srx <- reannualize(srx,new.ope=1)
 	cols <- mapply(function(sx,dfx,rescalx) {
 		cons <- 1 / sqrt(rescalx^2 + oosrescal^2)
 		udf <- c(dfx,oosdf)
