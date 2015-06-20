@@ -197,8 +197,8 @@ test_that("confint.sropt coverage",{#FOLDUP
 	}
 })#UNFOLD
 #UNFOLD
-context("estimation functions: prediction coverage")#FOLDUP
-test_that("predict runs at all",{#FOLDUP
+context("estimation functions: prediction intervals")#FOLDUP
+test_that("predint runs at all",{#FOLDUP
 	set.char.seed("080c6f73-834e-4d10-a6fa-4b27dc266b24")
 
 	ngen <- ceiling(THOROUGHNESS * 32)
@@ -220,6 +220,27 @@ test_that("predict runs at all",{#FOLDUP
 			}
 		}
 	}
+	# sentinel
+	expect_true(TRUE)
+})#UNFOLD
+test_that("predint not fooled by annualization",{#FOLDUP
+	set.char.seed("94cbb2a6-b497-48d4-9139-e987364f8a0f")
+
+	isn <- 200
+	oosn <- 100
+	ope <- 253
+	sg <- 0.013
+	zeta <- 1
+	x <- rnorm(isn,mean=(zeta/sqrt(ope))*sg,sd=sg)
+	srx1 <- as.sr(x,ope=1)
+	srx2 <- as.sr(x,ope=ope)
+	nominal.coverage <- 0.90
+	aci1 <- predint(srx1,oosdf=oosn-1,ope=1,level=nominal.coverage)
+	aci2 <- predint(srx2,oosdf=oosn-1,ope=1,level=nominal.coverage)
+	errs <- unlist(aci1) - unlist(aci2)
+
+	expect_less_than(max(abs(errs)),1e-4)
+
 	# sentinel
 	expect_true(TRUE)
 })#UNFOLD

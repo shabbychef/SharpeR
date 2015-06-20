@@ -1,4 +1,7 @@
 
+2015-06-19 Steven E. Pav <shabbychef@gmail.com>
+* prediction intervals should not depend on annualization.
+
 2015-06-18 Steven E. Pav <shabbychef@gmail.com>
 * unpaired k sample test of Sharpe.
 * rely on same for unpaired 2 sample test.
