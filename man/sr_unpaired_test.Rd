@@ -11,7 +11,10 @@ sr_unpaired_test(srs,contrasts=NULL,null.value=0,
 \arguments{
 \item{srs}{a (non-empty) list of objects of class \code{sr}, each containing
 a scalar sample Sharpe estimate. Or a single object of class \code{sr} with
-multiple Sharpe estimates.}
+multiple Sharpe estimates. If the \code{sr} objects have different
+annualizations (\code{ope} parameters), a warning is thrown, since
+it is presumed that the contrasts all have the same units, but the
+test proceeds.}
 
 \item{contrasts}{an array of the constrasts, the \eqn{a_j}{a_j} values.
 Defaults to \code{c(1,-1,1,...)}.}

@@ -481,7 +481,10 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #'
 #' @param srs a (non-empty) list of objects of class \code{sr}, each containing
 #'  a scalar sample Sharpe estimate. Or a single object of class \code{sr} with
-#'  multiple Sharpe estimates.
+#'  multiple Sharpe estimates. If the \code{sr} objects have different
+#'  annualizations (\code{ope} parameters), a warning is thrown, since
+#'  it is presumed that the contrasts all have the same units, but the
+#'  test proceeds.
 #' @param contrasts an array of the constrasts, the \eqn{a_j}{a_j} values.
 #'  Defaults to \code{c(1,-1,1,...)}.
 #' @param null.value the constant null value, the \eqn{b}{b}.
@@ -572,9 +575,13 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 	vals.sr <- c(vals.sr)
 	vals.ope <- c(vals.ope)
 
-	# guess ope
+	# check ope
+	uni.ope <- unique(vals.ope)
+	if (length(uni.ope) != 1) {
+		warning("ambiguous ope; check units of your contrasts!")
+	}
+	# inferr missing ope
 	if (is.null(ope)) {
-		uni.ope <- unique(vals.ope)
 		if (length(uni.ope) == 1) {
 			ope <- uni.ope
 		} else {
