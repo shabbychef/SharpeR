@@ -254,7 +254,7 @@ TAGS:
 
 README.md : $(NODIST_R_DIR)/README.md
 	mv $< $@
-	rsync -av --delete $(NODIST_R_DIR)/github_extra/ ./github_extra/
+	rsync -av --delete $(NODIST_R_DIR)/github_extra/figure/ ./github_extra/figure/
 
 # macro for local R
 R_LOCALLY  						= R_LIBS=$(LOCAL) $(R) $(R_FLAGS)
