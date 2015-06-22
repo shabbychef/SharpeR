@@ -246,7 +246,7 @@ print(coverage)
 
 ```
 
-![nominal coverage](github_extra/figure/borat_coverage.jpg)
+![nominal coverage](github_extra/static/borat_coverage.jpg)
 
 For a more complicated example, consider the 'Sharpe' under the attribution
 model. Here we download the _daily_ data of the three Fama French factors, then
@@ -297,7 +297,7 @@ print(coverage)
 It is not clear if non-normality or omitted variable bias (or broken code!) 
 is to blame for the apparent conservatism of the prediction intervals in this case.
 
-![no nominal coverage](github_extra/figure/yuno.jpg)
+![no nominal coverage](github_extra/static/yuno.jpg)
 
 ## Inference on the Markowitz Portfolio
 
