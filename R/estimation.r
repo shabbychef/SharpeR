@@ -515,34 +515,13 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 	if (is.null(ope)) { ope <- srx$ope }
 	srx <- reannualize(srx,new.ope=1)
 	cols <- mapply(function(sx,dfx,rescalx) {
-		cons <- 1 / sqrt(rescalx^2 + oosrescal^2)
+		ocons <- sqrt(rescalx^2 + oosrescal^2)
 		udf <- c(dfx,oosdf)
-		# eventually this guesswork involving uniroot will be replaced by another distribution
-		# that is similar to the upsilon, but has another chi in the denominator...
-		pfunc <- function(y,lvl) { 
-			ut <- cons * c(sx,-y)
-			retv <- lvl - sadists::pupsilon(0,df=udf,t=ut,lower.tail=TRUE)
-		}
+
 		ci <- lapply(c(level.lo,level.hi),function(lvl) {
 			if ((0 < lvl) && (lvl < 1)) {
-				# this is the only part that needs to be fixed:
-				# how to guess the interval.
-				lwt <- 3
-				alps <- (1/(lwt+1)) * (lwt*lvl + c(0,1))
-				invl <- sx + (1/cons) * qnorm(alps)
-				falps <- unlist(lapply(invl,pfunc,lvl=lvl))
-				itr <- 0
-				while ((prod(sign(falps)) > 0) && (itr < 60)) {
-					alps <- 0.5 * (alps + c(0,1))
-					invl <- sx + (1/cons) * qnorm(alps)
-					falps <- unlist(lapply(invl,pfunc,lvl=lvl))
-					itr <- itr + 1
-				}
-				invl <- sx + (1/cons) * qnorm(0.5 * (lvl + c(0,1)))
-				etc <- uniroot(pfunc,interval=invl,
-											 lower=invl[1],upper=invl[2],
-											 f.lower=falps[1],f.upper=falps[2],lvl=lvl)
-				yval <- .annualize(etc$root,ope)
+				yval <- sadists::qkprime(lvl,v1=udf[1],v2=udf[2],a=sx,b=ocons,order.max=5)
+				yval <- .annualize(yval,ope)
 			} else {
 				yval <- ifelse(lvl >= 1,Inf,-Inf)
 			}

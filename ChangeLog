@@ -1,6 +1,7 @@
 
 2015-06-19 Steven E. Pav <shabbychef@gmail.com>
 * prediction intervals should not depend on annualization.
+* change prediction intervals to use kprime, not root finding on upsilon.
 
 2015-06-18 Steven E. Pav <shabbychef@gmail.com>
 * unpaired k sample test of Sharpe.

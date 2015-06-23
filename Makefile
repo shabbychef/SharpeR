@@ -30,7 +30,7 @@ M4_FILES					?= $(wildcard m4/*.m4)
 VMAJOR 						 = 1
 VMINOR 						 = 0
 VPATCH  					 = 0
-VDEV 							 = .6000
+VDEV 							 = .7000
 VERSION 					 = $(VMAJOR).$(VMINOR).$(VPATCH)$(VDEV)
 TODAY 						:= $(shell date +%Y-%m-%d)
 
@@ -217,6 +217,7 @@ help:
 	@echo "  check      Make build, then R CMD check the package as CRAN."
 	@echo "  gitpush    Yes, I am lazy"
 	@echo "  dratit     Make build, then upload package to my drat repo."
+	@echo "  tag        suggestions for tagging a release."
 	@echo ""
 	@echo "Using R in: $(RBIN)"
 	@echo "Set the RBIN environment variable to change this."
@@ -352,7 +353,7 @@ $(DRAT_SENTINEL) : $(PKG_TGZ)
 	$(call WARN_DEPS)
 	$(R) --slave -e "drat:::insertPackage('$<',repodir='~/github/drat',commit=TRUE)"
 
-dratit : $(DRAT_SENTINEL)
+dratit : tag $(DRAT_SENTINEL)
 
 #$(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf : $(VIGNETTE_SRCS) $(RCHECK_SENTINEL)
 
