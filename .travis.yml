@@ -3,7 +3,7 @@ sudo: required
 
 language: r
 
-r_packages :
+r_binary_packages :
   - matrixcalc
   - xtable
   - xts
