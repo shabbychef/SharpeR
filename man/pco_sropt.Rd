@@ -51,7 +51,7 @@ to perform inference on \eqn{\zeta_*}{zeta*} given observed statistic
 }
 \details{
 Suppose \eqn{z_*}{z*} follows a \emph{Maximal Sharpe ratio} distribution
-(see \code{\link{SharpeR}}) for known degrees of freedom, and 
+(see \code{\link{SharpeR-package}}) for known degrees of freedom, and 
 unknown non-centrality parameter \eqn{\zeta_*}{zeta*}. The 
 'confidence distribution' views \eqn{\zeta_*}{zeta*} as a random
 quantity once \eqn{z_*}{z*} is observed. As such, the CDF of

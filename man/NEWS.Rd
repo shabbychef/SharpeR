@@ -2,10 +2,13 @@
 % Please edit documentation in R/SharpeR.r
 \name{SharpeR-NEWS}
 \alias{SharpeR-NEWS}
-\title{News for package 'SharpeR':
+\title{News for package 'SharpeR':}
+\description{
+News for package 'SharpeR'
 
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-\newcommand{\SharpeR}{\CRANpkg{SharpeR}}}
+\newcommand{\SharpeR}{\CRANpkg{SharpeR}}
+}
 \section{Changes in \SharpeR{} Version 1.0.0 (2015-06-18) }{
 
 

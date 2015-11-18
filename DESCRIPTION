@@ -34,4 +34,4 @@ Collate:
     'estimation.r'
     'tests.r'
     'unified.r'
-RoxygenNote: 5.0.0
+RoxygenNote: 5.0.1

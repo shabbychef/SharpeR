@@ -193,6 +193,10 @@ NULL
 
 #' @title News for package 'SharpeR':
 #'
+#' @description 
+#'
+#' News for package 'SharpeR'
+#'
 #' \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 #'
