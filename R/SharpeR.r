@@ -172,7 +172,7 @@
 #' and Portfolio Theory." Scandinavian Journal of Statistics 38, no. 2 (2011):
 #' 311--331. \url{http://dx.doi.org/10.1111/j.1467-9469.2011.00729.x}
 #'
-#' @name SharpeR
+#' @name SharpeR-package
 #' @rdname SharpeR
 #' @docType package
 #' @title statistics concerning Sharpe ratio and Markowitz portfolio
