@@ -546,7 +546,7 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 }
 
 #MLE of the ncp based on a single F-stat
-.F_ncp_MLE_single <- function(Fs,df1,df2,ub=NULL,lb=0) {
+.F_ncp_MLE_single <- function(Fs,df1,df2,ub=NULL,lb=0) { # nocov start
 	if (Fs <= 1) { return(0.0) }  # Spruill's Thm 3.1, eqn 8
 	max.func <- function(z) { df(Fs,df1,df2,ncp=z,log=TRUE) }
 
@@ -563,7 +563,7 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 	}
 	ncp.MLE <- optimize(max.func,c(lb,ub),maximum=TRUE)$maximum;
 	return(ncp.MLE)
-}
+} # nocov end
 .F_ncp_MLE <- Vectorize(.F_ncp_MLE_single,
 											vectorize.args = c("Fs","df1","df2"),
 											SIMPLIFY = TRUE)
