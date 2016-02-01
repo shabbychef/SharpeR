@@ -45,13 +45,13 @@
 #'
 #' The \code{sr} class contains information about a rescaled t-statistic.
 #' The following are list attributes of the object:
-#' \itemize{
-#' \item \code{sr} The Sharpe ratio statistic.
-#' \item \code{df} The d.f. of the equivalent t-statistic.
-#' \item \code{c0} The drag 'risk free rate' used.
-#' \item \code{ope} The 'observations per epoch'.
-#' \item \code{rescal} The rescaling parameter.
-#' \item \code{epoch} The string name of the 'epoch'.
+#' \describe{
+#' \item{sr}{The Sharpe ratio statistic.}
+#' \item{df}{The d.f. of the equivalent t-statistic.}
+#' \item{c0}{The drag 'risk free rate' used.}
+#' \item{ope}{The 'observations per epoch'.}
+#' \item{rescal}{The rescaling parameter.}
+#' \item{epoch}{The string name of the 'epoch'.}
 #' }
 #'
 #' The stored Sharpe statistic, \code{sr} is equal to the t-statistic 
@@ -154,12 +154,14 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #'        to 'yr'.
 #' @keywords univar 
 #' @return a list containing the following components:
+#' \describe{
 #' \item{sr}{the annualized Sharpe ratio.}
 #' \item{df}{the t-stat degrees of freedom.}
 #' \item{c0}{the risk free term.}
 #' \item{ope}{the annualization factor.}
 #' \item{rescal}{the rescaling factor.}
 #' \item{epoch}{the string epoch.}
+#' }
 #' cast to class \code{sr}.
 #' @seealso sr-distribution functions, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}
 #' @rdname as.sr
@@ -554,14 +556,14 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL,...) {
 #'
 #' The \code{sropt} class contains information about a rescaled T^2-statistic.
 #' The following are list attributes of the object:
-#' \itemize{
-#' \item \code{sropt} The (optimal) Sharpe ratio statistic.
-#' \item \code{df1} The number of assets.
-#' \item \code{df2} The number of observations.
-#' \item \code{drag} The drag term, which is the 'risk free rate' divided by
-#' the maximum risk.
-#' \item \code{ope} The 'observations per epoch'.
-#' \item \code{epoch} The string name of the 'epoch'.
+#' \describe{
+#' \item{sropt}{The (optimal) Sharpe ratio statistic.}
+#' \item{df1}{The number of assets.}
+#' \item{df2}{The number of observations.}
+#' \item{drag}{The drag term, which is the 'risk free rate' divided by
+#' the maximum risk.}
+#' \item{ope}{The 'observations per epoch'.}
+#' \item{epoch}{The string name of the 'epoch'.}
 #' }
 #'
 #' For the most part, this constructor should \emph{not} be called directly,
@@ -585,6 +587,7 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL,...) {
 #'        to 'yr'.
 #' @keywords univar 
 #' @return a list cast to class \code{sropt}, with the following attributes:
+#' \describe{
 #' \item{sropt}{the optimal Sharpe statistic.}
 #' \item{df1}{the number of assets.}
 #' \item{df2}{the number of observed vectors.}
@@ -592,6 +595,7 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL,...) {
 #' \item{ope}{the input \code{ope} term.}
 #' \item{epoch}{the input \code{epoch} term.}
 #' \item{T2}{the Hotelling \eqn{T^2} statistic.}
+#' }
 #' @seealso \code{\link{as.sropt}}
 #' @rdname sropt
 #' @export 
@@ -843,19 +847,19 @@ print.sropt <- function(x,...) {
 #' between two rescaled T^2-statistics, useful for spanning
 #' tests, and inference on hedged portfolios.
 #' The following are list attributes of the object:
-#' \itemize{
-#' \item \code{sropt} The (optimal) Sharpe ratio statistic of
-#' the 'full' set of assets.
-#' \item \code{sropt_sub} The (optimal) Sharpe ratio statistic on
-#' some subset, or linear subspace, of the assets.
-#' \item \code{df1} The number of assets.
-#' \item \code{df2} The number of observations.
-#' \item \code{df1.sub} The number of degrees of freedom in the 
-#' hedge constraint.
-#' \item \code{drag} The drag term, which is the 'risk free rate' divided by
-#' the maximum risk.
-#' \item \code{ope} The 'observations per epoch'.
-#' \item \code{epoch} The string name of the 'epoch'.
+#' \describe{
+#' \item{sropt}{The (optimal) Sharpe ratio statistic of
+#' the 'full' set of assets.}
+#' \item{sropt_sub}{The (optimal) Sharpe ratio statistic on
+#' some subset, or linear subspace, of the assets.}
+#' \item{df1}{The number of assets.}
+#' \item{df2}{The number of observations.}
+#' \item{df1.sub}{The number of degrees of freedom in the 
+#' hedge constraint.}
+#' \item{drag}{The drag term, which is the 'risk free rate' divided by
+#' the maximum risk.}
+#' \item{ope}{The 'observations per epoch'.}
+#' \item{epoch}{The string name of the 'epoch'.}
 #' }
 #'
 #' For the most part, this constructor should \emph{not} be called directly,
@@ -876,6 +880,7 @@ print.sropt <- function(x,...) {
 #' @template param-ope
 #' @keywords univar 
 #' @return a list cast to class \code{del_sropt}, with attributes
+#' \describe{
 #' \item{sropt}{the optimal Sharpe statistic.}
 #' \item{sropt.sub}{the optimal Sharpe statistic on the subspace.}
 #' \item{df1}{the number of assets.}
@@ -885,8 +890,7 @@ print.sropt <- function(x,...) {
 #' \item{ope}{the input \code{ope} term.}
 #' \item{T2}{the Hotelling \eqn{T^2} statistic.}
 #' \item{T2.sub}{the Hotelling \eqn{T^2} statistic on the subspace.}
-#'
-#' roll.own <- sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,df1.sub=df1.sub,ope=ope)
+#' }
 #'
 #' @seealso \code{\link{as.del_sropt}}
 #' @rdname del_sropt
@@ -1125,6 +1129,67 @@ print.del_sropt <- function(x,...) {
 #X <- matrix(rnorm(1000*10,0.00001),ncol=10)
 #foo <- as.del_sropt(X,G)
 #print(foo)
+
+# create a summary#FOLDUP
+#' @title Summarize a Sharpe, or (delta) optimal Sharpe object.
+#'
+#' @description 
+#'
+#' Computes a \sQuote{summary} of an object, adding in some statistics.
+#'
+#' @details
+#'
+#' Enhances an object of class \code{sr}, \code{sropt} or \code{del_sropt} to also 
+#' include t- or T-statistics, p-values, and so on.
+#' 
+#' @usage
+#'
+#' summary(obj)
+#'
+#' @param obj an object of class \code{sr}, \code{sropt} or \code{del_sropt}.
+#' @return For an \code{sr} object input, the object cast to class \code{summary.sr} with some
+#' additional fields:
+#' \describe{
+#' \item{tval}{the equivalent t-statistic.}
+#' \item{pval}{the p-value under the null.}
+#' \item{serr}{the standard error of the Sharpe ratio.}
+#' }
+#'
+#' @seealso \code{\link{print.sr}}.
+#' @rdname summary
+#' @export summary
+#' @template etc
+#' @template sr
+#'
+#' @examples 
+#' # Sharpe's 'model': just given a bunch of returns.
+#' set.seed(1234)
+#' asr <- as.sr(rnorm(253*3),ope=253)
+#' summary(asr)
+summary <- function(obj) {
+	UseMethod("summary", obj)
+}
+#' @rdname summary
+#' @method summary sr
+#' @S3method summary sr
+summary.sr <- function(obj) {
+	obj$tval <- .sr2t(obj)
+	obj$pval <- pt(obj$tval,obj$df,lower.tail=FALSE)
+	obj$serr <- se(obj,type="t")
+	class(obj) <- "summary.sr"
+	obj
+}
+#' @rdname summary
+#' @method summary sropt
+#' @S3method summary sropt
+summary.sropt <- function(obj) {
+	obj$pval <- .sropt.pval(obj)
+	...
+	class(obj) <- "summary.sropt"
+	obj
+}
+
+#UNFOLD
 
 #for vim modeline: (do not edit)
 # vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r
