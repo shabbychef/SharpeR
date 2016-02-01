@@ -426,7 +426,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	dname <- deparse(substitute(z))
 
 	df <- z$df
-	if (df < 1) stop("not enough 'x' observations")
+	if (any(df < 1)) stop("not enough 'x' observations")
 	statistic <- .sr2t(z)
 	names(statistic) <- "t"
 	estimate <- z$sr
