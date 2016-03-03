@@ -1184,7 +1184,7 @@ summary.sr <- function(obj) {
 #' @S3method summary sropt
 summary.sropt <- function(obj) {
 	obj$pval <- .sropt.pval(obj)
-	...
+	#...
 	class(obj) <- "summary.sropt"
 	obj
 }

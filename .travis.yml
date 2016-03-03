@@ -14,6 +14,15 @@ r_binary_packages :
 r_github_packages :
   - jimhester/covr
 
+r_build_args : " --compact-vignettes=gs+qpdf"
+
 after_success:
   - Rscript -e 'library(covr);codecov()'
 
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+
+#for vim modeline: (do not edit)
+# vim:ts=2:sw=2:tw=79:fdm=indent:cms=#%s:syn=yaml:ft=yaml:ai:si:cin:nu:
