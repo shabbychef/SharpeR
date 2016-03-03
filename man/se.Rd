@@ -74,7 +74,7 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
   \code{\link{reannualize}},
   \code{\link{sr_equality_test}}, \code{\link{sr_test}},
   \code{\link{sr_unpaired_test}}, \code{\link{sr_vcov}},
-  \code{\link{sr}}
+  \code{\link{sr}}, \code{\link{summary}}
 }
 \keyword{htest}
 

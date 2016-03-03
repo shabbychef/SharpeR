@@ -34,6 +34,7 @@ computed from the given information.}
 }
 \value{
 a list cast to class \code{sropt}, with the following attributes:
+\describe{
 \item{sropt}{the optimal Sharpe statistic.}
 \item{df1}{the number of assets.}
 \item{df2}{the number of observed vectors.}
@@ -42,20 +43,21 @@ a list cast to class \code{sropt}, with the following attributes:
 \item{epoch}{the input \code{epoch} term.}
 \item{T2}{the Hotelling \eqn{T^2} statistic.}
 }
+}
 \description{
 Spawns an object of class \code{sropt}.
 }
 \details{
 The \code{sropt} class contains information about a rescaled T^2-statistic.
 The following are list attributes of the object:
-\itemize{
-\item \code{sropt} The (optimal) Sharpe ratio statistic.
-\item \code{df1} The number of assets.
-\item \code{df2} The number of observations.
-\item \code{drag} The drag term, which is the 'risk free rate' divided by
-the maximum risk.
-\item \code{ope} The 'observations per epoch'.
-\item \code{epoch} The string name of the 'epoch'.
+\describe{
+\item{sropt}{The (optimal) Sharpe ratio statistic.}
+\item{df1}{The number of assets.}
+\item{df2}{The number of observations.}
+\item{drag}{The drag term, which is the 'risk free rate' divided by
+the maximum risk.}
+\item{ope}{The 'observations per epoch'.}
+\item{epoch}{The string name of the 'epoch'.}
 }
 
 For the most part, this constructor should \emph{not} be called directly,

@@ -38,6 +38,7 @@ to 'yr'.}
 }
 \value{
 a list cast to class \code{del_sropt}, with attributes
+\describe{
 \item{sropt}{the optimal Sharpe statistic.}
 \item{sropt.sub}{the optimal Sharpe statistic on the subspace.}
 \item{df1}{the number of assets.}
@@ -47,8 +48,7 @@ a list cast to class \code{del_sropt}, with attributes
 \item{ope}{the input \code{ope} term.}
 \item{T2}{the Hotelling \eqn{T^2} statistic.}
 \item{T2.sub}{the Hotelling \eqn{T^2} statistic on the subspace.}
-
-roll.own <- sropt(z.s=z,z.sub=zsub,df1=10,df2=1000,df1.sub=df1.sub,ope=ope)
+}
 }
 \description{
 Spawns an object of class \code{del_sropt}.
@@ -58,19 +58,19 @@ The \code{del_sropt} class contains information about the difference
 between two rescaled T^2-statistics, useful for spanning
 tests, and inference on hedged portfolios.
 The following are list attributes of the object:
-\itemize{
-\item \code{sropt} The (optimal) Sharpe ratio statistic of
-the 'full' set of assets.
-\item \code{sropt_sub} The (optimal) Sharpe ratio statistic on
-some subset, or linear subspace, of the assets.
-\item \code{df1} The number of assets.
-\item \code{df2} The number of observations.
-\item \code{df1.sub} The number of degrees of freedom in the 
-hedge constraint.
-\item \code{drag} The drag term, which is the 'risk free rate' divided by
-the maximum risk.
-\item \code{ope} The 'observations per epoch'.
-\item \code{epoch} The string name of the 'epoch'.
+\describe{
+\item{sropt}{The (optimal) Sharpe ratio statistic of
+the 'full' set of assets.}
+\item{sropt_sub}{The (optimal) Sharpe ratio statistic on
+some subset, or linear subspace, of the assets.}
+\item{df1}{The number of assets.}
+\item{df2}{The number of observations.}
+\item{df1.sub}{The number of degrees of freedom in the 
+hedge constraint.}
+\item{drag}{The drag term, which is the 'risk free rate' divided by
+the maximum risk.}
+\item{ope}{The 'observations per epoch'.}
+\item{epoch}{The string name of the 'epoch'.}
 }
 
 For the most part, this constructor should \emph{not} be called directly,

@@ -143,7 +143,8 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
   \code{\link{predint}}, \code{\link{print.sr}},
   \code{\link{reannualize}}, \code{\link{se}},
   \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
-  \code{\link{sr_vcov}}, \code{\link{sr}}
+  \code{\link{sr_vcov}}, \code{\link{sr}},
+  \code{\link{summary}}
 }
 \keyword{htest}
 

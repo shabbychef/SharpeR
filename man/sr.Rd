@@ -37,13 +37,13 @@ Spawns an object of class \code{sr}.
 \details{
 The \code{sr} class contains information about a rescaled t-statistic.
 The following are list attributes of the object:
-\itemize{
-\item \code{sr} The Sharpe ratio statistic.
-\item \code{df} The d.f. of the equivalent t-statistic.
-\item \code{c0} The drag 'risk free rate' used.
-\item \code{ope} The 'observations per epoch'.
-\item \code{rescal} The rescaling parameter.
-\item \code{epoch} The string name of the 'epoch'.
+\describe{
+\item{sr}{The Sharpe ratio statistic.}
+\item{df}{The d.f. of the equivalent t-statistic.}
+\item{c0}{The drag 'risk free rate' used.}
+\item{ope}{The 'observations per epoch'.}
+\item{rescal}{The rescaling parameter.}
+\item{epoch}{The string name of the 'epoch'.}
 }
 
 The stored Sharpe statistic, \code{sr} is equal to the t-statistic 
@@ -86,7 +86,8 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
   \code{\link{predint}}, \code{\link{print.sr}},
   \code{\link{reannualize}}, \code{\link{se}},
   \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_unpaired_test}}, \code{\link{sr_vcov}}
+  \code{\link{sr_unpaired_test}}, \code{\link{sr_vcov}},
+  \code{\link{summary}}
 }
 \keyword{univar}
 

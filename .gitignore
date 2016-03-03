@@ -12,6 +12,8 @@
 .staging/
 *.Rcheck
 .ipynb_checkpoints
+.docker_img
+*.crancheck
 
 # unit testing
 unit_test.log

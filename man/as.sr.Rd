@@ -49,12 +49,14 @@ to 'yr'.}
 }
 \value{
 a list containing the following components:
+\describe{
 \item{sr}{the annualized Sharpe ratio.}
 \item{df}{the t-stat degrees of freedom.}
 \item{c0}{the risk free term.}
 \item{ope}{the annualization factor.}
 \item{rescal}{the rescaling factor.}
 \item{epoch}{the string epoch.}
+}
 cast to class \code{sr}.
 }
 \description{
@@ -137,7 +139,8 @@ Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{print.sr}}, \code{\link{reannualize}},
   \code{\link{se}}, \code{\link{sr_equality_test}},
   \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
-  \code{\link{sr_vcov}}, \code{\link{sr}}
+  \code{\link{sr_vcov}}, \code{\link{sr}},
+  \code{\link{summary}}
 }
 \keyword{univar}
 

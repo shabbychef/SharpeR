@@ -23,3 +23,5 @@ unit_test.log
 asymarko_example.ipynb
 fooz.R
 inst/extdata/gmacro_data.rda
+LICENSE
+docker
