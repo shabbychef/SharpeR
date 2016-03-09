@@ -1,18 +1,21 @@
-
-sudo: required
+# see https://docs.travis-ci.com/user/languages/r
+# and http://blog.rstudio.org/2016/03/09/r-on-travis-ci/
 
 language: r
 
-r_binary_packages :
-  - matrixcalc
-  - xtable
-  - xts
-  - quantmod
-  - MASS
-  - sandwich
+sudo: false
+
+cache : packages
+
+r:
+  - oldrel
+  - release
+  - devel
 
 r_github_packages :
   - jimhester/covr
+
+warnings_are_errors : true
 
 r_build_args : " --compact-vignettes=gs+qpdf"
 
