@@ -203,6 +203,8 @@ NULL
 #' @section Changes in \SharpeR{} Version 1.1.0 (2016-??-??) :
 #' \itemize{
 #' \item fix sr_vcov on array input.
+#' \item add SRIC method.
+#' \item add SRIC to print.sropt.
 #' }
 #'
 #' @section Changes in \SharpeR{} Version 1.0.0 (2015-06-18) :

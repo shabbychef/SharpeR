@@ -106,6 +106,9 @@ test_that("basic sropt functionality",{
 	z2 <- inference(mysr, type="MLE")
 	z3 <- inference(mysr, type="unbiased")
 
+	sricv <- sric(mysr)
+	sricv <- sric(dummy)
+
 	# via xts
 	if (require(xts)) {
 		xxts <- xts(x,order.by=as.Date(1:(dim(x)[1]),origin="1990-01-01"))

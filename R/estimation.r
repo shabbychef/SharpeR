@@ -545,7 +545,6 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 }
 #UNFOLD
 
-
 # point inference on sropt/ncp of F#FOLDUP
 
 # compute an unbiased estimator of the non-centrality parameter
@@ -749,6 +748,58 @@ inference.del_sropt <- function(z.s,type=c("KRS","MLE","unbiased")) {
 	# 2FIX: drag is being ignored. harumph.
 	retval <- .annualize(sqrt(retval),z.s$ope)
 	return(retval)
+}
+#' @title Sharpe Ratio Information Coefficient
+#'
+#' @description 
+#'
+#' Computes the Sharpe Ratio Information Coefficient of
+#' Paulsen and Soehl, an asymptotically unbiased estimate of
+#' the out-of-sample Sharpe of the in-sample Markowitz portfolio.
+#'
+#' @details 
+#'
+#' Let \eqn{X}{X} be an observed \eqn{T \times k}{T x k} matrix whose
+#' rows are i.i.d. normal. Let \eqn{\mu}{mu} and \eqn{\Sigma}{Sigma} be
+#' the sample mean and sample covariance. The Markowitz portfolio is
+#' \deqn{w = \Sigma^{-1}\mu,}{w = Sigma^-1 mu,}
+#' which has an in-sample Sharpe of 
+#' \eqn{\zeta = \sqrt{\mu^{\top}\Sigma^{-1}\mu}.}{zeta = sqrt(mu' Sigma^-1 mu).}
+#'
+#' The \emph{Sharpe Ratio Information Criterion} is defined as
+#' \deqn{SRIC = \zeta - \frac{k}{T\zeta}.}{SRIC = zeta - (k / (T zeta)).}
+#' The expected value (over draws of \eqn{X}{X} and of future returns)
+#' of the \eqn{SRIC}{SRIC} is equal to the expected value of the out-of-sample
+#' Sharpe of the (in-sample) portfolio \eqn{w}{w} (again, over the same draws.)
+#'
+#' @param z.s an object of type \code{sropt}
+#' @return The Sharpe Ratio Information Coefficient.
+#' @export 
+#' @template etc
+#' @template ref-SRIC
+#' @family sropt Hotelling
+#' @rdname sric
+#' @export sric
+#'
+#' @examples 
+#' # generate some sropts
+#' nfac <- 3
+#' nyr <- 5
+#' ope <- 253
+#' # simulations with no covariance structure.
+#' # under the null:
+#' set.seed(as.integer(charToRaw("fix seed")))
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
+#' srv <- sric(asro)
+#'
+sric <- function(z.s) {
+	# deannualize the optimal Sharpe
+	znative <- .deannualize(z.s$sropt,z.s$ope)
+	retv <- znative - z.s$df1 / (znative * z.s$df2)
+	# reannualize
+	retv <- .annualize(retv,z.s$ope)
+	retv
 }
 #UNFOLD
 

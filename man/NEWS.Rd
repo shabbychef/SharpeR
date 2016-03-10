@@ -13,6 +13,8 @@ News for package 'SharpeR'
 
 \itemize{
 \item fix sr_vcov on array input.
+\item add SRIC method.
+\item add SRIC to print.sropt.
 }
 }
 

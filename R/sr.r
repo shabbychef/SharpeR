@@ -795,14 +795,15 @@ print.sropt <- function(x,...) {
 	Tval <- x$T2
 	pval <- .sropt.pval(x)
 	ci <- confint(x,level=0.95)
-	coefs <- cbind(x$sropt,ci,Tval,pval)
+	coefs <- cbind(x$sropt,sric(x),ci,Tval,pval)
 	colnames(coefs) <- c(paste(c("SR/sqrt(",x$epoch,")"),sep="",collapse=""),
-											colnames(ci)[1],colnames(ci)[2],
+											 paste(c("SRIC/sqrt(",x$epoch,")"),sep="",collapse=""),
+											 colnames(ci)[1],colnames(ci)[2],
 											 "T^2 value","Pr(>T^2)")
 	rownames(coefs) <- .get_strat_names(x$sropt)
 	printCoefmat(coefs,P.values=TRUE,has.Pvalue=TRUE,
 							 digits=max(2, getOption("digits") - 3),
-							 cs.ind=c(1,2,3),tst.ind=c(4),dig.tst=2)
+							 cs.ind=c(1,2,3,4),tst.ind=c(5),dig.tst=2)
 }
 
 # SROPT methods#FOLDUP
