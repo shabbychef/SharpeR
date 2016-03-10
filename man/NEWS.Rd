@@ -9,6 +9,13 @@ News for package 'SharpeR'
 \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 }
+\section{Changes in \SharpeR{} Version 1.1.0 (2016-??-??) }{
+
+\itemize{
+\item fix sr_vcov on array input.
+}
+}
+
 \section{Changes in \SharpeR{} Version 1.0.0 (2015-06-18) }{
 
 

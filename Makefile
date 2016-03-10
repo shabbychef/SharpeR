@@ -31,7 +31,7 @@ M4_FILES					?= $(wildcard m4/*.m4)
 VMAJOR 						 = 1
 VMINOR 						 = 0
 VPATCH  					 = 0
-VDEV 							 = .9000
+VDEV 							 = .9100
 VERSION 					 = $(VMAJOR).$(VMINOR).$(VPATCH)$(VDEV)
 TODAY 						:= $(shell date +%Y-%m-%d)
 
@@ -45,6 +45,7 @@ PKG_TGZ 					 = $(PKG_NAME)_$(PKG_VERSION).tar.gz
 LOCAL 						:= .local
 RCHECK 						 = $(PKG_NAME).Rcheck
 RCHECK_SENTINEL 	 = $(RCHECK)/$(PKG_NAME)/DESCRIPTION
+PKG_CRANCHECK 		 = $(basename $(basename $(PKG_TGZ))).crancheck
 DRAT_SENTINEL   	 = .drat_$(PKG_TGZ)
 
 # Specify the directory holding R binaries. To use an alternate R build (say a
@@ -352,7 +353,9 @@ $(RCHECK_SENTINEL) : $(PKG_TGZ)
 
 #$(R_LOCALLY) CMD check --as-cran --outdir=$(RCHECK) $^ 
 	
-check: $(RCHECK_SENTINEL)
+oldcheck: $(RCHECK_SENTINEL)
+
+check: $(PKG_CRANCHECK)
 
 checksee : $(RCHECK_SENTINEL)
 	okular $(RCHECK)/$(PKG_NAME)-manual.pdf

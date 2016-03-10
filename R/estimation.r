@@ -64,6 +64,8 @@
 #' sr_vcov(X,vcov.func=vcov,ope=1)
 #'
 #' @param X an \eqn{n \times p}{n x p} matrix of observed returns.
+#' It not a matrix, but a numeric of length \eqn{n}{n}, then it is
+#' coerced into a \eqn{n \times 1}{n x 1} matrix.
 #' @param vcov.func a function which takes an object of class \code{lm},
 #' and computes a variance-covariance matrix.
 #' @template param-ope
@@ -101,10 +103,17 @@
 #'	Sigmas <- sr_vcov(Xf,vcov.func=vcovHAC)
 #' }
 #' }
+#' # should run for a vector as well
+#' X <- rnorm(1000)
+#' SS <- sr_vcov(X)
 #'
 sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 	X <- na.omit(X)
 	p <- dim(X)[2]
+	if (is.null(p)) {
+		X <- matrix(X,ncol=1)
+		p <- dim(X)[2]
+	}
 
 	# cat together X and X squared
 	XX2 <- cbind(X,X^2)
@@ -113,8 +122,8 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 	mm2 <- mod2$coefficients
 
 	# mean of X and X^2
-	m1 <- mm2[1:p]
-	m2 <- mm2[p + (1:p)]
+	m1 <- mm2[1:p,drop=FALSE]
+	m2 <- mm2[p + (1:p),drop=FALSE]
 	# volatility
 	sig2 <- (m2 - m1^2)
 	# the SR:
@@ -125,8 +134,8 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 
 	# construct D matrix
 	deno <- (sig2)^(3/2)
-	D1 <- diag(m2 / deno)
-	D2 <- diag(-m1 / (2*deno))
+	D1 <- diag(m2 / deno,nrow=p,ncol=p)
+	D2 <- diag(-m1 / (2*deno),nrow=p,ncol=p)
 	Dt <- rbind(D1,D2)
 
 	# Omegahat

@@ -148,6 +148,18 @@ test_that("basic del_sropt functionality",{
 
 	expect_true(TRUE)
 })
+test_that("basic sr_vcov functionality",{
+	set.char.seed("de096679-85cc-438b-8335-96a9940a9021")
+	for (p in c(1:3)) {
+		X <- matrix(rnorm(1000*p,mean=3e-4),ncol=p)
+		S <- sr_vcov(X)
+	}
+	X <- rnorm(1000)
+	S <- sr_vcov(X)
+
+	# sentinel:
+	expect_true(TRUE)
+})
 #UNFOLD
 context("estimation functions: confint coverage")#FOLDUP
 test_that("confint.sr coverage",{#FOLDUP

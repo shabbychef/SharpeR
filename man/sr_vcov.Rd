@@ -7,7 +7,9 @@
 sr_vcov(X,vcov.func=vcov,ope=1)
 }
 \arguments{
-\item{X}{an \eqn{n \times p}{n x p} matrix of observed returns.}
+\item{X}{an \eqn{n \times p}{n x p} matrix of observed returns.
+It not a matrix, but a numeric of length \eqn{n}{n}, then it is
+coerced into a \eqn{n \times 1}{n x 1} matrix.}
 
 \item{vcov.func}{a function which takes an object of class \code{lm},
 and computes a variance-covariance matrix.}
@@ -65,6 +67,9 @@ if (require(sandwich)) {
 Sigmas <- sr_vcov(Xf,vcov.func=vcovHAC)
 }
 }
+# should run for a vector as well
+X <- rnorm(1000)
+SS <- sr_vcov(X)
 
 }
 \author{
