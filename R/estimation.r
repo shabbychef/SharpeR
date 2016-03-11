@@ -767,7 +767,7 @@ inference.del_sropt <- function(z.s,type=c("KRS","MLE","unbiased")) {
 #' \eqn{\zeta = \sqrt{\mu^{\top}\Sigma^{-1}\mu}.}{zeta = sqrt(mu' Sigma^-1 mu).}
 #'
 #' The \emph{Sharpe Ratio Information Criterion} is defined as
-#' \deqn{SRIC = \zeta - \frac{k}{T\zeta}.}{SRIC = zeta - (k / (T zeta)).}
+#' \deqn{SRIC = \zeta - \frac{k-1}{T\zeta}.}{SRIC = zeta - ((k-1) / (T zeta)).}
 #' The expected value (over draws of \eqn{X}{X} and of future returns)
 #' of the \eqn{SRIC}{SRIC} is equal to the expected value of the out-of-sample
 #' Sharpe of the (in-sample) portfolio \eqn{w}{w} (again, over the same draws.)
@@ -796,7 +796,7 @@ inference.del_sropt <- function(z.s,type=c("KRS","MLE","unbiased")) {
 sric <- function(z.s) {
 	# deannualize the optimal Sharpe
 	znative <- .deannualize(z.s$sropt,z.s$ope)
-	retv <- znative - z.s$df1 / (znative * z.s$df2)
+	retv <- znative - (z.s$df1 - 1) / (znative * z.s$df2)
 	# reannualize
 	retv <- .annualize(retv,z.s$ope)
 	retv

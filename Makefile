@@ -178,16 +178,16 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 #########################################################################
 
 # these are phony targets
-.PHONY: help tags all \
-	gitpull gitpush dratit staged \
-	news docs build install testthat tests \
-	staging_d local_d \
-	clean realclean \
-	vignette_cache \
-	the_vignette \
-	static_vignette \
-	the_paper \
-	R
+.PHONY: help tags all 
+.PHONY: gitpull gitpush dratit staged 
+.PHONY: news rdfiles docs build install testthat tests 
+.PHONY: staging_d local_d 
+.PHONY: clean realclean 
+.PHONY: vignette_cache 
+.PHONY: the_vignette 
+.PHONY: static_vignette 
+.PHONY: the_paper 
+.PHONY: R
 
 help:
 	@echo "\nTasks for $(PKG_NAME)\n"
@@ -197,7 +197,8 @@ help:
 	@echo "-----------------"
 	@echo "  tags       Build the ctags, for dev purposes"
 	@echo "  deps       Install dependencies for package development"
-	@echo "  docs       Invoke roxygen to generate Rd files in man/"
+	@echo "  rdfiles    Invoke roxygen to generate Rd files in man/"
+	@echo "  docs       Generate Rd files and more"
 	@echo "  testthat   Run unit tests."
 	@echo '  tests       "   "     "   '
 	@echo "  staged     Create a staging version of this package."
@@ -287,6 +288,8 @@ man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
 	$(call WARN_DEPS)
 	$(R_LOCALLY) --slave -e "require(roxygen2); roxygenize('.', clean=TRUE)"
 	touch $@
+
+rdfiles : DESCRIPTION man/$(PKG_NAME).Rd 
 
 docs: README.md DESCRIPTION man/$(PKG_NAME).Rd 
 
