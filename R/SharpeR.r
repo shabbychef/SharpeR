@@ -189,6 +189,8 @@
 #' This package is maintained as a hobby. 
 #'
 #' @import matrixcalc 
+#' @importFrom stats complete.cases confint cov deviance df dt lm na.omit optimize pchisq pf power.t.test printCoefmat pt qf qnorm qt rchisq rf rnorm rt sd time uniroot vcov
+#' @importFrom utils capture.output
 NULL
 
 #' @title News for package 'SharpeR':
