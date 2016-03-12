@@ -232,7 +232,12 @@ test_that("predint runs at all",{#FOLDUP
 			for (nominal.coverage in c(0.90,0.95)) {
 				aci <- predint(x,oosdf=oosn-1,ope=1,level=nominal.coverage)
 				aci2 <- predint(as.sr(x),oosdf=oosn-1,ope=1,level=nominal.coverage)
+				# no ope:
+				noaci <- predint(x,oosdf=oosn-1,level=nominal.coverage)
 			}
+			# corner cases:
+			iinf <- predint(x,oosdf=oosn-1,level.lo=0,level.hi=1)
+			expect_true(all(is.infinite(iinf)))
 		}
 	}
 	# sentinel

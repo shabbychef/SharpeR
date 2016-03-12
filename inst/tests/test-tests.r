@@ -104,6 +104,13 @@ test_that("sr_unpaired_test",{#FOLDUP
 	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='less')
 	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='greater')
 
+	# bad units, complain
+	X1 <- rnorm(100)
+	X2 <- rnorm(200)
+	inp1 <- as.sr(X1,ope=52)
+	inp2 <- as.sr(X2,ope=12)
+	expect_warning(sr_unpaired_test(list(inp1,inp2)))
+
 	# sentinel
 	expect_true(TRUE)
 })#UNFOLD
