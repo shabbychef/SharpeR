@@ -34,4 +34,7 @@
 library(testthat)
 library(SharpeR)
 
-test_package("SharpeR")
+# the old way:
+#test_package("SharpeR")
+# the new way:
+test_check("SharpeR")
