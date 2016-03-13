@@ -537,7 +537,7 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 		})
 		retval <- matrix(ci,nrow=1)
 	},srx$sr,srx$df,srx$rescal)
-	retval <- t(cols)
+	retval <- matrix(t(cols),ncol=2)
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
 
 	rownames(retval) <- .get_strat_names(srx$sr)
