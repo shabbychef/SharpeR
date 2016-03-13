@@ -15,6 +15,7 @@ News for package 'SharpeR'
 \item fix sr_vcov on array input.
 \item add SRIC method.
 \item add SRIC to print.sropt.
+\item change predint output to matrix.
 }
 }
 
