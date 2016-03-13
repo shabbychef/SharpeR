@@ -99,12 +99,12 @@
 }
 
 # for T^2: 
-.annualize2 <- function(T2, ope) {
+.annualize2 <- function(T2, ope) { # nocov start
   return(T2 * ope)  
-}
-.deannualize2 <- function(T2.pa, ope) {
+} # nocov end
+.deannualize2 <- function(T2.pa, ope) { # nocov start
   return(T2.pa / ope)
-}
+} # nocov end
 #UNFOLD
 
 # conversions
