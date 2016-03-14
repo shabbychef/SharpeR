@@ -1148,12 +1148,18 @@ print.del_sropt <- function(x,...) {
 #' summary(obj)
 #'
 #' @param obj an object of class \code{sr}, \code{sropt} or \code{del_sropt}.
-#' @return For an \code{sr} object input, the object cast to class \code{summary.sr} with some
+#' @return When an \code{sr} object is input, the object cast to class \code{summary.sr} with some
 #' additional fields:
 #' \describe{
 #' \item{tval}{the equivalent t-statistic.}
 #' \item{pval}{the p-value under the null.}
 #' \item{serr}{the standard error of the Sharpe ratio.}
+#' }
+#' When an \code{sropt} object is input, the object cast to class \code{summary.sropt} with some
+#' additional fields:
+#' \describe{
+#' \item{pval}{the p-value under the null.}
+#' \item{SRIC}{the SRIC value, see \code{\link{sric}}.}
 #' }
 #'
 #' @seealso \code{\link{print.sr}}.
@@ -1185,8 +1191,8 @@ summary.sr <- function(obj) {
 #' @S3method summary sropt
 summary.sropt <- function(obj) {
 	obj$pval <- .sropt.pval(obj)
-	obj$sric <- sric(obj)
-	#...
+	obj$SRIC <- sric(obj)
+	#... anything else? KRS?
 	class(obj) <- "summary.sropt"
 	obj
 }

@@ -16,12 +16,18 @@ summary(obj)
 \item{obj}{an object of class \code{sr}, \code{sropt} or \code{del_sropt}.}
 }
 \value{
-For an \code{sr} object input, the object cast to class \code{summary.sr} with some
+When an \code{sr} object is input, the object cast to class \code{summary.sr} with some
 additional fields:
 \describe{
 \item{tval}{the equivalent t-statistic.}
 \item{pval}{the p-value under the null.}
 \item{serr}{the standard error of the Sharpe ratio.}
+}
+When an \code{sropt} object is input, the object cast to class \code{summary.sropt} with some
+additional fields:
+\describe{
+\item{pval}{the p-value under the null.}
+\item{SRIC}{the SRIC value, see \code{\link{sric}}.}
 }
 }
 \description{

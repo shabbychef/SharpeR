@@ -140,19 +140,11 @@ data <- data.frame(pvals = pvals)
 ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist = qunif) + 
     geom_abline(slope = 1, intercept = 0, colour = "red") + 
     theme(text = element_text(size = 8)) + labs(title = "P-P plot")
-```
 
-```
-## Error: Unknown parameters: dist
-```
-
-```r
 print(ph)
 ```
 
-```
-## Error in print(ph): object 'ph' not found
-```
+<img src="github_extra/figure/unpaired_null-1.png" title="plot of chunk unpaired_null" alt="plot of chunk unpaired_null" width="700px" height="600px" />
 
 Now we repeat for non-zero null value:
 
@@ -175,19 +167,11 @@ data <- data.frame(pvals = pvals)
 ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist = qunif) + 
     geom_abline(slope = 1, intercept = 0, colour = "red") + 
     theme(text = element_text(size = 8)) + labs(title = "P-P plot")
-```
 
-```
-## Error: Unknown parameters: dist
-```
-
-```r
 print(ph)
 ```
 
-```
-## Error in print(ph): object 'ph' not found
-```
+<img src="github_extra/figure/unpaired_null_two-1.png" title="plot of chunk unpaired_null_two" alt="plot of chunk unpaired_null_two" width="700px" height="600px" />
 
 Now for real data.  We download monthly returns of the three Fama French factors plus momentum 
 (the original Fifth Beatle), then divide into January and non-January periods. We regress

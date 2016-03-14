@@ -535,7 +535,7 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 				yval <- ifelse(lvl >= 1,Inf,-Inf)
 			}
 		})
-		retval <- matrix(ci,nrow=1)
+		retval <- matrix(unlist(ci),nrow=1)
 	},srx$sr,srx$df,srx$rescal)
 	retval <- matrix(t(cols),ncol=2)
 	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })

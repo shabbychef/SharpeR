@@ -213,6 +213,21 @@ test_that("confint.sropt coverage",{#FOLDUP
 })#UNFOLD
 #UNFOLD
 context("estimation functions: prediction intervals")#FOLDUP
+test_that("predint right output",{#FOLDUP
+	set.char.seed("0919609e-4e99-42f2-b04c-89e2d2faaa4f")
+
+	for (nasset in c(1,2,4,8)) {
+		x <- matrix(rnorm(100*nasset),ncol=nasset)
+		srx <- as.sr(x)
+		aci <- predint(srx,oosdf=500)
+		expect_equal(nrow(aci),nasset)
+		expect_equal(ncol(aci),2)
+		expect_true(is.matrix(aci))
+	}
+
+	# sentinel
+	expect_true(TRUE)
+})#UNFOLD
 test_that("predint runs at all",{#FOLDUP
 	set.char.seed("080c6f73-834e-4d10-a6fa-4b27dc266b24")
 
@@ -237,10 +252,7 @@ test_that("predint runs at all",{#FOLDUP
 			}
 			# corner cases:
 			iinf <- predint(x,oosdf=oosn-1,level.lo=0,level.hi=1)
-			# 2FIX: predint should not be a *list* 
-			# but I cannot fix that now.
-			#
-			#expect_true(all(is.infinite(iinf)))
+			expect_true(all(is.infinite(iinf)))
 		}
 	}
 	# sentinel
