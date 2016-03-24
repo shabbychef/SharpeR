@@ -16,7 +16,7 @@ FROM shabbychef/crancheck
 MAINTAINER Steven E. Pav, shabbychef@gmail.com
 # UNFOLD
 
-ENV NONCE f5d10eaf-a347-426d-8374-fe23637723f9
+ENV NONCE 38b1eb8c-7af2-41a4-938e-aa1fe5f79f9a
 
 # rinstall somethings...
 RUN /usr/local/bin/install2.r matrixcalc sadists xtable xts timeSeries quantmod MASS TTR testthat sandwich knitr 
