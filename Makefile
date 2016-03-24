@@ -226,6 +226,7 @@ help:
 	@echo "Using R in: $(RBIN)"
 	@echo "Set the RBIN environment variable to change this."
 	@echo ""
+	@grep -E '^[a-zA-Z_-]+\s*:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 # dev stuff
 ~/.ctags :
@@ -237,7 +238,7 @@ help:
 .R_tags: $(R_FILES)
 	./rebuildTags.sh
 
-tags: .R_tags
+tags: .R_tags  ## make ctags, used for development.
 
 .Renviron : 
 	echo "R_LIBS=$(LOCAL)" >> $@
@@ -249,7 +250,7 @@ TAGS:
 % : m4/%.m4 Makefile
 	m4 -I ./m4 -DVERSION=$(VERSION) -DDATE=$(TODAY) -DPKG_NAME=$(PKG_NAME) $< > $@
 
-%.md : %.Rmd
+%.md : %.Rmd 
 	$(call WARN_DEPS)
 	$(call MKDIR,$(EXTDATA_D))
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
@@ -257,7 +258,7 @@ TAGS:
 				 $(R) $(R_FLAGS) --slave -e \
 				 "setwd(dirname('$@'));knitr::knit(basename('$<'));"
 
-README.md : $(NODIST_R_DIR)/README.md
+README.md : $(NODIST_R_DIR)/README.md   ## knit the readme.
 	mv $< $@
 	rsync -av --delete $(NODIST_R_DIR)/github_extra/figure/ ./github_extra/figure/
 
@@ -289,9 +290,9 @@ man/$(PKG_NAME).Rd NAMESPACE: $(R_FILES)
 	$(R_LOCALLY) --slave -e "require(roxygen2); roxygenize('.', clean=TRUE)"
 	touch $@
 
-rdfiles : DESCRIPTION man/$(PKG_NAME).Rd 
+rdfiles : DESCRIPTION man/$(PKG_NAME).Rd  ## roxygenize the R files to Rd files.
 
-docs: README.md DESCRIPTION man/$(PKG_NAME).Rd 
+docs: README.md DESCRIPTION man/$(PKG_NAME).Rd ## build all documentation.
 
 #RSYNC_FLAGS     = -av
 #RSYNC_FLAGS     = -vrlpgoD --delete
@@ -332,9 +333,9 @@ $(PKG_TGZ) : $(STAGED_PKG)/DESCRIPTION $(INSTALLED_DEPS) $(EXTRA_PKG_DEPS)
 %.crancheck : %.tar.gz .docker_img
 	$(DOCKER) run -it --rm --volume $(PWD):/srv:ro $(USER)/$(PKG_LCNAME)-crancheck $< > $@
 
-build : $(PKG_TGZ)
+build : $(PKG_TGZ) ## build the package
 
-build_list : $(PKG_TGZ)
+build_list : $(PKG_TGZ) ## list the entries in the package
 	tar -tzvf $<
 
 # an 'install'
@@ -344,7 +345,7 @@ $(LOCAL)/$(PKG_NAME)/INDEX : $(PKG_TGZ)
 	$(R_LOCALLY) CMD INSTALL $(INSTALL_FLAGS) $<
 	touch $@
 
-install: $(LOCAL)/$(PKG_NAME)/INDEX
+install: $(LOCAL)/$(PKG_NAME)/INDEX ## install the package locally.
 
 # rely on the 'install' target above.
 $(LOCAL)/doc/$(PKG_NAME).pdf : $(LOCAL)/$(PKG_NAME)/INDEX
@@ -358,7 +359,7 @@ $(RCHECK_SENTINEL) : $(PKG_TGZ)
 	
 oldcheck: $(RCHECK_SENTINEL)
 
-check: $(PKG_CRANCHECK)
+check: $(PKG_CRANCHECK) ## check the package as CRAN.
 
 checksee : $(RCHECK_SENTINEL)
 	okular $(RCHECK)/$(PKG_NAME)-manual.pdf
@@ -367,7 +368,7 @@ $(DRAT_SENTINEL) : $(PKG_TGZ)
 	$(call WARN_DEPS)
 	$(R) --slave -e "drat:::insertPackage('$<',repodir='~/github/drat',commit=TRUE)"
 
-dratit : tag $(DRAT_SENTINEL)
+dratit : tag $(DRAT_SENTINEL) ## push to my drat store.
 
 #$(RCHECK)/$(PKG_NAME)/doc/$(PKG_NAME).pdf : $(VIGNETTE_SRCS) $(RCHECK_SENTINEL)
 
@@ -391,7 +392,7 @@ testthat : unit_test.log
 tests    : unit_test.log
 
 # drop into R shell in the 'local context'
-R : deps $(LOCAL)/$(PKG_NAME)/INDEX
+R : deps $(LOCAL)/$(PKG_NAME)/INDEX ## drop into R shell in the local context with the installed package
 	R_LIBS=$(LOCAL) R_PROFILE=load.R \
 				 R_DEFAULT_PACKAGES=$(BASE_DEF_PACKAGES) $(R) -q --no-save
 
@@ -485,7 +486,7 @@ newbuild :
 	$(MAKE) tags
 	$(MAKE) build
 
-shinecov : 
+shinecov : ## Code coverage in local shiny window.
 	Rscript -e 'library(covr);shine(package_coverage())'
 
 # http://krisjordan.com/essays/encrypting-with-rsa-key-pairs
@@ -495,7 +496,7 @@ shinecov :
 token : .codecov_token
 	< $< openssl rsautl -decrypt -inkey ~/.ssh/id_rsa | tee $@
 
-codecov : token
+codecov : token ## Code coverage, uploaded to codecov.io.
 	. token && Rscript -e 'library(covr);codecov()'
 
 # Python. well, iPython.
@@ -514,7 +515,7 @@ texclean :
 	-rm -rf $(PKG_NAME).bbl
 	-rm -rf $(PKG_NAME).blg
 
-clean : texclean
+clean : texclean ## clean a bunch of stuff up.
 	-rm DESCRIPTION
 	-rm -rf man/*.Rd
 	-rm -rf $(STAGED_PKG)
@@ -538,7 +539,7 @@ gitpush :
 gitpull :
 	git pull origin $(GIT_BRANCH)
 
-tag :
+tag : ## create a git tag corresponding to the package version.
 	@-echo "git tag -a r$(VERSION) -m 'release $(VERSION)'"
 	@-echo "git push --tags"
 
@@ -558,9 +559,9 @@ tag :
 	@-read -p 'really send email? [y/n] ' -n 1 yorn ; \
 	[[ "$$yorn" == "y" ]] && echo "automatic message" | mail -s "CRAN submission $(PKG_NAME) $(VERSION)" CRAN@R-project.org
 
-submit : .cran_upload .send_email
+submit : .cran_upload .send_email ## submit to CRAN via ftp upload and email?
 
-subadvice :
+subadvice : ## CRAN submission advice, echoed.
 	@-echo -e "upload $(PKG_TGZ) to cran.r-project.org/incoming via anonymous ftp"
 	@-echo -e "then email CRAN@R-project.org w/ subject 'CRAN submission $(PKG_NAME) $(VERSION)'"
 
@@ -599,6 +600,5 @@ arxiv : vignettes/AsymptoticMarkowitz.tex
 	@-echo 'cd vignettes/'
 	@-echo 'make -f ~/sys/etc/MOAMakefile AsymptoticMarkowitz.dvi'
 
-
 #for vim modeline: (do not edit)
-# vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:tags=tags;:syntax=make:filetype=make:ai:si:cin:nu:fo=croqt:cino=p0t0c5(0:
+# vim:ts=2:sw=2:tw=129:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:tags=tags;:syntax=make:filetype=make:ai:si:cin:nu:fo=croqt:cino=p0t0c5(0:
