@@ -31,7 +31,7 @@ M4_FILES					?= $(wildcard m4/*.m4)
 VMAJOR 						 = 1
 VMINOR 						 = 1
 VPATCH  					 = 0
-VDEV 							 = .1000
+VDEV 							 = .2000
 VERSION 					 = $(VMAJOR).$(VMINOR).$(VPATCH)$(VDEV)
 TODAY 						:= $(shell date +%Y-%m-%d)
 
@@ -189,7 +189,7 @@ WARN_DEPS = $(warning will build $@ ; newer deps are $(?))
 .PHONY: the_paper 
 .PHONY: R
 
-help:
+help:  ## generate this help message
 	@echo "\nTasks for $(PKG_NAME)\n"
 	@echo "Usage: \`make <task>\` where <task> is one of:"
 	@echo ""
@@ -227,6 +227,8 @@ help:
 	@echo "Set the RBIN environment variable to change this."
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+\s*:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@grep -P '^(([^\s]+\s+)*([^\s]+))\s*:.*?##\s*.*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 # dev stuff
 ~/.ctags :

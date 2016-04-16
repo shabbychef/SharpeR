@@ -98,28 +98,29 @@ test_that("sropt functions",{#FOLDUP
 	ope <- 252
 	df1 <- 8
 	df2 <- ope * 10
-	drag <- 0
 	zeta.s <- 1.1
 
-	# sample:
 	set.char.seed("fc90523d-abb4-4543-8476-d48e3a6f28a3")
-	rvs <- rsropt(ngen, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
+	for (drag in c(0,1)) {
+		# sample:
+		rvs <- rsropt(ngen, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
 
-	dens <- dsropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
-	expect_true(all(dens >= 0))
-	dens <- dsropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, log=TRUE)
-	expect_false(all(dens >= 0))
+		dens <- dsropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
+		expect_true(all(dens >= 0))
+		dens <- dsropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, log=TRUE)
+		expect_false(all(dens >= 0))
 
-	pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
-	expect_true(all(pvs >= 0) && all(pvs <= 1))
-	pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE)
-	pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, log.p=TRUE)
-	pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+		pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
+		expect_true(all(pvs >= 0) && all(pvs <= 1))
+		pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE)
+		pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, log.p=TRUE)
+		pvs <- psropt(rvs, df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
 
-	qvs <- qsropt(ppoints(100), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
-	qvs <- qsropt(ppoints(100), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE)
-	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
-	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+		qvs <- qsropt(ppoints(100), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag)
+		qvs <- qsropt(ppoints(100), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE)
+		qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+		qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, zeta.s=zeta.s, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
+	}
 
 	# once again, without optional zeta.s
 	set.char.seed("7166310f-7462-4890-bdd0-0df9ca5d97bd")
@@ -141,7 +142,7 @@ test_that("sropt functions",{#FOLDUP
 	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
 	qvs <- qsropt(log(ppoints(100)), df1=df1, df2=df2, ope=ope, drag=drag, lower.tail=FALSE, log.p=TRUE)
 
-	# once again, with optional drag
+	# once again, without drag?
 	set.char.seed("7166310f-7462-4890-bdd0-0df9ca5d97bd")
 	rvs <- rsropt(ngen, df1=df1, df2=df2, ope=ope)
 
