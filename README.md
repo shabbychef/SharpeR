@@ -4,8 +4,9 @@
 
 [![Build Status](https://travis-ci.org/shabbychef/SharpeR.png)](https://travis-ci.org/shabbychef/SharpeR)
 [![codecov.io](http://codecov.io/github/shabbychef/SharpeR/coverage.svg?branch=master)](http://codecov.io/github/shabbychef/SharpeR?branch=master)
-[![CRAN](http://www.r-pkg.org/badges/version/SharpeR)](http://cran.rstudio.com/package=SharpeR) 
-[![Downloads](http://cranlogs.r-pkg.org/badges/SharpeR?color=brightgreen)](http://www.r-pkg.org/pkg/SharpeR)
+[![CRAN](http://www.r-pkg.org/badges/version/SharpeR)](https://cran.r-project.org/package=SharpeR)
+[![Downloads](http://cranlogs.r-pkg.org/badges/SharpeR?color=green)](http://www.r-pkg.org/pkg/SharpeR)
+[![Total](http://cranlogs.r-pkg.org/badges/grand-total/SharpeR?color=green)](http://www.r-pkg.org/pkg/SharpeR)
 
 A number of utilities for dealing with Sharpe ratio, the Sharpe ratio of the
 Markowitz portfolio, and, in general, overfit of trading strategies based on
