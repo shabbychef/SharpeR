@@ -199,7 +199,7 @@ NULL
 #'
 #' News for package 'SharpeR'
 #'
-#' \newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+#' \newcommand{\CRANpkg}{\href{http://cran.r-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 #'
 #' @section Changes in \SharpeR{} Version 1.1.0 (2016-03-14) :
