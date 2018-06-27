@@ -244,7 +244,7 @@ as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 }
 #' @rdname as.sr
 #' @method as.sr default
-#' @S3method as.sr default
+#' @export
 as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- mean(x,na.rm=na.rm)
 	sigma <- sd(x,na.rm=na.rm)
@@ -254,7 +254,7 @@ as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 }
 #' @rdname as.sr
 #' @method as.sr matrix
-#' @S3method as.sr matrix
+#' @export
 as.sr.matrix <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- apply(x,2,mean,na.rm=na.rm)
 	sigma <- apply(x,2,sd,na.rm=na.rm)
@@ -264,14 +264,14 @@ as.sr.matrix <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 }
 #' @rdname as.sr
 #' @method as.sr data.frame
-#' @S3method as.sr data.frame
+#' @export
 as.sr.data.frame <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	retval <- as.sr.matrix(x,c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
 	return(retval)
 }
 #' @rdname as.sr
 #' @method as.sr lm 
-#' @S3method as.sr lm
+#' @export
 as.sr.lm <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	mu <- x$coefficients["(Intercept)"]
 	sigma <- sqrt(deviance(x) / x$df.residual)
@@ -286,7 +286,7 @@ as.sr.lm <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 }
 #' @rdname as.sr
 #' @method as.sr xts 
-#' @S3method as.sr xts
+#' @export
 as.sr.xts <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	if (missing(ope) && missing(epoch)) {
 		ope <- .infer_ope_xts(x)
@@ -297,7 +297,7 @@ as.sr.xts <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 }
 #' @rdname as.sr
 #' @method as.sr timeSeries
-#' @S3method as.sr timeSeries
+#' @export
 as.sr.timeSeries <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	# you want to do this, but requires xts package. oops.
 	#retval <- as.sr.xts(as.xts(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
@@ -334,7 +334,7 @@ as.sr.timeSeries <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 #' is.sr(rvs)
 is.sr <- function(x) inherits(x,"sr")
 
-# ' @S3method format sr
+# ' @export
 # ' @export
 format.sr <- function(x,...) {
 	# oh! ugly! ugly!
@@ -354,7 +354,7 @@ format.sr <- function(x,...) {
 #' @return the object, wrapped in \code{invisible}.
 #' @rdname print
 #' @method print sr
-#' @S3method print sr
+#' @export
 #' @export
 #' @template etc
 #' @template sr
@@ -466,7 +466,6 @@ reannualize <- function(object,new.ope=NULL,new.epoch=NULL) {
 }
 #' @rdname reannualize
 #' @method reannualize sr
-#' @S3method reannualize sr
 #' @export
 reannualize.sr <- function(object,new.ope=NULL,new.epoch=NULL) {
 	if (!is.sr(object)) stop("must give sr object")
@@ -479,7 +478,6 @@ reannualize.sr <- function(object,new.ope=NULL,new.epoch=NULL) {
 }
 #' @rdname reannualize
 #' @method reannualize sropt
-#' @S3method reannualize sropt
 #' @export
 reannualize.sropt <- function(object,new.ope=NULL,new.epoch=NULL) {
 	if (!is.sropt(object)) stop("must give sropt object")
@@ -543,7 +541,7 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL,...) {
 #UNFOLD
 
 ########################################################################
-# Optimal Sharpe ratio#FOLDUP
+# Optimal Sharpe ratio#
 
 # spawn a "SROPT" object.
 #' @title Create an 'sropt' object.
@@ -727,7 +725,7 @@ as.sropt <- function(X,drag=0,ope=1,epoch="yr") {
 }
 #' @rdname as.sropt
 #' @method as.sropt default
-#' @S3method as.sropt default
+#' @export
 as.sropt.default <- function(X,drag=0,ope=1,epoch="yr") {
 	# somehow call sropt!
 	hotval <- as.markowitz(X)
@@ -746,7 +744,7 @@ as.sropt.default <- function(X,drag=0,ope=1,epoch="yr") {
 }
 #' @rdname as.sropt
 #' @method as.sropt xts
-#' @S3method as.sropt xts
+#' @export
 as.sropt.xts <- function(X,drag=0,ope=1,epoch="yr") {
 	if (missing(ope)) {
 		ope <- .infer_ope_xts(X)
@@ -789,7 +787,6 @@ is.sropt <- function(x) inherits(x,"sropt")
 
 #' @rdname print
 #' @method print sropt
-#' @S3method print sropt
 #' @export
 print.sropt <- function(x,...) {
 	Tval <- x$T2
@@ -806,7 +803,7 @@ print.sropt <- function(x,...) {
 							 cs.ind=c(1,2,3,4),tst.ind=c(5),dig.tst=2)
 }
 
-# SROPT methods#FOLDUP
+# SROPT methods#
 # get the T2-stat associated with an SROPT object.
 .sropt2T <- function(x,Tval=x$T2) {
 	if (is.null(Tval)) {
@@ -829,8 +826,8 @@ print.sropt <- function(x,...) {
 		retv <- pT2(Tval,x$df1,x$df2,lower.tail=FALSE)
 	return(retv)
 }
-#UNFOLD
-#UNFOLD
+#
+#
 
 ########################################################################
 # Delta Squared Optimal Sharpe ratio#FOLDUP
@@ -1043,7 +1040,7 @@ as.del_sropt <- function(X,G,drag=0,ope=1,epoch="yr") {
 }
 #' @rdname as.del_sropt
 #' @method as.del_sropt default
-#' @S3method as.del_sropt default
+#' @export
 as.del_sropt.default <- function(X,G,drag=0,ope=1,epoch="yr") {
 	# somehow call sropt!
 	hotval <- as.markowitz(X)
@@ -1069,7 +1066,7 @@ as.del_sropt.default <- function(X,G,drag=0,ope=1,epoch="yr") {
 }
 #' @rdname as.del_sropt
 #' @method as.del_sropt xts
-#' @S3method as.del_sropt xts
+#' @export
 as.del_sropt.xts <- function(X,G,drag=0,ope=1,epoch="yr") {
 	if (missing(ope)) {
 		ope <- .infer_ope_xts(X)
@@ -1105,7 +1102,6 @@ is.del_sropt <- function(x) inherits(x,"del_sropt")
 
 #' @rdname print
 #' @method print del_sropt
-#' @S3method print del_sropt
 #' @export
 print.del_sropt <- function(x,...) {
 	Fandp <- .del_sropt.asF(x)
@@ -1178,7 +1174,7 @@ summary <- function(obj) {
 }
 #' @rdname summary
 #' @method summary sr
-#' @S3method summary sr
+#' @export
 summary.sr <- function(obj) {
 	obj$tval <- .sr2t(obj)
 	obj$pval <- pt(obj$tval,obj$df,lower.tail=FALSE)
@@ -1188,7 +1184,7 @@ summary.sr <- function(obj) {
 }
 #' @rdname summary
 #' @method summary sropt
-#' @S3method summary sropt
+#' @export
 summary.sropt <- function(obj) {
 	obj$pval <- .sropt.pval(obj)
 	obj$SRIC <- sric(obj)

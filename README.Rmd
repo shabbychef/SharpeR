@@ -172,7 +172,7 @@ ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist=qunif) +
 print(ph)
 ```
 
-Now for real data.  We download monthly returns of the three Fama French factors plus momentum 
+Now for real data.  We take monthly returns of the three Fama French factors plus momentum 
 (the original Fifth Beatle), then divide into January and non-January periods. We regress
 Momentum against the other three factors, then convert the linear regression to a Sharpe ratio
 estimate. The two Sharpe ratios are then thrown into an unpaired sample test. We reject the null
@@ -181,36 +181,19 @@ Is this 'the January Effect'? Perhaps.
 
 ```{r ff_momentum_check,eval=TRUE,echo=TRUE}
 library(xts)
-library(Quandl)
+if (!require(aqfb.data)) {
+	devtools::install_github('shabbychef/aqfb_data')
+	library(aqfb.data)
+}
 
-# auth-fu
-quandl.auth <- Sys.getenv('QUANDL_AUTH')
-options(quandl.auth = ifelse(nchar(quandl.auth),quandl.auth,""))
-rm(quandl.auth)
-Quandl.auth(options()$quandl.auth)
-
-# get data!
-fff.xts <- Quandl("KFRENCH/FACTORS_M",
-	start_date="1927-01-31",end_date="2014-12-31",
-	type="xts")
-
-mom.xts <- Quandl("KFRENCH/MOMENTUM_M",
-	start_date="1927-01-31",end_date="2014-12-31",
-	type="xts")
-colnames(mom.xts) <- c("UMD")
-
-# munge data!
-ff4.xts <- cbind(fff.xts[,c("SMB","HML","RF")],mom.xts)
-ff4.xts$Mkt <- fff.xts[,"Mkt-RF"] + fff.xts[,"RF"]
-# re-sort
-ff4.xts <- ff4.xts[,c("Mkt","SMB","HML","UMD","RF")]
+data('mff4',package='aqfb.data')
 
 # January or not
-is.jan <- months(index(ff4.xts)) == 'January'
+is.jan <- months(index(mff4)) == 'January'
 
 # perform linear regression
-mod.jan <- lm(UMD ~ Mkt + SMB + HML,data=ff4.xts[is.jan,])
-mod.rem <- lm(UMD ~ Mkt + SMB + HML,data=ff4.xts[!is.jan,])
+mod.jan <- lm(UMD ~ Mkt + SMB + HML,data=mff4[is.jan,])
+mod.rem <- lm(UMD ~ Mkt + SMB + HML,data=mff4[!is.jan,])
 
 # convert lm models to Sharpes
 sr.jan <- as.sr(mod.jan)
@@ -252,7 +235,7 @@ print(coverage)
 ![nominal coverage](tools/static/borat_coverage.jpg)
 
 For a more complicated example, consider the 'Sharpe' under the attribution
-model. Here we download the _daily_ data of the three Fama French factors, then
+model. Here we use the _daily_ data of the three Fama French factors, then
 perform an attribution of SMB against the market and HML. We compute the
 factor model Sharpe for the first nine months of each year, and of the last three
 months separately. Using the first three quarters, we compute a prediction interval 
@@ -260,31 +243,24 @@ for the fourth quarter, then check coverage:
 
 ```{r ff_predint_check,eval=TRUE,echo=TRUE}
 library(xts)
-library(Quandl)
+if (!require(aqfb.data)) {
+	devtools::install_github('shabbychef/aqfb_data')
+	library(aqfb.data)
+}
 
-# auth-fu
-quandl.auth <- Sys.getenv('QUANDL_AUTH')
-options(quandl.auth = ifelse(nchar(quandl.auth),quandl.auth,""))
-rm(quandl.auth)
-Quandl.auth(options()$quandl.auth)
-
-# get data!
-fff.xts <- Quandl("KFRENCH/FACTORS_D",
-	start_date="1927-01-31",end_date="2014-12-31",
-	type="xts")
-fff.xts$Mkt <- fff.xts[,"Mkt-RF"] + fff.xts[,"RF"]
+data('dff4',package='aqfb.data')
 
 # shoot me if this is how to get the year number from a time index.
-yrno <- as.numeric(floor(as.yearmon(index(fff.xts))))
-qname <- quarters(index(fff.xts))
+yrno <- as.numeric(floor(as.yearmon(index(dff4))))
+qname <- quarters(index(dff4))
 
 is.q4 <- (qname == 'Q4')
 
 okvals <- lapply(unique(yrno),function(yr) { 
 	isi <- (yrno == yr) & !is.q4
 	oosi <- (yrno == yr) & is.q4
-	mod.is <- lm(SMB ~ Mkt + HML,data=fff.xts[isi,])
-	mod.oos <- lm(SMB ~ Mkt + HML,data=fff.xts[oosi,])
+	mod.is <- lm(SMB ~ Mkt + HML,data=dff4[isi,])
+	mod.oos <- lm(SMB ~ Mkt + HML,data=dff4[oosi,])
 	sr.is <- as.sr(mod.is)
 	sr.oos <- as.sr(mod.oos)
 	# compute prediction intervals
@@ -308,7 +284,7 @@ experiment:
 
 # shuffle the returns data by row
 set.seed(1234)
-shufff <- as.data.frame(fff.xts)
+shufff <- as.data.frame(dff4)
 shufff <- shufff[sample.int(nrow(shufff)),]
 
 okvals <- lapply(unique(yrno),function(yr) { 

@@ -260,7 +260,6 @@ se <- function(z, type) {
 #' anse <- se(asr,type="Lo")
 #'
 #' @method se sr
-#' @S3method se sr
 #' @rdname se
 #' @export
 se.sr <- function(z, type=c("t","Lo")) {
@@ -382,7 +381,6 @@ se.sr <- function(z, type=c("t","Lo")) {
 #' aci <- confint(asro,level=0.95)
 #'
 #' @method confint sr 
-#' @S3method confint sr 
 #' @export
 confint.sr <- function(object,parm,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,
@@ -399,7 +397,6 @@ confint.sr <- function(object,parm,level=0.95,
 #' @export
 #' @rdname confint
 #' @method confint sropt
-#' @S3method confint sropt
 confint.sropt <- function(object,parm,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,...) {
 	ci.hi <- qco_sropt(level.hi,df1=object$df1,df2=object$df2,
@@ -415,7 +412,6 @@ confint.sropt <- function(object,parm,level=0.95,
 #' @export
 #' @rdname confint
 #' @method confint del_sropt
-#' @S3method confint del_sropt
 confint.del_sropt <- function(object,parm,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,...) {
 	Fandp <- .del_sropt.asF(object)
@@ -720,7 +716,7 @@ inference <- function(z.s,type=c("KRS","MLE","unbiased")) {
 }
 #' @rdname inference
 #' @method inference sropt
-#' @S3method inference sropt
+#' @export
 inference.sropt <- function(z.s,type=c("KRS","MLE","unbiased")) {
 	# type defaults to "KRS":
 	type <- match.arg(type)
@@ -732,7 +728,7 @@ inference.sropt <- function(z.s,type=c("KRS","MLE","unbiased")) {
 }
 #' @rdname inference
 #' @method inference del_sropt
-#' @S3method inference del_sropt
+#' @export
 inference.del_sropt <- function(z.s,type=c("KRS","MLE","unbiased")) {
 	# type defaults to "KRS":
 	type <- match.arg(type)

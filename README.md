@@ -107,10 +107,10 @@ print(as.sr(some.rets))
 ```
 
 ```
-##      SR/sqrt(yr) Std. Error t value  Pr(>t)    
-## IBM         0.43       0.32     1.3 0.08950 .  
-## AAPL        1.05       0.32     3.3 0.00056 ***
-## XOM         0.42       0.32     1.3 0.09601 .  
+##      SR/sqrt(yr) Std. Error t value Pr(>t)    
+## IBM         0.43       0.32     1.3 0.0905 .  
+## AAPL        1.09       0.32     3.4 0.0004 ***
+## XOM         0.43       0.32     1.3 0.0937 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -145,7 +145,7 @@ ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist = qunif) +
 print(ph)
 ```
 
-<img src="github_extra/figure/unpaired_null-1.png" title="plot of chunk unpaired_null" alt="plot of chunk unpaired_null" width="700px" height="600px" />
+<img src="tools/figure/unpaired_null-1.png" title="plot of chunk unpaired_null" alt="plot of chunk unpaired_null" width="700px" height="600px" />
 
 Now we repeat for non-zero null value:
 
@@ -172,9 +172,9 @@ ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist = qunif) +
 print(ph)
 ```
 
-<img src="github_extra/figure/unpaired_null_two-1.png" title="plot of chunk unpaired_null_two" alt="plot of chunk unpaired_null_two" width="700px" height="600px" />
+<img src="tools/figure/unpaired_null_two-1.png" title="plot of chunk unpaired_null_two" alt="plot of chunk unpaired_null_two" width="700px" height="600px" />
 
-Now for real data.  We download monthly returns of the three Fama French factors plus momentum 
+Now for real data.  We take monthly returns of the three Fama French factors plus momentum 
 (the original Fifth Beatle), then divide into January and non-January periods. We regress
 Momentum against the other three factors, then convert the linear regression to a Sharpe ratio
 estimate. The two Sharpe ratios are then thrown into an unpaired sample test. We reject the null
@@ -184,38 +184,20 @@ Is this 'the January Effect'? Perhaps.
 
 ```r
 library(xts)
-library(Quandl)
+if (!require(aqfb.data)) {
+    devtools::install_github("shabbychef/aqfb_data")
+    library(aqfb.data)
+}
 
-# auth-fu
-quandl.auth <- Sys.getenv("QUANDL_AUTH")
-options(quandl.auth = ifelse(nchar(quandl.auth), quandl.auth, 
-    ""))
-rm(quandl.auth)
-Quandl.auth(options()$quandl.auth)
-
-# get data!
-fff.xts <- Quandl("KFRENCH/FACTORS_M", start_date = "1927-01-31", 
-    end_date = "2014-12-31", type = "xts")
-
-mom.xts <- Quandl("KFRENCH/MOMENTUM_M", start_date = "1927-01-31", 
-    end_date = "2014-12-31", type = "xts")
-colnames(mom.xts) <- c("UMD")
-
-# munge data!
-ff4.xts <- cbind(fff.xts[, c("SMB", "HML", "RF")], 
-    mom.xts)
-ff4.xts$Mkt <- fff.xts[, "Mkt-RF"] + fff.xts[, "RF"]
-# re-sort
-ff4.xts <- ff4.xts[, c("Mkt", "SMB", "HML", "UMD", 
-    "RF")]
+data("mff4", package = "aqfb.data")
 
 # January or not
-is.jan <- months(index(ff4.xts)) == "January"
+is.jan <- months(index(mff4)) == "January"
 
 # perform linear regression
-mod.jan <- lm(UMD ~ Mkt + SMB + HML, data = ff4.xts[is.jan, 
+mod.jan <- lm(UMD ~ Mkt + SMB + HML, data = mff4[is.jan, 
     ])
-mod.rem <- lm(UMD ~ Mkt + SMB + HML, data = ff4.xts[!is.jan, 
+mod.rem <- lm(UMD ~ Mkt + SMB + HML, data = mff4[!is.jan, 
     ])
 
 # convert lm models to Sharpes
@@ -233,13 +215,13 @@ print(etc)
 ## 	unpaired k-sample sr-test
 ## 
 ## data:  list(sr.jan, sr.rem)
-## df = 80, NA = 1000, p-value = 0.002
+## df = 90, NA = 1000, p-value = 0.002
 ## alternative hypothesis: true weighted sum of signal-noise ratios is not equal to 0
 ## 95 percent confidence interval:
-##  -2.44 -0.57
+##  -2.34 -0.52
 ## sample estimates:
 ## equation on Sharpe ratios 
-##                      -1.5
+##                      -1.4
 ```
 
 ## Prediction Intervals
@@ -273,10 +255,10 @@ print(coverage)
 ## [1] 0.95
 ```
 
-![nominal coverage](github_extra/static/borat_coverage.jpg)
+![nominal coverage](tools/static/borat_coverage.jpg)
 
 For a more complicated example, consider the 'Sharpe' under the attribution
-model. Here we download the _daily_ data of the three Fama French factors, then
+model. Here we use the _daily_ data of the three Fama French factors, then
 perform an attribution of SMB against the market and HML. We compute the
 factor model Sharpe for the first nine months of each year, and of the last three
 months separately. Using the first three quarters, we compute a prediction interval 
@@ -285,33 +267,26 @@ for the fourth quarter, then check coverage:
 
 ```r
 library(xts)
-library(Quandl)
+if (!require(aqfb.data)) {
+    devtools::install_github("shabbychef/aqfb_data")
+    library(aqfb.data)
+}
 
-# auth-fu
-quandl.auth <- Sys.getenv("QUANDL_AUTH")
-options(quandl.auth = ifelse(nchar(quandl.auth), quandl.auth, 
-    ""))
-rm(quandl.auth)
-Quandl.auth(options()$quandl.auth)
-
-# get data!
-fff.xts <- Quandl("KFRENCH/FACTORS_D", start_date = "1927-01-31", 
-    end_date = "2014-12-31", type = "xts")
-fff.xts$Mkt <- fff.xts[, "Mkt-RF"] + fff.xts[, "RF"]
+data("dff4", package = "aqfb.data")
 
 # shoot me if this is how to get the year number
 # from a time index.
-yrno <- as.numeric(floor(as.yearmon(index(fff.xts))))
-qname <- quarters(index(fff.xts))
+yrno <- as.numeric(floor(as.yearmon(index(dff4))))
+qname <- quarters(index(dff4))
 
 is.q4 <- (qname == "Q4")
 
 okvals <- lapply(unique(yrno), function(yr) {
     isi <- (yrno == yr) & !is.q4
     oosi <- (yrno == yr) & is.q4
-    mod.is <- lm(SMB ~ Mkt + HML, data = fff.xts[isi, 
+    mod.is <- lm(SMB ~ Mkt + HML, data = dff4[isi, 
         ])
-    mod.oos <- lm(SMB ~ Mkt + HML, data = fff.xts[oosi, 
+    mod.oos <- lm(SMB ~ Mkt + HML, data = dff4[oosi, 
         ])
     sr.is <- as.sr(mod.is)
     sr.oos <- as.sr(mod.oos)
@@ -330,7 +305,7 @@ print(coverage)
 ## [1] 0.8
 ```
 
-![no nominal coverage](github_extra/static/yuno.jpg)
+![no nominal coverage](tools/static/yuno.jpg)
 
 It is not clear if non-normality or omitted variable bias (or broken code!) 
 is to blame for the apparent conservatism of the prediction intervals in this case.
@@ -341,7 +316,7 @@ experiment:
 ```r
 # shuffle the returns data by row
 set.seed(1234)
-shufff <- as.data.frame(fff.xts)
+shufff <- as.data.frame(dff4)
 shufff <- shufff[sample.int(nrow(shufff)), ]
 
 okvals <- lapply(unique(yrno), function(yr) {
@@ -365,7 +340,7 @@ print(coverage)
 ```
 
 ```
-## [1] 0.95
+## [1] 0.92
 ```
 
 Of course, this could be a 'lucky seed', but one suspects that non-normality is _not_
@@ -407,7 +382,7 @@ print(t(wald.stats))
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.22  2.9 0.15
+## [1,] -0.27    3 0.15
 ```
 
 ```r
@@ -419,5 +394,5 @@ if (require(sandwich)) {
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.21  2.8 0.16
+## [1,] -0.26    3 0.16
 ```
