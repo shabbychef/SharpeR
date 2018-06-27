@@ -1,4 +1,10 @@
+
+2017-03-?? Steven E. Pav <shabbychef@gmail.com>
+* 1.1.1 on CRAN
+* move github figures to location CRAN understands
+
 2016-03-14 Steven E. Pav <shabbychef@gmail.com>
+* 1.1.0 on CRAN
 * predint outputs a matrix.
 * SRIC method.
 * SRIC in summary.
@@ -9,32 +15,40 @@
 * change prediction intervals to use kprime, not root finding on upsilon.
 
 2015-06-18 Steven E. Pav <shabbychef@gmail.com>
+* 1.0.0 on CRAN
+* less silly version numbering.
 * unpaired k sample test of Sharpe.
 * rely on same for unpaired 2 sample test.
 * prediction intervals for Sharpe based on upsilon.
 * more tests.
 
 2014-12-06 Steven E. Pav <shabbychef@gmail.com>
+* 0.1501 on CRAN
 * fix inference of frequency from xts objects
 * add rlambdap, variates from the lambda-prime distribution
 
 2014-01-03 Steven E. Pav <shabbychef@gmail.com>
+* 0.1401 on CRAN
 * fix matrix calculus in sm_vcov
 * add 'confidence distribution' functions for sr and sropt
 
 2013-10-30 Steven E. Pav <shabbychef@gmail.com>
+* 0.1310 on CRAN
 * ism_vcov for variance/covariance on Markowitz portfolio
 * expanding vignettes
 
 2013-09-20 Steven E. Pav <shabbychef@gmail.com>
+* 0.1309 on CRAN
 * add spanning tests
 * split vignette in two
 * sr_vcov
 * sr equality test via callback 
 
 2013-08-08 Steven E. Pav <shabbychef@gmail.com>
+* 0.1307 on CRAN
 * restore vignette to package
 
 2013-05-30 Steven E. Pav <shabbychef@gmail.com>
 * as.sr : fix df bug
+* 0.1305 on CRAN
 

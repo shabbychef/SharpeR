@@ -2,12 +2,12 @@
 % Please edit documentation in R/sr.r
 \name{as.sr}
 \alias{as.sr}
-\alias{as.sr.data.frame}
 \alias{as.sr.default}
-\alias{as.sr.lm}
 \alias{as.sr.matrix}
-\alias{as.sr.timeSeries}
+\alias{as.sr.data.frame}
+\alias{as.sr.lm}
 \alias{as.sr.xts}
+\alias{as.sr.timeSeries}
 \title{Compute the Sharpe ratio.}
 \usage{
 as.sr(x,c0=0,ope=1,na.rm=FALSE,epoch="yr")
@@ -118,9 +118,6 @@ colnames(my.returns) <- c("strat a","strat b","strat c","strat d")
 asr <- as.sr(my.returns)
   
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \references{
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
 \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
@@ -142,5 +139,7 @@ Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
   \code{\link{sr_vcov}}, \code{\link{sr}},
   \code{\link{summary}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{univar}
-

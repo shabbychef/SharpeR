@@ -76,9 +76,6 @@ asro <- as.sropt(Returns,drag=0,ope=ope)
 stest <- sropt_test(asro,alternative="two.sided")
 
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 \code{\link{reannualize}}
 
@@ -90,5 +87,7 @@ Other sropt: \code{\link{as.sropt}},
   \code{\link{power.sropt_test}},
   \code{\link{reannualize}}, \code{\link{sropt}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{htest}
-

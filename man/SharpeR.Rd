@@ -134,9 +134,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
+
 \references{
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
 \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
@@ -186,5 +184,7 @@ and Normal Distributions with Applications to Discriminant Analysis
 and Portfolio Theory." Scandinavian Journal of Statistics 38, no. 2 (2011):
 311--331. \url{http://dx.doi.org/10.1111/j.1467-9469.2011.00729.x}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{package}
-

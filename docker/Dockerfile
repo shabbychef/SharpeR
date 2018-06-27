@@ -16,16 +16,35 @@ FROM shabbychef/crancheck
 MAINTAINER Steven E. Pav, shabbychef@gmail.com
 # UNFOLD
 
-ENV NONCE 38b1eb8c-7af2-41a4-938e-aa1fe5f79f9a
+ENV DOCKERFILE_REFRESHED_AT 2017.03.14
+# see http://crosbymichael.com/dockerfile-best-practices.html
+#RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
+
+RUN (apt-get clean -y ; \
+ apt-get update -y -qq; \
+ apt-get update --fix-missing );
+
+#RUN (apt-get dist-upgrade -y ; \
+#apt-get update -qq ; \
+RUN (DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true apt-get install -q -y --no-install-recommends \ 
+  libgs9 texlive-base texlive-binaries \
+	libcupsimage2 libcups2 curl wget \
+	qpdf pandoc ghostscript \
+	texlive-latex-extra texlive-latex-base texlive-fonts-recommended texlive-fonts-extra ; \
+	sync ; \
+	mkdir -p /usr/local/lib/R/site-library ; \
+	chmod -R 777 /usr/local/lib/R/site-library ; \
+	sync ; \
+	/usr/local/bin/install2.r Rcpp testthat roxygen2 devtools knitr formatR codetools)
 
 # rinstall somethings...
-RUN /usr/local/bin/install2.r matrixcalc sharper xtable xts timeSeries quantmod MASS TTR testthat sandwich knitr 
+RUN /usr/local/bin/install2.r matrixcalc sadists xtable xts timeSeries quantmod MASS TTR sandwich ;
 
 #####################################################
 # entry and cmd# FOLDUP
 # these are the default, but remind you that you might want to use /usr/bin/R instead?
 # always use array syntax:
-ENTRYPOINT ["/usr/local/bin/Rdevel","CMD","check","--as-cran","--output=/tmp"]
+ENTRYPOINT ["/usr/bin/R","CMD","check","--as-cran","--output=/tmp"]
 
 # ENTRYPOINT and CMD are better together:
 CMD ["/srv/*.tar.gz"]

@@ -22,13 +22,12 @@ To satisfy the minimum requirements of an S3 class.
 roll.own <- del_sropt(z.s=2,z.sub=1,df1=10,df2=1000,df1.sub=3,ope=1,epoch="yr")
 is.sropt(roll.own)
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 del_sropt
 
 Other del_sropt: \code{\link{as.del_sropt}},
   \code{\link{del_sropt}}
 }
-
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}

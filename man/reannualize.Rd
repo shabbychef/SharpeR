@@ -46,9 +46,6 @@ roll.monthly <- reannualize(roll.own,new.ope=21,new.epoch="mo.")
 # make 'daily'
 roll.daily <- reannualize(roll.own,new.ope=1,new.epoch="day")
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 sr
 
@@ -69,4 +66,6 @@ Other sropt: \code{\link{as.sropt}},
   \code{\link{power.sropt_test}}, \code{\link{sropt_test}},
   \code{\link{sropt}}
 }
-
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}

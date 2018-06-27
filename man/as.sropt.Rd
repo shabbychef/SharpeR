@@ -109,9 +109,6 @@ if (require(quantmod)) {
 }
 }
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 \code{\link{sropt}}, \code{\link{sr}}, sropt-distribution functions, 
 \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
@@ -122,5 +119,7 @@ Other sropt: \code{\link{confint.sr}},
   \code{\link{reannualize}}, \code{\link{sropt_test}},
   \code{\link{sropt}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{univar}
-

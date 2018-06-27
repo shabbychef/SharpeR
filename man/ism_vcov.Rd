@@ -92,9 +92,6 @@ ism <- ism_vcov(Xf,vcov.func=vcovHAC)
 }
 
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \references{
 Pav, S. E. "Asymptotic Distribution of the Markowitz Portfolio."
 2013 \url{http://arxiv.org/abs/1312.0557}
@@ -102,5 +99,7 @@ Pav, S. E. "Asymptotic Distribution of the Markowitz Portfolio."
 \seealso{
 \code{\link{sm_vcov}}, \code{\link{sr_vcov}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{univar}
-

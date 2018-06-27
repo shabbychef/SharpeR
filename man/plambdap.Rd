@@ -82,9 +82,6 @@ qv <- qlambdap(c(0.1,0.2),c(128,253),c(2,4,8,16))
 rv <- rlambdap(1000,252,2)
 
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \references{
 Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
 Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107--116.
@@ -105,5 +102,7 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
   \code{\link{sr_vcov}}, \code{\link{sr}},
   \code{\link{summary}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{distribution}
-

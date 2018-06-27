@@ -107,9 +107,6 @@ qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),df2,rvs)
 qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 \code{\link{reannualize}}
 
@@ -121,5 +118,7 @@ Other sropt: \code{\link{as.sropt}},
   \code{\link{reannualize}}, \code{\link{sropt_test}},
   \code{\link{sropt}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{distribution}
-

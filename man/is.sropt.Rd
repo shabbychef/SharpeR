@@ -29,9 +29,6 @@ Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 asro <- as.sropt(Returns,drag=0,ope=ope)
 is.sropt(asro)
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 sropt
 
@@ -41,4 +38,6 @@ Other sropt: \code{\link{as.sropt}},
   \code{\link{reannualize}}, \code{\link{sropt_test}},
   \code{\link{sropt}}
 }
-
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}

@@ -52,9 +52,6 @@ must be explicitly passed if you want to compute it.
 anex <- power.sropt_test(8,4*253,1,0.05,NULL,ope=253) 
 
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 \code{\link{reannualize}}
 
@@ -66,5 +63,7 @@ Other sropt: \code{\link{as.sropt}},
   \code{\link{reannualize}}, \code{\link{sropt_test}},
   \code{\link{sropt}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{htest}
-

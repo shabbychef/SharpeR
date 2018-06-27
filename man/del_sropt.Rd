@@ -104,9 +104,6 @@ roll.own <- del_sropt(z.s=z,z.sub=z.sub,df1=10,df2=1000,
 print(roll.own)
 
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 \code{\link{reannualize}}
 
@@ -115,5 +112,7 @@ Steven E. Pav \email{shabbychef@gmail.com}
 Other del_sropt: \code{\link{as.del_sropt}},
   \code{\link{is.del_sropt}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{univar}
-

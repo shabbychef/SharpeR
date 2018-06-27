@@ -97,9 +97,6 @@ if (require(quantmod)) {
 }
 }
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \seealso{
 \code{\link{del_sropt}}, \code{\link{sropt}}, 
 \code{\link{sr}}
@@ -107,5 +104,7 @@ Steven E. Pav \email{shabbychef@gmail.com}
 Other del_sropt: \code{\link{del_sropt}},
   \code{\link{is.del_sropt}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{univar}
-

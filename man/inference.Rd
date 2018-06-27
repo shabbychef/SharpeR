@@ -2,8 +2,8 @@
 % Please edit documentation in R/estimation.r
 \name{inference}
 \alias{inference}
-\alias{inference.del_sropt}
 \alias{inference.sropt}
+\alias{inference.del_sropt}
 \title{Inference on noncentrality parameter of F-like statistic}
 \usage{
 inference(z.s, type = c("KRS", "MLE", "unbiased"))
@@ -93,9 +93,6 @@ est2 <- inference(asro,type='KRS')
 est3 <- inference(asro,type='MLE')
 
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \references{
 Kubokawa, T., C. P. Robert, and A. K. Saleh. "Estimation of noncentrality parameters." 
 Canadian Journal of Statistics 21, no. 1 (1993): 45-57. \url{http://www.jstor.org/stable/3315657}
@@ -109,5 +106,7 @@ F-distribution functions, \code{\link{df}}.
 
 Other sropt Hotelling: \code{\link{sric}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{htest}
-

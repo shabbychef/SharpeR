@@ -43,9 +43,6 @@ set.seed(1234)
 asr <- as.sr(rnorm(253*3),ope=253)
 summary(asr)
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \references{
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
 \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
@@ -62,4 +59,6 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
   \code{\link{sr_unpaired_test}}, \code{\link{sr_vcov}},
   \code{\link{sr}}
 }
-
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}

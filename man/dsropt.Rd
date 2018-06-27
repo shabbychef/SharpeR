@@ -120,9 +120,6 @@ isp <- psropt(rvs, df1, df2, drag, ope)
 plot(ecdf(isp))
 
 }
-\author{
-Steven E. Pav \email{shabbychef@gmail.com}
-}
 \references{
 Kan, Raymond and Smith, Daniel R. "The Distribution of the Sample Minimum-Variance Frontier."
 Journal of Management Science 54, no. 7 (2008): 1364--1380.
@@ -140,5 +137,7 @@ Other sropt: \code{\link{as.sropt}},
   \code{\link{reannualize}}, \code{\link{sropt_test}},
   \code{\link{sropt}}
 }
+\author{
+Steven E. Pav \email{shabbychef@gmail.com}
+}
 \keyword{distribution}
-
