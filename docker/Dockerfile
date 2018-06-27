@@ -16,7 +16,7 @@ FROM shabbychef/crancheck
 MAINTAINER Steven E. Pav, shabbychef@gmail.com
 # UNFOLD
 
-ENV DOCKERFILE_REFRESHED_AT 2018.06.26
+ENV DOCKERFILE_REFRESHED_AT 2018-06-15
 # see http://crosbymichael.com/dockerfile-best-practices.html
 #RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
 
@@ -30,7 +30,8 @@ RUN (DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true apt-get ins
   libgs9 texlive-base texlive-binaries \
 	libcupsimage2 libcups2 curl wget \
 	qpdf pandoc ghostscript \
-	texlive-latex-extra texlive-latex-base texlive-fonts-recommended texlive-fonts-extra ; \
+	texlive-latex-extra texlive-latex-base texlive-fonts-recommended texlive-fonts-extra \
+	liblapack-dev libblas-dev ; \
 	sync ; \
 	mkdir -p /usr/local/lib/R/site-library ; \
 	chmod -R 777 /usr/local/lib/R/site-library ; \

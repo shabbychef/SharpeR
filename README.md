@@ -128,17 +128,17 @@ We are testing the sum of three differences of Sharpes here.
 
 ```r
 set.seed(9001)
-pvals <- replicate(1000, {
+pvals <- replicate(10000L, {
     X <- matrix(rnorm(500 * 6), ncol = 6)
     inp <- as.sr(X)
     etc <- sr_unpaired_test(inp)
     etc$p.value
 })
-require(ggplot2)
+library(ggplot2)
 
 data <- data.frame(pvals = pvals)
 # empirical CDF of the p-values; should be uniform
-ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist = qunif) + 
+ph <- ggplot(data, aes(sample = pvals)) + stat_qq(distribution = stats::qunif) + 
     geom_abline(slope = 1, intercept = 0, colour = "red") + 
     theme(text = element_text(size = 8)) + labs(title = "P-P plot")
 
@@ -151,7 +151,7 @@ Now we repeat for non-zero null value:
 
 ```r
 set.seed(9002)
-pvals <- replicate(1000, {
+pvals <- replicate(10000L, {
     zeta <- 0.1
     sg <- 0.01
     X <- matrix(rnorm(500 * 6, mean = zeta * sg, sd = sg), 
@@ -165,7 +165,7 @@ require(ggplot2)
 
 data <- data.frame(pvals = pvals)
 # empirical CDF of the p-values; should be uniform
-ph <- ggplot(data, aes(sample = pvals)) + stat_qq(dist = qunif) + 
+ph <- ggplot(data, aes(sample = pvals)) + stat_qq(distribution = stats::qunif) + 
     geom_abline(slope = 1, intercept = 0, colour = "red") + 
     theme(text = element_text(size = 8)) + labs(title = "P-P plot")
 
