@@ -1,7 +1,9 @@
 
-2017-03-?? Steven E. Pav <shabbychef@gmail.com>
-* 1.1.1 on CRAN
+2018-10-06 Steven E. Pav <shabbychef@gmail.com>
+* 1.2.0 on CRAN
 * move github figures to location CRAN understands
+* do not redefine summary and print and so on; 
+use setOldClasses to define sr, sropt, etc as S3 classes.
 
 2016-03-14 Steven E. Pav <shabbychef@gmail.com>
 * 1.1.0 on CRAN

@@ -12,31 +12,9 @@
 
 #####################################################
 # preamble# FOLDUP
-FROM shabbychef/crancheck
+FROM shabbychef/crancheck:heavy
 MAINTAINER Steven E. Pav, shabbychef@gmail.com
 # UNFOLD
-
-ENV DOCKERFILE_REFRESHED_AT 2018-06-15
-# see http://crosbymichael.com/dockerfile-best-practices.html
-#RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
-
-RUN (apt-get clean -y ; \
- apt-get update -y -qq; \
- apt-get update --fix-missing );
-
-#RUN (apt-get dist-upgrade -y ; \
-#apt-get update -qq ; \
-RUN (DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true apt-get install -q -y --no-install-recommends \ 
-  libgs9 texlive-base texlive-binaries \
-	libcupsimage2 libcups2 curl wget \
-	qpdf pandoc ghostscript \
-	texlive-latex-extra texlive-latex-base texlive-fonts-recommended texlive-fonts-extra \
-	liblapack-dev libblas-dev ; \
-	sync ; \
-	mkdir -p /usr/local/lib/R/site-library ; \
-	chmod -R 777 /usr/local/lib/R/site-library ; \
-	sync ; \
-	/usr/local/bin/install2.r Rcpp testthat roxygen2 devtools knitr formatR codetools)
 
 # rinstall somethings...
 RUN /usr/local/bin/install2.r matrixcalc sadists xtable xts timeSeries quantmod MASS TTR sandwich ;

@@ -272,16 +272,6 @@ se.sr <- function(z, type=c("t","Lo")) {
 
 # confidence intervals on the Sharpe ratio#FOLDUP
 
-# do not have to include this, as confint is a generic provided
-# by R. I think.
-#  ' @usage
-#  '
-#  ' confint(object,level=0.95,level.lo=(1-level)/2,level.hi=1-level.lo,...)
-#confint <- function(object,level=0.95,
-							 #level.lo=(1-level)/2,level.hi=1-level.lo,...) {
-	#UseMethod("confint", object)
-#}
-
 #' @title Confidence Interval on (optimal) Signal-Noise Ratio
 #'
 #' @description 

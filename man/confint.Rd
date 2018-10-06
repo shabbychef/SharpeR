@@ -127,7 +127,7 @@ Other sr: \code{\link{as.sr}}, \code{\link{dsr}},
   \code{\link{se}}, \code{\link{sr_equality_test}},
   \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
   \code{\link{sr_vcov}}, \code{\link{sr}},
-  \code{\link{summary}}
+  \code{\link{summary.sr}}
 
 Other sropt: \code{\link{as.sropt}}, \code{\link{dsropt}},
   \code{\link{is.sropt}}, \code{\link{pco_sropt}},

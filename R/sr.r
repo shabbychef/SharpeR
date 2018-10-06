@@ -31,6 +31,8 @@
 #' @include distributions.r
 #' @include estimation.r
 
+setOldClass(c('sr','sropt','del_sropt','summary.sr','summary.sropt'))
+
 ########################################################################
 # Sharpe Ratio#FOLDUP
 
@@ -1139,11 +1141,10 @@ print.del_sropt <- function(x,...) {
 #' Enhances an object of class \code{sr}, \code{sropt} or \code{del_sropt} to also 
 #' include t- or T-statistics, p-values, and so on.
 #' 
-#' @usage
-#'
-#' summary(obj)
-#'
-#' @param obj an object of class \code{sr}, \code{sropt} or \code{del_sropt}.
+#' @param object an object of class \code{sr}, \code{sropt} or \code{del_sropt}.
+#' @param ...  additional arguments affecting the summary produced, though
+#' ignored here.
+#' @inheritParams summary
 #' @return When an \code{sr} object is input, the object cast to class \code{summary.sr} with some
 #' additional fields:
 #' \describe{
@@ -1160,7 +1161,6 @@ print.del_sropt <- function(x,...) {
 #'
 #' @seealso \code{\link{print.sr}}.
 #' @rdname summary
-#' @export summary
 #' @template etc
 #' @template sr
 #'
@@ -1169,28 +1169,24 @@ print.del_sropt <- function(x,...) {
 #' set.seed(1234)
 #' asr <- as.sr(rnorm(253*3),ope=253)
 #' summary(asr)
-summary <- function(obj) {
-	UseMethod("summary", obj)
-}
-#' @rdname summary
 #' @method summary sr
 #' @export
-summary.sr <- function(obj) {
-	obj$tval <- .sr2t(obj)
-	obj$pval <- pt(obj$tval,obj$df,lower.tail=FALSE)
-	obj$serr <- se(obj,type="t")
-	class(obj) <- "summary.sr"
-	obj
+summary.sr <- function(object,...) {
+	object$tval <- .sr2t(object)
+	object$pval <- pt(object$tval,object$df,lower.tail=FALSE)
+	object$serr <- se(object,type="t")
+	class(object) <- "summary.sr"
+	object
 }
 #' @rdname summary
 #' @method summary sropt
 #' @export
-summary.sropt <- function(obj) {
-	obj$pval <- .sropt.pval(obj)
-	obj$SRIC <- sric(obj)
+summary.sropt <- function(object,...) {
+	object$pval <- .sropt.pval(object)
+	object$SRIC <- sric(object)
 	#... anything else? KRS?
-	class(obj) <- "summary.sropt"
-	obj
+	class(object) <- "summary.sropt"
+	object
 }
 
 #UNFOLD

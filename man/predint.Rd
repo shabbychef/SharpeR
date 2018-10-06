@@ -92,7 +92,7 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
   \code{\link{se}}, \code{\link{sr_equality_test}},
   \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
   \code{\link{sr_vcov}}, \code{\link{sr}},
-  \code{\link{summary}}
+  \code{\link{summary.sr}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

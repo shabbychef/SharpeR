@@ -202,6 +202,12 @@ NULL
 #' \newcommand{\CRANpkg}{\href{https://cran.r-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 #'
+#' @section Changes in \SharpeR{} Version 1.2.0 (2016-10-07) :
+#' \itemize{
+#' \item move github figures to location CRAN understands
+#' \item be smarter about S3 classes: do not redefine summary and print.
+#' }
+#'
 #' @section Changes in \SharpeR{} Version 1.1.0 (2016-03-14) :
 #' \itemize{
 #' \item fix sr_vcov on array input.
