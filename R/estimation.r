@@ -239,7 +239,8 @@ se <- function(z, type) {
 #' @template param-ellipsis
 #' @keywords htest
 #' @return an estimate of standard error.
-#' @seealso sr-distribution functions, \code{\link{dsr}}
+#' @seealso sr-distribution functions, \code{\link{dsr}},
+#' \code{\link{sr_variance}}.
 #' @export 
 #' @template etc
 #' @template sr

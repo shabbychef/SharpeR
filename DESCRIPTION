@@ -40,6 +40,7 @@ Collate:
     'distributions.r'
     'sr.r'
     'estimation.r'
+    'sr_bias.r'
     'tests.r'
     'unified.r'
 RoxygenNote: 6.0.1

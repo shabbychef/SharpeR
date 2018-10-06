@@ -717,7 +717,9 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #'     # chomp first NA!
 #'     lrets[-1,]
 #'   }
-#'   get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+#'   get.rets <- function(syms,...) { 
+#'		some.rets <- do.call("cbind",lapply(syms,get.ret,...)) 
+#'	 }
 #'   some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
 #'   asro <- as.sropt(some.rets)
 #' }
@@ -1030,7 +1032,9 @@ del_sropt <- function(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr") {
 #'     # chomp first NA!
 #'     lrets[-1,]
 #'   }
-#'   get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+#'   get.rets <- function(syms,...) { 
+#'		some.rets <- do.call("cbind",lapply(syms,get.ret,...)) 
+#'	 }
 #'   some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
 #'   # hedge out SPY
 #'   G <- diag(dim(some.rets)[2])[5,]

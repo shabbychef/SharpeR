@@ -58,5 +58,16 @@ test_that("sropt_test",{#FOLDUP
 })#UNFOLD
 #UNFOLD
 
+context("sr bias and variance")#FOLDUP
+test_that("they run",{#FOLDUP
+	set.char.seed("972fee72-33dd-447d-a4ee-3424638d5d50")
+
+	sr_bias(1, 100, rep(0,5), type='simple')
+	sr_bias(1, 100, rep(0,5), type='second_order')
+	sr_variance(1, 100, rep(0,5))
+
+})#UNFOLD
+#UNFOLD
+
 #for vim modeline: (do not edit)
 # vim:ts=2:sw=2:tw=79:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r:ai:si:cin:nu:fo=croql:cino=p0t0c5(0:

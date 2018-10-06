@@ -89,7 +89,9 @@ if (require(quantmod)) {
     # chomp first NA!
     lrets[-1,]
   }
-  get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
+  get.rets <- function(syms,...) { 
+	some.rets <- do.call("cbind",lapply(syms,get.ret,...)) 
+ }
   some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
   # hedge out SPY
   G <- diag(dim(some.rets)[2])[5,]

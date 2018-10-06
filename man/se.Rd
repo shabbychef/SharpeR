@@ -62,7 +62,8 @@ Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
 1996. \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
 }
 \seealso{
-sr-distribution functions, \code{\link{dsr}}
+sr-distribution functions, \code{\link{dsr}},
+\code{\link{sr_variance}}.
 
 Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
   \code{\link{dsr}}, \code{\link{is.sr}},

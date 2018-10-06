@@ -206,6 +206,7 @@ NULL
 #' \itemize{
 #' \item move github figures to location CRAN understands
 #' \item be smarter about S3 classes: do not redefine summary and print.
+#' \item add bias and variance from Bao (2009).
 #' }
 #'
 #' @section Changes in \SharpeR{} Version 1.1.0 (2016-03-14) :
