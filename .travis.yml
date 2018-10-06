@@ -12,6 +12,10 @@ r:
   - release
   - devel
 
+# set this to test for methods gotchas?
+env:
+  - R_S3_METHOD_LOOKUP_BASEENV_AFTER_GLOBALENV=true
+
 r_github_packages :
   - jimhester/covr
 
