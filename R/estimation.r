@@ -174,9 +174,12 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 # note that typically the df given here is n-1?
 # just sweep that under the rug.
 .t_se_Mertens <- function(tstat,df,cumulants) {
-	se <- sqrt(1 - (cumulants[1] * tstat / sqrt(df)) + (cumulants[4] + 2) * (tstat**2) / (4*df))
+	stopifnot(!is.null(cumulants))
+	# hey, how is this supposed to work with matrices??
+	se <- sqrt(1 - (cumulants[1] * tstat / sqrt(df+1)) + (cumulants[4] + 2) * (tstat**2) / (4*(df+1)))
 } 
 .t_se_Bao <- function(tstat,df,cumulants) {
+	stopifnot(!is.null(cumulants))
 	# this is from Yong Bao's code:
 	S <- tstat / sqrt(df+1)
 	se <- sqrt((df+1) * ( (1+S^2/2)/(df+1)+(19*S^2/8+2)/(df+1)^2-cumulants[1]*S*(1/(df+1)+5/2/(df+1)^2)

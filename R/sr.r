@@ -267,6 +267,7 @@ as.sr.matrix <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE)
 	mu <- apply(x,2,mean,na.rm=na.rm)
 	sigma <- apply(x,2,sd,na.rm=na.rm)
 
+	# remember that the cumulants in general will be a matrix...
 	if (higher_order) {
 		# find this in sr_bias.r
 		cumulants <- apply(x,2,.smplgamma,na.rm=na.rm)
