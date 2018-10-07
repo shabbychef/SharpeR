@@ -203,10 +203,10 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 				 Bao = .t_se_Bao(t,df,cumulants))
 }
 
-.t_bias1 <- function(tstat,df,cumulants) {
-	if (!is.matrix(cumulants)) { cumulants <- matrix(cumulants,ncol=1) }
-	(2 + cumulants[2,,drop=TRUE])*tstat*3/8/(df+1)^(3/2) - cumulants[1,,drop=TRUE]/2/(df+1);
-}
+#.t_bias1 <- function(tstat,df,cumulants) {
+	#if (!is.matrix(cumulants)) { cumulants <- matrix(cumulants,ncol=1) }
+	#(2 + cumulants[2,,drop=TRUE])*tstat*3/8/(df+1)^(3/2) - cumulants[1,,drop=TRUE]/2/(df+1);
+#}
 .t_bias2 <- function(tstat,df,cumulants) {
 	if (!is.matrix(cumulants)) { cumulants <- matrix(cumulants,ncol=1) }
 	3*tstat/4/(df+1)^(3/2) +
