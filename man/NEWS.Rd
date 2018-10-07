@@ -17,6 +17,7 @@ News for package 'SharpeR'
 \item add bias and variance from Bao (2009).
 \item support estimation of higher order moments in \code{as.sr}, 
 and expands methods for se and confidence interval computations.
+\item incorporate higher order methods into one sample sr tests.
 }
 }
 

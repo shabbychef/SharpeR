@@ -209,6 +209,7 @@ NULL
 #' \item add bias and variance from Bao (2009).
 #' \item support estimation of higher order moments in \code{as.sr}, 
 #' and expands methods for se and confidence interval computations.
+#' \item incorporate higher order methods into one sample sr tests.
 #' }
 #'
 #' @section Changes in \SharpeR{} Version 1.1.0 (2016-03-14) :

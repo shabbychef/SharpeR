@@ -7,6 +7,7 @@ use setOldClasses to define sr, sropt, etc as S3 classes.
 * add bias and variance from Bao (2009).
 * support estimation of higher order moments in as.sr,
 and expands methods for se and confidence interval computations.
+* incorporate higher order methods into one sample sr tests.
 
 2016-03-14 Steven E. Pav <shabbychef@gmail.com>
 * 1.1.0 on CRAN

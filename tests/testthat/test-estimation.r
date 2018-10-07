@@ -213,6 +213,7 @@ test_that("basic as.sr usage",{
 		}
 	}
 })
+# basically make sure each of the types gives about the same results
 test_that("se not confounded by ope",{
 	set.char.seed("8eb9aa6a-4435-46ba-bb60-1c8c39593218")
 	x <- rnorm(1000)
@@ -225,6 +226,21 @@ test_that("se not confounded by ope",{
 	expect_lt(abs(log(myse_t / myse_l)),0.2)
 	expect_lt(abs(log(myse_t / myse_m)),0.2)
 	expect_lt(abs(log(myse_t / myse_b)),0.2)
+
+	set.char.seed("8eb9aa6a-4435-46ba-bb60-1c8c39593218")
+	x <- rnorm(1000,mean=4)
+	expect_error(mysr_h <- as.sr(x,higher_order=TRUE),NA,ope=252)
+
+	expect_error(myci_e <- confint(mysr_h,type="exact"),NA)
+	expect_error(myci_t <- confint(mysr_h,type="t"),NA)
+	expect_error(myci_z <- confint(mysr_h,type="Z"),NA)
+	expect_error(myci_m <- confint(mysr_h,type="Mertens"),NA)
+	expect_error(myci_b <- confint(mysr_h,type="Bao"),NA)
+
+	expect_lt(max(abs(log(myci_e / myci_t))),0.2)
+	expect_lt(max(abs(log(myci_e / myci_z))),0.2)
+	expect_lt(max(abs(log(myci_e / myci_m))),0.2)
+	expect_lt(max(abs(log(myci_e / myci_b))),0.2)
 
 })
 
