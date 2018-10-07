@@ -106,6 +106,46 @@ test_that("basic sr functionality, Matrix",{# FOLDUP
 	expect_error(myse <- se(mysr_h,"Mertens"),NA)
 	expect_error(myse <- se(mysr_h,"Bao"),NA)
 })# UNFOLD
+test_that("Matrix computations work in parallel",{# FOLDUP
+	set.char.seed("4f080841-01cc-4d35-8e5f-cd3f9b786dc0")
+	X <- matrix(rnorm(100*2),ncol=4)
+
+	# now break them apart and combine them together
+	expect_error(mysr_h <- as.sr(X,higher_order=TRUE),NA)
+	expect_error(myse_t <- se(mysr_h,"t"),NA)
+	expect_error(myse_l <- se(mysr_h,"Lo"),NA)
+	expect_error(myse_m <- se(mysr_h,"Mertens"),NA)
+	expect_error(myse_b <- se(mysr_h,"Bao"),NA)
+
+	expect_error(myci_t <- confint(mysr_h, type="t"),NA)
+	expect_error(myci_z <- confint(mysr_h, type="Z"),NA)
+	expect_error(myci_m <- confint(mysr_h, type="Mertens"),NA)
+	expect_error(myci_b <- confint(mysr_h, type="Bao"),NA)
+
+	for (iii in 1:ncol(X)) {
+		expect_error(subsr_h <- as.sr(X[,iii],higher_order=TRUE),NA)
+		expect_error(subse_t <- se(subsr_h,"t"),NA)
+		expect_error(subse_l <- se(subsr_h,"Lo"),NA)
+		expect_error(subse_m <- se(subsr_h,"Mertens"),NA)
+		expect_error(subse_b <- se(subsr_h,"Bao"),NA)
+
+		expect_error(subci_t <- confint(subsr_h, type="t"),NA)
+		expect_error(subci_z <- confint(subsr_h, type="Z"),NA)
+		expect_error(subci_m <- confint(subsr_h, type="Mertens"),NA)
+		expect_error(subci_b <- confint(subsr_h, type="Bao"),NA)
+
+		expect_equal(as.numeric(subse_t),as.numeric(myse_t[iii]))
+		expect_equal(as.numeric(subse_l),as.numeric(myse_l[iii]))
+		expect_equal(as.numeric(subse_m),as.numeric(myse_m[iii]))
+		expect_equal(as.numeric(subse_b),as.numeric(myse_b[iii]))
+
+		expect_equal(as.numeric(subci_t),as.numeric(myci_t[iii,]))
+		expect_equal(as.numeric(subci_z),as.numeric(myci_z[iii,]))
+		expect_equal(as.numeric(subci_m),as.numeric(myci_m[iii,]))
+		expect_equal(as.numeric(subci_b),as.numeric(myci_b[iii,]))
+	}
+
+})# UNFOLD
 test_that("basic sr functionality, others",{# FOLDUP
 	set.char.seed("76bd2b1d-1de1-4e93-b133-6a22310510e6")
 

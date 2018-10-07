@@ -176,16 +176,18 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 .t_se_Mertens <- function(tstat,df,cumulants) {
 	stopifnot(!is.null(cumulants))
 	# hey, how is this supposed to work with matrices??
-	se <- sqrt(1 - (cumulants[1] * tstat / sqrt(df+1)) + (cumulants[4] + 2) * (tstat**2) / (4*(df+1)))
+	if (!is.matrix(cumulants)) { cumulants <- matrix(cumulants,ncol=1) }
+	se <- sqrt(1 - (cumulants[1,,drop=TRUE] * tstat / sqrt(df+1)) + (cumulants[2,,drop=TRUE] + 2) * (tstat**2) / (4*(df+1)))
 } 
 .t_se_Bao <- function(tstat,df,cumulants) {
 	stopifnot(!is.null(cumulants))
+	if (!is.matrix(cumulants)) { cumulants <- matrix(cumulants,ncol=1) }
 	# this is from Yong Bao's code:
 	S <- tstat / sqrt(df+1)
-	se <- sqrt((df+1) * ( (1+S^2/2)/(df+1)+(19*S^2/8+2)/(df+1)^2-cumulants[1]*S*(1/(df+1)+5/2/(df+1)^2)
-    +cumulants[2]*S^2*(1/4/(df+1)+3/8/(df+1)^2)+5*cumulants[3]*S/4/(df+1)^2-3*cumulants[4]*S^2/8/(df+1)^2
-    +cumulants[1]^2*(7/4/(df+1)^2-3*S^2/2/(df+1)^2)
-    -15*cumulants[1]*cumulants[2]*S/4/(df+1)^2+39*cumulants[2]^2*S^2/32/(df+1)^2 ));
+	se <- sqrt((df+1) * ( (1+S^2/2)/(df+1)+(19*S^2/8+2)/(df+1)^2-cumulants[1,,drop=TRUE]*S*(1/(df+1)+5/2/(df+1)^2)
+    +cumulants[2,,drop=TRUE]*S^2*(1/4/(df+1)+3/8/(df+1)^2)+5*cumulants[3,,drop=TRUE]*S/4/(df+1)^2-3*cumulants[4,,drop=TRUE]*S^2/8/(df+1)^2
+    +cumulants[1,,drop=TRUE]^2*(7/4/(df+1)^2-3*S^2/2/(df+1)^2)
+    -15*cumulants[1,,drop=TRUE]*cumulants[2,,drop=TRUE]*S/4/(df+1)^2+39*cumulants[2,,drop=TRUE]^2*S^2/32/(df+1)^2 ));
 } 
 
  
@@ -201,15 +203,17 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 				 Bao = .t_se_Bao(t,df,cumulants))
 }
 
-.t_bias1 <- function(tstat,df,r) {
-	(2 + r[2])*tstat*3/8/(df+1)^(3/2) - r[1]/2/(df+1);
+.t_bias1 <- function(tstat,df,cumulants) {
+	if (!is.matrix(cumulants)) { cumulants <- matrix(cumulants,ncol=1) }
+	(2 + cumulants[2,,drop=TRUE])*tstat*3/8/(df+1)^(3/2) - cumulants[1,,drop=TRUE]/2/(df+1);
 }
-.t_bias2 <- function(tstat,df,r) {
+.t_bias2 <- function(tstat,df,cumulants) {
+	if (!is.matrix(cumulants)) { cumulants <- matrix(cumulants,ncol=1) }
 	3*tstat/4/(df+1)^(3/2) +
-		3/8/(df+1)^2 * (r[3] - 5*r[1]*r[2]/2) + 
-		r[1]*(1/2/(df+1)+3/8/(df+1)^2) +
-		tstat*r[2]*(3/8 -15/32/(df+1))/(df+1)^(3/2) +
-		5*tstat/16/(df+1)^(5/2) * (49/10 - r[4] - 4 * r[1]^2 + 21*r[2]^2/8) 
+		3/8/(df+1)^2 * (cumulants[3,,drop=TRUE] - 5*cumulants[1,,drop=TRUE]*cumulants[2,,drop=TRUE]/2) + 
+		cumulants[1,,drop=TRUE]*(1/2/(df+1)+3/8/(df+1)^2) +
+		tstat*cumulants[2,,drop=TRUE]*(3/8 -15/32/(df+1))/(df+1)^(3/2) +
+		5*tstat/16/(df+1)^(5/2) * (49/10 - cumulants[4,,drop=TRUE] - 4 * cumulants[1,,drop=TRUE]^2 + 21*cumulants[2,,drop=TRUE]^2/8) 
 }
 
 # recentering to remove bias
@@ -221,7 +225,7 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 									 tstat * (1 - 1 / (4 * df))
 								 },
 								 Bao={
-									 tstat - .t_bias2(tstat,df,r=cumulants)
+									 tstat - .t_bias2(tstat,df,cumulants=cumulants)
 								 })
 }
 
