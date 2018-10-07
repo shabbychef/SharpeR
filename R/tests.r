@@ -411,7 +411,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			higher_order <- type %in% c('Mertens','Bao')
 			srx <- as.sr(x,c0=0,ope=1,na.rm=TRUE,higher_order=higher_order)
 			sry <- as.sr(y,c0=0,ope=1,na.rm=TRUE,higher_order=higher_order)
-# add type to sr_unpaired_test
+			# 2FIX add type to sr_unpaired_test
 			retval <- sr_unpaired_test(list(srx,sry),c(1,-1),0,
 																 alternative=alternative,
 																 ope=ope,conf.level=conf.level)
@@ -453,7 +453,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 	estimate <- z$sr
 	names(estimate) <- paste(c("Sharpe ratio of",dname),sep=" ",collapse="")
 
-	method <- "One Sample sr test"
+	method <- paste("One Sample sr test,",type,"method")
 
 	if (type=='exact') {
 		switch(alternative,

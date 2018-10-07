@@ -380,6 +380,130 @@ test_that("sr_test two sample paired power under alternative",{#FOLDUP
 	}
 })#UNFOLD
 
+test_that("sr_test monotonicity",{#FOLDUP
+	# do the volkswagon
+	skip_on_cran()
+
+	# for greater alternative# FOLDUP
+	thealt <- 'greater'
+	set.char.seed("44db258a-e22e-46e0-b1fe-1d722efdc854")
+	x <- rnorm(100)
+	ptes_e <- sr_test(x,zeta=0,type='exact',alternative=thealt)
+	ptes_l <- sr_test(x,zeta=0,type='t',alternative=thealt)
+	ptes_z <- sr_test(x,zeta=0,type='Z',alternative=thealt)
+	ptes_m <- sr_test(x,zeta=0,type='Mertens',alternative=thealt)
+	ptes_b <- sr_test(x,zeta=0,type='Bao',alternative=thealt)
+
+	for (zeta in c(-0.5,0.5)) {
+		ptes_e_a <- sr_test(x,zeta=zeta,type='exact',alternative=thealt)
+		ptes_l_a <- sr_test(x,zeta=zeta,type='t',alternative=thealt)
+		ptes_z_a <- sr_test(x,zeta=zeta,type='Z',alternative=thealt)
+		ptes_m_a <- sr_test(x,zeta=zeta,type='Mertens',alternative=thealt)
+		ptes_b_a <- sr_test(x,zeta=zeta,type='Bao',alternative=thealt)
+
+		# now when you test it against a smaller zeta, the p-value
+		# should be smaller, since we are testing against the greater alternative
+		# multiplying by sign flips it
+		expect_gt(sign(zeta)*ptes_e_a$p.value,sign(zeta)*ptes_e$p.value)
+		expect_gt(sign(zeta)*ptes_l_a$p.value,sign(zeta)*ptes_l$p.value)
+		expect_gt(sign(zeta)*ptes_z_a$p.value,sign(zeta)*ptes_z$p.value)
+		expect_gt(sign(zeta)*ptes_m_a$p.value,sign(zeta)*ptes_m$p.value)
+		expect_gt(sign(zeta)*ptes_b_a$p.value,sign(zeta)*ptes_b$p.value)
+	}
+	for (addon in c(-1,1)) {
+		z <- x + addon
+		ptes_e_a <- sr_test(z,zeta=0,type='exact',alternative=thealt)
+		ptes_l_a <- sr_test(z,zeta=0,type='t',alternative=thealt)
+		ptes_z_a <- sr_test(z,zeta=0,type='Z',alternative=thealt)
+		ptes_m_a <- sr_test(z,zeta=0,type='Mertens',alternative=thealt)
+		ptes_b_a <- sr_test(z,zeta=0,type='Bao',alternative=thealt)
+
+		expect_lt(sign(addon)*ptes_e_a$p.value,sign(addon)*ptes_e$p.value)
+		expect_lt(sign(addon)*ptes_l_a$p.value,sign(addon)*ptes_l$p.value)
+		expect_lt(sign(addon)*ptes_z_a$p.value,sign(addon)*ptes_z$p.value)
+		expect_lt(sign(addon)*ptes_m_a$p.value,sign(addon)*ptes_m$p.value)
+		expect_lt(sign(addon)*ptes_b_a$p.value,sign(addon)*ptes_b$p.value)
+	}
+# UNFOLD
+	# for less alternative# FOLDUP
+	thealt <- 'less'
+	set.char.seed("24735f8b-2a3f-44a6-9dc8-2d66803eef1f")
+	x <- rnorm(100)
+	ptes_e <- sr_test(x,zeta=0,type='exact',alternative=thealt)
+	ptes_l <- sr_test(x,zeta=0,type='t',alternative=thealt)
+	ptes_z <- sr_test(x,zeta=0,type='Z',alternative=thealt)
+	ptes_m <- sr_test(x,zeta=0,type='Mertens',alternative=thealt)
+	ptes_b <- sr_test(x,zeta=0,type='Bao',alternative=thealt)
+
+	for (zeta in c(-0.5,0.5)) {
+		ptes_e_a <- sr_test(x,zeta=zeta,type='exact',alternative=thealt)
+		ptes_l_a <- sr_test(x,zeta=zeta,type='t',alternative=thealt)
+		ptes_z_a <- sr_test(x,zeta=zeta,type='Z',alternative=thealt)
+		ptes_m_a <- sr_test(x,zeta=zeta,type='Mertens',alternative=thealt)
+		ptes_b_a <- sr_test(x,zeta=zeta,type='Bao',alternative=thealt)
+
+		# now when you test it against a smaller zeta, the p-value
+		# should be bigger, since we are testing against the less alternative
+		# multiplying by sign flips it
+		expect_lt(sign(zeta)*ptes_e_a$p.value,sign(zeta)*ptes_e$p.value)
+		expect_lt(sign(zeta)*ptes_l_a$p.value,sign(zeta)*ptes_l$p.value)
+		expect_lt(sign(zeta)*ptes_z_a$p.value,sign(zeta)*ptes_z$p.value)
+		expect_lt(sign(zeta)*ptes_m_a$p.value,sign(zeta)*ptes_m$p.value)
+		expect_lt(sign(zeta)*ptes_b_a$p.value,sign(zeta)*ptes_b$p.value)
+	}
+	for (addon in c(-1,1)) {
+		z <- x + addon
+		ptes_e_a <- sr_test(z,zeta=0,type='exact',alternative=thealt)
+		ptes_l_a <- sr_test(z,zeta=0,type='t',alternative=thealt)
+		ptes_z_a <- sr_test(z,zeta=0,type='Z',alternative=thealt)
+		ptes_m_a <- sr_test(z,zeta=0,type='Mertens',alternative=thealt)
+		ptes_b_a <- sr_test(z,zeta=0,type='Bao',alternative=thealt)
+
+		expect_gt(sign(addon)*ptes_e_a$p.value,sign(addon)*ptes_e$p.value)
+		expect_gt(sign(addon)*ptes_l_a$p.value,sign(addon)*ptes_l$p.value)
+		expect_gt(sign(addon)*ptes_z_a$p.value,sign(addon)*ptes_z$p.value)
+		expect_gt(sign(addon)*ptes_m_a$p.value,sign(addon)*ptes_m$p.value)
+		expect_gt(sign(addon)*ptes_b_a$p.value,sign(addon)*ptes_b$p.value)
+	}
+# UNFOLD
+	# for lesser alternative# FOLDUP
+	set.char.seed("e6c57e7b-ad9d-40e9-a549-43d430740b61")
+	x <- rnorm(100)
+	ptes_e <- sr_test(x,zeta=0,type='exact',alternative='less')
+	ptes_l <- sr_test(x,zeta=0,type='t',alternative='less')
+	ptes_z <- sr_test(x,zeta=0,type='Z',alternative='less')
+	ptes_m <- sr_test(x,zeta=0,type='Mertens',alternative='less')
+	ptes_b <- sr_test(x,zeta=0,type='Bao',alternative='less')
+
+	# now when you test it against a smaller zeta, the p-value
+	# should be bigger, since we are testing against the less alternative
+	ptes_e_m <- sr_test(x,zeta=-0.5,type='exact',alternative='less')
+	ptes_l_m <- sr_test(x,zeta=-0.5,type='t',alternative='less')
+	ptes_z_m <- sr_test(x,zeta=-0.5,type='Z',alternative='less')
+	ptes_m_m <- sr_test(x,zeta=-0.5,type='Mertens',alternative='less')
+	ptes_b_m <- sr_test(x,zeta=-0.5,type='Bao',alternative='less')
+
+	expect_gt(ptes_e_m$p.value,ptes_e$p.value)
+	expect_gt(ptes_l_m$p.value,ptes_l$p.value)
+	expect_gt(ptes_z_m$p.value,ptes_z$p.value)
+	expect_gt(ptes_m_m$p.value,ptes_m$p.value)
+	expect_gt(ptes_b_m$p.value,ptes_b$p.value)
+
+	# now when you test it against a larger zeta, the p-value
+	# should be smaller, since we are testing against the less alternative
+	ptes_e_p <- sr_test(x,zeta=0.5,type='exact',alternative='less')
+	ptes_l_p <- sr_test(x,zeta=0.5,type='t',alternative='less')
+	ptes_z_p <- sr_test(x,zeta=0.5,type='Z',alternative='less')
+	ptes_m_p <- sr_test(x,zeta=0.5,type='Mertens',alternative='less')
+	ptes_b_p <- sr_test(x,zeta=0.5,type='Bao',alternative='less')
+
+	expect_lt(ptes_e_p$p.value,ptes_e$p.value)
+	expect_lt(ptes_l_p$p.value,ptes_l$p.value)
+	expect_lt(ptes_z_p$p.value,ptes_z$p.value)
+	expect_lt(ptes_m_p$p.value,ptes_m$p.value)
+	expect_lt(ptes_b_p$p.value,ptes_b$p.value)
+# UNFOLD
+})#UNFOLD
 #UNFOLD
 
 #for vim modeline: (do not edit)

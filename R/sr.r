@@ -250,11 +250,11 @@ as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE
 	sigma <- sd(x)
 	if (higher_order) {
 		# find this in sr_bias.r
-		cumulants <- .smplgamma(x,muy=mu)
+		cumulants <- matrix(.smplgamma(x,muy=mu),ncol=1)  # make it a matrix.
+		rownames(cumulants) <- paste0('gamma_',1:4)
 	} else { 
 		cumulants <- NULL 
 	}
-
 
 	retval <- .as.sr.unified(x=x,mu=mu,sigma=sigma,c0=c0,ope=ope,
 													 na.rm=na.rm,epoch=epoch,cumulants=cumulants)
