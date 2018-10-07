@@ -139,10 +139,6 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr",cumulants=NULL)
 #' attempts to infer the observations per year, without regard to 
 #' the name of the \code{epoch} given.
 #'
-#' @usage
-#'
-#' as.sr(x,c0=0,ope=1,na.rm=FALSE,epoch="yr")
-#'
 #' @param x vector of returns, or object of class \code{data.frame}, \code{xts},
 #'        or \code{lm}.
 #' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
@@ -339,10 +335,6 @@ as.sr.timeSeries <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FA
 #' @details
 #'
 #' To satisfy the minimum requirements of an S3 class.
-#'
-#' @usage
-#'
-#' is.sr(x)
 #'
 #' @param x an object of some kind.
 #' @return a boolean.
@@ -590,10 +582,6 @@ as.markowitz.default <- function(X,mu=NULL,Sigma=NULL,...) {
 #' rather \code{\link{as.sropt}} should be called instead to compute the
 #' needed statistics.
 #'
-#' @usage
-#'
-#' sropt(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL)
-#'
 #' @param z.s an optimum Sharpe ratio statistic.
 #' @inheritParams dsropt
 #' @param drag the 'drag' term, \eqn{c_0/R}{c0/R}. defaults to 0. It is assumed
@@ -685,10 +673,6 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #' Note that if \code{ope} and \code{epoch} are not given, the 
 #' converter from \code{xts} attempts to infer the observations per epoch,
 #' assuming yearly epoch.
-#'
-#' @usage
-#'
-#' as.sropt(X,drag=0,ope=1,epoch="yr")
 #'
 #' @param X matrix of returns, or \code{xts} object.
 #' @inheritParams sropt 
@@ -785,10 +769,6 @@ as.sropt.xts <- function(X,drag=0,ope=1,epoch="yr") {
 #' @details
 #'
 #' To satisfy the minimum requirements of an S3 class.
-#'
-#' @usage
-#'
-#' is.sropt(x)
 #'
 #' @param x an object of some kind.
 #' @return a boolean.
@@ -887,10 +867,6 @@ print.sropt <- function(x,...) {
 #' For the most part, this constructor should \emph{not} be called directly,
 #' rather \code{\link{as.del_sropt}} should be called instead to compute the
 #' needed statistics.
-#'
-#' @usage
-#'
-#' del_sropt(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr")
 #'
 #' @param z.s an optimum Sharpe ratio statistic, on some set of assets.
 #' @param z.sub an optimum Sharpe ratio statistic, on a linear subspace
@@ -1008,10 +984,6 @@ del_sropt <- function(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr") {
 #' converter from \code{xts} attempts to infer the observations per epoch,
 #' assuming yearly epoch.
 #'
-#' @usage
-#'
-#' as.del_sropt(X,G,drag=0,ope=1,epoch="yr")
-#'
 #' @param X matrix of returns, or \code{xts} object.
 #' @param G an \eqn{g \times q}{g x q} matrix of hedge constraints. A 
 #' garden variety application would have \code{G} be one row of the
@@ -1109,10 +1081,6 @@ as.del_sropt.xts <- function(X,G,drag=0,ope=1,epoch="yr") {
 #' @details
 #'
 #' To satisfy the minimum requirements of an S3 class.
-#'
-#' @usage
-#'
-#' is.del_sropt(x)
 #'
 #' @param x an object of some kind.
 #' @return a boolean.

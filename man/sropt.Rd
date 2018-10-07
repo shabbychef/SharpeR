@@ -4,7 +4,7 @@
 \alias{sropt}
 \title{Create an 'sropt' object.}
 \usage{
-sropt(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL)
+sropt(z.s, df1, df2, drag = 0, ope = 1, epoch = "yr", T2 = NULL)
 }
 \arguments{
 \item{z.s}{an optimum Sharpe ratio statistic.}

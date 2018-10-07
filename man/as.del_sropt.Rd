@@ -6,7 +6,7 @@
 \alias{as.del_sropt.xts}
 \title{Compute the Sharpe ratio of a hedged Markowitz portfolio.}
 \usage{
-as.del_sropt(X,G,drag=0,ope=1,epoch="yr")
+as.del_sropt(X, G, drag = 0, ope = 1, epoch = "yr")
 
 \method{as.del_sropt}{default}(X, G, drag = 0, ope = 1, epoch = "yr")
 

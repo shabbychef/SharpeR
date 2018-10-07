@@ -10,7 +10,8 @@
 \alias{as.sr.timeSeries}
 \title{Compute the Sharpe ratio.}
 \usage{
-as.sr(x,c0=0,ope=1,na.rm=FALSE,epoch="yr")
+as.sr(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
+  higher_order = FALSE)
 
 \method{as.sr}{default}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
   higher_order = FALSE)

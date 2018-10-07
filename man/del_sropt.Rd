@@ -4,7 +4,7 @@
 \alias{del_sropt}
 \title{Create an 'del_sropt' object.}
 \usage{
-del_sropt(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr")
+del_sropt(z.s, z.sub, df1, df2, df1.sub, drag = 0, ope = 1, epoch = "yr")
 }
 \arguments{
 \item{z.s}{an optimum Sharpe ratio statistic, on some set of assets.}

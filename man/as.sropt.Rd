@@ -6,7 +6,7 @@
 \alias{as.sropt.xts}
 \title{Compute the Sharpe ratio of the Markowitz portfolio.}
 \usage{
-as.sropt(X,drag=0,ope=1,epoch="yr")
+as.sropt(X, drag = 0, ope = 1, epoch = "yr")
 
 \method{as.sropt}{default}(X, drag = 0, ope = 1, epoch = "yr")
 
