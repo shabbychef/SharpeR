@@ -9,5 +9,5 @@
 #'
 #' Rao, C. R. "On Some Problems Arising out of Discrimination with Multiple 
 #' Characters." Sankhya, 9, no. 4 (1949): 343-366.
-#' \url{http://www.jstor.org/stable/25047988}
+#' \url{https://www.jstor.org/stable/25047988}
 #'

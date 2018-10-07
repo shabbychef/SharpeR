@@ -71,7 +71,9 @@
 # as a difftime
 .infer_delt_xts <- function(anxts) {
 	TEO <- time(anxts)
-	delt <- difftime(TEO[length(TEO)],TEO[1],units='days')
+	# the as.Date rigamarole is b/c these are timeDate objects and now
+	# the conversion to POSIXct in difftime requires an origin? WTF?
+	delt <- difftime(as.Date(TEO[length(TEO)]),as.Date(TEO[1]),units='days')
 	return(delt)
 }
 # infer the observations per epoch from an xts object

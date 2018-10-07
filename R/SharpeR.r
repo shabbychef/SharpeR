@@ -161,7 +161,7 @@
 #'
 #' Britten-Jones, Mark. "The Sampling Error in Estimates of Mean-Variance 
 #' Efficient Portfolio Weights." The Journal of Finance 54, no. 2 (1999):
-#' 655--671. \url{http://www.jstor.org/stable/2697722}
+#' 655--671. \url{https://www.jstor.org/stable/2697722}
 #'
 #' Silvapulle, Mervyn. J. "A Hotelling's T2-type statistic for testing against 
 #' one-sided hypotheses." Journal of Multivariate Analysis 55, no. 2 (1995):
