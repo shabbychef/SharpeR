@@ -7,12 +7,12 @@
 \usage{
 se(z, type)
 
-\method{se}{sr}(z, type = c("t", "Lo"))
+\method{se}{sr}(z, type = c("t", "Lo", "Mertens", "Bao"))
 }
 \arguments{
 \item{z}{an observed Sharpe ratio statistic, of class \code{sr}.}
 
-\item{type}{estimator type. one of \code{"t", "Lo", "exact"}}
+\item{type}{estimator type. one of \code{"t", "Lo", "Mertens", "Bao"}}
 
 \item{...}{further arguments to be passed to or from methods.}
 }
@@ -24,14 +24,17 @@ Estimates the standard error of the Sharpe ratio statistic.
 }
 \details{
 For an observed Sharpe ratio, estimate the standard error.
-There are two methods:
+The following methods are recognized:
 
-\itemize{
-\item The default, \code{t}, based on Johnson & Welch, with a correction
-for small sample size, also known as \code{Lo}.
-\item A method based on the exact variance of the non-central t-distribution,
-\code{exact}.
+\describe{
+\item{t}{The default, based on Johnson & Welch, with a correction
+for small sample size. Also known as \code{'Lo'}.}
+\item{Mertens}{An approximation to the standard error taking into
+skewness and kurtosis of the returns distribution.}
+\item{Bao}{An even higher accuracty approximation using higher order
+moments.}
 }
+
 There should be very little difference between these except for very small
 sample sizes.
 }
@@ -54,6 +57,10 @@ Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31
 
 Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
 (2002): 36-52. \url{http://ssrn.com/paper=377260}
+
+Bao, Yong. "Estimation Risk-Adjusted Sharpe Ratio and Fund Performance Ranking 
+Under a General Return Distribution." Journal of Financial Econometrics 7, 
+no. 2 (2009): 152-173. \url{https://doi.org/10.1093/jjfinec/nbn022}
 
 Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the p-values?" Journal of Asset
 Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}

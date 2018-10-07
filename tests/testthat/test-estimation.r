@@ -38,20 +38,34 @@ context("code runs at all")#FOLDUP
 test_that("basic sr functionality",{
 	set.char.seed("50e02c82-fdfc-4423-93ef-cbd350a65391")
 	x <- matrix(rnorm(100*2),ncol=4)
-	mysr <- as.sr(x)
-	print(mysr)
-	print(format(mysr))
-	dummy <- reannualize(mysr,new.ope=2)
+	expect_error(mysr <- as.sr(x),NA)
+	expect_error(print(mysr),NA)
+	expect_error(print(format(mysr)),NA)
+	expect_error(dummy <- reannualize(mysr,new.ope=2),NA)
 	expect_true(is.sr(mysr))
-	myse <- se(mysr,"t")
-	myse <- se(mysr,"Lo")
+	expect_error(myse <- se(mysr,"t"),NA)
+	expect_error(myse <- se(mysr,"Lo"),NA)
+	# these should throw b/c they do not have cumulants
+	expect_error(myse <- se(mysr,"Mertenst"))
+	expect_error(myse <- se(mysr,"Bao"))
 
-	ci1 <- confint(mysr)
-	ci2 <- confint(mysr, level=0.9)
-	ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95)
-	ci4 <- confint(mysr, type="exact")
-	ci5 <- confint(mysr, type="t")
-	ci6 <- confint(mysr, type="Z")
+	expect_error(ci1 <- confint(mysr),NA)
+	expect_error(ci2 <- confint(mysr, level=0.9),NA)
+	expect_error(ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95),NA)
+	expect_error(ci4 <- confint(mysr, type="exact"),NA)
+	expect_error(ci5 <- confint(mysr, type="t"),NA)
+	expect_error(ci6 <- confint(mysr, type="Z"),NA)
+	# these should throw b/c they do not have cumulants
+	expect_error(dci7 <- confint(mysr, type="Mertens"))
+	expect_error(dci8 <- confint(mysr, type="Bao"))
+
+	# compute cumulants and try higher order methods
+	expect_error(mysr_h <- as.sr(x,higher_order=TRUE),NA)
+	expect_error(ci7 <- confint(mysr_h, type="Mertens"),NA)
+	expect_error(ci8 <- confint(mysr_h, type="Bao"),NA)
+
+	expect_error(myse <- se(mysr_h,"Mertens"),NA)
+	expect_error(myse <- se(mysr_h,"Bao"),NA)
 
 	# via data.frame
 	xdf <- data.frame(a=rnorm(500,1),b=rnorm(500,1));
@@ -70,7 +84,7 @@ test_that("basic sr functionality",{
 
 	# via xts
 	if (require(xts)) {
-		xxts <- xts(x,order.by=as.Date(1:(dim(x)[1]),origin="1990-01-01"))
+		xxts <- xts(x,order.by=as.Date(1:nrow(x),origin="1990-01-01"))
 		mysr <- as.sr(xxts)
 		print(mysr)
 		print(format(mysr))
@@ -162,6 +176,49 @@ test_that("basic sr_vcov functionality",{
 
 	# sentinel:
 	expect_true(TRUE)
+})
+#UNFOLD
+context("higher order moments")#FOLDUP
+test_that("basic as.sr usage",{
+	set.char.seed("a11f6c3d-c0f1-4282-a4ba-d6ebf990bdef")
+	x <- rnorm(100)
+	X <- matrix(rnorm(100*2),ncol=4)
+	expect_error(mysr1 <- as.sr(x,higher_order=FALSE),NA)
+	expect_error(mysr2 <- as.sr(x,higher_order=TRUE),NA)
+	expect_equal(mysr1$sr,mysr2$sr)
+
+	expect_error(mysr1 <- as.sr(X,higher_order=FALSE),NA)
+	expect_error(mysr2 <- as.sr(X,higher_order=TRUE),NA)
+	expect_equal(mysr1$sr,mysr2$sr)
+
+	# via data.frame
+	xdf <- data.frame(a=rnorm(500,1),b=rnorm(500,1));
+	expect_error(mysr1 <- as.sr(xdf,higher_order=FALSE),NA)
+	expect_error(mysr2 <- as.sr(xdf,higher_order=TRUE),NA)
+	expect_equal(mysr1$sr,mysr2$sr)
+
+	# via lm
+	xdf <- data.frame(AAPL=rnorm(500,1),SPY=rnorm(500,1))
+	mylm <- lm(AAPL ~ SPY,data=xdf)
+	expect_error(mysr1 <- as.sr(mylm,higher_order=FALSE),NA)
+	expect_error(mysr2 <- as.sr(mylm,higher_order=TRUE),NA)
+	expect_warning(mysr2 <- as.sr(mylm,higher_order=TRUE))
+	expect_equal(mysr1$sr,mysr2$sr)
+
+	# via xts
+	if (require(xts)) {
+		xxts <- xts(X,order.by=as.Date(1:nrow(X),origin="1990-01-01"))
+		expect_error(mysr1 <- as.sr(xxts,higher_order=FALSE),NA)
+		expect_error(mysr2 <- as.sr(xxts,higher_order=TRUE),NA)
+		expect_equal(mysr1$sr,mysr2$sr)
+
+		if (require(timeSeries)) {
+			ats <- as.timeSeries(xxts)
+			expect_error(mysr1 <- as.sr(ats,higher_order=FALSE),NA)
+			expect_error(mysr2 <- as.sr(ats,higher_order=TRUE),NA)
+			expect_equal(mysr1$sr,mysr2$sr)
+		}
+	}
 })
 #UNFOLD
 context("estimation functions: confint coverage")#FOLDUP

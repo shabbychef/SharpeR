@@ -15,6 +15,8 @@ News for package 'SharpeR'
 \item move github figures to location CRAN understands
 \item be smarter about S3 classes: do not redefine summary and print.
 \item add bias and variance from Bao (2009).
+\item support estimation of higher order moments in \code{as.sr}, 
+and expands methods for se and confidence interval computations.
 }
 }
 

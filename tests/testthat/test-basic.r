@@ -39,22 +39,16 @@ test_that("sr_basic",{#FOLDUP
 	set.char.seed("653c0960-a65c-4091-b916-cb9bfc21a21b")
 	X <- matrix(rnorm(1000*1),ncol=1)
 	Y <- matrix(rnorm(length(X)),ncol=1)
-	asrX <- as.sr(X)
-	asrY <- as.sr(Y)
+	expect_error(asrX <- as.sr(X),NA)
+	expect_error(asrY <- as.sr(Y),NA)
 	print(summary(asrX))
 	print(summary(asrY))
-
-	# sentinel
-	expect_true(TRUE)
 })#UNFOLD
 test_that("sropt_test",{#FOLDUP
 	set.char.seed("1f9001aa-7457-4492-b4a0-ce7b8ae55049")
 	X <- matrix(rnorm(1000*10),ncol=10)
-	sroX <- as.sropt(X)
-	print(summary(sroX))
-
-	# sentinel
-	expect_true(TRUE)
+	expect_error(sroX <- as.sropt(X),NA)
+	expect_error(print(summary(sroX)),NA)
 })#UNFOLD
 #UNFOLD
 
@@ -62,10 +56,9 @@ context("sr bias and variance")#FOLDUP
 test_that("they run",{#FOLDUP
 	set.char.seed("972fee72-33dd-447d-a4ee-3424638d5d50")
 
-	sr_bias(1, 100, rep(0,5), type='simple')
-	sr_bias(1, 100, rep(0,5), type='second_order')
-	sr_variance(1, 100, rep(0,5))
-
+	expect_error(sr_bias(1, 100, rep(0,5), type='simple'),NA)
+	expect_error(sr_bias(1, 100, rep(0,5), type='second_order'),NA)
+	expect_error(sr_variance(1, 100, rep(0,5)),NA)
 })#UNFOLD
 #UNFOLD
 

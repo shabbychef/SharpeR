@@ -434,18 +434,19 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 
 	method <- "One Sample sr test"
 
-	if (alternative == "less") {
-		pval <- .psr(z, zeta=zeta, lower.tail=TRUE)
-		cint <- confint(z,type="exact",level.lo=0,level.hi=conf.level)
-	}
-	else if (alternative == "greater") {
-		pval <- .psr(z, zeta=zeta, lower.tail=FALSE)
-		cint <- confint(z,type="exact",level.lo=1-conf.level,level.hi=1)
-	}
-	else {
-		pval <- .oneside2two(.psr(z, zeta=zeta, lower.tail=TRUE))
-		cint <- confint(z,type="exact",level=conf.level)
-	}
+	switch(alternative,
+				 less={
+					 pval <- .psr(z, zeta=zeta, lower.tail=TRUE)
+					 cint <- confint(z,type="exact",level.lo=0,level.hi=conf.level)
+				 },
+				 greater={
+					 pval <- .psr(z, zeta=zeta, lower.tail=FALSE)
+					 cint <- confint(z,type="exact",level.lo=1-conf.level,level.hi=1)
+				 },
+				 two.sided={
+					 pval <- .oneside2two(.psr(z, zeta=zeta, lower.tail=TRUE))
+					 cint <- confint(z,type="exact",level=conf.level)
+				 })
 
 	names(df) <- "df"
 	names(zeta) <- "signal-noise ratio"

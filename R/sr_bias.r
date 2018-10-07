@@ -34,41 +34,42 @@
 	#vf <- .variance(TT,Shat,rhat);   
 #}
 
-#.smplgamma <- function(y) {
-	#x <- y - mean(y)
-	#k <- .kstat(x)
-	#retv <- k[3:6] / (k[2] ^ ((3:6)/2))
-	#retv
-#}
+# we use these elsewhere
+.smplgamma <- function(y,muy=mean(y,na.rm=TRUE),n=length(y),na.rm=TRUE) {
+	x <- y - muy
+	if (na.rm) { x <- na.omit(x) }
+	k <- .kstat(x,n=n)
+	retv <- k[3:6] / (k[2] ^ ((3:6)/2))
+	retv
+}
 
-## /* k-statistic, see Kendall's Advanced Theory of Statistics */
-#.kstat <- function(x) {
-	#n <- length(x)
-	#s <- unlist(lapply(1:6,function(iii) { sum(x^iii) }))
-	#nn <- n^(1:6)
-	#nd <- exp(lfactorial(n) - lfactorial(n-(1:6)))
-	#k <- rep(0,6)
-	## sample mean
-	#k[1] <- s[1]/n;
-	## sample variance
-	#k[2] <- (n*s[2]-s[1]^2)/nd[2];
-	## skewness?
-	#k[3] <- (nn[2]*s[3]-3*n*s[2]*s[1]+2*s[1]^3)/nd[3]
-	## excess kurtosis.
-	#k[4] <- ((nn[3]+nn[2])*s[4]-4*(nn[2]+n)*s[3]*s[1]-3*(nn[2]-n)*s[2]^2 +12*n*s[2]*s[1]^2-6*s[1]^4)/nd[4];
-	## whatchamacallit
-	#k[5] <- ((nn[4]+5*nn[3])*s[5]-5*(nn[3]+5*nn[2])*s[4]*s[1]-10*(nn[3]-nn[2])*s[3]*s[2] 
-					 #+20*(nn[2]+2*n)*s[3]*s[1]^2+30*(nn[2]-n)*s[2]^2*s[1]-60*n*s[2]*s[1]^3 +24*s[1]^5)/nd[5];
-	## yeah, ok.
-	#k[6] <- ((nn[5]+16*nn[4]+11*nn[3]-4*nn[2])*s[6]
-					#-6*(nn[4]+16*nn[3]+11*nn[2]-4*n)*s[5]*s[1]
-					#-15*n*(n-1)^2*(n+4)*s[4]*s[2]-10*(nn[4]-2*nn[3]+5*nn[2]-4*n)*s[3]^2
-					#+30*(nn[3]+9*nn[2]+2*n)*s[4]*s[1]^2+120*(nn[3]-n)*s[3]*s[2]*s[1]
-					#+30*(nn[3]-3*nn[2]+2*n)*s[2]^3-120*(nn[2]+3*n)*s[3]*s[1]^3
-					#-270*(nn[2]-n)*s[2]^2*s[1]^2+360*n*s[2]*s[1]^4-120*s[1]^6)/nd[6];
+# /* k-statistic, see Kendall's Advanced Theory of Statistics */
+.kstat <- function(x,n=length(x)) {
+	s <- unlist(lapply(1:6,function(iii) { sum(x^iii) }))
+	nn <- n^(1:6)
+	nd <- exp(lfactorial(n) - lfactorial(n-(1:6)))
+	k <- rep(0,6)
+	# sample mean
+	k[1] <- s[1]/n;
+	# sample variance
+	k[2] <- (n*s[2]-s[1]^2)/nd[2];
+	# skewness?
+	k[3] <- (nn[2]*s[3]-3*n*s[2]*s[1]+2*s[1]^3)/nd[3]
+	# excess kurtosis.
+	k[4] <- ((nn[3]+nn[2])*s[4]-4*(nn[2]+n)*s[3]*s[1]-3*(nn[2]-n)*s[2]^2 +12*n*s[2]*s[1]^2-6*s[1]^4)/nd[4];
+	# whatchamacallit
+	k[5] <- ((nn[4]+5*nn[3])*s[5]-5*(nn[3]+5*nn[2])*s[4]*s[1]-10*(nn[3]-nn[2])*s[3]*s[2] 
+					 +20*(nn[2]+2*n)*s[3]*s[1]^2+30*(nn[2]-n)*s[2]^2*s[1]-60*n*s[2]*s[1]^3 +24*s[1]^5)/nd[5];
+	# yeah, ok.
+	k[6] <- ((nn[5]+16*nn[4]+11*nn[3]-4*nn[2])*s[6]
+					-6*(nn[4]+16*nn[3]+11*nn[2]-4*n)*s[5]*s[1]
+					-15*n*(n-1)^2*(n+4)*s[4]*s[2]-10*(nn[4]-2*nn[3]+5*nn[2]-4*n)*s[3]^2
+					+30*(nn[3]+9*nn[2]+2*n)*s[4]*s[1]^2+120*(nn[3]-n)*s[3]*s[2]*s[1]
+					+30*(nn[3]-3*nn[2]+2*n)*s[2]^3-120*(nn[2]+3*n)*s[3]*s[1]^3
+					-270*(nn[2]-n)*s[2]^2*s[1]^2+360*n*s[2]*s[1]^4-120*s[1]^6)/nd[6];
 
-	#k
-#}
+	k
+}
 
 .bias2 <- function(TT,S,r) {
 	3*S/4/TT+49*S/32/TT^2-r[1]*(1/2/TT+3/8/TT^2)+S*r[2]*(3/8/TT-15/32/TT^2) +3*r[3]/8/TT^2-5*S*r[4]/16/TT^2-5*S*r[1]^2/4/TT^2+105*S*r[2]^2/128/TT^2-15*r[1]*r[2]/16/TT^2;

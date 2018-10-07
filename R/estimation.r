@@ -170,33 +170,49 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 # See Walck, section 33.5
 .t_se_normal <- function(tstat,df) {
 	se <- sqrt(1 + (tstat**2) / (2*df))
-	return(se)
 }
-.t_se <- function(t,df,type=c("t","Lo")) {
-	# 2FIX: add opdyke corrections for skew and kurtosis?
+# note that typically the df given here is n-1?
+# just sweep that under the rug.
+.t_se_Mertens <- function(tstat,df,cumulants) {
+	se <- sqrt(1 - (cumulants[1] * tstat / sqrt(df)) + (cumulants[4] + 2) * (tstat**2) / (4*df))
+} 
+ 
+# note that the cumulants are assumed on the returns distribution,
+# not the cumulants of the t-stat, of course.
+.t_se <- function(t,df,type=c("t","Lo","Mertens","Bao"),cumulants=NULL) {
 	# 2FIX: add autocorrelation correction?
 	type <- match.arg(type)
-	se <- switch(type,
-							 t = .t_se_normal(t,df),
-							 Lo = .t_se_normal(t,df))
-	return(se)
+	switch(type,
+				 t = .t_se_normal(t,df),
+				 Lo = .t_se_normal(t,df),
+				 Mertens = .t_se_Mertens(t,df,cumulants),
+				 Bao = sqrt(df+1) * sqrt(sr_variance(snr=t/sqrt(df+1),n=df+1,cumulants=cumulants)))  # this is awful.
 }
 # confidence intervals on the non-centrality parameter of a t-stat
-.t_confint <- function(tstat,df,level=0.95,type=c("exact","t","Z"),
-					 level.lo=(1-level)/2,level.hi=1-level.lo) {
+.t_confint <- function(tstat,df,level=0.95,type=c("exact","t","Z","Mertens","Bao"),
+					 level.lo=(1-level)/2,level.hi=1-level.lo,cumulants=cumulants) {
 	type <- match.arg(type)
 	if (type == "exact") {
 		ci.lo <- qlambdap(level.lo,df,tstat,lower.tail=TRUE)
 		ci.hi <- qlambdap(level.hi,df,tstat,lower.tail=TRUE)
 		ci <- cbind(ci.lo,ci.hi)
 	} else {
-		if (type == "t") {
-			se <- .t_se(tstat,df,type=type)
-			midp <- tstat
-		} else if (type == "Z") {
-			se <- .t_se(tstat,df,type="t")
-			midp <- tstat * (1 - 1 / (4 * df))
-		} else stop("internal error")
+		midp <- tstat  # mostly we use the tstat as the middle point, unless bias correcting.
+		switch(type,
+					 t={
+						 se <- .t_se(tstat,df,type="t")
+					 },
+					 Z={  # this is odd: we unbias the SR based on the simple bias correction
+						 se <- .t_se(tstat,df,type="t")
+						 midp <- tstat * (1 - 1 / (4 * df))
+					 },
+					 Mertens={
+						 se <- .t_se(tstat,df,type="Mertens",cumulants=cumulants)
+					 },
+					 Bao={
+						 se <- .t_se(tstat,df,type="Bao",cumulants=cumulants)
+						 midp <- tstat - sr_bias(snr=tstat/sqrt(df+1),n=df+1,cumulants=cumulants,type='second_order')
+					 })
 		zalp <- qnorm(c(level.lo,level.hi))
 		ci <- cbind(midp + zalp[1] * se,midp + zalp[2] * se)
 	} 
@@ -223,19 +239,22 @@ se <- function(z, type) {
 #' @details 
 #'
 #' For an observed Sharpe ratio, estimate the standard error.
-#' There are two methods:
+#' The following methods are recognized:
 #'
-#' \itemize{
-#' \item The default, \code{t}, based on Johnson & Welch, with a correction
-#' for small sample size, also known as \code{Lo}.
-#' \item A method based on the exact variance of the non-central t-distribution,
-#' \code{exact}.
+#' \describe{
+#' \item{t}{The default, based on Johnson & Welch, with a correction
+#' for small sample size. Also known as \code{'Lo'}.}
+#' \item{Mertens}{An approximation to the standard error taking into
+#' skewness and kurtosis of the returns distribution.}
+#' \item{Bao}{An even higher accuracty approximation using higher order
+#' moments.}
 #' }
+#'
 #' There should be very little difference between these except for very small
 #' sample sizes.
 #'
 #' @param z an observed Sharpe ratio statistic, of class \code{sr}.
-#' @param type estimator type. one of \code{"t", "Lo", "exact"}
+#' @param type estimator type. one of \code{"t", "Lo", "Mertens", "Bao"}
 #' @template param-ellipsis
 #' @keywords htest
 #' @return an estimate of standard error.
@@ -249,6 +268,7 @@ se <- function(z, type) {
 #' kurtosis.
 #' @template ref-JW
 #' @template ref-Lo
+#' @template ref-Bao
 #' @template ref-Opdyke
 #' @references 
 #'
@@ -263,9 +283,9 @@ se <- function(z, type) {
 #' @method se sr
 #' @rdname se
 #' @export
-se.sr <- function(z, type=c("t","Lo")) {
+se.sr <- function(z, type=c("t","Lo","Mertens","Bao")) {
 	tstat <- .sr2t(z)
-	retval <- .t_se(tstat,df=z$df,type=type)
+	retval <- .t_se(tstat,df=z$df,type=type,cumulants=z$cumulants)
 	retval <- .t2sr(z,retval)
 	return(retval)
 }
@@ -286,12 +306,18 @@ se.sr <- function(z, type=c("t","Lo")) {
 #' Constructs confidence intervals on the Signal-Noise ratio given observed
 #' Sharpe ratio statistic. The available methods are:
 #'
-#' \itemize{
-#' \item The default, \code{exact}, which is only exact when returns are
-#' normal, based on inverting the non-central t
-#' distribution.
-#' \item A method based on the standard error of a non-central t distribution.
-#' \item A method based on a normal approximation.
+#' \describe{
+#' \item{exact}{The default, which is only exact when returns are
+#' normal, based on inverting the non-central t distribution.}
+#' \item{t}{Uses the Johnson Welch approximation to the standard error, centered around
+#' the sample value.}
+#' \item{Z}{Uses the Johnson Welch approximation to the standard error,
+#' performing a simple correction for the bias of the Sharpe ratio based on 
+#' Miller and Gehr formula.}
+#' \item{Mertens}{Uses the Mertens higher order approximation to the standard
+#' error, centered around the sample value.}
+#' \item{Bao}{Uses the Bao higher order approximation to the standard error,
+#' performing a higher order correction for the bias of the Sharpe ratio.}
 #' }
 #'
 #' Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate
@@ -375,12 +401,12 @@ se.sr <- function(z, type=c("t","Lo")) {
 #' @export
 confint.sr <- function(object,parm,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,
-							 type=c("exact","t","Z"),...) {
+							 type=c("exact","t","Z","Mertens","Bao"),...) {
 	type <- match.arg(type)
 	tstat <- .sr2t(object)
 	retval <- .t_confint(tstat,df=object$df,level=level,
 											 level.lo=level.lo,level.hi=level.hi,
-											 type=type)
+											 type=type,cumulants=object$cumulants)
 	retval <- .t2sr(object,retval)
 	rownames(retval) <- .get_strat_names(object$sr)
 	return(retval)

@@ -63,10 +63,6 @@ setOldClass(c('sr','sropt','del_sropt','summary.sr','summary.sropt'))
 #' rather \code{\link{as.sr}} should be called instead to compute the
 #' Sharpe ratio.
 #'
-#' @usage
-#'
-#' sr(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") 
-#'
 #' @param sr a Sharpe ratio statistic.
 #' @param df the degrees of freedom of the equivalent t-statistic.
 #' @param c0 the 'risk-free' or 'disastrous' rate of return. this is
@@ -76,6 +72,7 @@ setOldClass(c('sr','sropt','del_sropt','summary.sr','summary.sropt'))
 #' @param rescal the rescaling parameter.
 #' @param epoch the string representation of the 'epoch', defaulting
 #'        to 'yr'.
+#' @template param-cumulants
 #' @keywords univar 
 #' @return a list cast to class \code{sr}.
 #' @seealso \code{\link{as.sr}}
@@ -98,9 +95,10 @@ setOldClass(c('sr','sropt','del_sropt','summary.sr','summary.sropt'))
 #' rvs <- rsr(5,n,zeta,ope=ope)
 #' roll.own <- sr(sr=rvs,df=n-1,ope=ope,rescal=sqrt(1/n))
 #'
-sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
+sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr",cumulants=NULL) {
 	retval <- list(sr = sr,df = df,c0 = c0,
-								 ope = ope,rescal = rescal,epoch = epoch)
+								 ope = ope,rescal = rescal,epoch = epoch,
+								 cumulants=cumulants)
 	class(retval) <- "sr"
 	return(retval)
 }
@@ -154,6 +152,9 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' @param na.rm logical.  Should missing values be removed?
 #' @param epoch the string representation of the 'epoch', defaulting
 #'        to 'yr'.
+#' @param higher_order  a Boolean. If true, we compute 
+#'        cumulants of the returns to leverage higher order accuracy formulae
+#'        when possible.
 #' @keywords univar 
 #' @return a list containing the following components:
 #' \describe{
@@ -208,10 +209,10 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr") {
 #' colnames(my.returns) <- c("strat a","strat b","strat c","strat d")
 #' asr <- as.sr(my.returns)
 #'   
-as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE) {
 	UseMethod("as.sr", x)
 }
-.as.sr.unified <- function(x,mu,sigma,c0,ope,na.rm,epoch) {
+.as.sr.unified <- function(x,mu,sigma,c0,ope,na.rm,epoch,cumulants=NULL) {
 	z <- .compute_sr(mu,c0,sigma,ope)
 	dim(z) <- c(length(mu),1)
 
@@ -241,73 +242,92 @@ as.sr <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
 	
 	# n.b. sr$df is n-1
 	retval <- sr(z,df=df-1,c0=c0,ope=ope,
-							 rescal=1/sqrt(df),epoch=epoch)
+							 rescal=1/sqrt(df),epoch=epoch,cumulants=cumulants)
 	return(retval)
 }
 #' @rdname as.sr
 #' @method as.sr default
 #' @export
-as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
-	mu <- mean(x,na.rm=na.rm)
-	sigma <- sd(x,na.rm=na.rm)
+as.sr.default <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE) {
+	if (na.rm) { x <- na.omit(x) }
+	mu <- mean(x)
+	sigma <- sd(x)
+	if (higher_order) {
+		# find this in sr_bias.r
+		cumulants <- .smplgamma(x,muy=mu)
+	} else { 
+		cumulants <- NULL 
+	}
+
+
 	retval <- .as.sr.unified(x=x,mu=mu,sigma=sigma,c0=c0,ope=ope,
-													 na.rm=na.rm,epoch=epoch)
+													 na.rm=na.rm,epoch=epoch,cumulants=cumulants)
 	return(retval)
 }
 #' @rdname as.sr
 #' @method as.sr matrix
 #' @export
-as.sr.matrix <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+as.sr.matrix <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE) {
 	mu <- apply(x,2,mean,na.rm=na.rm)
 	sigma <- apply(x,2,sd,na.rm=na.rm)
+
+	if (higher_order) {
+		# find this in sr_bias.r
+		cumulants <- apply(x,2,.smplgamma,na.rm=na.rm)
+		rownames(cumulants) <- paste0('gamma_',1:4)
+	} else { 
+		cumulants <- NULL 
+	}
+
 	retval <- .as.sr.unified(x=x,mu=mu,sigma=sigma,c0=c0,ope=ope,
-													 na.rm=na.rm,epoch=epoch)
+													 na.rm=na.rm,epoch=epoch,cumulants=cumulants)
 	return(retval)
 }
 #' @rdname as.sr
 #' @method as.sr data.frame
 #' @export
-as.sr.data.frame <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
-	retval <- as.sr.matrix(x,c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
+as.sr.data.frame <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE) {
+	retval <- as.sr.matrix(x,c0=c0,ope=ope,na.rm=na.rm,epoch=epoch,higher_order=higher_order)
 	return(retval)
 }
 #' @rdname as.sr
 #' @method as.sr lm 
 #' @export
-as.sr.lm <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+as.sr.lm <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE) {
 	mu <- x$coefficients["(Intercept)"]
 	sigma <- sqrt(deviance(x) / x$df.residual)
+	if (higher_order) { warning('cannot compute higher order cumulants on lm object; ignoring the flag') }
 	z <- .compute_sr(mu,c0,sigma,ope)
 	dim(z) <- c(1,1)
 	rownames(z) <- deparse(substitute(x))
 	XXinv <- vcov(x) / sigma^2
 	rescal <- sqrt(XXinv["(Intercept)","(Intercept)"])
 	retval <- sr(z,df=x$df.residual,c0=c0,ope=ope,
-							 rescal=rescal,epoch=epoch)
+							 rescal=rescal,epoch=epoch,cumulants=NULL)
 	return(retval)
 }
 #' @rdname as.sr
 #' @method as.sr xts 
 #' @export
-as.sr.xts <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+as.sr.xts <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE) {
 	if (missing(ope) && missing(epoch)) {
 		ope <- .infer_ope_xts(x)
 		epoch <- "yr"
 	}
-	retval <- as.sr.data.frame(as.data.frame(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
+	retval <- as.sr.data.frame(as.data.frame(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch,higher_order=higher_order)
 	return(retval)
 }
 #' @rdname as.sr
 #' @method as.sr timeSeries
 #' @export
-as.sr.timeSeries <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr") {
+as.sr.timeSeries <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FALSE) {
 	# you want to do this, but requires xts package. oops.
 	#retval <- as.sr.xts(as.xts(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
 	if (missing(ope) && missing(epoch)) {
 		ope <- .infer_ope_xts(x)
 		epoch <- "yr"
 	}
-	retval <- as.sr.data.frame(as.data.frame(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch)
+	retval <- as.sr.data.frame(as.data.frame(x),c0=c0,ope=ope,na.rm=na.rm,epoch=epoch,higher_order=higher_order)
 	return(retval)
 }
 #' @title Is this in the "sr" class?

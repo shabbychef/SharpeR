@@ -207,6 +207,8 @@ NULL
 #' \item move github figures to location CRAN understands
 #' \item be smarter about S3 classes: do not redefine summary and print.
 #' \item add bias and variance from Bao (2009).
+#' \item support estimation of higher order moments in \code{as.sr}, 
+#' and expands methods for se and confidence interval computations.
 #' }
 #'
 #' @section Changes in \SharpeR{} Version 1.1.0 (2016-03-14) :

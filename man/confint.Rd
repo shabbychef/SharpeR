@@ -7,7 +7,8 @@
 \title{Confidence Interval on (optimal) Signal-Noise Ratio}
 \usage{
 \method{confint}{sr}(object, parm, level = 0.95, level.lo = (1 - level)/2,
-  level.hi = 1 - level.lo, type = c("exact", "t", "Z"), ...)
+  level.hi = 1 - level.lo, type = c("exact", "t", "Z", "Mertens", "Bao"),
+  ...)
 
 \method{confint}{sropt}(object, parm, level = 0.95, level.lo = (1 -
   level)/2, level.hi = 1 - level.lo, ...)
@@ -45,12 +46,18 @@ Works on objects of class \code{sr} and \code{sropt}.
 Constructs confidence intervals on the Signal-Noise ratio given observed
 Sharpe ratio statistic. The available methods are:
 
-\itemize{
-\item The default, \code{exact}, which is only exact when returns are
-normal, based on inverting the non-central t
-distribution.
-\item A method based on the standard error of a non-central t distribution.
-\item A method based on a normal approximation.
+\describe{
+\item{exact}{The default, which is only exact when returns are
+normal, based on inverting the non-central t distribution.}
+\item{t}{Uses the Johnson Welch approximation to the standard error, centered around
+the sample value.}
+\item{Z}{Uses the Johnson Welch approximation to the standard error,
+performing a simple correction for the bias of the Sharpe ratio based on 
+Miller and Gehr formula.}
+\item{Mertens}{Uses the Mertens higher order approximation to the standard
+error, centered around the sample value.}
+\item{Bao}{Uses the Bao higher order approximation to the standard error,
+performing a higher order correction for the bias of the Sharpe ratio.}
 }
 
 Suppose \eqn{x_i}{xi} are \eqn{n}{n} independent draws of a \eqn{q}{q}-variate

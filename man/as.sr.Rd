@@ -12,19 +12,23 @@
 \usage{
 as.sr(x,c0=0,ope=1,na.rm=FALSE,epoch="yr")
 
-\method{as.sr}{default}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr")
+\method{as.sr}{default}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
+  higher_order = FALSE)
 
-\method{as.sr}{matrix}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr")
+\method{as.sr}{matrix}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
+  higher_order = FALSE)
 
 \method{as.sr}{data.frame}(x, c0 = 0, ope = 1, na.rm = FALSE,
-  epoch = "yr")
+  epoch = "yr", higher_order = FALSE)
 
-\method{as.sr}{lm}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr")
+\method{as.sr}{lm}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
+  higher_order = FALSE)
 
-\method{as.sr}{xts}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr")
+\method{as.sr}{xts}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
+  higher_order = FALSE)
 
 \method{as.sr}{timeSeries}(x, c0 = 0, ope = 1, na.rm = FALSE,
-  epoch = "yr")
+  epoch = "yr", higher_order = FALSE)
 }
 \arguments{
 \item{x}{vector of returns, or object of class \code{data.frame}, \code{xts},
@@ -46,6 +50,10 @@ will be made.}
 
 \item{epoch}{the string representation of the 'epoch', defaulting
 to 'yr'.}
+
+\item{higher_order}{a Boolean. If true, we compute 
+cumulants of the returns to leverage higher order accuracy formulae
+when possible.}
 }
 \value{
 a list containing the following components:
