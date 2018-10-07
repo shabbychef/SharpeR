@@ -271,11 +271,22 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' For unpaired (and independent) observations, tests
 #' \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
 #' against two or one-sided alternatives via the upsilon distribution.
-#' 
-#' @usage
 #'
-#' sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
-#'         zeta=0,ope=1,paired=FALSE,conf.level=0.95)
+#' The one sample test admits a number of different methods:
+#' \describe{
+#' \item{exact}{The default, which is only exact when returns are
+#' normal, based on inverting the non-central t distribution.}
+#' \item{t}{Uses the Johnson Welch approximation to the standard error, 
+#' centered around the sample value.}
+#' \item{Z}{Uses the Johnson Welch approximation to the standard error,
+#' performing a simple correction for the bias of the Sharpe ratio based on 
+#' Miller and Gehr formula.}
+#' \item{Mertens}{Uses the Mertens higher order approximation to the standard
+#' error, centered around the sample value.}
+#' \item{Bao}{Uses the Bao higher order approximation to the standard error,
+#' performing a higher order correction for the bias of the Sharpe ratio.}
+#' }
+#' See \code{\link{confint.sr}} for more information on these types
 #'
 #' @param x a (non-empty) numeric vector of data values, or an
 #'    object of class \code{sr}, containing a scalar sample Sharpe estimate.
@@ -287,7 +298,8 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #'       must be one of \code{"two.sided"} (default), \code{"greater"} or
 #'       \code{"less"}.  You can specify just the initial letter.
 #' @param zeta a number indicating the null hypothesis offset value, the
-#' \eqn{S} value.
+#'        \eqn{S} value.
+#' @param type which method to apply.
 #' @template param-ope
 #' @param paired a logical indicating whether you want a paired test.
 #' @param conf.level confidence level of the interval. 
@@ -309,6 +321,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' @template sr
 #' @template ref-upsilon
 #' @rdname sr_test
+#' @importFrom stats pnorm
 #' @examples 
 #' # should reject null
 #' x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,ope=1,alternative="greater")
@@ -327,7 +340,9 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #'
 #' @export
 sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
-										zeta=0,ope=1,paired=FALSE,conf.level=0.95) {
+										zeta=0,ope=1,paired=FALSE,conf.level=0.95,
+										type=c("exact","t","Z","Mertens","Bao"),...) {
+	type <- match.arg(type)
 	# much of this stolen from t.test.default:
 	alternative <- match.arg(alternative)
 	#if (is.sr(x) && is.null(y)) {
@@ -363,9 +378,10 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 		if (is.sr(x)) { 
 			srx <- x 
 		} else {
-			srx <- as.sr(x,c0=0,ope=ope,na.rm=TRUE)
+			higher_order <- type %in% c('Mertens','Bao')
+			srx <- as.sr(x,c0=0,ope=ope,na.rm=TRUE,higher_order=higher_order)
 		} 
-		retv <- .sr_test_on_sr(srx,alternative=alternative,zeta=zeta,conf.level=conf.level)
+		retv <- .sr_test_on_sr(srx,alternative=alternative,zeta=zeta,conf.level=conf.level,type=type)
 		retv$data.name <- dname
 		names(retv$estimate) <- paste(c("Sharpe ratio of ",dname),sep=" ",collapse="")
 		return(retv)
@@ -392,8 +408,10 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 			pval <- subtest$p.value
 		} #UNFOLD
 		else {#FOLDUP
-			srx <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
-			sry <- as.sr(y,c0=0,ope=1,na.rm=TRUE)
+			higher_order <- type %in% c('Mertens','Bao')
+			srx <- as.sr(x,c0=0,ope=1,na.rm=TRUE,higher_order=higher_order)
+			sry <- as.sr(y,c0=0,ope=1,na.rm=TRUE,higher_order=higher_order)
+# add type to sr_unpaired_test
 			retval <- sr_unpaired_test(list(srx,sry),c(1,-1),0,
 																 alternative=alternative,
 																 ope=ope,conf.level=conf.level)
@@ -415,8 +433,11 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 # screw it, this used to be sr_test.sr, but tired of fighting with roxygen
 # and R CMD check --as-cran warnings.
 .sr_test_on_sr <- function(z,alternative=c("two.sided","less","greater"),
-											 zeta=0,conf.level=0.95) {
+													 zeta=0,conf.level=0.95,
+													 type=c("exact","t","Z","Mertens","Bao"),...) {
+	type <- match.arg(type)
 	# all this stolen from t.test.default:
+	
 	alternative <- match.arg(alternative)
 	if (!missing(zeta) && (length(zeta) != 1 || is.na(zeta))) 
 		stop("'zeta' must be a single number")
@@ -427,31 +448,65 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 
 	df <- z$df
 	if (any(df < 1)) stop("not enough 'x' observations")
-	statistic <- .sr2t(z)
-	names(statistic) <- "t"
+	tstat <- .sr2t(z)
+	names(tstat) <- "t"
 	estimate <- z$sr
 	names(estimate) <- paste(c("Sharpe ratio of",dname),sep=" ",collapse="")
 
 	method <- "One Sample sr test"
 
-	switch(alternative,
-				 less={
-					 pval <- .psr(z, zeta=zeta, lower.tail=TRUE)
-					 cint <- confint(z,type="exact",level.lo=0,level.hi=conf.level)
-				 },
-				 greater={
-					 pval <- .psr(z, zeta=zeta, lower.tail=FALSE)
-					 cint <- confint(z,type="exact",level.lo=1-conf.level,level.hi=1)
-				 },
-				 two.sided={
-					 pval <- .oneside2two(.psr(z, zeta=zeta, lower.tail=TRUE))
-					 cint <- confint(z,type="exact",level=conf.level)
-				 })
+	if (type=='exact') {
+		switch(alternative,
+					 less={
+						 pval <- .psr(z, zeta=zeta, lower.tail=TRUE)
+						 cint <- confint(z,type="exact",level.lo=0,level.hi=conf.level)
+					 },
+					 greater={
+						 pval <- .psr(z, zeta=zeta, lower.tail=FALSE)
+						 cint <- confint(z,type="exact",level.lo=1-conf.level,level.hi=1)
+					 },
+					 two.sided={
+						 pval <- .oneside2two(.psr(z, zeta=zeta, lower.tail=TRUE))
+						 cint <- confint(z,type="exact",level=conf.level)
+					 })
+	} else {
+		switch(alternative,
+					 less={
+						 level.lo <- 0
+						 level.hi <- conf.level
+					 },
+					 greater={
+						 level.lo <- 1-conf.level
+						 level.hi <- 1
+					 },
+					 two.sided={
+						 level.lo <- conf.level / 2
+						 level.hi <- (2 - conf.level) / 2
+					 })
+		# man, this code is really unfortunate and not DRY
+		midp <- .t2sr(z,.t_recenter(tstat,df=z$df,type=type,cumulants=z$cumulants))
+
+		se <- se(z)
+		zalp <- qnorm(c(level.lo,level.hi))
+		cint <- cbind(midp + zalp[1] * se,midp + zalp[2] * se)
+
+		switch(alternative,
+					 less={
+						 pval <- pnorm((midp - zeta) / se,lower.tail=TRUE)
+					 },
+					 greater={
+						 pval <- pnorm((midp - zeta) / se,lower.tail=FALSE)
+					 },
+					 two.sided={
+						 pval <- .oneside2two(pnorm((midp - zeta) / se,lower.tail=FALSE))
+					 })
+	}
+
 
 	names(df) <- "df"
 	names(zeta) <- "signal-noise ratio"
 	attr(cint, "conf.level") <- conf.level
-	retval <- list(statistic = statistic, parameter = df,
+	retval <- list(statistic = tstat, parameter = df,
 								 estimate = estimate, p.value = pval, 
 								 alternative = alternative, null.value = zeta,
 								 method = method, data.name = dname)
@@ -474,11 +529,6 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' \deqn{H_0: \sum_j a_j \frac{\mu_j}{\sigma_j} = b}{H0: sum_j a_j mu_j/sigma_j = b}
 #' against two or one sided alternatives.
 #' 
-#' @usage
-#'
-#' sr_unpaired_test(srs,contrasts=NULL,null.value=0,
-#'   alternative=c("two.sided","less","greater"),
-#'   ope=NULL,conf.level=0.95)
 #'
 #' @param srs a (non-empty) list of objects of class \code{sr}, each containing
 #'  a scalar sample Sharpe estimate. Or a single object of class \code{sr} with
@@ -516,6 +566,10 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @template sr
 #' @template ref-upsilon
 #' @rdname sr_unpaired_test
+#' @note This code is based on the \sQuote{upsilon} code from 
+#' \code{sadists}, which may be inaccurate for a large number of series.
+#' Take caution when applying this test. File a bug report if you are
+#' negatively impacted.
 #' @examples 
 #' # basic usage
 #' set.seed(as.integer(charToRaw("set the seed")))

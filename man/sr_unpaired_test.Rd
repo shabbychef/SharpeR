@@ -4,9 +4,9 @@
 \alias{sr_unpaired_test}
 \title{test for equation on unpaired Sharpe ratios}
 \usage{
-sr_unpaired_test(srs,contrasts=NULL,null.value=0,
-  alternative=c("two.sided","less","greater"),
-  ope=NULL,conf.level=0.95)
+sr_unpaired_test(srs, contrasts = NULL, null.value = 0,
+  alternative = c("two.sided", "less", "greater"), ope = NULL,
+  conf.level = 0.95)
 }
 \arguments{
 \item{srs}{a (non-empty) list of objects of class \code{sr}, each containing
@@ -61,6 +61,12 @@ independent. Given constants \eqn{a_j}{a_j} and value \eqn{b}{b}, this
 code tests the null hypothesis
 \deqn{H_0: \sum_j a_j \frac{\mu_j}{\sigma_j} = b}{H0: sum_j a_j mu_j/sigma_j = b}
 against two or one sided alternatives.
+}
+\note{
+This code is based on the \sQuote{upsilon} code from 
+\code{sadists}, which may be inaccurate for a large number of series.
+Take caution when applying this test. File a bug report if you are
+negatively impacted.
 }
 \examples{
 # basic usage

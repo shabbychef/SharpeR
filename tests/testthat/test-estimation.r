@@ -46,8 +46,10 @@ test_that("basic sr functionality",{
 	expect_error(myse <- se(mysr,"t"),NA)
 	expect_error(myse <- se(mysr,"Lo"),NA)
 	# these should throw b/c they do not have cumulants
-	expect_error(myse <- se(mysr,"Mertenst"))
+	expect_error(myse <- se(mysr,"Mertens"))
 	expect_error(myse <- se(mysr,"Bao"))
+	# unknown method
+	expect_error(myse <- se(mysr,"FJNORD"))
 
 	expect_error(ci1 <- confint(mysr),NA)
 	expect_error(ci2 <- confint(mysr, level=0.9),NA)
@@ -89,7 +91,7 @@ test_that("basic sr functionality",{
 		print(mysr)
 		print(format(mysr))
 		expect_true(is.sr(mysr))
-		dummy <- reannualize(mysr,new.ope=2)
+		expect_error(dummy <- reannualize(mysr,new.ope=2),NA)
 
 		if (require(timeSeries)) {
 			ats <- as.timeSeries(xxts)
@@ -97,11 +99,9 @@ test_that("basic sr functionality",{
 			print(mysr)
 			print(format(mysr))
 			expect_true(is.sr(mysr))
-			dummy <- reannualize(mysr,new.ope=2)
+			expect_error(dummy <- reannualize(mysr,new.ope=2),NA)
 		}
 	}
-
-	expect_true(TRUE)
 })
 
 test_that("basic sropt functionality",{
@@ -112,13 +112,13 @@ test_that("basic sropt functionality",{
 	print(format(mysr))
 	dummy <- reannualize(mysr,new.ope=2)
 	expect_true(is.sropt(mysr))
-	ci1 <- confint(mysr)
-	ci2 <- confint(mysr, level=0.9)
-	ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95)
+	expect_error(ci1 <- confint(mysr),NA)
+	expect_error(ci2 <- confint(mysr, level=0.9),NA)
+	expect_error(ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95),NA)
 
-	z1 <- inference(mysr, type="KRS")
-	z2 <- inference(mysr, type="MLE")
-	z3 <- inference(mysr, type="unbiased")
+	expect_error(z1 <- inference(mysr, type="KRS"),NA)
+	expect_error(z2 <- inference(mysr, type="MLE"),NA)
+	expect_error(z3 <- inference(mysr, type="unbiased"),NA)
 
 	sricv <- sric(mysr)
 	sricv <- sric(dummy)
@@ -130,10 +130,8 @@ test_that("basic sropt functionality",{
 		print(mysr)
 		print(format(mysr))
 		expect_true(is.sropt(mysr))
-		dummy <- reannualize(mysr,new.ope=2)
+		expect_error(dummy <- reannualize(mysr,new.ope=2),NA)
 	}
-
-	expect_true(TRUE)
 })
 test_that("basic del_sropt functionality",{
 	set.char.seed("cdbfbd76-29f4-454f-b8a1-e3502ba287d7")
@@ -145,13 +143,13 @@ test_that("basic del_sropt functionality",{
 	# not yet:
 	#dummy <- reannualize(mysr,new.ope=2)
 	expect_true(is.del_sropt(mysr))
-	ci1 <- confint(mysr)
-	ci2 <- confint(mysr, level=0.9)
-	ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95)
+	expect_error(ci1 <- confint(mysr),NA)
+	expect_error(ci2 <- confint(mysr, level=0.9),NA)
+	expect_error(ci3 <- confint(mysr, level.lo=0.1, level.hi=0.95),NA)
 
-	z1 <- inference(mysr, type="KRS")
-	z2 <- inference(mysr, type="MLE")
-	z3 <- inference(mysr, type="unbiased")
+	expect_error(z1 <- inference(mysr, type="KRS"),NA)
+	expect_error(z2 <- inference(mysr, type="MLE"),NA)
+	expect_error(z3 <- inference(mysr, type="unbiased"),NA)
 
 	# via xts
 	if (require(xts)) {
@@ -162,20 +160,15 @@ test_that("basic del_sropt functionality",{
 		expect_true(is.del_sropt(mysr))
 		#dummy <- reannualize(mysr,new.ope=2)
 	}
-
-	expect_true(TRUE)
 })
 test_that("basic sr_vcov functionality",{
 	set.char.seed("de096679-85cc-438b-8335-96a9940a9021")
 	for (p in c(1:3)) {
 		X <- matrix(rnorm(1000*p,mean=3e-4),ncol=p)
-		S <- sr_vcov(X)
+		expect_error(S <- sr_vcov(X),NA)
 	}
 	X <- rnorm(1000)
-	S <- sr_vcov(X)
-
-	# sentinel:
-	expect_true(TRUE)
+	expect_error(S <- sr_vcov(X),NA)
 })
 #UNFOLD
 context("higher order moments")#FOLDUP
@@ -220,6 +213,21 @@ test_that("basic as.sr usage",{
 		}
 	}
 })
+test_that("se not confounded by ope",{
+	set.char.seed("8eb9aa6a-4435-46ba-bb60-1c8c39593218")
+	x <- rnorm(1000)
+	expect_error(mysr_h <- as.sr(x,higher_order=TRUE),NA,ope=252)
+
+	expect_error(myse_t <- se(mysr_h,"t"),NA)
+	expect_error(myse_l <- se(mysr_h,"Lo"),NA)
+	expect_error(myse_m <- se(mysr_h,"Mertens"),NA)
+	expect_error(myse_b <- se(mysr_h,"Bao"),NA)
+	expect_lt(abs(log(myse_t / myse_l)),0.2)
+	expect_lt(abs(log(myse_t / myse_m)),0.2)
+	expect_lt(abs(log(myse_t / myse_b)),0.2)
+
+})
+
 #UNFOLD
 context("estimation functions: confint coverage")#FOLDUP
 test_that("confint.sr coverage",{#FOLDUP
@@ -281,9 +289,6 @@ test_that("predint right output",{#FOLDUP
 		expect_equal(ncol(aci),2)
 		expect_true(is.matrix(aci))
 	}
-
-	# sentinel
-	expect_true(TRUE)
 })#UNFOLD
 test_that("predint runs at all",{#FOLDUP
 	set.char.seed("080c6f73-834e-4d10-a6fa-4b27dc266b24")
@@ -312,8 +317,6 @@ test_that("predint runs at all",{#FOLDUP
 			expect_true(all(is.infinite(iinf)))
 		}
 	}
-	# sentinel
-	expect_true(TRUE)
 })#UNFOLD
 test_that("predint not fooled by annualization",{#FOLDUP
 	set.char.seed("94cbb2a6-b497-48d4-9139-e987364f8a0f")
@@ -332,9 +335,6 @@ test_that("predint not fooled by annualization",{#FOLDUP
 	errs <- unlist(aci1) - unlist(aci2)
 
 	expect_less_than(max(abs(errs)),1e-4)
-
-	# sentinel
-	expect_true(TRUE)
 })#UNFOLD
 #UNFOLD
 

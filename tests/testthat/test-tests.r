@@ -41,68 +41,75 @@ test_that("sr_test",{#FOLDUP
 	Y <- matrix(rnorm(length(X)),ncol=1)
 	Y2 <- matrix(rnorm(2*length(X)),ncol=1)
 
-	fooz <- sr_test(X,alternative="two.sided")
-	fooz <- sr_test(X,alternative="less")
-	fooz <- sr_test(X,alternative="greater")
+	expect_error(fooz <- sr_test(X,alternative="two.sided"),NA)
+	expect_error(fooz <- sr_test(X,alternative="less"),NA)
+	expect_error(fooz <- sr_test(X,alternative="greater"),NA)
 
-	fooz <- sr_test(as.sr(X),alternative="two.sided")
+	expect_error(fooz <- sr_test(as.sr(X),alternative="two.sided"),NA)
 
 	# with a zeta
 	zeta <- 1.0
-	fooz <- sr_test(X,zeta=zeta,alternative="two.sided")
-	fooz <- sr_test(X,zeta=zeta,alternative="less")
-	fooz <- sr_test(X,zeta=zeta,alternative="greater")
+	expect_error(fooz <- sr_test(X,zeta=zeta,alternative="two.sided"),NA)
+	expect_error(fooz <- sr_test(X,zeta=zeta,alternative="less"),NA)
+	expect_error(fooz <- sr_test(X,zeta=zeta,alternative="greater"),NA)
+
+	# try different methods
+	for (type in c('exact',"t","Z","Mertens","Bao")) {
+		for (alternative in c("less","greater","two.sided")) {
+			expect_error(fooz <- sr_test(X,alternative=alternative,type=type),NA)
+			# with a zeta
+			zeta <- 1.0
+			expect_error(fooz <- sr_test(X,zeta=zeta,alternative=alternative,type=type),NA)
+		}
+	}
 
 	# and an ope
 	ope <- 252
-	fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="two.sided")
-	fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="less")
-	fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="greater")
+	expect_error(fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="two.sided"),NA)
+	expect_error(fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="less"),NA)
+	expect_error(fooz <- sr_test(X,zeta=zeta,ope=ope,alternative="greater"),NA)
 
 	# X and Y
-	fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="two.sided")
-	fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="less")
-	fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="greater")
+	expect_error(fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="two.sided"),NA)
+	expect_error(fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="less"),NA)
+	expect_error(fooz <- sr_test(X,Y,ope=ope,paired=TRUE,alternative="greater"),NA)
 
-	fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="two.sided")
-	fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="less")
-	fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="greater")
+	expect_error(fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="two.sided"),NA)
+	expect_error(fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="less"),NA)
+	expect_error(fooz <- sr_test(X,Y,ope=ope,paired=FALSE,alternative="greater"),NA)
 
-	fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="two.sided")
-	fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="less")
-	fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="greater")
-
-	# sentinel
-	expect_true(TRUE)
+	expect_error(fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="two.sided"),NA)
+	expect_error(fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="less"),NA)
+	expect_error(fooz <- sr_test(X,Y2,ope=ope,paired=FALSE,alternative="greater"),NA)
 })#UNFOLD
 test_that("sr_unpaired_test",{#FOLDUP
 	set.char.seed("6036d6e3-b3e9-415a-bd2b-bfc19dbd45ea")
 	X <- matrix(rnorm(1000*6),ncol=6)
 	inp <- as.sr(X)
 	nv <- dim(X)[2]
-	etc <- sr_unpaired_test(inp)
-	etc <- sr_unpaired_test(inp,alternative='two.sided')
-	etc <- sr_unpaired_test(inp,alternative='less')
-	etc <- sr_unpaired_test(inp,alternative='greater')
-	etc <- sr_unpaired_test(inp,ope=1)
-	etc <- sr_unpaired_test(inp,ope=10)
-	etc <- sr_unpaired_test(inp,contrasts=runif(nv))
-	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5)
-	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='less')
-	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='greater')
+	expect_error(etc <- sr_unpaired_test(inp),NA)
+	expect_error(etc <- sr_unpaired_test(inp,alternative='two.sided'),NA)
+	expect_error(etc <- sr_unpaired_test(inp,alternative='less'),NA)
+	expect_error(etc <- sr_unpaired_test(inp,alternative='greater'),NA)
+	expect_error(etc <- sr_unpaired_test(inp,ope=1),NA)
+	expect_error(etc <- sr_unpaired_test(inp,ope=10),NA)
+	expect_error(etc <- sr_unpaired_test(inp,contrasts=runif(nv)),NA)
+	expect_error(etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5),NA)
+	expect_error(etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='less'),NA)
+	expect_error(etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='greater'),NA)
 
 	inp <- apply(X,2,as.sr)
 	nv <- length(inp)
-	etc <- sr_unpaired_test(inp)
-	etc <- sr_unpaired_test(inp,alternative='two.sided')
-	etc <- sr_unpaired_test(inp,alternative='less')
-	etc <- sr_unpaired_test(inp,alternative='greater')
-	etc <- sr_unpaired_test(inp,ope=1)
-	etc <- sr_unpaired_test(inp,ope=10)
-	etc <- sr_unpaired_test(inp,contrasts=runif(nv))
-	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5)
-	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='less')
-	etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='greater')
+	expect_error(etc <- sr_unpaired_test(inp),NA)
+	expect_error(etc <- sr_unpaired_test(inp,alternative='two.sided'),NA)
+	expect_error(etc <- sr_unpaired_test(inp,alternative='less'),NA)
+	expect_error(etc <- sr_unpaired_test(inp,alternative='greater'),NA)
+	expect_error(etc <- sr_unpaired_test(inp,ope=1),NA)
+	expect_error(etc <- sr_unpaired_test(inp,ope=10),NA)
+	expect_error(etc <- sr_unpaired_test(inp,contrasts=runif(nv)),NA)
+	expect_error(etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5),NA)
+	expect_error(etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='less'),NA)
+	expect_error(etc <- sr_unpaired_test(inp,contrasts=runif(nv),null.value=0.5,alternative='greater'),NA)
 
 	# bad units, complain
 	X1 <- rnorm(100)
@@ -110,84 +117,69 @@ test_that("sr_unpaired_test",{#FOLDUP
 	inp1 <- as.sr(X1,ope=52)
 	inp2 <- as.sr(X2,ope=12)
 	expect_warning(sr_unpaired_test(list(inp1,inp2)))
-
-	# sentinel
-	expect_true(TRUE)
 })#UNFOLD
 test_that("sr_equality_test",{#FOLDUP
 	set.char.seed("0b144107-4de8-4e00-95f7-d746db3aef8e")
 	X <- matrix(rnorm(1000*5),ncol=5)
 	Con = matrix(rnorm(dim(X)[2]),nrow=1)
-	fooz <- sr_equality_test(X,type="chisq")
-	fooz <- sr_equality_test(X,type="F")
-	fooz <- sr_equality_test(X,type="t",contrasts=Con)
-	fooz <- sr_equality_test(X,type="t",contrasts=Con,alternative='less')
-	fooz <- sr_equality_test(X,type="t",contrasts=Con,alternative='greater')
+	expect_error(fooz <- sr_equality_test(X,type="chisq"),NA)
+	expect_error(fooz <- sr_equality_test(X,type="F"),NA)
+	expect_error(fooz <- sr_equality_test(X,type="t",contrasts=Con),NA)
+	expect_error(fooz <- sr_equality_test(X,type="t",contrasts=Con,alternative='less'),NA)
+	expect_error(fooz <- sr_equality_test(X,type="t",contrasts=Con,alternative='greater'),NA)
 
 	expect_warning(sr_equality_test(X,type="F",alternative='less'))
 	expect_warning(sr_equality_test(X,type="F",alternative='greater'))
-
-	# sentinel
-	expect_true(TRUE)
 })#UNFOLD
 test_that("sropt_test",{#FOLDUP
 	set.char.seed("02a77746-3f08-4320-9696-46521ab4de37")
 	X <- matrix(rnorm(1000*10),ncol=10)
 
-	fooz <- sropt_test(X,alternative="two.sided")
-	fooz <- sropt_test(X,alternative="less")
-	fooz <- sropt_test(X,alternative="greater")
+	expect_error(fooz <- sropt_test(X,alternative="two.sided"),NA)
+	expect_error(fooz <- sropt_test(X,alternative="less"),NA)
+	expect_error(fooz <- sropt_test(X,alternative="greater"),NA)
 
-	fooz <- sropt_test(as.sropt(X),alternative="two.sided")
-	fooz <- sropt_test(as.sropt(X),alternative="less")
-	fooz <- sropt_test(as.sropt(X),alternative="greater")
+	expect_error(fooz <- sropt_test(as.sropt(X),alternative="two.sided"),NA)
+	expect_error(fooz <- sropt_test(as.sropt(X),alternative="less"),NA)
+	expect_error(fooz <- sropt_test(as.sropt(X),alternative="greater"),NA)
 
 	# with a zeta
 	zeta.s <- 1.0
-	fooz <- sropt_test(X,zeta.s=zeta.s,alternative="two.sided")
-	fooz <- sropt_test(X,zeta.s=zeta.s,alternative="less")
-	fooz <- sropt_test(X,zeta.s=zeta.s,alternative="greater")
+	expect_error(fooz <- sropt_test(X,zeta.s=zeta.s,alternative="two.sided"),NA)
+	expect_error(fooz <- sropt_test(X,zeta.s=zeta.s,alternative="less"),NA)
+	expect_error(fooz <- sropt_test(X,zeta.s=zeta.s,alternative="greater"),NA)
 
 	# and an ope
 	ope <- 252
-	fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="two.sided")
-	fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="less")
-	fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="greater")
-
-	# sentinel
-	expect_true(TRUE)
+	expect_error(fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="two.sided"),NA)
+	expect_error(fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="less"),NA)
+	expect_error(fooz <- sropt_test(X,zeta.s=zeta.s,ope=ope,alternative="greater"),NA)
 })#UNFOLD
 test_that("power_sr_test",{#FOLDUP
 	set.char.seed("5e24476e-4001-472d-bd63-8a660c3737b4")
 
 	ope <- 252
-	apo <- power.sr_test(n=1000,zeta=1.0,sig.level=0.05,alternative="one.sided",ope=ope)
-	apo <- power.sr_test(n=1000,power=0.3,sig.level=0.05,alternative="one.sided",ope=ope)
+	expect_error(apo <- power.sr_test(n=1000,zeta=1.0,sig.level=0.05,alternative="one.sided",ope=ope),NA)
+	expect_error(apo <- power.sr_test(n=1000,power=0.3,sig.level=0.05,alternative="one.sided",ope=ope),NA)
 	# this is dumb:
 	#apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,alternative="one.sided",ope=ope)
-	apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,sig.level=NULL,alternative="one.sided",ope=ope)
+	expect_error(apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,sig.level=NULL,alternative="one.sided",ope=ope),NA)
 
-	apo <- power.sr_test(n=1000,zeta=1.0,sig.level=0.05,alternative="two.sided",ope=ope)
-	apo <- power.sr_test(n=1000,power=0.3,sig.level=0.05,alternative="two.sided",ope=ope)
+	expect_error(apo <- power.sr_test(n=1000,zeta=1.0,sig.level=0.05,alternative="two.sided",ope=ope),NA)
+	expect_error(apo <- power.sr_test(n=1000,power=0.3,sig.level=0.05,alternative="two.sided",ope=ope),NA)
 	# this is dumb:
 	#apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,alternative="two.sided",ope=ope)
-	apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,sig.level=NULL,alternative="two.sided",ope=ope)
-
-	# sentinel
-	expect_true(TRUE)
+	expect_error(apo <- power.sr_test(n=1000,zeta=0.9,power=0.3,sig.level=NULL,alternative="two.sided",ope=ope),NA)
 })#UNFOLD
 test_that("power_sropt_test",{#FOLDUP
 	set.char.seed("d486234e-e897-4dc9-ae8b-c4312b48c8b4")
 
 	ope <- 1
-	apo <- power.sropt_test(df1=10,df2=1000,zeta.s=1.0,sig.level=0.05,power=NULL,ope=ope)
-	apo <- power.sropt_test(df1=10,df2=1000,zeta.s=2.0,sig.level=NULL,power=0.9,ope=ope)
-	apo <- power.sropt_test(df1=10,df2=1000,zeta.s=NULL,sig.level=0.05,power=0.9,ope=ope)
+	expect_error(apo <- power.sropt_test(df1=10,df2=1000,zeta.s=1.0,sig.level=0.05,power=NULL,ope=ope),NA)
+	expect_error(apo <- power.sropt_test(df1=10,df2=1000,zeta.s=2.0,sig.level=NULL,power=0.9,ope=ope),NA)
+	expect_error(apo <- power.sropt_test(df1=10,df2=1000,zeta.s=NULL,sig.level=0.05,power=0.9,ope=ope),NA)
 	#apo <- power.sropt_test(df1=10,df2=NULL,zeta.s=1.0,sig.level=0.05,power=0.3,ope=ope)
 	#apo <- power.sropt_test(df1=NULL,df2=1000,zeta.s=1.0,sig.level=0.05,power=0.4,ope=ope)
-
-	# sentinel
-	expect_true(TRUE)
 })#UNFOLD
 #UNFOLD
 context("test hypothesis tests")#FOLDUP

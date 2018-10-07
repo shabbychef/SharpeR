@@ -23,6 +23,7 @@
 # Author: Steven E. Pav <shabbychef@gmail.com>
 # Comments: Steven E. Pav
 
+# 2FIX: to make this DRY should probably perform these on t-stats instead.
 # moments computations, translated from Yong Bao's Gauss code:# FOLDUP
 #.bao_func <- function(y,rhat=NULL,na.rm=TRUE) {
 	#if (na.rm) { y <- na.omit(y) }
@@ -76,7 +77,7 @@
 }
 .bias1 <- function(TT,S,r) {
 	#3*S/4/TT-r[1]*(1/2/TT)+S*r[2]*(3/8/TT);
-	(2 + r[2])*3/8/TT - r[1]/2/TT;
+	(2 + r[2])*S*3/8/TT - r[1]/2/TT;
 }
 
 #.variance <- function(TT,S,r) {

@@ -4,8 +4,9 @@
 \alias{sr_test}
 \title{test for Sharpe ratio}
 \usage{
-sr_test(x,y=NULL,alternative=c("two.sided","less","greater"),
-        zeta=0,ope=1,paired=FALSE,conf.level=0.95)
+sr_test(x, y = NULL, alternative = c("two.sided", "less", "greater"),
+  zeta = 0, ope = 1, paired = FALSE, conf.level = 0.95,
+  type = c("exact", "t", "Z", "Mertens", "Bao"), ...)
 }
 \arguments{
 \item{x}{a (non-empty) numeric vector of data values, or an
@@ -34,6 +35,8 @@ will be made.}
 \item{paired}{a logical indicating whether you want a paired test.}
 
 \item{conf.level}{confidence level of the interval.}
+
+\item{type}{which method to apply.}
 
 \item{...}{further arguments to be passed to or from methods.}
 }
@@ -67,6 +70,22 @@ against two or one sided alternative, via
 For unpaired (and independent) observations, tests
 \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
 against two or one-sided alternatives via the upsilon distribution.
+
+The one sample test admits a number of different methods:
+\describe{
+\item{exact}{The default, which is only exact when returns are
+normal, based on inverting the non-central t distribution.}
+\item{t}{Uses the Johnson Welch approximation to the standard error, 
+centered around the sample value.}
+\item{Z}{Uses the Johnson Welch approximation to the standard error,
+performing a simple correction for the bias of the Sharpe ratio based on 
+Miller and Gehr formula.}
+\item{Mertens}{Uses the Mertens higher order approximation to the standard
+error, centered around the sample value.}
+\item{Bao}{Uses the Bao higher order approximation to the standard error,
+performing a higher order correction for the bias of the Sharpe ratio.}
+}
+See \code{\link{confint.sr}} for more information on these types
 }
 \examples{
 # should reject null

@@ -176,6 +176,15 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 .t_se_Mertens <- function(tstat,df,cumulants) {
 	se <- sqrt(1 - (cumulants[1] * tstat / sqrt(df)) + (cumulants[4] + 2) * (tstat**2) / (4*df))
 } 
+.t_se_Bao <- function(tstat,df,cumulants) {
+	# this is from Yong Bao's code:
+	S <- tstat / sqrt(df+1)
+	se <- sqrt((df+1) * ( (1+S^2/2)/(df+1)+(19*S^2/8+2)/(df+1)^2-cumulants[1]*S*(1/(df+1)+5/2/(df+1)^2)
+    +cumulants[2]*S^2*(1/4/(df+1)+3/8/(df+1)^2)+5*cumulants[3]*S/4/(df+1)^2-3*cumulants[4]*S^2/8/(df+1)^2
+    +cumulants[1]^2*(7/4/(df+1)^2-3*S^2/2/(df+1)^2)
+    -15*cumulants[1]*cumulants[2]*S/4/(df+1)^2+39*cumulants[2]^2*S^2/32/(df+1)^2 ));
+} 
+
  
 # note that the cumulants are assumed on the returns distribution,
 # not the cumulants of the t-stat, of course.
@@ -186,8 +195,33 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 				 t = .t_se_normal(t,df),
 				 Lo = .t_se_normal(t,df),
 				 Mertens = .t_se_Mertens(t,df,cumulants),
-				 Bao = sqrt(df+1) * sqrt(sr_variance(snr=t/sqrt(df+1),n=df+1,cumulants=cumulants)))  # this is awful.
+				 Bao = .t_se_Bao(t,df,cumulants))
 }
+
+.t_bias1 <- function(tstat,df,r) {
+	(2 + r[2])*tstat*3/8/(df+1)^(3/2) - r[1]/2/(df+1);
+}
+.t_bias2 <- function(tstat,df,r) {
+	3*tstat/4/(df+1)^(3/2) +
+		3/8/(df+1)^2 * (r[3] - 5*r[1]*r[2]/2) + 
+		r[1]*(1/2/(df+1)+3/8/(df+1)^2) +
+		tstat*r[2]*(3/8 -15/32/(df+1))/(df+1)^(3/2) +
+		5*tstat/16/(df+1)^(5/2) * (49/10 - r[4] - 4 * r[1]^2 + 21*r[2]^2/8) 
+}
+
+# recentering to remove bias
+.t_recenter <- function(tstat,df,type=c("t","Lo","Z","Mertens","Bao"),cumulants=NULL) {
+	type <- match.arg(type)
+	if (type %in% c("t","Lo","Mertens")) { return(tstat) }
+	retv <- switch(type,
+								 Z={
+									 tstat * (1 - 1 / (4 * df))
+								 },
+								 Bao={
+									 tstat - .t_bias2(tstat,df,r=cumulants)
+								 })
+}
+
 # confidence intervals on the non-centrality parameter of a t-stat
 .t_confint <- function(tstat,df,level=0.95,type=c("exact","t","Z","Mertens","Bao"),
 					 level.lo=(1-level)/2,level.hi=1-level.lo,cumulants=cumulants) {
@@ -204,14 +238,14 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 					 },
 					 Z={  # this is odd: we unbias the SR based on the simple bias correction
 						 se <- .t_se(tstat,df,type="t")
-						 midp <- tstat * (1 - 1 / (4 * df))
+						 midp <- .t_recenter(tstat,df,type=type)
 					 },
 					 Mertens={
 						 se <- .t_se(tstat,df,type="Mertens",cumulants=cumulants)
 					 },
 					 Bao={
 						 se <- .t_se(tstat,df,type="Bao",cumulants=cumulants)
-						 midp <- tstat - sr_bias(snr=tstat/sqrt(df+1),n=df+1,cumulants=cumulants,type='second_order')
+						 midp <- .t_recenter(tstat,df,type=type,cumulants=cumulants)
 					 })
 		zalp <- qnorm(c(level.lo,level.hi))
 		ci <- cbind(midp + zalp[1] * se,midp + zalp[2] * se)
@@ -264,8 +298,8 @@ se <- function(z, type) {
 #' @template etc
 #' @template sr
 #' @note
-#' Eventually this should include corrections for autocorrelation, skew,
-#' kurtosis.
+#' The units of the standard error are consistent with those of the
+#' input \code{sr} object.
 #' @template ref-JW
 #' @template ref-Lo
 #' @template ref-Bao

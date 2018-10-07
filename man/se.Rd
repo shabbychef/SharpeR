@@ -39,8 +39,8 @@ There should be very little difference between these except for very small
 sample sizes.
 }
 \note{
-Eventually this should include corrections for autocorrelation, skew,
-kurtosis.
+The units of the standard error are consistent with those of the
+input \code{sr} object.
 }
 \examples{
 asr <- as.sr(rnorm(128,0.2))
