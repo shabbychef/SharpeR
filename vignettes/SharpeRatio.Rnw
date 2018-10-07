@@ -95,8 +95,8 @@ lseq <- function(from,to,length.out) {
 
 \title{Notes on the \txtSR}
 \author{Steven E. Pav %
-\thanks{\email{shabbychef@gmail.com} This document is a bit of a mess at
-the moment, and is in a constant state of flux.}}
+\thanks{\email{shabbychef@gmail.com} A more complete version of this document 
+is available elsewhere, titled, \emph{A Short Sharpe Course}. \cite{pav_ssc}}}
 %\date{\today, \currenttime}
 
 \maketitle
@@ -294,7 +294,7 @@ For example, if one was looking at one year's worth of data with monthly marks, 
 $\tbias = \Sexpr{round(tbias,digits=4)}$, \ie almost eight percent.  The bias is multiplicative and larger than one, 
 so the \txtSR will overestimate the SNR when the latter is positive, and underestimate it when it is negative.
 The existence of this bias was first described by Miller 
-and Gehr. \cite{CambridgeJournals:4493808,jobsonkorkie1981} 
+and Gehr. \cite{CambridgeJournals:4493808,jobsonkorkie1981,baoestimation}
 
 A decent asymptotic approximation \cite{dlmf_gammarat} to \tbias is given by
 $$
@@ -376,6 +376,10 @@ These are both zero for normally distributed returns, and so Mertens' form
 reduces to Lo's form.  These are unknown in practice, and 
 have to be estimated from the data, which results in 
 some mis-estimation of the standard error when skew is extreme.
+Bao gives a higher order formula for the standard error, which is 
+perhaps more susceptible to problems with estimation of higher
+order moments.  \cite{baoestimation} It is not clear if this method
+gives better standard error estimates than Mertens' estimate.
 
 %In practice these three confidence interval approximations give very similar coverage, with no
 %appreciable difference when $\ssiz > 30$ or so. For small sample sizes, the corrected form of
@@ -1092,6 +1096,7 @@ investment has idiosyncratic `alpha' (\ie \pregco[0]) without significant exposu
 %2FIX
 %\cite{GVK322224764,Krause2001}
 \nocite{GVK322224764,Krause2001}
+\nocite{pav_ssc}
 
 \subsubsection{Examples of linear attribution models}%FOLDUP
 

@@ -927,6 +927,7 @@ purposes. See the help for \Rfunction{dsr} and \Rfunction{dsropt} for more detai
 % bibliography%FOLDUP
 \nocite{CambridgeJournals:4493808,lo2002,Lecoutre2007,Johnson:1940,Ledoit2008850,sref2011}
 \nocite{1307.0450}
+\nocite{pav_ssc}
 
 %\bibliographystyle{jss}
 %\bibliographystyle{ieeetr}
