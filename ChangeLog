@@ -1,5 +1,5 @@
 
-2018-10-06 Steven E. Pav <shabbychef@gmail.com>
+2018-10-07 Steven E. Pav <shabbychef@gmail.com>
 * 1.2.0 on CRAN
 * move github figures to location CRAN understands
 * do not redefine summary and print and so on; 
