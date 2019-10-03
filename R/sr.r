@@ -176,10 +176,13 @@ sr <- function(sr,df,c0=0,ope=1,rescal=sqrt(1/(df+1)),epoch="yr",cumulants=NULL)
 #' my.returns <- matrix(rnorm(253*3),ncol=1)
 #' colnames(my.returns) <- c("my strategy")
 #' asr <- as.sr(my.returns)
+#'
 #' # given an xts object:
-#' data(stock_returns)
-#' IBM <- stock_returns[,'IBM']
-#' asr <- as.sr(IBM,na.rm=TRUE)
+#' if (require(xts)) {
+#'  data(stock_returns)
+#'  IBM <- stock_returns[,'IBM']
+#'  asr <- as.sr(IBM,na.rm=TRUE)
+#' }
 #'
 #' # on a linear model, find the 'Sharpe' of the residual term
 #' nfac <- 5
@@ -712,8 +715,10 @@ sropt <- function(z.s,df1,df2,drag=0,ope=1,epoch="yr",T2=NULL) {
 #' }
 #'
 #' # using real data.
-#' data(stock_returns)
-#' asro <- as.sropt(stock_returns)
+#' if (require(xts)) {
+#'  data(stock_returns)
+#'  asro <- as.sropt(stock_returns)
+#' }  
 as.sropt <- function(X,drag=0,ope=1,epoch="yr") {
 	UseMethod("as.sropt", X)
 }
@@ -1003,10 +1008,12 @@ del_sropt <- function(z.s,z.sub,df1,df2,df1.sub,drag=0,ope=1,epoch="yr") {
 #' asro.alt <- as.sropt(Returns[,4:nfac],drag=0,ope=ope)
 #'
 #' # using real data.
-#' data(stock_returns)
-#' # hedge out SPY
-#' G <- diag(dim(stock_returns)[2])[3,]
-#' asro <- as.del_sropt(stock_returns,G)
+#' if (require(xts)) {
+#'   data(stock_returns)
+#'   # hedge out SPY
+#'   G <- diag(dim(stock_returns)[2])[3,]
+#'   asro <- as.del_sropt(stock_returns,G=G)
+#' }
 as.del_sropt <- function(X,G,drag=0,ope=1,epoch="yr") {
 	UseMethod("as.del_sropt",X)
 }

@@ -73,7 +73,9 @@
 	TEO <- time(anxts)
 	# the as.Date rigamarole is b/c these are timeDate objects and now
 	# the conversion to POSIXct in difftime requires an origin? WTF?
-	delt <- difftime(as.Date(TEO[length(TEO)]),as.Date(TEO[1]),units='days')
+	orig <- '1970-01-01'
+	delt <- difftime(as.Date(TEO[length(TEO)],origin=orig),
+									 as.Date(TEO[1],origin=orig),units='days')
 	return(delt)
 }
 # infer the observations per epoch from an xts object

@@ -82,10 +82,12 @@ asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
 asro.alt <- as.sropt(Returns[,4:nfac],drag=0,ope=ope)
 
 # using real data.
-data(stock_returns)
-# hedge out SPY
-G <- diag(dim(stock_returns)[2])[3,]
-asro <- as.del_sropt(stock_returns,G)
+if (require(xts)) {
+  data(stock_returns)
+  # hedge out SPY
+  G <- diag(dim(stock_returns)[2])[3,]
+  asro <- as.del_sropt(stock_returns,G=G)
+}
 }
 \seealso{
 \code{\link{del_sropt}}, \code{\link{sropt}}, 

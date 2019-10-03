@@ -47,9 +47,10 @@
 #' @docType data
 #' @keywords data
 #' @examples
-#' data(stock_returns)
-#' as.sr(stock_returns)
-#'
+#' if (require(xts)) {
+#'  data(stock_returns)
+#'  as.sr(stock_returns)
+#' }
 "stock_returns"
 
 #for vim modeline: (do not edit)

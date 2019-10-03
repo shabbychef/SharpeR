@@ -27,9 +27,10 @@ Nineteen years of daily log returns on three stocks and an ETF.
 The author makes no guarantees regarding correctness of this data.
 }
 \examples{
-data(stock_returns)
-as.sr(stock_returns)
-
+if (require(xts)) {
+ data(stock_returns)
+ as.sr(stock_returns)
+}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

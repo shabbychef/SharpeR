@@ -96,8 +96,10 @@ if (require(MASS)) {
 }
 
 # using real data.
-data(stock_returns)
-asro <- as.sropt(stock_returns)
+if (require(xts)) {
+ data(stock_returns)
+ asro <- as.sropt(stock_returns)
+}  
 }
 \seealso{
 \code{\link{sropt}}, \code{\link{sr}}, sropt-distribution functions, 

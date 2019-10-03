@@ -153,8 +153,10 @@
 #' rv <- sr_equality_test(rets)
 #' 
 #' # using real data
-#' data(stock_returns)
-#' pvs <- sr_equality_test(stock_returns)
+#' if (require(xts)) {
+#'  data(stock_returns)
+#'  pvs <- sr_equality_test(stock_returns)
+#' }
 #'
 #' # test for uniformity
 #' pvs <- replicate(1024,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
