@@ -94,22 +94,10 @@ if (require(MASS)) {
   Returns <- mvrnorm(ceiling(ope*nyr),mu=matrix(0.001,ncol=nstok),Sigma=Sigma)
   asro <- as.sropt(Returns,ope=ope)
 }
-\dontrun{
+
 # using real data.
-if (require(quantmod)) {
-  get.ret <- function(sym,...) {
-    OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
-    lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
-    # chomp first NA!
-    lrets[-1,]
-  }
-  get.rets <- function(syms,...) { 
-	some.rets <- do.call("cbind",lapply(syms,get.ret,...)) 
- }
-  some.rets <- get.rets(c("IBM","AAPL","A","C","SPY","XOM"))
-  asro <- as.sropt(some.rets)
-}
-}
+data(stock_returns)
+asro <- as.sropt(stock_returns)
 }
 \seealso{
 \code{\link{sropt}}, \code{\link{sr}}, sropt-distribution functions, 

@@ -98,13 +98,10 @@ my.returns <- matrix(rnorm(253*3),ncol=1)
 colnames(my.returns) <- c("my strategy")
 asr <- as.sr(my.returns)
 # given an xts object:
-\dontrun{
-if (require(quantmod)) {
-  IBM <- getSymbols('IBM',auto.assign=FALSE)
-  lrets <- diff(log(IBM[,"IBM.Adjusted"]))
-  asr <- as.sr(lrets,na.rm=TRUE)
-}
-}
+data(stock_returns)
+IBM <- stock_returns[,'IBM']
+asr <- as.sr(IBM,na.rm=TRUE)
+
 # on a linear model, find the 'Sharpe' of the residual term
 nfac <- 5
 nyr <- 10

@@ -59,34 +59,29 @@ described by Wright. \emph{et. al.}, the latter by Leung and Wong.
 }
 \examples{
 # under the null 
+set.seed(1234)
 rv <- sr_equality_test(matrix(rnorm(500*5),ncol=5))
+
 # under the alternative (but with identity covariance)
 ope <- 253
 nyr <- 10
 nco <- 5
+set.seed(909)
 rets <- 0.01 * sapply(seq(0,1.7/sqrt(ope),length.out=nco),
   function(mu) { rnorm(ope*nyr,mean=mu,sd=1) })
 rv <- sr_equality_test(rets)
 
-\dontrun{
 # using real data
-if (require(quantmod)) {
-  get.ret <- function(sym,...) {
-    OHLCV <- getSymbols(sym,auto.assign=FALSE,...)
-    lrets <- diff(log(OHLCV[,paste(c(sym,"Adjusted"),collapse=".",sep="")]))
-    lrets[-1,]
-  }
-  get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.ret,...)) }
-  some.rets <- get.rets(c("IBM","AAPL","NFLX","SPY"))
-  pvs <- sr_equality_test(some.rets)
-}
+data(stock_returns)
+pvs <- sr_equality_test(stock_returns)
+
 # test for uniformity
 pvs <- replicate(1024,{ x <- sr_equality_test(matrix(rnorm(400*5),400,5),type="chisq")
                        x$p.value })
 plot(ecdf(pvs))
 abline(0,1,col='red') 
-}
-\dontrun{
+
+\donttest{
 if (require(sandwich)) {
   set.seed(as.integer(charToRaw("0b2fd4e9-3bdf-4e3e-9c75-25c6d18c331f")))
   n.manifest <- 10
