@@ -20,6 +20,7 @@ Depends:
     R (>= 3.0.0)
 Imports: 
     matrixcalc,
+    methods,
     sadists (>= 0.2.0)
 Suggests: 
     xtable,
@@ -35,13 +36,12 @@ Suggests:
 URL: https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
 Collate:
-    'SharpeR.r'
     'data.r'
-    'utils.r'
     'distributions.r'
-    'sr.r'
     'estimation.r'
+    'SharpeR.r'
     'sr_bias.r'
+    'sr.r'
     'tests.r'
     'unified.r'
-RoxygenNote: 6.1.1
+    'utils.r'

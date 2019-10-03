@@ -27,6 +27,7 @@
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
+#' @importFrom methods setOldClass
 #' @include utils.r
 #' @include distributions.r
 #' @include estimation.r
