@@ -4,8 +4,8 @@
 \alias{sr}
 \title{Create an 'sr' object.}
 \usage{
-sr(sr, df, c0 = 0, ope = 1, rescal = sqrt(1/(df + 1)), epoch = "yr",
-  cumulants = NULL)
+sr(sr, df, c0 = 0, ope = 1, rescal = sqrt(1/(df + 1)),
+  epoch = "yr", cumulants = NULL)
 }
 \arguments{
 \item{sr}{a Sharpe ratio statistic.}
@@ -97,4 +97,5 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sr}
 \keyword{univar}

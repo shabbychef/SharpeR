@@ -31,3 +31,4 @@ Other del_sropt: \code{\link{as.del_sropt}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{del_sropt}

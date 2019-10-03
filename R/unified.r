@@ -120,7 +120,7 @@ ivech <- function(x) {
 #' # make it fat tailed:
 #' X <- matrix(rt(1000*3,df=5),ncol=3)
 #' Sigmas <- sm_vcov(X)
-#' \dontrun{
+#' \donttest{
 #' if (require(sandwich)) {
 #'  Sigmas <- sm_vcov(X,vcov.func=vcovHC)
 #' }
@@ -129,7 +129,7 @@ ivech <- function(x) {
 #' Xf <- filter(X,c(0.2),"recursive")
 #' colnames(Xf) <- colnames(X)
 #' Sigmas <- sm_vcov(Xf)
-#' \dontrun{
+#' \donttest{
 #' if (require(sandwich)) {
 #'	Sigmas <- sm_vcov(Xf,vcov.func=vcovHAC)
 #' }
@@ -294,7 +294,7 @@ sm_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
 #' X <- matrix(rt(1000*3,df=5),ncol=3)
 #' ism <- ism_vcov(X)
 #' wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
-#' \dontrun{
+#' \donttest{
 #' if (require(sandwich)) {
 #'  ism <- ism_vcov(X,vcov.func=vcovHC)
 #'  wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
@@ -305,7 +305,7 @@ sm_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
 #' colnames(Xf) <- colnames(X)
 #' ism <- ism_vcov(Xf)
 #' wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
-#' \dontrun{
+#' \donttest{
 #' if (require(sandwich)) {
 #'	ism <- ism_vcov(Xf,vcov.func=vcovHAC)
 #'  wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))

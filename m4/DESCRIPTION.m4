@@ -35,6 +35,7 @@ Suggests:
     TTR,
     testthat, 
     sandwich,
+    txtplot,
     knitr
 URL: https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr

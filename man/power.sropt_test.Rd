@@ -66,4 +66,5 @@ Other sropt: \code{\link{as.sropt}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sropt}
 \keyword{htest}

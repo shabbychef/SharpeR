@@ -109,4 +109,5 @@ Other sropt Hotelling: \code{\link{sric}}
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sropt Hotelling}
 \keyword{htest}

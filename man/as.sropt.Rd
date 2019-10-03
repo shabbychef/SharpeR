@@ -124,4 +124,5 @@ Other sropt: \code{\link{confint.sr}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sropt}
 \keyword{univar}

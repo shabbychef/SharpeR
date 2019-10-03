@@ -53,7 +53,7 @@ Sigmas <- sr_vcov(X)
 # make it fat tailed:
 X <- matrix(rt(1000*3,df=5),ncol=3)
 Sigmas <- sr_vcov(X)
-\dontrun{
+\donttest{
 if (require(sandwich)) {
 Sigmas <- sr_vcov(X,vcov.func=vcovHC)
 }
@@ -62,7 +62,7 @@ Sigmas <- sr_vcov(X,vcov.func=vcovHC)
 Xf <- filter(X,c(0.2),"recursive")
 colnames(Xf) <- colnames(X)
 Sigmas <- sr_vcov(Xf)
-\dontrun{
+\donttest{
 if (require(sandwich)) {
 Sigmas <- sr_vcov(Xf,vcov.func=vcovHAC)
 }
@@ -96,4 +96,5 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sr}
 \keyword{univar}

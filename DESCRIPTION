@@ -35,11 +35,12 @@ Suggests:
 URL: https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
 Collate:
-    'distributions.r'
-    'estimation.r'
     'SharpeR.r'
-    'sr_bias.r'
+    'utils.r'
+    'distributions.r'
     'sr.r'
+    'estimation.r'
+    'sr_bias.r'
     'tests.r'
     'unified.r'
-    'utils.r'
+RoxygenNote: 6.1.1

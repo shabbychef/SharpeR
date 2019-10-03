@@ -187,4 +187,5 @@ and Portfolio Theory." Scandinavian Journal of Statistics 38, no. 2 (2011):
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sr sropt}
 \keyword{package}

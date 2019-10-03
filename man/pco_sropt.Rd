@@ -77,12 +77,12 @@ df2 <- 6 * ope
 rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
 qvs <- seq(0,10,length.out=51)
 pps <- pco_sropt(qvs,df1,df2,rvs[1],ope)
-\dontrun{
+\donttest{
 if (require(txtplot))
  txtplot(qvs,pps)
 }
 pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
-\dontrun{
+\donttest{
 if (require(txtplot))
  txtplot(qvs,pps)
 }
@@ -121,4 +121,5 @@ Other sropt: \code{\link{as.sropt}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sropt}
 \keyword{distribution}

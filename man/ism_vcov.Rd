@@ -73,7 +73,7 @@ wald.stats <- ism.mu / sqrt(diag(ism.Sg))
 X <- matrix(rt(1000*3,df=5),ncol=3)
 ism <- ism_vcov(X)
 wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
-\dontrun{
+\donttest{
 if (require(sandwich)) {
  ism <- ism_vcov(X,vcov.func=vcovHC)
  wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
@@ -84,7 +84,7 @@ Xf <- filter(X,c(0.2),"recursive")
 colnames(Xf) <- colnames(X)
 ism <- ism_vcov(Xf)
 wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))
-\dontrun{
+\donttest{
 if (require(sandwich)) {
 ism <- ism_vcov(Xf,vcov.func=vcovHAC)
  wald.stats <- ism$mu[1:ism$p] / sqrt(diag(ism$Ohat[1:ism$p,1:ism$p]))

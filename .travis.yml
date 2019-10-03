@@ -23,6 +23,8 @@ warnings_are_errors : true
 
 r_build_args : " --compact-vignettes=gs+qpdf"
 
+r_check_args : " --as-cran --run-donttest"
+
 after_success:
   - Rscript -e 'library(covr);codecov()'
 

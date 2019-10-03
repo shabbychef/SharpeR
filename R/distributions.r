@@ -207,7 +207,7 @@ rrt <- function(n, df, K, rho = 0) {
 #' dvs <- dsr(rvs, 253*6, 0, 253)
 #' pvs.H0 <- psr(rvs, 253*6, 0, 253)
 #' pvs.HA <- psr(rvs, 253*6, 1, 253)
-#' \dontrun{
+#' \donttest{
 #' plot(ecdf(pvs.H0))
 #' plot(ecdf(pvs.HA))
 #' }
@@ -806,12 +806,12 @@ rlambdap <- function(n, df, tstat) {
 #' rvs <- rsropt(ntest,df1=df1,df2=df2,zeta.s=zeta.s)
 #' qvs <- seq(0,10,length.out=51)
 #' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope)
-#' \dontrun{
+#' \donttest{
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
 #' }
 #' pps <- pco_sropt(qvs,df1,df2,rvs[1],ope,lower.tail=FALSE)
-#' \dontrun{
+#' \donttest{
 #' if (require(txtplot))
 #'  txtplot(qvs,pps)
 #' }

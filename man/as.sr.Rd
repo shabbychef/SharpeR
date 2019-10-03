@@ -13,11 +13,11 @@
 as.sr(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
   higher_order = FALSE)
 
-\method{as.sr}{default}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
-  higher_order = FALSE)
+\method{as.sr}{default}(x, c0 = 0, ope = 1, na.rm = FALSE,
+  epoch = "yr", higher_order = FALSE)
 
-\method{as.sr}{matrix}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
-  higher_order = FALSE)
+\method{as.sr}{matrix}(x, c0 = 0, ope = 1, na.rm = FALSE,
+  epoch = "yr", higher_order = FALSE)
 
 \method{as.sr}{data.frame}(x, c0 = 0, ope = 1, na.rm = FALSE,
   epoch = "yr", higher_order = FALSE)
@@ -25,8 +25,8 @@ as.sr(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
 \method{as.sr}{lm}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
   higher_order = FALSE)
 
-\method{as.sr}{xts}(x, c0 = 0, ope = 1, na.rm = FALSE, epoch = "yr",
-  higher_order = FALSE)
+\method{as.sr}{xts}(x, c0 = 0, ope = 1, na.rm = FALSE,
+  epoch = "yr", higher_order = FALSE)
 
 \method{as.sr}{timeSeries}(x, c0 = 0, ope = 1, na.rm = FALSE,
   epoch = "yr", higher_order = FALSE)
@@ -151,4 +151,5 @@ Other sr: \code{\link{confint.sr}}, \code{\link{dsr}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sr}
 \keyword{univar}

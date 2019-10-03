@@ -97,7 +97,7 @@ rvs <- rsr(128, 253*6, 0, 253)
 dvs <- dsr(rvs, 253*6, 0, 253)
 pvs.H0 <- psr(rvs, 253*6, 0, 253)
 pvs.HA <- psr(rvs, 253*6, 1, 253)
-\dontrun{
+\donttest{
 plot(ecdf(pvs.H0))
 plot(ecdf(pvs.HA))
 }
@@ -124,4 +124,5 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sr}
 \keyword{distribution}

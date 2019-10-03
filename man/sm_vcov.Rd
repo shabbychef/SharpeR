@@ -56,7 +56,7 @@ Sigmas.n <- sm_vcov(X,fit.intercept=FALSE)
 # make it fat tailed:
 X <- matrix(rt(1000*3,df=5),ncol=3)
 Sigmas <- sm_vcov(X)
-\dontrun{
+\donttest{
 if (require(sandwich)) {
  Sigmas <- sm_vcov(X,vcov.func=vcovHC)
 }
@@ -65,7 +65,7 @@ if (require(sandwich)) {
 Xf <- filter(X,c(0.2),"recursive")
 colnames(Xf) <- colnames(X)
 Sigmas <- sm_vcov(Xf)
-\dontrun{
+\donttest{
 if (require(sandwich)) {
 Sigmas <- sm_vcov(Xf,vcov.func=vcovHAC)
 }

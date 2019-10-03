@@ -109,4 +109,5 @@ Other del_sropt: \code{\link{del_sropt}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{del_sropt}
 \keyword{univar}

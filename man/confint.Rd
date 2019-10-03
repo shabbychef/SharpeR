@@ -6,9 +6,9 @@
 \alias{confint.del_sropt}
 \title{Confidence Interval on (optimal) Signal-Noise Ratio}
 \usage{
-\method{confint}{sr}(object, parm, level = 0.95, level.lo = (1 - level)/2,
-  level.hi = 1 - level.lo, type = c("exact", "t", "Z", "Mertens", "Bao"),
-  ...)
+\method{confint}{sr}(object, parm, level = 0.95, level.lo = (1 -
+  level)/2, level.hi = 1 - level.lo, type = c("exact", "t", "Z",
+  "Mertens", "Bao"), ...)
 
 \method{confint}{sropt}(object, parm, level = 0.95, level.lo = (1 -
   level)/2, level.hi = 1 - level.lo, ...)
@@ -145,4 +145,6 @@ Other sropt: \code{\link{as.sropt}}, \code{\link{dsropt}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sr}
+\concept{sropt}
 \keyword{htest}

@@ -129,4 +129,5 @@ Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
 }
+\concept{sr}
 \keyword{htest}
