@@ -36,6 +36,7 @@ Suggests:
 URL: https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
 Collate:
+    'data.r'
     'distributions.r'
     'estimation.r'
     'SharpeR.r'
