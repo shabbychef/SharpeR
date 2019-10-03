@@ -5,7 +5,7 @@ Authors@R: c(person(c("Steven", "E."), "Pav",
     email="shabbychef@gmail.com",
     comment = c(ORCID = "0000-0002-4197-6195")))
 Version: 1.2.0.0001
-Date: 2018-10-07
+Date: 2019-10-02
 License: LGPL-3
 Title: Statistical Significance of the Sharpe Ratio
 BugReports: https://github.com/shabbychef/SharpeR/issues
@@ -31,16 +31,16 @@ Suggests:
     TTR,
     testthat, 
     sandwich,
+    txtplot,
     knitr
 URL: https://github.com/shabbychef/SharpeR
 VignetteBuilder: knitr
 Collate:
-    'SharpeR.r'
-    'utils.r'
     'distributions.r'
-    'sr.r'
     'estimation.r'
+    'SharpeR.r'
     'sr_bias.r'
+    'sr.r'
     'tests.r'
     'unified.r'
-RoxygenNote: 6.1.1
+    'utils.r'
