@@ -636,7 +636,6 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 #' @param log.p logical; if TRUE, probabilities p are given as \eqn{\mbox{log}(p)}{log(p)}.
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #'        \eqn{P[X \le x]}{P[X <= x]}, otherwise, \eqn{P[X > x]}{P[X > x]}.
-#' @inheritParams dsr
 #' @keywords distribution 
 #' @return \code{dlambdap} gives the density, \code{plambdap} gives the distribution function,
 #' \code{qlambdap} gives the quantile function, and \code{rlambdap} generates random deviates.

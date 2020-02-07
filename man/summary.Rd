@@ -12,8 +12,7 @@
 \arguments{
 \item{object}{an object of class \code{sr}, \code{sropt} or \code{del_sropt}.}
 
-\item{...}{additional arguments affecting the summary produced, though
-ignored here.}
+\item{...}{additional arguments affecting the summary produced, though ignored here.}
 }
 \value{
 When an \code{sr} object is input, the object cast to class \code{summary.sr} with some

@@ -1116,9 +1116,7 @@ print.del_sropt <- function(x,...) {
 #' include t- or T-statistics, p-values, and so on.
 #' 
 #' @param object an object of class \code{sr}, \code{sropt} or \code{del_sropt}.
-#' @param ...  additional arguments affecting the summary produced, though
-#' ignored here.
-#' @inheritParams summary
+#' @param ...  additional arguments affecting the summary produced, though ignored here.
 #' @return When an \code{sr} object is input, the object cast to class \code{summary.sr} with some
 #' additional fields:
 #' \describe{

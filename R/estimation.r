@@ -700,7 +700,6 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #'
 #' @param z.s an object of type \code{sropt}, or \code{del_sropt}
-#' @inheritParams dsropt
 #' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
 #' @keywords htest
 #' @return an estimate of the non-centrality parameter, which is
