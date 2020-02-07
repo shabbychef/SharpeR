@@ -90,8 +90,9 @@ if (require(sandwich)) {
   n.latent <- 4
   n.day <- 1024
   snr <- 0.95
-  latent.rets <- matrix(rnorm(n.day*n.latent),ncol=n.latent) %*%
-	matrix(runif(n.latent*n.manifest),ncol=n.manifest)
+  la_A <- matrix(rnorm(n.day*n.latent),ncol=n.latent)
+  la_B <- matrix(runif(n.latent*n.manifest),ncol=n.manifest)
+  latent.rets <- la_A \%*\% la_B
   noise.rets <- matrix(rnorm(n.day*n.manifest),ncol=n.manifest)
   some.rets <- snr * latent.rets + sqrt(1-snr^2) * noise.rets
   # naive vcov
