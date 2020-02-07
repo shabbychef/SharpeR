@@ -81,11 +81,15 @@ stest <- sropt_test(asro,alternative="two.sided")
 
 \code{\link{sr_test}}, \code{\link{t.test}}.
 
-Other sropt: \code{\link{as.sropt}},
-  \code{\link{confint.sr}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{pco_sropt}},
-  \code{\link{power.sropt_test}},
-  \code{\link{reannualize}}, \code{\link{sropt}}
+Other sropt: 
+\code{\link{as.sropt}()},
+\code{\link{confint.sr}()},
+\code{\link{dsropt}()},
+\code{\link{is.sropt}()},
+\code{\link{pco_sropt}()},
+\code{\link{power.sropt_test}()},
+\code{\link{reannualize}()},
+\code{\link{sropt}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

@@ -545,7 +545,6 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #'   object, if it is unambiguous. Otherwise, it defaults to 1, with a warning
 #'   thrown.
 #' @inheritParams sr_test
-#' @template param-ellipsis
 #' @keywords htest
 #' @return A list with class \code{"htest"} containing the following components:
 #' \item{statistic}{\code{NULL} here.}

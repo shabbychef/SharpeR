@@ -1,3 +1,6 @@
+2020-02-06 Steven E. Pav <shabbychef@gmail.com>
+* 1.2.1 on CRAN
+* CRAN fix for warnings about ellipsis.
 
 2018-10-07 Steven E. Pav <shabbychef@gmail.com>
 * 1.2.0 on CRAN

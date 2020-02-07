@@ -94,14 +94,22 @@ Journal of Statistical Planning and Inference 79  (1999): 93--105.
 \seealso{
 t-distribution functions, \code{\link{dt},\link{pt},\link{qt},\link{rt}}
 
-Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
-  \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{power.sr_test}}, \code{\link{predint}},
-  \code{\link{print.sr}}, \code{\link{reannualize}},
-  \code{\link{se}}, \code{\link{sr_equality_test}},
-  \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
-  \code{\link{sr_vcov}}, \code{\link{sr}},
-  \code{\link{summary.sr}}
+Other sr: 
+\code{\link{as.sr}()},
+\code{\link{confint.sr}()},
+\code{\link{dsr}()},
+\code{\link{is.sr}()},
+\code{\link{power.sr_test}()},
+\code{\link{predint}()},
+\code{\link{print.sr}()},
+\code{\link{reannualize}()},
+\code{\link{se}()},
+\code{\link{sr_equality_test}()},
+\code{\link{sr_test}()},
+\code{\link{sr_unpaired_test}()},
+\code{\link{sr_vcov}()},
+\code{\link{sr}},
+\code{\link{summary.sr}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

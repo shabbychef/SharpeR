@@ -32,11 +32,15 @@ is.sropt(asro)
 \seealso{
 sropt
 
-Other sropt: \code{\link{as.sropt}},
-  \code{\link{confint.sr}}, \code{\link{dsropt}},
-  \code{\link{pco_sropt}}, \code{\link{power.sropt_test}},
-  \code{\link{reannualize}}, \code{\link{sropt_test}},
-  \code{\link{sropt}}
+Other sropt: 
+\code{\link{as.sropt}()},
+\code{\link{confint.sr}()},
+\code{\link{dsropt}()},
+\code{\link{pco_sropt}()},
+\code{\link{power.sropt_test}()},
+\code{\link{reannualize}()},
+\code{\link{sropt_test}()},
+\code{\link{sropt}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

@@ -4,9 +4,14 @@
 \alias{sr_unpaired_test}
 \title{test for equation on unpaired Sharpe ratios}
 \usage{
-sr_unpaired_test(srs, contrasts = NULL, null.value = 0,
-  alternative = c("two.sided", "less", "greater"), ope = NULL,
-  conf.level = 0.95)
+sr_unpaired_test(
+  srs,
+  contrasts = NULL,
+  null.value = 0,
+  alternative = c("two.sided", "less", "greater"),
+  ope = NULL,
+  conf.level = 0.95
+)
 }
 \arguments{
 \item{srs}{a (non-empty) list of objects of class \code{sr}, each containing
@@ -35,8 +40,6 @@ object, if it is unambiguous. Otherwise, it defaults to 1, with a warning
 thrown.}
 
 \item{conf.level}{confidence level of the interval.}
-
-\item{...}{further arguments to be passed to or from methods.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
@@ -103,14 +106,22 @@ Arxiv (2015).
 \seealso{
 \code{\link{sr_equality_test}}, \code{\link{sr_test}}, \code{\link{t.test}}.
 
-Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
-  \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{plambdap}}, \code{\link{power.sr_test}},
-  \code{\link{predint}}, \code{\link{print.sr}},
-  \code{\link{reannualize}}, \code{\link{se}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_vcov}}, \code{\link{sr}},
-  \code{\link{summary.sr}}
+Other sr: 
+\code{\link{as.sr}()},
+\code{\link{confint.sr}()},
+\code{\link{dsr}()},
+\code{\link{is.sr}()},
+\code{\link{plambdap}()},
+\code{\link{power.sr_test}()},
+\code{\link{predint}()},
+\code{\link{print.sr}()},
+\code{\link{reannualize}()},
+\code{\link{se}()},
+\code{\link{sr_equality_test}()},
+\code{\link{sr_test}()},
+\code{\link{sr_vcov}()},
+\code{\link{sr}},
+\code{\link{summary.sr}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

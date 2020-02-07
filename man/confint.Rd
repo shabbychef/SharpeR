@@ -6,15 +6,33 @@
 \alias{confint.del_sropt}
 \title{Confidence Interval on (optimal) Signal-Noise Ratio}
 \usage{
-\method{confint}{sr}(object, parm, level = 0.95, level.lo = (1 -
-  level)/2, level.hi = 1 - level.lo, type = c("exact", "t", "Z",
-  "Mertens", "Bao"), ...)
+\method{confint}{sr}(
+  object,
+  parm,
+  level = 0.95,
+  level.lo = (1 - level)/2,
+  level.hi = 1 - level.lo,
+  type = c("exact", "t", "Z", "Mertens", "Bao"),
+  ...
+)
 
-\method{confint}{sropt}(object, parm, level = 0.95, level.lo = (1 -
-  level)/2, level.hi = 1 - level.lo, ...)
+\method{confint}{sropt}(
+  object,
+  parm,
+  level = 0.95,
+  level.lo = (1 - level)/2,
+  level.hi = 1 - level.lo,
+  ...
+)
 
-\method{confint}{del_sropt}(object, parm, level = 0.95, level.lo = (1 -
-  level)/2, level.hi = 1 - level.lo, ...)
+\method{confint}{del_sropt}(
+  object,
+  parm,
+  level = 0.95,
+  level.lo = (1 - level)/2,
+  level.hi = 1 - level.lo,
+  ...
+)
 }
 \arguments{
 \item{object}{an observed Sharpe ratio statistic, of class \code{sr} or
@@ -127,20 +145,32 @@ Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-13
 \seealso{
 \code{\link{confint}}, \code{\link{se}}
 
-Other sr: \code{\link{as.sr}}, \code{\link{dsr}},
-  \code{\link{is.sr}}, \code{\link{plambdap}},
-  \code{\link{power.sr_test}}, \code{\link{predint}},
-  \code{\link{print.sr}}, \code{\link{reannualize}},
-  \code{\link{se}}, \code{\link{sr_equality_test}},
-  \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
-  \code{\link{sr_vcov}}, \code{\link{sr}},
-  \code{\link{summary.sr}}
+Other sr: 
+\code{\link{as.sr}()},
+\code{\link{dsr}()},
+\code{\link{is.sr}()},
+\code{\link{plambdap}()},
+\code{\link{power.sr_test}()},
+\code{\link{predint}()},
+\code{\link{print.sr}()},
+\code{\link{reannualize}()},
+\code{\link{se}()},
+\code{\link{sr_equality_test}()},
+\code{\link{sr_test}()},
+\code{\link{sr_unpaired_test}()},
+\code{\link{sr_vcov}()},
+\code{\link{sr}},
+\code{\link{summary.sr}}
 
-Other sropt: \code{\link{as.sropt}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{pco_sropt}},
-  \code{\link{power.sropt_test}},
-  \code{\link{reannualize}}, \code{\link{sropt_test}},
-  \code{\link{sropt}}
+Other sropt: 
+\code{\link{as.sropt}()},
+\code{\link{dsropt}()},
+\code{\link{is.sropt}()},
+\code{\link{pco_sropt}()},
+\code{\link{power.sropt_test}()},
+\code{\link{reannualize}()},
+\code{\link{sropt_test}()},
+\code{\link{sropt}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

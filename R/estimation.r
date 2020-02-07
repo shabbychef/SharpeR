@@ -296,7 +296,6 @@ se <- function(z, type) {
 #'
 #' @param z an observed Sharpe ratio statistic, of class \code{sr}.
 #' @param type estimator type. one of \code{"t", "Lo", "Mertens", "Bao"}
-#' @template param-ellipsis
 #' @keywords htest
 #' @return an estimate of standard error.
 #' @seealso sr-distribution functions, \code{\link{dsr}},

@@ -112,11 +112,15 @@ qv <- qco_sropt(c(0.1,0.2),c(df1,2*df1),c(df2,2*df2),rvs)
 
 \code{\link{dsropt},\link{psropt},\link{qsropt},\link{rsropt}}
 
-Other sropt: \code{\link{as.sropt}},
-  \code{\link{confint.sr}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{power.sropt_test}},
-  \code{\link{reannualize}}, \code{\link{sropt_test}},
-  \code{\link{sropt}}
+Other sropt: 
+\code{\link{as.sropt}()},
+\code{\link{confint.sr}()},
+\code{\link{dsropt}()},
+\code{\link{is.sropt}()},
+\code{\link{power.sropt_test}()},
+\code{\link{reannualize}()},
+\code{\link{sropt_test}()},
+\code{\link{sropt}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

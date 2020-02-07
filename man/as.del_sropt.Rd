@@ -93,8 +93,9 @@ if (require(xts)) {
 \code{\link{del_sropt}}, \code{\link{sropt}}, 
 \code{\link{sr}}
 
-Other del_sropt: \code{\link{del_sropt}},
-  \code{\link{is.del_sropt}}
+Other del_sropt: 
+\code{\link{del_sropt}},
+\code{\link{is.del_sropt}()}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

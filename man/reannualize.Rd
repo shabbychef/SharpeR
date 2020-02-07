@@ -51,20 +51,32 @@ sr
 
 sropt
 
-Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
-  \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{plambdap}}, \code{\link{power.sr_test}},
-  \code{\link{predint}}, \code{\link{print.sr}},
-  \code{\link{se}}, \code{\link{sr_equality_test}},
-  \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
-  \code{\link{sr_vcov}}, \code{\link{sr}},
-  \code{\link{summary.sr}}
+Other sr: 
+\code{\link{as.sr}()},
+\code{\link{confint.sr}()},
+\code{\link{dsr}()},
+\code{\link{is.sr}()},
+\code{\link{plambdap}()},
+\code{\link{power.sr_test}()},
+\code{\link{predint}()},
+\code{\link{print.sr}()},
+\code{\link{se}()},
+\code{\link{sr_equality_test}()},
+\code{\link{sr_test}()},
+\code{\link{sr_unpaired_test}()},
+\code{\link{sr_vcov}()},
+\code{\link{sr}},
+\code{\link{summary.sr}}
 
-Other sropt: \code{\link{as.sropt}},
-  \code{\link{confint.sr}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{pco_sropt}},
-  \code{\link{power.sropt_test}}, \code{\link{sropt_test}},
-  \code{\link{sropt}}
+Other sropt: 
+\code{\link{as.sropt}()},
+\code{\link{confint.sr}()},
+\code{\link{dsropt}()},
+\code{\link{is.sropt}()},
+\code{\link{pco_sropt}()},
+\code{\link{power.sropt_test}()},
+\code{\link{sropt_test}()},
+\code{\link{sropt}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

@@ -49,7 +49,8 @@ Paulsen, D., and Soehl, J. "Noise Fit, Estimation Error, and Sharpe Information 
 arxiv preprint (2016): \url{http://arxiv.org/abs/1602.06186}
 }
 \seealso{
-Other sropt Hotelling: \code{\link{inference}}
+Other sropt Hotelling: 
+\code{\link{inference}()}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

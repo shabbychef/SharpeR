@@ -4,9 +4,17 @@
 \alias{sr_test}
 \title{test for Sharpe ratio}
 \usage{
-sr_test(x, y = NULL, alternative = c("two.sided", "less", "greater"),
-  zeta = 0, ope = 1, paired = FALSE, conf.level = 0.95,
-  type = c("exact", "t", "Z", "Mertens", "Bao"), ...)
+sr_test(
+  x,
+  y = NULL,
+  alternative = c("two.sided", "less", "greater"),
+  zeta = 0,
+  ope = 1,
+  paired = FALSE,
+  conf.level = 0.95,
+  type = c("exact", "t", "Z", "Mertens", "Bao"),
+  ...
+)
 }
 \arguments{
 \item{x}{a (non-empty) numeric vector of data values, or an
@@ -117,14 +125,22 @@ Arxiv (2015).
 
 \code{\link{sr_equality_test}}, \code{\link{sr_unpaired_test}}, \code{\link{t.test}}.
 
-Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
-  \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{plambdap}}, \code{\link{power.sr_test}},
-  \code{\link{predint}}, \code{\link{print.sr}},
-  \code{\link{reannualize}}, \code{\link{se}},
-  \code{\link{sr_equality_test}},
-  \code{\link{sr_unpaired_test}}, \code{\link{sr_vcov}},
-  \code{\link{sr}}, \code{\link{summary.sr}}
+Other sr: 
+\code{\link{as.sr}()},
+\code{\link{confint.sr}()},
+\code{\link{dsr}()},
+\code{\link{is.sr}()},
+\code{\link{plambdap}()},
+\code{\link{power.sr_test}()},
+\code{\link{predint}()},
+\code{\link{print.sr}()},
+\code{\link{reannualize}()},
+\code{\link{se}()},
+\code{\link{sr_equality_test}()},
+\code{\link{sr_unpaired_test}()},
+\code{\link{sr_vcov}()},
+\code{\link{sr}},
+\code{\link{summary.sr}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

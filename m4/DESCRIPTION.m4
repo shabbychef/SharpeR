@@ -19,12 +19,13 @@ Description: A collection of tools for analyzing significance of assets,
     of the Sharpe ratio distribution based on normal returns, as well
     as the optimal Sharpe ratio over multiple assets. Computes confidence intervals
     on the Sharpe and provides a test of equality of Sharpe ratios based on 
-    the Delta method.
+    the Delta method. The statistical foundations of the Sharpe can be found in
+    the author's Short Sharpe Course  <doi:10.2139/ssrn.3036276>.
 Depends: 
     R (>= 3.0.0)
 Imports: 
     matrixcalc,
-    methods,
+dnl methods,
     sadists (>= 0.2.0)
 Suggests: 
     xtable,

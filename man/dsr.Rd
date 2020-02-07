@@ -112,14 +112,22 @@ Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-13
 
 t-distribution functions, \code{\link{dt}, \link{pt}, \link{qt}, \link{rt}}
 
-Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
-  \code{\link{is.sr}}, \code{\link{plambdap}},
-  \code{\link{power.sr_test}}, \code{\link{predint}},
-  \code{\link{print.sr}}, \code{\link{reannualize}},
-  \code{\link{se}}, \code{\link{sr_equality_test}},
-  \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
-  \code{\link{sr_vcov}}, \code{\link{sr}},
-  \code{\link{summary.sr}}
+Other sr: 
+\code{\link{as.sr}()},
+\code{\link{confint.sr}()},
+\code{\link{is.sr}()},
+\code{\link{plambdap}()},
+\code{\link{power.sr_test}()},
+\code{\link{predint}()},
+\code{\link{print.sr}()},
+\code{\link{reannualize}()},
+\code{\link{se}()},
+\code{\link{sr_equality_test}()},
+\code{\link{sr_test}()},
+\code{\link{sr_unpaired_test}()},
+\code{\link{sr_vcov}()},
+\code{\link{sr}},
+\code{\link{summary.sr}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

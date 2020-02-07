@@ -202,7 +202,12 @@ NULL
 #' \newcommand{\CRANpkg}{\href{https://cran.r-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 #'
-#' @section Changes in \SharpeR{} Version 1.2.0 (2016-10-07) :
+#' @section Changes in \SharpeR{} Version 1.2.1 (2020-02-06) :
+#' \itemize{
+#' \item CRAN fix for warnings about ellipsis.
+#' }
+#'
+#' @section Changes in \SharpeR{} Version 1.2.0 (2018-10-07) :
 #' \itemize{
 #' \item move github figures to location CRAN understands
 #' \item be smarter about S3 classes: do not redefine summary and print.

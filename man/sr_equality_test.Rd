@@ -131,14 +131,22 @@ Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, 
 \seealso{
 \code{\link{sr_test}}
 
-Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
-  \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{plambdap}}, \code{\link{power.sr_test}},
-  \code{\link{predint}}, \code{\link{print.sr}},
-  \code{\link{reannualize}}, \code{\link{se}},
-  \code{\link{sr_test}}, \code{\link{sr_unpaired_test}},
-  \code{\link{sr_vcov}}, \code{\link{sr}},
-  \code{\link{summary.sr}}
+Other sr: 
+\code{\link{as.sr}()},
+\code{\link{confint.sr}()},
+\code{\link{dsr}()},
+\code{\link{is.sr}()},
+\code{\link{plambdap}()},
+\code{\link{power.sr_test}()},
+\code{\link{predint}()},
+\code{\link{print.sr}()},
+\code{\link{reannualize}()},
+\code{\link{se}()},
+\code{\link{sr_test}()},
+\code{\link{sr_unpaired_test}()},
+\code{\link{sr_vcov}()},
+\code{\link{sr}},
+\code{\link{summary.sr}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

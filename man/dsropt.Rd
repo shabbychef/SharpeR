@@ -131,11 +131,15 @@ Journal of Management Science 54, no. 7 (2008): 1364--1380.
 F-distribution functions, \code{\link{df}, \link{pf}, \link{qf}, \link{rf}}, 
 Sharpe ratio distribution, \code{\link{dsr}, \link{psr}, \link{qsr}, \link{rsr}}.
 
-Other sropt: \code{\link{as.sropt}},
-  \code{\link{confint.sr}}, \code{\link{is.sropt}},
-  \code{\link{pco_sropt}}, \code{\link{power.sropt_test}},
-  \code{\link{reannualize}}, \code{\link{sropt_test}},
-  \code{\link{sropt}}
+Other sropt: 
+\code{\link{as.sropt}()},
+\code{\link{confint.sr}()},
+\code{\link{is.sropt}()},
+\code{\link{pco_sropt}()},
+\code{\link{power.sropt_test}()},
+\code{\link{reannualize}()},
+\code{\link{sropt_test}()},
+\code{\link{sropt}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

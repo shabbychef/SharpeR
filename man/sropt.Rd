@@ -87,11 +87,15 @@ print(roll.own)
 
 \code{\link{as.sropt}}
 
-Other sropt: \code{\link{as.sropt}},
-  \code{\link{confint.sr}}, \code{\link{dsropt}},
-  \code{\link{is.sropt}}, \code{\link{pco_sropt}},
-  \code{\link{power.sropt_test}},
-  \code{\link{reannualize}}, \code{\link{sropt_test}}
+Other sropt: 
+\code{\link{as.sropt}()},
+\code{\link{confint.sr}()},
+\code{\link{dsropt}()},
+\code{\link{is.sropt}()},
+\code{\link{pco_sropt}()},
+\code{\link{power.sropt_test}()},
+\code{\link{reannualize}()},
+\code{\link{sropt_test}()}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

@@ -105,11 +105,15 @@ if (require(xts)) {
 \code{\link{sropt}}, \code{\link{sr}}, sropt-distribution functions, 
 \code{\link{dsropt}, \link{psropt}, \link{qsropt}, \link{rsropt}}
 
-Other sropt: \code{\link{confint.sr}},
-  \code{\link{dsropt}}, \code{\link{is.sropt}},
-  \code{\link{pco_sropt}}, \code{\link{power.sropt_test}},
-  \code{\link{reannualize}}, \code{\link{sropt_test}},
-  \code{\link{sropt}}
+Other sropt: 
+\code{\link{confint.sr}()},
+\code{\link{dsropt}()},
+\code{\link{is.sropt}()},
+\code{\link{pco_sropt}()},
+\code{\link{power.sropt_test}()},
+\code{\link{reannualize}()},
+\code{\link{sropt_test}()},
+\code{\link{sropt}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

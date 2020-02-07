@@ -13,8 +13,6 @@ se(z, type)
 \item{z}{an observed Sharpe ratio statistic, of class \code{sr}.}
 
 \item{type}{estimator type. one of \code{"t", "Lo", "Mertens", "Bao"}}
-
-\item{...}{further arguments to be passed to or from methods.}
 }
 \value{
 an estimate of standard error.
@@ -72,14 +70,22 @@ Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
 sr-distribution functions, \code{\link{dsr}},
 \code{\link{sr_variance}}.
 
-Other sr: \code{\link{as.sr}}, \code{\link{confint.sr}},
-  \code{\link{dsr}}, \code{\link{is.sr}},
-  \code{\link{plambdap}}, \code{\link{power.sr_test}},
-  \code{\link{predint}}, \code{\link{print.sr}},
-  \code{\link{reannualize}},
-  \code{\link{sr_equality_test}}, \code{\link{sr_test}},
-  \code{\link{sr_unpaired_test}}, \code{\link{sr_vcov}},
-  \code{\link{sr}}, \code{\link{summary.sr}}
+Other sr: 
+\code{\link{as.sr}()},
+\code{\link{confint.sr}()},
+\code{\link{dsr}()},
+\code{\link{is.sr}()},
+\code{\link{plambdap}()},
+\code{\link{power.sr_test}()},
+\code{\link{predint}()},
+\code{\link{print.sr}()},
+\code{\link{reannualize}()},
+\code{\link{sr_equality_test}()},
+\code{\link{sr_test}()},
+\code{\link{sr_unpaired_test}()},
+\code{\link{sr_vcov}()},
+\code{\link{sr}},
+\code{\link{summary.sr}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
