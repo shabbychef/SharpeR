@@ -33,3 +33,4 @@ inst/extdata/gmacro_data.rda
 rpkg_make
 ^SharpeR$
 bao2008.pdf
+^\.github$
