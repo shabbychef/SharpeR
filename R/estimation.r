@@ -300,6 +300,9 @@ se <- function(z, type) {
 #' There should be very little difference between these except for very small
 #' sample sizes.
 #'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' sections 2.5.1 and 3.2.3.
+#'
 #' @param z an observed Sharpe ratio statistic, of class \code{sr}.
 #' @param type estimator type. one of \code{"t", "Lo", "Mertens", "Bao"}
 #' @keywords htest
@@ -316,6 +319,7 @@ se <- function(z, type) {
 #' @template ref-Lo
 #' @template ref-Bao
 #' @template ref-Opdyke
+#' @template ref-tsrsa
 #' @references 
 #'
 #' Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
@@ -336,6 +340,20 @@ se.sr <- function(z, type=c("t","Lo","Mertens","Bao")) {
 	return(retval)
 }
 #UNFOLD
+
+
+# generalize confidence/prediction interval
+.genint <- function(object,level.lo,level.hi,type,inflate_by=1) {
+	tstat <- .sr2t(object)
+	retval <- .t_confint(tstat,df=object$df,level=NULL, # ignored
+											 level.lo=level.lo,level.hi=level.hi,
+											 type=type,cumulants=object$cumulants,
+											 inflate_by=inflate_by)
+	retval <- .t2sr(object,retval)
+	rownames(retval) <- .get_strat_names(object$sr)
+	return(retval)
+}
+
 
 # confidence intervals on the Sharpe ratio#FOLDUP
 
@@ -449,13 +467,7 @@ confint.sr <- function(object,parm,level=0.95,
 							 level.lo=(1-level)/2,level.hi=1-level.lo,
 							 type=c("exact","t","Z","Mertens","Bao"),...) {
 	type <- match.arg(type)
-	tstat <- .sr2t(object)
-	retval <- .t_confint(tstat,df=object$df,level=level,
-											 level.lo=level.lo,level.hi=level.hi,
-											 type=type,cumulants=object$cumulants)
-	retval <- .t2sr(object,retval)
-	rownames(retval) <- .get_strat_names(object$sr)
-	return(retval)
+	return(.genint(object,level.lo=level.lo,level.hi=level.hi,type=type))
 }
 #' @export
 #' @rdname confint
@@ -520,11 +532,9 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #' Coverage is approximate. Prediction intervals are computed by
 #' inflating a confidence interval by an amount which depends on the sample
 #' sizes.
-#' 
-#' @usage
 #'
-#' predint(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
-#'				 level.lo=(1-level)/2,level.hi=1-level.lo)
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' sections 2.5.9 and 3.5.2.
 #'
 #' @param x a (non-empty) numeric vector of data values, or an
 #'    object of class \code{sr}.
@@ -552,12 +562,14 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #' confidence limits for the parameter. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
 #' @seealso \code{\link{confint.sr}}.
+#' @template ref-tsrsa
 #' @export 
 #' @template etc
 #' @template sr
 #' @examples 
 #'
 #' # should reject null
+#' set.seed(1234)
 #' etc <- predint(rnorm(1000,mean=0.5,sd=0.1),oosdf=127,ope=1)
 #' etc <- predint(matrix(rnorm(1000*5,mean=0.05),ncol=5),oosdf=63,ope=1)
 #'
@@ -587,18 +599,9 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 		object <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
 	}
 	if (is.null(ope)) { ope <- object$ope }
-	object <- reannualize(object,new.ope=1)
-
-	inflate_by <- sqrt(1 + object$df / oosdf)
-	tstat <- .sr2t(object)
-	retval <- .t_confint(tstat,df=object$df,level=level,
-											 level.lo=level.lo,level.hi=level.hi,
-											 type=type,cumulants=object$cumulants,
-											 inflate_by=inflate_by)
-	# 2FIX: add in the rescal to .t2sr?
-	retval <- .t2sr(object,retval)
-	rownames(retval) <- .get_strat_names(object$sr)
-	return(retval)
+	inflate_by <- sqrt(1 + (object$df + 1) * oosrescal^2)
+	# have to rescale properly by oosrescal?
+	return(.genint(object,level.lo=level.lo,level.hi=level.hi,type=type,inflate_by=inflate_by))
 }
 #UNFOLD
 
