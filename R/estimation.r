@@ -230,10 +230,15 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 }
 
 # confidence intervals on the non-centrality parameter of a t-stat
+# we optionally inflate the standard error by `inflate_by` to support
+# prediction intervals
 .t_confint <- function(tstat,df,level=0.95,type=c("exact","t","Z","Mertens","Bao"),
-					 level.lo=(1-level)/2,level.hi=1-level.lo,cumulants=cumulants) {
+											 level.lo=(1-level)/2,level.hi=1-level.lo,cumulants=cumulants,
+											 inflate_by=1) {
 	type <- match.arg(type)
+	# non-trivial inflation only really supported by se methods.
 	if (type == "exact") {
+		stopifnot(inflate_by==1)
 		ci.lo <- qlambdap(level.lo,df,tstat,lower.tail=TRUE)
 		ci.hi <- qlambdap(level.hi,df,tstat,lower.tail=TRUE)
 		ci <- cbind(ci.lo,ci.hi)
@@ -254,6 +259,7 @@ sr_vcov <- function(X,vcov.func=vcov,ope=1) {
 						 se <- .t_se(tstat,df,type="Bao",cumulants=cumulants)
 						 midp <- .t_recenter(tstat,df,type=type,cumulants=cumulants)
 					 })
+		se <- inflate_by * se
 		zalp <- qnorm(c(level.lo,level.hi))
 		ci <- cbind(midp + zalp[1] * se,midp + zalp[2] * se)
 	} 
@@ -387,7 +393,7 @@ se.sr <- function(z, type=c("t","Lo","Mertens","Bao")) {
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the parameter. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
-#' @seealso \code{\link{confint}}, \code{\link{se}}
+#' @seealso \code{\link{confint}}, \code{\link{se}}, \code{\link{predint}}
 #' @examples 
 #'
 #' # using "sr" class:
@@ -538,6 +544,10 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #' @param level the confidence level required.
 #' @param level.lo the lower confidence level required.
 #' @param level.hi the upper confidence level required.
+#' @param type which method to apply. Only methods based on an approximate
+#' standard error are supported.
+#' @note if \code{level.lo < 0} or \code{level.hi > 1}, \code{NaN} will be
+#' returned.
 #' @return A matrix (or vector) with columns giving lower and upper
 #' confidence limits for the parameter. These will be labelled as
 #' level.lo and level.hi in \%, \emph{e.g.} \code{"2.5 \%"}
@@ -568,34 +578,27 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #'
 #' @export
 predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
-										level.lo=(1-level)/2,level.hi=1-level.lo) {
+										level.lo=(1-level)/2,level.hi=1-level.lo,
+										type=c("t","Z","Mertens","Bao")) {
+	type <- match.arg(type)
 	if (is.sr(x)) {
-		srx <- x
+		object <- x
 	} else {
-		srx <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
+		object <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
 	}
-	if (is.null(ope)) { ope <- srx$ope }
-	srx <- reannualize(srx,new.ope=1)
-	# 2FIX: parametrize the type
-	xse <- se(srx,type='t')
-	inflate <- sqrt(1 + dfx / oosdf)
-  ise <- inflate * xse
-	cols <- mapply(function(sx,dfx,rescalx) {
-		ci <- lapply(c(level.lo,level.hi),function(lvl) {
-			if ((0 < lvl) && (lvl < 1)) {
-				yval <- sx + ise * qnorm(lvl)
-				yval <- .annualize(yval,ope)
-			} else {
-				yval <- ifelse(lvl >= 1,Inf,-Inf)
-			}
-		})
-		retval <- matrix(unlist(ci),nrow=1)
-	},srx$sr,srx$df,srx$rescal)
-	retval <- matrix(t(cols),ncol=2)
-	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+	if (is.null(ope)) { ope <- object$ope }
+	object <- reannualize(object,new.ope=1)
 
-	rownames(retval) <- .get_strat_names(srx$sr)
-	retval
+	inflate_by <- sqrt(1 + object$df / oosdf)
+	tstat <- .sr2t(object)
+	retval <- .t_confint(tstat,df=object$df,level=level,
+											 level.lo=level.lo,level.hi=level.hi,
+											 type=type,cumulants=object$cumulants,
+											 inflate_by=inflate_by)
+	# 2FIX: add in the rescal to .t2sr?
+	retval <- .t2sr(object,retval)
+	rownames(retval) <- .get_strat_names(object$sr)
+	return(retval)
 }
 #UNFOLD
 

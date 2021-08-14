@@ -32,6 +32,9 @@ object, if it is unambiguous.}
 \item{level.lo}{the lower confidence level required.}
 
 \item{level.hi}{the upper confidence level required.}
+
+\item{type}{which method to apply. Only methods based on an approximate
+standard error are supported.}
 }
 \value{
 A matrix (or vector) with columns giving lower and upper
@@ -52,6 +55,10 @@ estimate of Sharpe and the as yet unrealized returns.
 Coverage is approximate. Prediction intervals are computed by
 inflating a confidence interval by an amount which depends on the sample
 sizes.
+}
+\note{
+if \code{level.lo < 0} or \code{level.hi > 1}, \code{NaN} will be
+returned.
 }
 \examples{
 
