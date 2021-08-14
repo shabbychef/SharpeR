@@ -12,7 +12,7 @@ VMAJOR 						 = 1
 VMINOR 						 = 2
 VPATCH  					 = 1
 #VDEV 							 = .0001
-VDEV 							 =
+VDEV 							 = 0.999
 
 undefine RPKG_USES_RCPP
 

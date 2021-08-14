@@ -95,6 +95,9 @@ performing a higher order correction for the bias of the Sharpe ratio.}
 }
 See \code{\link{confint.sr}} for more information on these types
 }
+\note{
+remove upsilon
+}
 \examples{
 # should reject null
 x <- sr_test(rnorm(1000,mean=0.5,sd=0.1),zeta=2,ope=1,alternative="greater")
@@ -115,10 +118,6 @@ checkit <- sr_test(asr,zeta=0)
 \references{
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
 \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
-
-Pav, Steven. "Inference on the Sharpe ratio via the upsilon distribution.'
-Arxiv (2015). 
-\url{http://arxiv.org/abs/1505.00829}
 }
 \seealso{
 \code{\link{reannualize}}

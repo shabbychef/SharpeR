@@ -317,7 +317,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' @export 
 #' @template etc
 #' @template sr
-#' @template ref-upsilon
+#' @note remove upsilon
 #' @rdname sr_test
 #' @importFrom stats pnorm
 #' @examples 
@@ -561,7 +561,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @export 
 #' @template etc
 #' @template sr
-#' @template ref-upsilon
+#' @note remove upsilon
 #' @rdname sr_unpaired_test
 #' @note This code is based on the \sQuote{upsilon} code from 
 #' \code{sadists}, which may be inaccurate for a large number of series.

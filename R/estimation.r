@@ -511,6 +511,9 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #' given interval. The coverage is over repeated draws of both the past and
 #' future data, thus this computation takes into account error in both the
 #' estimate of Sharpe and the as yet unrealized returns.
+#' Coverage is approximate. Prediction intervals are computed by
+#' inflating a confidence interval by an amount which depends on the sample
+#' sizes.
 #' 
 #' @usage
 #'
@@ -542,7 +545,6 @@ confint.del_sropt <- function(object,parm,level=0.95,
 #' @export 
 #' @template etc
 #' @template sr
-#' @template ref-upsilon
 #' @examples 
 #'
 #' # should reject null
@@ -574,13 +576,14 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 	}
 	if (is.null(ope)) { ope <- srx$ope }
 	srx <- reannualize(srx,new.ope=1)
+	# 2FIX: parametrize the type
+	xse <- se(srx,type='t')
+	inflate <- sqrt(1 + dfx / oosdf)
+  ise <- inflate * xse
 	cols <- mapply(function(sx,dfx,rescalx) {
-		ocons <- sqrt(rescalx^2 + oosrescal^2)
-		udf <- c(dfx,oosdf)
-
 		ci <- lapply(c(level.lo,level.hi),function(lvl) {
 			if ((0 < lvl) && (lvl < 1)) {
-				yval <- sadists::qkprime(lvl,v1=udf[1],v2=udf[2],a=sx,b=ocons,order.max=5)
+				yval <- sx + ise * qnorm(lvl)
 				yval <- .annualize(yval,ope)
 			} else {
 				yval <- ifelse(lvl >= 1,Inf,-Inf)
