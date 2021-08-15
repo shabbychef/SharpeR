@@ -436,7 +436,7 @@ test_that("predint not fooled by annualization",{#FOLDUP
 	aci2 <- predint(srx2,oosdf=oosn-1,ope=1,level=nominal.coverage)
 	errs <- unlist(aci1) - unlist(aci2)
 
-	expect_less_than(max(abs(errs)),1e-4)
+	expect_lt(max(abs(errs)),1e-4)
 })#UNFOLD
 #UNFOLD
 

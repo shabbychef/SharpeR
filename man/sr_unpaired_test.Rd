@@ -67,11 +67,6 @@ against two or one sided alternatives.
 }
 \note{
 remove upsilon
-
-This code is based on the \sQuote{upsilon} code from 
-\code{sadists}, which may be inaccurate for a large number of series.
-Take caution when applying this test. File a bug report if you are
-negatively impacted.
 }
 \examples{
 # basic usage

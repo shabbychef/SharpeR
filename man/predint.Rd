@@ -4,8 +4,16 @@
 \alias{predint}
 \title{prediction interval for Sharpe ratio}
 \usage{
-predint(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
-			 level.lo=(1-level)/2,level.hi=1-level.lo)
+predint(
+  x,
+  oosdf,
+  oosrescal = 1/sqrt(oosdf + 1),
+  ope = NULL,
+  level = 0.95,
+  level.lo = (1 - level)/2,
+  level.hi = 1 - level.lo,
+  type = c("t", "Z", "Mertens", "Bao")
+)
 }
 \arguments{
 \item{x}{a (non-empty) numeric vector of data values, or an
@@ -55,6 +63,9 @@ estimate of Sharpe and the as yet unrealized returns.
 Coverage is approximate. Prediction intervals are computed by
 inflating a confidence interval by an amount which depends on the sample
 sizes.
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+sections 2.5.9 and 3.5.2.
 }
 \note{
 if \code{level.lo < 0} or \code{level.hi > 1}, \code{NaN} will be
@@ -63,6 +74,7 @@ returned.
 \examples{
 
 # should reject null
+set.seed(1234)
 etc <- predint(rnorm(1000,mean=0.5,sd=0.1),oosdf=127,ope=1)
 etc <- predint(matrix(rnorm(1000*5,mean=0.05),ncol=5),oosdf=63,ope=1)
 
@@ -83,6 +95,8 @@ covr <- mean(is.ok)
 
 }
 \references{
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
+
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
 \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 }

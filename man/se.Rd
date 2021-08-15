@@ -35,6 +35,9 @@ moments.}
 
 There should be very little difference between these except for very small
 sample sizes.
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+sections 2.5.1 and 3.2.3.
 }
 \note{
 The units of the standard error are consistent with those of the
@@ -62,6 +65,8 @@ no. 2 (2009): 152-173. \url{https://doi.org/10.1093/jjfinec/nbn022}
 
 Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the p-values?" Journal of Asset
 Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}
+
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 
 Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
 1996. \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}

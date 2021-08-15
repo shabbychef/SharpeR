@@ -77,7 +77,8 @@ against two or one sided alternative, via
 
 For unpaired (and independent) observations, tests
 \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
-against two or one-sided alternatives via the upsilon distribution.
+against two or one-sided alternatives via an asymptotic
+approximation.
 
 The one sample test admits a number of different methods:
 \describe{
@@ -94,9 +95,9 @@ error, centered around the sample value.}
 performing a higher order correction for the bias of the Sharpe ratio.}
 }
 See \code{\link{confint.sr}} for more information on these types
-}
-\note{
-remove upsilon
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 3.2.1, 3.2.2, and 3.3.1.
 }
 \examples{
 # should reject null
@@ -118,6 +119,8 @@ checkit <- sr_test(asr,zeta=0)
 \references{
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
 \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
 \seealso{
 \code{\link{reannualize}}

@@ -598,7 +598,7 @@ predint <- function(x,oosdf,oosrescal=1/sqrt(oosdf+1),ope=NULL,level=0.95,
 	} else {
 		object <- as.sr(x,c0=0,ope=1,na.rm=TRUE)
 	}
-	if (is.null(ope)) { ope <- object$ope }
+	if (!is.null(ope)) { object <- reannualize(object,new.ope=ope) } 
 	inflate_by <- sqrt(1 + (object$df + 1) * oosrescal^2)
 	# have to rescale properly by oosrescal?
 	return(.genint(object,level.lo=level.lo,level.hi=level.hi,type=type,inflate_by=inflate_by))
