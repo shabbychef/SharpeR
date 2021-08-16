@@ -43,6 +43,9 @@ Given any three of: the effect size (the population SNR, \eqn{\zeta}{zeta}),
 the number of observations, and the type I and type II rates,
 this function computes the fourth.
 
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 2.5.8.
+
 This is a thin wrapper on \code{\link{power.t.test}}.
 
 Exactly one of the parameters \code{n}, \code{zeta}, \code{power}, and 
@@ -75,6 +78,8 @@ Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-13
 
 Johnson, N. L., and Welch, B. L. "Applications of the non-central t-distribution."
 Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31.3-4.362}
+
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 
 Lehr, R. "Sixteen S-squared over D-squared: A relation for crude 
 sample size estimates." Statist. Med., 11, no 8 (1992): 1099--1102. 

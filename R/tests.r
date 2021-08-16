@@ -89,6 +89,9 @@
 #' 
 #' Both chi-squared and F- approximations are supported; the former is
 #' described by Wright. \emph{et. al.}, the latter by Leung and Wong.
+#'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 3.3.1.
 #' 
 #' @usage
 #'
@@ -137,6 +140,7 @@
 #'
 #' @template ref-LW
 #' @template ref-Lo
+#' @template ref-tsrsa
 #'
 #' @examples 
 #' # under the null 
@@ -268,7 +272,8 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #'
 #' For unpaired (and independent) observations, tests
 #' \deqn{H_0: \frac{\mu_x}{\sigma_x} - \frac{\mu_u}{\sigma_y} = S}{H0: mu_x / sigma_x - mu_y / sigma_y = S}
-#' against two or one-sided alternatives via the upsilon distribution.
+#' against two or one-sided alternatives via an asymptotic
+#' approximation.
 #'
 #' The one sample test admits a number of different methods:
 #' \describe{
@@ -285,6 +290,9 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' performing a higher order correction for the bias of the Sharpe ratio.}
 #' }
 #' See \code{\link{confint.sr}} for more information on these types
+#'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 3.2.1, 3.2.2, and 3.3.1.
 #'
 #' @param x a (non-empty) numeric vector of data values, or an
 #'    object of class \code{sr}, containing a scalar sample Sharpe estimate.
@@ -317,7 +325,7 @@ sr_equality_test <- function(X,type=c("chisq","F","t"),
 #' @export 
 #' @template etc
 #' @template sr
-#' @template ref-upsilon
+#' @template ref-tsrsa
 #' @rdname sr_test
 #' @importFrom stats pnorm
 #' @examples 
@@ -526,7 +534,9 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' code tests the null hypothesis
 #' \deqn{H_0: \sum_j a_j \frac{\mu_j}{\sigma_j} = b}{H0: sum_j a_j mu_j/sigma_j = b}
 #' against two or one sided alternatives.
-#' 
+#'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 3.3.1.
 #'
 #' @param srs a (non-empty) list of objects of class \code{sr}, each containing
 #'  a scalar sample Sharpe estimate. Or a single object of class \code{sr} with
@@ -548,8 +558,8 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @inheritParams sr_test
 #' @keywords htest
 #' @return A list with class \code{"htest"} containing the following components:
-#' \item{statistic}{\code{NULL} here.}
-#' \item{parameter}{a list of upsilon parameters.}
+#' \item{statistic}{The Wald statistic.}
+#' \item{parameter}{The degrees of freedom of the Wald statistic.}
 #' \item{p.value}{the p-value for the test.}
 #' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
 #' \item{estimate}{the estimated equation value, just the weighted sum of the sample Sharpe ratios. Annualized}
@@ -561,12 +571,8 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @export 
 #' @template etc
 #' @template sr
-#' @template ref-upsilon
 #' @rdname sr_unpaired_test
-#' @note This code is based on the \sQuote{upsilon} code from 
-#' \code{sadists}, which may be inaccurate for a large number of series.
-#' Take caution when applying this test. File a bug report if you are
-#' negatively impacted.
+#' @template ref-tsrsa
 #' @examples 
 #' # basic usage
 #' set.seed(as.integer(charToRaw("set the seed")))
@@ -593,6 +599,7 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @export
 sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.sided","less","greater"),
 														 ope=NULL,conf.level=0.95) {
+
 	# much of this stolen from t.test.default:
 	alternative <- match.arg(alternative)
 	if (!missing(null.value) && (length(null.value) != 1 || is.na(null.value))) 
@@ -611,6 +618,7 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 		vals.rescal <- unlist(lapply(srs,function(x) { x$rescal }))
 		vals.df <- unlist(lapply(srs,function(x) { x$df }))
 		vals.ope <- unlist(lapply(srs,function(x) { x$ope }))
+		vals.se <- unlist(lapply(srs,function(x) { se(x) }))
 	} else {
 		nterm <- length(srs$sr)
 		# 2FIX: possibly recycle these out to common length..
@@ -618,6 +626,7 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 		vals.rescal <- srs$rescal
 		vals.df <- srs$df 
 		vals.ope <- srs$ope
+		vals.se <- se(srs)
 	}
 	if (is.null(contrasts)) { contrasts <- (-1)^(1 + seq_len(nterm)) }
 	stopifnot(nterm == length(contrasts))
@@ -632,7 +641,7 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 	if (length(uni.ope) != 1) {
 		warning("ambiguous ope; check units of your contrasts!")
 	}
-	# inferr missing ope
+	# infer missing ope
 	if (is.null(ope)) {
 		if (length(uni.ope) == 1) {
 			ope <- uni.ope
@@ -641,49 +650,46 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 			ope <- 1.0
 		}
 	}
+	estimate <- sum(contrasts * vals.sr)
+	# ok, now get the total variance
+	tot_sig <- sum((contrasts * vals.se)^2)
+	statistic <- (estimate - null.value) / sqrt(tot_sig)
 
-	# nb. the Sharpe is tstat * sqrt(ope) * rescal
-	# deannualize
-	vals.sr.de <- .deannualize(vals.sr,vals.ope)
-	conval <- 1 / sqrt(sum((vals.rescal * contrasts) ^ 2))
-
-	ups.t <- conval * (contrasts * vals.sr)
-	ups.df <- c(vals.df)
-	ups.val <- conval * null.value
+	# sketchy: picking the smallest df and then using a t-stat
+	mindf <- min(vals.df)
 	
-	#2FIX: lower tail here?
-	less.lt <- FALSE
+	less.lt <- TRUE
 	if (alternative == "less") {
-		pval <- sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=less.lt)
+		pval <- pt(statistic,df=mindf,lower.tail=less.lt)
 		ciq <- c(0.0,conf.level)
 	}
 	else if (alternative == "greater") {
-		pval <- sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=! less.lt)
+		pval <- pt(statistic,df=mindf,lower.tail=! less.lt)
 		ciq <- c(1.0-conf.level,1.0)
 	}
 	else {
-		pval <- .oneside2two(sadists::pupsilon(ups.val,df=ups.df,t=ups.t,lower.tail=less.lt))
+		pval <- .oneside2two(pt(statistic,df=mindf,lower.tail=less.lt))
 		ciq <- 0.5 * (1 + conf.level * c(-1.0,1.0))
 	}
-	# figure out cis
-	cint <- sadists::qupsilon(ciq,df=ups.df,t=ups.t)
-	# convert back
-	cint <- cint / conval
+	# figure out cis? for what values would we reject?
+	cint <- qt(ciq,df=mindf)
+	# convert back to something on contrasts
+	cint <- cint * sqrt(tot_sig) + null.value
 	cint <- .annualize(cint,ope)
 	attr(cint, "conf.level") <- conf.level
 
-	statistic <- NULL 
-	#names(statistic) <- "null"
+	names(statistic) <- "Wald statistic"
 	names(null.value) <- "weighted sum of signal-noise ratios"
 
-	estimate <- sum(contrasts * vals.sr)
+	# now annualize the estimate
 	estimate <- .annualize(estimate,ope)
 	method <- "unpaired k-sample sr-test"
 	names(estimate) <- "equation on Sharpe ratios"
 
 	# 2FIX:
-	names(ups.df) <- "df"
-	retval <- list(statistic = statistic, parameter = ups.df,
+	parm <- mindf
+	names(parm) <- "df"
+	retval <- list(statistic = statistic, parameter = parm,
 								 estimate = estimate, p.value = pval, 
 								 alternative = alternative, null.value = null.value, conf.int = cint,
 								 method = method, data.name = dname)
@@ -703,6 +709,9 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 #' Given any three of: the effect size (the population SNR, \eqn{\zeta}{zeta}), 
 #' the number of observations, and the type I and type II rates,
 #' this function computes the fourth.
+#'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 2.5.8.
 #'
 #' This is a thin wrapper on \code{\link{power.t.test}}.
 #'
@@ -733,6 +742,7 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 #' @template etc
 #' @template sr
 #' @template ref-JW
+#' @template ref-tsrsa
 #' @references 
 #'
 #' Lehr, R. "Sixteen S-squared over D-squared: A relation for crude 
@@ -811,6 +821,9 @@ power.sr_test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #' 
 #' Note there is no 'drag' term here since this represents a linear offset of
 #' the population parameter.
+#'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 6.3.2.
 #' 
 #' @usage
 #'
@@ -841,6 +854,7 @@ power.sr_test <- function(n=NULL,zeta=NULL,sig.level=0.05,power=NULL,
 #' @export 
 #' @template etc
 #' @template sropt
+#' @template ref-tsrsa
 #' @examples 
 #'
 #' # test for uniformity
@@ -960,6 +974,9 @@ sropt_test <- function(X,alternative=c("greater","two.sided","less"),
 #' \eqn{\zeta_*}{zeta*}), the number of assets, the number of observations, 
 #' and the type I and type II rates, this function computes the fifth.
 #'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 6.3.3.
+#'
 #' Exactly one of the parameters \code{df1}, \code{df2}, 
 #' \code{zeta.s}, \code{power}, and 
 #' \code{sig.level} must be passed as NULL, and that parameter is determined 
@@ -985,6 +1002,7 @@ sropt_test <- function(X,alternative=c("greater","two.sided","less"),
 #' @export 
 #' @template etc
 #' @template sropt
+#' @template ref-tsrsa
 #'
 #' @examples 
 #' anex <- power.sropt_test(8,4*253,1,0.05,NULL,ope=253) 

@@ -163,6 +163,9 @@ rrt <- function(n, df, K, rho = 0) {
 #' will not follow this distribution. It does provide, however, a reasonable
 #' approximation in many cases.
 #'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 2.2.
+#'
 #' @usage
 #'
 #' dsr(x, df, zeta, ope, ...)
@@ -202,6 +205,7 @@ rrt <- function(n, df, K, rho = 0) {
 #' @export 
 #' @template etc
 #' @template sr
+#' @template ref-tsrsa
 #' @examples 
 #' rvs <- rsr(128, 253*6, 0, 253)
 #' dvs <- dsr(rvs, 253*6, 0, 253)
@@ -443,6 +447,9 @@ rT2 <- function(n, df1, df2, delta2) {
 #' \item \eqn{c_0/R} is denoted by \code{drag}.
 #' }
 #'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 6.1.4.
+#'
 #' @usage
 #'
 #' dsropt(x, df1, df2, zeta.s, ope, drag = 0, log = FALSE)
@@ -483,11 +490,8 @@ rT2 <- function(n, df1, df2, delta2) {
 #' @note
 #' This is a thin wrapper on the Hotelling T-squared distribution, which is a
 #' wrapper on the F distribution.
-#' @references 
-#'
-#' Kan, Raymond and Smith, Daniel R. "The Distribution of the Sample Minimum-Variance Frontier."
-#' Journal of Management Science 54, no. 7 (2008): 1364--1380.
-#' \url{http://mansci.journal.informs.org/cgi/doi/10.1287/mnsc.1070.0852}
+#' @template ref-ks
+#' @template ref-tsrsa
 #'
 #' @examples 
 #' # generate some variates 
@@ -619,6 +623,9 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 #' for Chi-square \eqn{V}{V} with \eqn{\nu}{v} d.f., independent from
 #' standard normal \eqn{Z}{Z}
 #'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 2.4.
+#'
 #' @usage
 #'
 #' plambdap(q, df, tstat, lower.tail = TRUE, log.p = FALSE)
@@ -646,6 +653,7 @@ rsropt <- function(n, df1, df2, zeta.s, ope, drag = 0, ...) {
 #' @export 
 #' @template etc
 #' @family sr
+#' @template ref-tsrsa
 #' @references 
 #'
 #' Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 

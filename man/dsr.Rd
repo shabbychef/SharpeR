@@ -85,6 +85,9 @@ If the returns violate the assumptions of normality, independence, etc
 (\emph{as they always should in the real world}), the sample Sharpe Ratio
 will not follow this distribution. It does provide, however, a reasonable
 approximation in many cases.
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 2.2.
 }
 \note{
 This is a thin wrapper on the t distribution. 
@@ -106,6 +109,8 @@ plot(ecdf(pvs.HA))
 \references{
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
 \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
 \seealso{
 \code{\link{reannualize}}

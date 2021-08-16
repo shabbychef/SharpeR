@@ -39,6 +39,9 @@ and \eqn{\gamma_2} is the population excess kurtosis, and
 \eqn{\gamma_3} through \eqn{\gamma_5} are the fifth through
 seventh cumulants of the error term.
 This form of the variance appears as Equation (4) in Bao.
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 3.2.3.
 }
 \examples{
 # variance under normality:
@@ -48,6 +51,8 @@ sr_variance(1, 100, rep(0,5))
 Bao, Yong. "Estimation Risk-Adjusted Sharpe Ratio and Fund Performance Ranking 
 Under a General Return Distribution." Journal of Financial Econometrics 7, 
 no. 2 (2009): 152-173. \url{https://doi.org/10.1093/jjfinec/nbn022}
+
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
 \seealso{
 \code{\link{sr_bias}}.

@@ -9,10 +9,10 @@
 
 PKG_NAME 					:= SharpeR
 VMAJOR 						 = 1
-VMINOR 						 = 2
-VPATCH  					 = 1
+VMINOR 						 = 3
+VPATCH  					 = 0
 #VDEV 							 = .0001
-VDEV 							 =
+VDEV 							 = 
 
 undefine RPKG_USES_RCPP
 

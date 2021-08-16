@@ -42,6 +42,9 @@ Given any four of: the effect size (the population optimal SNR,
 \eqn{\zeta_*}{zeta*}), the number of assets, the number of observations, 
 and the type I and type II rates, this function computes the fifth.
 
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 6.3.3.
+
 Exactly one of the parameters \code{df1}, \code{df2}, 
 \code{zeta.s}, \code{power}, and 
 \code{sig.level} must be passed as NULL, and that parameter is determined 
@@ -51,6 +54,9 @@ must be explicitly passed if you want to compute it.
 \examples{
 anex <- power.sropt_test(8,4*253,1,0.05,NULL,ope=253) 
 
+}
+\references{
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
 \seealso{
 \code{\link{reannualize}}

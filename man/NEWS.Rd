@@ -9,6 +9,13 @@ News for package 'SharpeR'
 \newcommand{\CRANpkg}{\href{https://cran.r-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 }
+\section{Changes in \SharpeR{} Version 1.3.0 (2021-08-15) }{
+
+\itemize{
+\item Remove tests based on upsilon distribution. Also removes dependency on sadists package.
+}
+}
+
 \section{Changes in \SharpeR{} Version 1.2.1 (2020-02-06) }{
 
 \itemize{

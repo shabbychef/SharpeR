@@ -34,3 +34,6 @@ rpkg_make
 ^SharpeR$
 bao2008.pdf
 ^\.github$
+submodule_directions.sh
+.staging
+.local

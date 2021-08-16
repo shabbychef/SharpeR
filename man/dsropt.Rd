@@ -100,6 +100,9 @@ The parameters are encoded as follows:
 \item \eqn{d} is denoted by \code{ope}.
 \item \eqn{c_0/R} is denoted by \code{drag}.
 }
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 6.1.4.
 }
 \note{
 This is a thin wrapper on the Hotelling T-squared distribution, which is a
@@ -121,6 +124,8 @@ plot(ecdf(isp))
 
 }
 \references{
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
+
 Kan, Raymond and Smith, Daniel R. "The Distribution of the Sample Minimum-Variance Frontier."
 Journal of Management Science 54, no. 7 (2008): 1364--1380.
 \url{http://mansci.journal.informs.org/cgi/doi/10.1287/mnsc.1070.0852}

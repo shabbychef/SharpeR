@@ -114,6 +114,9 @@
 #' where \eqn{\gamma_3} through \eqn{\gamma_5} are the fifth through
 #' seventh cumulants of the error term.
 #'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 3.2.3.
+#'
 #' @param snr   the population Signal Noise ratio. Often one will use
 #' the population estimate instead.
 #' @param n     the sample size that the Shapre ratio is observed on.
@@ -133,6 +136,7 @@
 #' expected value of the sample Sharpe minus the Signal Noise ratio.
 #' @template ref-Bao
 #' @template etc
+#' @template ref-tsrsa
 #' @seealso \code{\link{sr_variance}}
 #' @note much of the code is adapted from Gauss code provided by Yong Bao.
 #'
@@ -186,11 +190,15 @@ sr_bias <- function(snr, n, cumulants, type=c('simple','second_order')) {
 #' seventh cumulants of the error term.
 #' This form of the variance appears as Equation (4) in Bao.
 #'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 3.2.3.
+#'
 #' @inheritParams sr_bias
 #' @return the variance of the sample statistic.
 #' @seealso \code{\link{sr_bias}}.
 #' @template ref-Bao
 #' @template etc
+#' @template ref-tsrsa
 #'
 #' @examples 
 #' # variance under normality:

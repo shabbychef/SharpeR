@@ -55,6 +55,9 @@ but this can be set otherwise.
 
 Note there is no 'drag' term here since this represents a linear offset of
 the population parameter.
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 6.3.2.
 }
 \examples{
 
@@ -75,6 +78,9 @@ Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
 asro <- as.sropt(Returns,drag=0,ope=ope)
 stest <- sropt_test(asro,alternative="two.sided")
 
+}
+\references{
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
 \seealso{
 \code{\link{reannualize}}

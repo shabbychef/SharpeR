@@ -43,8 +43,8 @@ thrown.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
-\item{statistic}{\code{NULL} here.}
-\item{parameter}{a list of upsilon parameters.}
+\item{statistic}{The Wald statistic.}
+\item{parameter}{The degrees of freedom of the Wald statistic.}
 \item{p.value}{the p-value for the test.}
 \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
 \item{estimate}{the estimated equation value, just the weighted sum of the sample Sharpe ratios. Annualized}
@@ -64,12 +64,9 @@ independent. Given constants \eqn{a_j}{a_j} and value \eqn{b}{b}, this
 code tests the null hypothesis
 \deqn{H_0: \sum_j a_j \frac{\mu_j}{\sigma_j} = b}{H0: sum_j a_j mu_j/sigma_j = b}
 against two or one sided alternatives.
-}
-\note{
-This code is based on the \sQuote{upsilon} code from 
-\code{sadists}, which may be inaccurate for a large number of series.
-Take caution when applying this test. File a bug report if you are
-negatively impacted.
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 3.3.1.
 }
 \examples{
 # basic usage
@@ -99,9 +96,7 @@ etc$conf.int
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
 \url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 
-Pav, Steven. "Inference on the Sharpe ratio via the upsilon distribution.'
-Arxiv (2015). 
-\url{http://arxiv.org/abs/1505.00829}
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
 \seealso{
 \code{\link{sr_equality_test}}, \code{\link{sr_test}}, \code{\link{t.test}}.

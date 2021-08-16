@@ -136,6 +136,9 @@ ivech <- function(x) {
 #' }
 #'
 sm_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
+	.Deprecated(new='theta_vcov',
+							package='MarkowitzR',
+							msg='Users should migrate to MarkowtizR::theta_vcov, with similar functionality')
 	X <- na.omit(X)
 	n <- dim(X)[1]
 	p <- dim(X)[2]
@@ -313,6 +316,9 @@ sm_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
 #' }
 #'
 ism_vcov <- function(X,vcov.func=vcov,fit.intercept=TRUE) {
+	.Deprecated(new='itheta_vcov',
+							package='MarkowitzR',
+							msg='Users should migrate to MarkowtizR::itheta_vcov, with similar functionality')
 	# delegate
 	sm_est <- sm_vcov(X,vcov.func=vcov.func,
 										fit.intercept=fit.intercept)

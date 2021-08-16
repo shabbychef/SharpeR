@@ -25,8 +25,8 @@ Depends:
     R (>= 3.0.0)
 Imports: 
     matrixcalc,
-    methods,
-    sadists (>= 0.2.0)
+    methods
+dnl sadists (>= 0.2.0)
 Suggests: 
     xtable,
     xts,

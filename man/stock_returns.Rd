@@ -4,7 +4,8 @@
 \name{stock_returns}
 \alias{stock_returns}
 \title{Stock Returns Data}
-\format{An \code{xts} object with 4777 observations and 4 columns. 
+\format{
+An \code{xts} object with 4777 observations and 4 columns. 
 
 The columns are the daily log returns for the tickers IBM, AAPL, SPY and XOM, 
 as sourced from Yahoo finance using the \code{quantmod} package.
@@ -12,7 +13,8 @@ Daily returns span from January, 2000 through December, 2018.
 Returns are \sQuote{log returns}, which are the differences of the logs of
 daily adjusted closing price series, as defined by Yahoo finance (thus presumably
 including adjustments for splits and dividends). Dates of observations are
-the date of the second close defining the return, not the first.}
+the date of the second close defining the return, not the first.
+}
 \source{
 Data were collected on October 2, 2019, from Yahoo finance using the
 \code{quantmod} package.
