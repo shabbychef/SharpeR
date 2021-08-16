@@ -121,7 +121,7 @@ print(as.sr(some.rets))
 
 A single equation on multiple signal-noise ratios with independent samples
 can be computed using the `sr_unpaired_test` function. This code performs
-inference via the [Upsilon distribution](http://arxiv.org/abs/1505.00829).
+inference via the asymptotic expansion of the Sharpe ratio.
 The `sr_test` also acts as a frontend for this code, for the two sample
 case.
 
@@ -207,7 +207,7 @@ print(etc)
 
 ## Prediction Intervals
 
-Using the [Upsilon distribution](http://arxiv.org/abs/1505.00829), we can
+By inflating standard errors, we can
 compute prediction intervals for future realized Sharpe ratio, with coverage
 frequency over the full experiment. Here is an example on fake data:
 

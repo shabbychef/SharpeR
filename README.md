@@ -107,10 +107,10 @@ print(as.sr(some.rets))
 ```
 
 ```
-##      SR/sqrt(yr) Std. Error t value Pr(>t)    
-## IBM         0.43       0.32     1.3 0.0905 .  
-## AAPL        1.09       0.32     3.4 0.0004 ***
-## XOM         0.43       0.32     1.3 0.0937 .  
+##      SR/sqrt(yr) Std. Error t value  Pr(>t)    
+## IBM         0.43       0.32     1.3 0.09045 .  
+## AAPL        1.05       0.32     3.2 0.00058 ***
+## XOM         0.43       0.32     1.3 0.09366 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -119,7 +119,7 @@ print(as.sr(some.rets))
 
 A single equation on multiple signal-noise ratios with independent samples
 can be computed using the `sr_unpaired_test` function. This code performs
-inference via the [Upsilon distribution](http://arxiv.org/abs/1505.00829).
+inference via the asymptotic expansion of the Sharpe ratio.
 The `sr_test` also acts as a frontend for this code, for the two sample
 case.
 
@@ -215,10 +215,10 @@ print(etc)
 ## 	unpaired k-sample sr-test
 ## 
 ## data:  list(sr.jan, sr.rem)
-## df = 90, NA = 1000, p-value = 0.002
+## Wald statistic = -3, df = 90, p-value = 0.003
 ## alternative hypothesis: true weighted sum of signal-noise ratios is not equal to 0
 ## 95 percent confidence interval:
-##  -2.34 -0.52
+##  -0.9  0.9
 ## sample estimates:
 ## equation on Sharpe ratios 
 ##                      -1.4
@@ -226,7 +226,7 @@ print(etc)
 
 ## Prediction Intervals
 
-Using the [Upsilon distribution](http://arxiv.org/abs/1505.00829), we can
+By inflating standard errors, we can
 compute prediction intervals for future realized Sharpe ratio, with coverage
 frequency over the full experiment. Here is an example on fake data:
 
@@ -297,12 +297,19 @@ okvals <- lapply(unique(yrno), function(yr) {
         pint[, 2])
     is.ok
 })
+```
+
+```
+## Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...): 0 (non-NA) cases
+```
+
+```r
 coverage <- mean(unlist(okvals))
 print(coverage)
 ```
 
 ```
-## [1] 0.8
+## [1] 0.95
 ```
 
 ![no nominal coverage](tools/static/yuno.jpg)
@@ -335,12 +342,19 @@ okvals <- lapply(unique(yrno), function(yr) {
         pint[, 2])
     is.ok
 })
+```
+
+```
+## Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...): 0 (non-NA) cases
+```
+
+```r
 coverage <- mean(unlist(okvals))
 print(coverage)
 ```
 
 ```
-## [1] 0.92
+## [1] 0.95
 ```
 
 Of course, this could be a 'lucky seed', but one suspects that non-normality is _not_
@@ -382,7 +396,7 @@ print(t(wald.stats))
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.27    3 0.15
+## [1,] -0.23  2.9 0.17
 ```
 
 ```r
@@ -394,5 +408,5 @@ if (require(sandwich)) {
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.26    3 0.16
+## [1,] -0.22  2.8 0.18
 ```

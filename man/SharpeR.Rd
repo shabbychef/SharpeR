@@ -143,18 +143,18 @@ Johnson, N. L., and Welch, B. L. "Applications of the non-central t-distribution
 Biometrika 31, no. 3-4 (1940): 362-389. \doi{10.1093/biomet/31.3-4.362}
 
 Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
-(2002): 36-52. \url{https://ssrn.com/paper=377260}
+(2002): 36-52. \url{https://www.ssrn.com/paper=377260}
 
 Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the p-values?" Journal of Asset
-Management 8, no. 5 (2006): 308-336. \url{https://ssrn.com/paper=886728}
+Management 8, no. 5 (2006): 308-336. \url{https://www.ssrn.com/paper=886728}
 
 Ledoit, O., and Wolf, M. "Robust performance hypothesis testing with the 
 Sharpe ratio." Journal of Empirical Finance 15, no. 5 (2008): 850-859.
-\url{https://www.ledoit.net/jef2008_abstract.htm}
+\doi{10.1016/j.jempfin.2008.03.002}
 
 Giri, N. "On the likelihood ratio test of a normal multivariate testing problem."
 Annals of Mathematical Statistics 35, no. 1 (1964): 181-189. 
-\url{https://projecteuclid.org/euclid.aoms/1177703740}
+\doi{10.1214/aoms/1177703740}
 
 Rao, C. R. "Advanced Statistical Methods in Biometric Research." Wiley
 (1952).
@@ -169,7 +169,7 @@ Journal of Management Science 54, no. 7 (2008): 1364--1380.
 
 Kan, Raymond and Zhou, GuoFu. "Tests of Mean-Variance Spanning."
 Annals of Economics and Finance 13, no. 1 (2012)
-\url{https://www.aeconf.net/Articles/May2012/aef130105.pdf}
+\url{https://econpapers.repec.org/article/cufjournl/y_3a2012_3av_3a13_3ai_3a1_3akanzhou.htm}
 
 Britten-Jones, Mark. "The Sampling Error in Estimates of Mean-Variance 
 Efficient Portfolio Weights." The Journal of Finance 54, no. 2 (1999):

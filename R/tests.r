@@ -129,7 +129,7 @@
 #' Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
 #' equality of multiple Sharpe ratios and its application on the evaluation
 #' of iShares." J. Risk. to appear. 
-#' \url{https://www.risk.net/journal-of-risk/technical-paper/2340067/a-test-for-the-equality-of-multiple-sharpe-ratios}
+#' \url{https://www.risk.net/journal-risk/2340067/test-equality-multiple-sharpe-ratios}
 #'
 #' Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with 
 #' application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15--30.

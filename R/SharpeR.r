@@ -154,7 +154,7 @@
 #'
 #' Kan, Raymond and Zhou, GuoFu. "Tests of Mean-Variance Spanning."
 #' Annals of Economics and Finance 13, no. 1 (2012)
-#' \url{https://www.aeconf.net/Articles/May2012/aef130105.pdf}
+#' \url{https://econpapers.repec.org/article/cufjournl/y_3a2012_3av_3a13_3ai_3a1_3akanzhou.htm}
 #'
 #' Britten-Jones, Mark. "The Sampling Error in Estimates of Mean-Variance 
 #' Efficient Portfolio Weights." The Journal of Finance 54, no. 2 (1999):

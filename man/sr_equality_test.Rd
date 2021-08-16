@@ -116,7 +116,7 @@ Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-13
 Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
 equality of multiple Sharpe ratios and its application on the evaluation
 of iShares." J. Risk. to appear. 
-\url{https://www.risk.net/journal-of-risk/technical-paper/2340067/a-test-for-the-equality-of-multiple-sharpe-ratios}
+\url{https://www.risk.net/journal-risk/2340067/test-equality-multiple-sharpe-ratios}
 
 Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with 
 application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15--30.
@@ -127,10 +127,10 @@ Letters 1 (2003): 21--23.
 
 Ledoit, O., and Wolf, M. "Robust performance hypothesis testing with the 
 Sharpe ratio." Journal of Empirical Finance 15, no. 5 (2008): 850-859.
-\url{https://www.ledoit.net/jef2008_abstract.htm}
+\doi{10.1016/j.jempfin.2008.03.002}
 
 Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
-(2002): 36-52. \url{https://ssrn.com/paper=377260}
+(2002): 36-52. \url{https://www.ssrn.com/paper=377260}
 
 Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
