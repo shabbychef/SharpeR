@@ -111,7 +111,7 @@ get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.re
 ```
 
 
-```{r real_data,eval=TRUE,echo=TRUE}
+```{r real_data,dependson=c('stock_loading'),eval=TRUE,echo=TRUE}
 some.rets <- get.rets(c("IBM","AAPL","XOM"),
 	from="2004-01-01",to="2013-08-01")
 print(as.sr(some.rets))
@@ -181,12 +181,12 @@ Is this 'the January Effect'? Perhaps.
 
 ```{r ff_momentum_check,eval=TRUE,echo=TRUE}
 library(xts)
-if (!require(aqfb.data)) {
-	devtools::install_github('shabbychef/aqfb_data')
-	library(aqfb.data)
+if (!require(tsrsa)) {
+	devtools::install_github('shabbychef/tsrsa')
+	library(tsrsa)
 }
 
-data('mff4',package='aqfb.data')
+data('mff4',package='tsrsa')
 
 # January or not
 is.jan <- months(index(mff4)) == 'January'
@@ -243,12 +243,13 @@ for the fourth quarter, then check coverage:
 
 ```{r ff_predint_check,eval=TRUE,echo=TRUE}
 library(xts)
-if (!require(aqfb.data)) {
-	devtools::install_github('shabbychef/aqfb_data')
-	library(aqfb.data)
+if (!require(tsrsa)) {
+	devtools::install_github('shabbychef/tsrsa')
+	library(tsrsa)
 }
 
-data('dff4',package='aqfb.data')
+data('dff4',package='tsrsa')
+dff4 <- dff4['1927-01-01::']
 
 # shoot me if this is how to get the year number from a time index.
 yrno <- as.numeric(floor(as.yearmon(index(dff4))))
@@ -280,7 +281,7 @@ is to blame for the apparent conservatism of the prediction intervals in this ca
 We can check by simply shuffling the monthly returns data and repeating the
 experiment:
 
-```{r ff_predint_check_shuf,eval=TRUE,echo=TRUE}
+```{r ff_predint_check_shuf,dependson=c('ff_predint_check'),eval=TRUE,echo=TRUE}
 
 # shuffle the returns data by row
 set.seed(1234)

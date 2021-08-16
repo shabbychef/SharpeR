@@ -184,12 +184,12 @@ Is this 'the January Effect'? Perhaps.
 
 ```r
 library(xts)
-if (!require(aqfb.data)) {
-    devtools::install_github("shabbychef/aqfb_data")
-    library(aqfb.data)
+if (!require(tsrsa)) {
+    devtools::install_github("shabbychef/tsrsa")
+    library(tsrsa)
 }
 
-data("mff4", package = "aqfb.data")
+data("mff4", package = "tsrsa")
 
 # January or not
 is.jan <- months(index(mff4)) == "January"
@@ -215,13 +215,13 @@ print(etc)
 ## 	unpaired k-sample sr-test
 ## 
 ## data:  list(sr.jan, sr.rem)
-## Wald statistic = -3, df = 90, p-value = 0.003
+## Wald statistic = -3, df = 90, p-value = 0.004
 ## alternative hypothesis: true weighted sum of signal-noise ratios is not equal to 0
 ## 95 percent confidence interval:
-##  -0.9  0.9
+##  -0.88  0.88
 ## sample estimates:
 ## equation on Sharpe ratios 
-##                      -1.4
+##                      -1.3
 ```
 
 ## Prediction Intervals
@@ -267,12 +267,13 @@ for the fourth quarter, then check coverage:
 
 ```r
 library(xts)
-if (!require(aqfb.data)) {
-    devtools::install_github("shabbychef/aqfb_data")
-    library(aqfb.data)
+if (!require(tsrsa)) {
+    devtools::install_github("shabbychef/tsrsa")
+    library(tsrsa)
 }
 
-data("dff4", package = "aqfb.data")
+data("dff4", package = "tsrsa")
+dff4 <- dff4["1927-01-01::"]
 
 # shoot me if this is how to get the year number
 # from a time index.
@@ -297,19 +298,12 @@ okvals <- lapply(unique(yrno), function(yr) {
         pint[, 2])
     is.ok
 })
-```
-
-```
-## Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...): 0 (non-NA) cases
-```
-
-```r
 coverage <- mean(unlist(okvals))
 print(coverage)
 ```
 
 ```
-## [1] 0.95
+## [1] 0.79
 ```
 
 ![no nominal coverage](tools/static/yuno.jpg)
@@ -342,19 +336,12 @@ okvals <- lapply(unique(yrno), function(yr) {
         pint[, 2])
     is.ok
 })
-```
-
-```
-## Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...): 0 (non-NA) cases
-```
-
-```r
 coverage <- mean(unlist(okvals))
 print(coverage)
 ```
 
 ```
-## [1] 0.95
+## [1] 0.94
 ```
 
 Of course, this could be a 'lucky seed', but one suspects that non-normality is _not_
