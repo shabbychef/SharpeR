@@ -49,6 +49,9 @@ A more accurate form is given by Bao (Equation (3)) as
 + \frac{105\gamma_2^2 \zeta}{128 n^2} - \frac{15 \gamma_1 \gamma_2}{16n^2} + o\left(n^{-2}\right),}
 where \eqn{\gamma_3} through \eqn{\gamma_5} are the fifth through
 seventh cumulants of the error term.
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 3.2.3.
 }
 \note{
 much of the code is adapted from Gauss code provided by Yong Bao.
@@ -75,6 +78,8 @@ sr_bias(snr, n, c(sku,kur), type='simple')
 Bao, Yong. "Estimation Risk-Adjusted Sharpe Ratio and Fund Performance Ranking 
 Under a General Return Distribution." Journal of Financial Econometrics 7, 
 no. 2 (2009): 152-173. \url{https://doi.org/10.1093/jjfinec/nbn022}
+
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
 \seealso{
 \code{\link{sr_variance}}

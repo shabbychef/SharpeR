@@ -89,6 +89,9 @@
 #' 
 #' Both chi-squared and F- approximations are supported; the former is
 #' described by Wright. \emph{et. al.}, the latter by Leung and Wong.
+#'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 3.3.1.
 #' 
 #' @usage
 #'
@@ -137,6 +140,7 @@
 #'
 #' @template ref-LW
 #' @template ref-Lo
+#' @template ref-tsrsa
 #'
 #' @examples 
 #' # under the null 
@@ -530,7 +534,9 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' code tests the null hypothesis
 #' \deqn{H_0: \sum_j a_j \frac{\mu_j}{\sigma_j} = b}{H0: sum_j a_j mu_j/sigma_j = b}
 #' against two or one sided alternatives.
-#' 
+#'
+#' See \sQuote{The Sharpe Ratio: Statistics and Applications},
+#' section 3.3.1.
 #'
 #' @param srs a (non-empty) list of objects of class \code{sr}, each containing
 #'  a scalar sample Sharpe estimate. Or a single object of class \code{sr} with
@@ -552,8 +558,8 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @inheritParams sr_test
 #' @keywords htest
 #' @return A list with class \code{"htest"} containing the following components:
-#' \item{statistic}{\code{NULL} here.}
-#' \item{parameter}{a list of upsilon parameters.}
+#' \item{statistic}{The Wald statistic.}
+#' \item{parameter}{The degrees of freedom of the Wald statistic.}
 #' \item{p.value}{the p-value for the test.}
 #' \item{conf.int}{a confidence interval appropriate to the specified alternative hypothesis.}
 #' \item{estimate}{the estimated equation value, just the weighted sum of the sample Sharpe ratios. Annualized}
@@ -565,8 +571,8 @@ sr_test <- function(x,y=NULL,alternative=c("two.sided","less","greater"),
 #' @export 
 #' @template etc
 #' @template sr
-#' @note remove upsilon
 #' @rdname sr_unpaired_test
+#' @template ref-tsrsa
 #' @examples 
 #' # basic usage
 #' set.seed(as.integer(charToRaw("set the seed")))

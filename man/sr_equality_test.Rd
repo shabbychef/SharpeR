@@ -56,6 +56,9 @@ alternative hypothesis \eqn{H_a: E s > 0}{Ha: E s > 0}
 
 Both chi-squared and F- approximations are supported; the former is
 described by Wright. \emph{et. al.}, the latter by Leung and Wong.
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 3.3.1.
 }
 \examples{
 # under the null 
@@ -128,6 +131,8 @@ Sharpe ratio." Journal of Empirical Finance 15, no. 5 (2008): 850-859.
 
 Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
 (2002): 36-52. \url{http://ssrn.com/paper=377260}
+
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }
 \seealso{
 \code{\link{sr_test}}

@@ -55,6 +55,9 @@ Thus a 'lambda-prime' random variable with parameters \eqn{t}{t} and
 \deqn{t\sqrt{V/\nu} + Z}{t sqrt(V/v) + Z}
 for Chi-square \eqn{V}{V} with \eqn{\nu}{v} d.f., independent from
 standard normal \eqn{Z}{Z}
+
+See \sQuote{The Sharpe Ratio: Statistics and Applications},
+section 2.4.
 }
 \note{
 \code{plambdap} should be an increasing function of the argument \code{q},
@@ -83,6 +86,8 @@ rv <- rlambdap(1000,252,2)
 
 }
 \references{
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
+
 Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
 Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107--116.
 \url{http://eris62.eu/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
