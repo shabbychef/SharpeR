@@ -90,7 +90,7 @@ Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 
 Lecoutre, Bruno. "Another look at confidence intervals for the noncentral t distribution." 
 Journal of Modern Applied Statistical Methods 6, no. 1 (2007): 107--116.
-\url{http://eris62.eu/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
+\url{https://eris62.eu/telechargements/Lecoutre_Another_look-JMSAM2007_6(1).pdf}
 
 
 Lecoutre, Bruno. "Two useful distributions for Bayesian predictive procedures under normal models."

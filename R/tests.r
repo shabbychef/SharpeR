@@ -129,11 +129,11 @@
 #' Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
 #' equality of multiple Sharpe ratios and its application on the evaluation
 #' of iShares." J. Risk. to appear. 
-#' \url{http://www.risk.net/journal-of-risk/technical-paper/2340067/a-test-for-the-equality-of-multiple-sharpe-ratios}
+#' \url{https://www.risk.net/journal-of-risk/technical-paper/2340067/a-test-for-the-equality-of-multiple-sharpe-ratios}
 #'
 #' Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with 
 #' application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15--30.
-#' \url{http://papers.ssrn.com/sol3/papers.cfm?abstract_id=907270}
+#' \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=907270}
 #'
 #' Memmel, C. "Performance hypothesis testing with the Sharpe ratio." Finance
 #' Letters 1 (2003): 21--23.
@@ -747,7 +747,7 @@ sr_unpaired_test <- function(srs,contrasts=NULL,null.value=0,alternative=c("two.
 #'
 #' Lehr, R. "Sixteen S-squared over D-squared: A relation for crude 
 #' sample size estimates." Statist. Med., 11, no 8 (1992): 1099--1102. 
-#' doi: 10.1002/sim.4780110811
+#' \doi{10.1002/sim.4780110811}
 #'
 #' @examples 
 #' anex <- power.sr_test(253,1,0.05,NULL,ope=253) 

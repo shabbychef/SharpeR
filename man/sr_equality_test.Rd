@@ -111,26 +111,26 @@ if (require(sandwich)) {
 }
 \references{
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
-\url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+\url{https://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 
 Wright, J. A., Yam, S. C. P., and Yung, S. P. "A note on the test for the
 equality of multiple Sharpe ratios and its application on the evaluation
 of iShares." J. Risk. to appear. 
-\url{http://www.risk.net/journal-of-risk/technical-paper/2340067/a-test-for-the-equality-of-multiple-sharpe-ratios}
+\url{https://www.risk.net/journal-of-risk/technical-paper/2340067/a-test-for-the-equality-of-multiple-sharpe-ratios}
 
 Leung, P.-L., and Wong, W.-K. "On testing the equality of multiple Sharpe ratios, with 
 application on the evaluation of iShares." J. Risk 10, no. 3 (2008): 15--30.
-\url{http://papers.ssrn.com/sol3/papers.cfm?abstract_id=907270}
+\url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=907270}
 
 Memmel, C. "Performance hypothesis testing with the Sharpe ratio." Finance
 Letters 1 (2003): 21--23.
 
 Ledoit, O., and Wolf, M. "Robust performance hypothesis testing with the 
 Sharpe ratio." Journal of Empirical Finance 15, no. 5 (2008): 850-859.
-\url{http://www.ledoit.net/jef2008_abstract.htm}
+\url{https://www.ledoit.net/jef2008_abstract.htm}
 
 Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
-(2002): 36-52. \url{http://ssrn.com/paper=377260}
+(2002): 36-52. \url{https://ssrn.com/paper=377260}
 
 Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 }

@@ -724,7 +724,7 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' Spruill, M. C. "Computation of the maximum likelihood estimate of a noncentrality parameter." 
 #' Journal of multivariate analysis 18, no. 2 (1986): 216-224.
-#' \url{http://www.sciencedirect.com/science/article/pii/0047259X86900709}
+#' \url{https://www.sciencedirect.com/science/article/pii/0047259X86900709}
 #'
 #' @rdname inference
 #' @export inference
