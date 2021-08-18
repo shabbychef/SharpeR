@@ -33,8 +33,8 @@ opts_chunk$set(tidy=TRUE,tidy.opts=list(width.cutoff=50,keep.blank.line=TRUE))
 # SharpeR
 
 [![Build Status](https://github.com/shabbychef/SharpeR/workflows/R-CMD-check/badge.svg)](https://github.com/shabbychef/SharpeR/actions)
-[![codecov.io](http://codecov.io/github/shabbychef/SharpeR/coverage.svg?branch=master)](http://codecov.io/github/shabbychef/SharpeR?branch=master)
-[![CRAN](https://www.r-pkg.org/badges/version/SharpeR)](https://cran.r-project.org/web/packages/SharpeR/index.html)
+[![codecov.io](https://codecov.io/github/shabbychef/SharpeR/coverage.svg?branch=master)](https://codecov.io/github/shabbychef/SharpeR?branch=master)
+[![CRAN](https://www.r-pkg.org/badges/version/SharpeR)](https://cran.r-project.org/package=SharpeR)
 [![Downloads](http://cranlogs.r-pkg.org/badges/SharpeR?color=green)](https://www.r-pkg.org/pkg/SharpeR)
 [![Total](http://cranlogs.r-pkg.org/badges/grand-total/SharpeR?color=green)](https://www.r-pkg.org/pkg/SharpeR)
 
@@ -48,7 +48,7 @@ Markowitz portfolio, and, in general, overfit of trading strategies based on
 
 This package may be installed from CRAN; the latest development version may be
 installed via [drat](https://github.com/eddelbuettel/drat "drat"), or built from
-[github](https://www.github.com/shabbychef/SharpeR "SharpeR"):
+[github](https://github.com/shabbychef/SharpeR "SharpeR"):
 
 ```{r install,eval=FALSE,echo=TRUE}
 # install via CRAN:
@@ -111,7 +111,7 @@ get.rets <- function(syms,...) { some.rets <- do.call("cbind",lapply(syms,get.re
 ```
 
 
-```{r real_data,eval=TRUE,echo=TRUE}
+```{r real_data,dependson=c('stock_loading'),eval=TRUE,echo=TRUE}
 some.rets <- get.rets(c("IBM","AAPL","XOM"),
 	from="2004-01-01",to="2013-08-01")
 print(as.sr(some.rets))
@@ -121,7 +121,7 @@ print(as.sr(some.rets))
 
 A single equation on multiple signal-noise ratios with independent samples
 can be computed using the `sr_unpaired_test` function. This code performs
-inference via the [Upsilon distribution](http://arxiv.org/abs/1505.00829).
+inference via the asymptotic expansion of the Sharpe ratio.
 The `sr_test` also acts as a frontend for this code, for the two sample
 case.
 
@@ -181,12 +181,12 @@ Is this 'the January Effect'? Perhaps.
 
 ```{r ff_momentum_check,eval=TRUE,echo=TRUE}
 library(xts)
-if (!require(aqfb.data)) {
-	devtools::install_github('shabbychef/aqfb_data')
-	library(aqfb.data)
+if (!require(tsrsa)) {
+	devtools::install_github('shabbychef/tsrsa')
+	library(tsrsa)
 }
 
-data('mff4',package='aqfb.data')
+data('mff4',package='tsrsa')
 
 # January or not
 is.jan <- months(index(mff4)) == 'January'
@@ -207,7 +207,7 @@ print(etc)
 
 ## Prediction Intervals
 
-Using the [Upsilon distribution](http://arxiv.org/abs/1505.00829), we can
+By inflating standard errors, we can
 compute prediction intervals for future realized Sharpe ratio, with coverage
 frequency over the full experiment. Here is an example on fake data:
 
@@ -243,12 +243,13 @@ for the fourth quarter, then check coverage:
 
 ```{r ff_predint_check,eval=TRUE,echo=TRUE}
 library(xts)
-if (!require(aqfb.data)) {
-	devtools::install_github('shabbychef/aqfb_data')
-	library(aqfb.data)
+if (!require(tsrsa)) {
+	devtools::install_github('shabbychef/tsrsa')
+	library(tsrsa)
 }
 
-data('dff4',package='aqfb.data')
+data('dff4',package='tsrsa')
+dff4 <- dff4['1927-01-01::']
 
 # shoot me if this is how to get the year number from a time index.
 yrno <- as.numeric(floor(as.yearmon(index(dff4))))
@@ -280,7 +281,7 @@ is to blame for the apparent conservatism of the prediction intervals in this ca
 We can check by simply shuffling the monthly returns data and repeating the
 experiment:
 
-```{r ff_predint_check_shuf,eval=TRUE,echo=TRUE}
+```{r ff_predint_check_shuf,dependson=c('ff_predint_check'),eval=TRUE,echo=TRUE}
 
 # shuffle the returns data by row
 set.seed(1234)

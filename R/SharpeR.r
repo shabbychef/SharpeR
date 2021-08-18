@@ -154,7 +154,7 @@
 #'
 #' Kan, Raymond and Zhou, GuoFu. "Tests of Mean-Variance Spanning."
 #' Annals of Economics and Finance 13, no. 1 (2012)
-#' \url{http://www.aeconf.net/Articles/May2012/aef130105.pdf}
+#' \url{https://econpapers.repec.org/article/cufjournl/y_3a2012_3av_3a13_3ai_3a1_3akanzhou.htm}
 #'
 #' Britten-Jones, Mark. "The Sampling Error in Estimates of Mean-Variance 
 #' Efficient Portfolio Weights." The Journal of Finance 54, no. 2 (1999):
@@ -162,12 +162,12 @@
 #'
 #' Silvapulle, Mervyn. J. "A Hotelling's T2-type statistic for testing against 
 #' one-sided hypotheses." Journal of Multivariate Analysis 55, no. 2 (1995):
-#' 312--319. \url{http://dx.doi.org/10.1006/jmva.1995.1081}
+#' 312--319. \doi{10.1006/jmva.1995.1081}
 #'
 #' Bodnar, Taras and Okhrin, Yarema. "On the Product of Inverse Wishart
 #' and Normal Distributions with Applications to Discriminant Analysis 
 #' and Portfolio Theory." Scandinavian Journal of Statistics 38, no. 2 (2011):
-#' 311--331. \url{http://dx.doi.org/10.1111/j.1467-9469.2011.00729.x}
+#' 311--331. \doi{10.1111/j.1467-9469.2011.00729.x}
 #'
 #' @name SharpeR-package
 #' @rdname SharpeR

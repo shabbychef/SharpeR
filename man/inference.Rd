@@ -99,7 +99,7 @@ Canadian Journal of Statistics 21, no. 1 (1993): 45-57. \url{https://www.jstor.o
 
 Spruill, M. C. "Computation of the maximum likelihood estimate of a noncentrality parameter." 
 Journal of multivariate analysis 18, no. 2 (1986): 216-224.
-\url{http://www.sciencedirect.com/science/article/pii/0047259X86900709}
+\url{https://www.sciencedirect.com/science/article/pii/0047259X86900709}
 }
 \seealso{
 F-distribution functions, \code{\link{df}}.

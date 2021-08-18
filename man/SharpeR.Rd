@@ -137,24 +137,24 @@ GNU Lesser General Public License for more details.
 
 \references{
 Sharpe, William F. "Mutual fund performance." Journal of business (1966): 119-138.
-\url{http://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
+\url{https://ideas.repec.org/a/ucp/jnlbus/v39y1965p119.html}
 
 Johnson, N. L., and Welch, B. L. "Applications of the non-central t-distribution."
-Biometrika 31, no. 3-4 (1940): 362-389. \url{http://dx.doi.org/10.1093/biomet/31.3-4.362}
+Biometrika 31, no. 3-4 (1940): 362-389. \doi{10.1093/biomet/31.3-4.362}
 
 Lo, Andrew W. "The statistics of Sharpe ratios." Financial Analysts Journal 58, no. 4 
-(2002): 36-52. \url{http://ssrn.com/paper=377260}
+(2002): 36-52. \url{https://www.ssrn.com/paper=377260}
 
 Opdyke, J. D. "Comparing Sharpe Ratios: So Where are the p-values?" Journal of Asset
-Management 8, no. 5 (2006): 308-336. \url{http://ssrn.com/paper=886728}
+Management 8, no. 5 (2006): 308-336. \url{https://www.ssrn.com/paper=886728}
 
 Ledoit, O., and Wolf, M. "Robust performance hypothesis testing with the 
 Sharpe ratio." Journal of Empirical Finance 15, no. 5 (2008): 850-859.
-\url{http://www.ledoit.net/jef2008_abstract.htm}
+\doi{10.1016/j.jempfin.2008.03.002}
 
 Giri, N. "On the likelihood ratio test of a normal multivariate testing problem."
 Annals of Mathematical Statistics 35, no. 1 (1964): 181-189. 
-\url{http://projecteuclid.org/euclid.aoms/1177703740}
+\doi{10.1214/aoms/1177703740}
 
 Rao, C. R. "Advanced Statistical Methods in Biometric Research." Wiley
 (1952).
@@ -165,11 +165,11 @@ Characters." Sankhya, 9, no. 4 (1949): 343-366.
 
 Kan, Raymond and Smith, Daniel R. "The Distribution of the Sample Minimum-Variance Frontier."
 Journal of Management Science 54, no. 7 (2008): 1364--1380.
-\url{http://mansci.journal.informs.org/cgi/doi/10.1287/mnsc.1070.0852}
+\doi{10.1287/mnsc.1070.0852}
 
 Kan, Raymond and Zhou, GuoFu. "Tests of Mean-Variance Spanning."
 Annals of Economics and Finance 13, no. 1 (2012)
-\url{http://www.aeconf.net/Articles/May2012/aef130105.pdf}
+\url{https://econpapers.repec.org/article/cufjournl/y_3a2012_3av_3a13_3ai_3a1_3akanzhou.htm}
 
 Britten-Jones, Mark. "The Sampling Error in Estimates of Mean-Variance 
 Efficient Portfolio Weights." The Journal of Finance 54, no. 2 (1999):
@@ -177,12 +177,12 @@ Efficient Portfolio Weights." The Journal of Finance 54, no. 2 (1999):
 
 Silvapulle, Mervyn. J. "A Hotelling's T2-type statistic for testing against 
 one-sided hypotheses." Journal of Multivariate Analysis 55, no. 2 (1995):
-312--319. \url{http://dx.doi.org/10.1006/jmva.1995.1081}
+312--319. \doi{10.1006/jmva.1995.1081}
 
 Bodnar, Taras and Okhrin, Yarema. "On the Product of Inverse Wishart
 and Normal Distributions with Applications to Discriminant Analysis 
 and Portfolio Theory." Scandinavian Journal of Statistics 38, no. 2 (2011):
-311--331. \url{http://dx.doi.org/10.1111/j.1467-9469.2011.00729.x}
+311--331. \doi{10.1111/j.1467-9469.2011.00729.x}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

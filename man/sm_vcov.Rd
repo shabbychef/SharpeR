@@ -74,7 +74,7 @@ Sigmas <- sm_vcov(Xf,vcov.func=vcovHAC)
 }
 \references{
 Pav, S. E. "Asymptotic Distribution of the Markowitz Portfolio."
-2013 \url{http://arxiv.org/abs/1312.0557}
+2013 \url{https://arxiv.org/abs/1312.0557}
 }
 \seealso{
 \code{\link{ism_vcov}}, \code{\link{sr_vcov}}

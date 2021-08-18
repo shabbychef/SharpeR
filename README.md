@@ -3,8 +3,8 @@
 # SharpeR
 
 [![Build Status](https://github.com/shabbychef/SharpeR/workflows/R-CMD-check/badge.svg)](https://github.com/shabbychef/SharpeR/actions)
-[![codecov.io](http://codecov.io/github/shabbychef/SharpeR/coverage.svg?branch=master)](http://codecov.io/github/shabbychef/SharpeR?branch=master)
-[![CRAN](https://www.r-pkg.org/badges/version/SharpeR)](https://cran.r-project.org/web/packages/SharpeR/index.html)
+[![codecov.io](https://codecov.io/github/shabbychef/SharpeR/coverage.svg?branch=master)](https://codecov.io/github/shabbychef/SharpeR?branch=master)
+[![CRAN](https://www.r-pkg.org/badges/version/SharpeR)](https://cran.r-project.org/package=SharpeR)
 [![Downloads](http://cranlogs.r-pkg.org/badges/SharpeR?color=green)](https://www.r-pkg.org/pkg/SharpeR)
 [![Total](http://cranlogs.r-pkg.org/badges/grand-total/SharpeR?color=green)](https://www.r-pkg.org/pkg/SharpeR)
 
@@ -18,7 +18,7 @@ Markowitz portfolio, and, in general, overfit of trading strategies based on
 
 This package may be installed from CRAN; the latest development version may be
 installed via [drat](https://github.com/eddelbuettel/drat "drat"), or built from
-[github](https://www.github.com/shabbychef/SharpeR "SharpeR"):
+[github](https://github.com/shabbychef/SharpeR "SharpeR"):
 
 
 ```r
@@ -107,10 +107,10 @@ print(as.sr(some.rets))
 ```
 
 ```
-##      SR/sqrt(yr) Std. Error t value Pr(>t)    
-## IBM         0.43       0.32     1.3 0.0905 .  
-## AAPL        1.09       0.32     3.4 0.0004 ***
-## XOM         0.43       0.32     1.3 0.0937 .  
+##      SR/sqrt(yr) Std. Error t value  Pr(>t)    
+## IBM         0.43       0.32     1.3 0.09045 .  
+## AAPL        1.05       0.32     3.2 0.00058 ***
+## XOM         0.43       0.32     1.3 0.09366 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -119,7 +119,7 @@ print(as.sr(some.rets))
 
 A single equation on multiple signal-noise ratios with independent samples
 can be computed using the `sr_unpaired_test` function. This code performs
-inference via the [Upsilon distribution](http://arxiv.org/abs/1505.00829).
+inference via the asymptotic expansion of the Sharpe ratio.
 The `sr_test` also acts as a frontend for this code, for the two sample
 case.
 
@@ -184,12 +184,12 @@ Is this 'the January Effect'? Perhaps.
 
 ```r
 library(xts)
-if (!require(aqfb.data)) {
-    devtools::install_github("shabbychef/aqfb_data")
-    library(aqfb.data)
+if (!require(tsrsa)) {
+    devtools::install_github("shabbychef/tsrsa")
+    library(tsrsa)
 }
 
-data("mff4", package = "aqfb.data")
+data("mff4", package = "tsrsa")
 
 # January or not
 is.jan <- months(index(mff4)) == "January"
@@ -215,18 +215,18 @@ print(etc)
 ## 	unpaired k-sample sr-test
 ## 
 ## data:  list(sr.jan, sr.rem)
-## df = 90, NA = 1000, p-value = 0.002
+## Wald statistic = -3, df = 90, p-value = 0.004
 ## alternative hypothesis: true weighted sum of signal-noise ratios is not equal to 0
 ## 95 percent confidence interval:
-##  -2.34 -0.52
+##  -0.88  0.88
 ## sample estimates:
 ## equation on Sharpe ratios 
-##                      -1.4
+##                      -1.3
 ```
 
 ## Prediction Intervals
 
-Using the [Upsilon distribution](http://arxiv.org/abs/1505.00829), we can
+By inflating standard errors, we can
 compute prediction intervals for future realized Sharpe ratio, with coverage
 frequency over the full experiment. Here is an example on fake data:
 
@@ -267,12 +267,13 @@ for the fourth quarter, then check coverage:
 
 ```r
 library(xts)
-if (!require(aqfb.data)) {
-    devtools::install_github("shabbychef/aqfb_data")
-    library(aqfb.data)
+if (!require(tsrsa)) {
+    devtools::install_github("shabbychef/tsrsa")
+    library(tsrsa)
 }
 
-data("dff4", package = "aqfb.data")
+data("dff4", package = "tsrsa")
+dff4 <- dff4["1927-01-01::"]
 
 # shoot me if this is how to get the year number
 # from a time index.
@@ -302,7 +303,7 @@ print(coverage)
 ```
 
 ```
-## [1] 0.8
+## [1] 0.79
 ```
 
 ![no nominal coverage](tools/static/yuno.jpg)
@@ -340,7 +341,7 @@ print(coverage)
 ```
 
 ```
-## [1] 0.92
+## [1] 0.94
 ```
 
 Of course, this could be a 'lucky seed', but one suspects that non-normality is _not_
@@ -382,7 +383,7 @@ print(t(wald.stats))
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.27    3 0.15
+## [1,] -0.23  2.9 0.17
 ```
 
 ```r
@@ -394,5 +395,5 @@ if (require(sandwich)) {
 
 ```
 ##        IBM AAPL  XOM
-## [1,] -0.26    3 0.16
+## [1,] -0.22  2.8 0.18
 ```
