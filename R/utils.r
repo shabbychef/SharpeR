@@ -69,13 +69,16 @@
 # class utils#FOLDUP
 # infer the total time from an xts object,
 # as a difftime
+#' @importFrom
 .infer_delt_xts <- function(anxts) {
 	TEO <- time(anxts)
 	# the as.Date rigamarole is b/c these are timeDate objects and now
 	# the conversion to POSIXct in difftime requires an origin? WTF?
 	orig <- '1970-01-01'
-	delt <- difftime(as.Date(TEO[length(TEO)],origin=orig),
-									 as.Date(TEO[1],origin=orig),units='days')
+	two_TEO <- TEO[c(1,length(TEO))]
+	# note this crashes for some reason if you use yearmon.
+	two_TEO <- as.Date(two_TEO,origin=orig)
+	delt <- difftime(two_TEO[2],two_TEO[1],units='days')
 	return(delt)
 }
 # infer the observations per epoch from an xts object
