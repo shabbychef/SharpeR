@@ -25,6 +25,7 @@ Depends:
     R (>= 3.0.0)
 Imports: 
     matrixcalc,
+    zoo,
     methods
 dnl sadists (>= 0.2.0)
 Suggests: 

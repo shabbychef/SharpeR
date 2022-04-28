@@ -69,7 +69,7 @@
 # class utils#FOLDUP
 # infer the total time from an xts object,
 # as a difftime
-#' @importFrom
+#' @importFrom zoo as.Date.yearmon
 .infer_delt_xts <- function(anxts) {
 	TEO <- time(anxts)
 	# the as.Date rigamarole is b/c these are timeDate objects and now
@@ -77,7 +77,11 @@
 	orig <- '1970-01-01'
 	two_TEO <- TEO[c(1,length(TEO))]
 	# note this crashes for some reason if you use yearmon.
-	two_TEO <- as.Date(two_TEO,origin=orig)
+	if (inherits(two_TEO,'yearmon')) { 
+		two_TEO <- as.Date(two_TEO,frac=1)
+	} else {
+		two_TEO <- as.Date(two_TEO,origin=orig)
+	}
 	delt <- difftime(two_TEO[2],two_TEO[1],units='days')
 	return(delt)
 }
