@@ -4,7 +4,7 @@ Authors@R: c(person(c("Steven", "E."), "Pav",
     role=c("aut","cre"),
     email="shabbychef@gmail.com",
     comment = c(ORCID = "0000-0002-4197-6195")))
-Version: 1.3.0.005
+Version: 1.3.0.006
 Date: 2022-05-09
 License: LGPL-3
 Title: Statistical Significance of the Sharpe Ratio
@@ -40,12 +40,11 @@ VignetteBuilder: knitr
 Collate:
     'SharpeR.r'
     'data.r'
-    'utils.r'
     'distributions.r'
-    'sr.r'
     'estimation.r'
     'overoptimism.r'
+    'sr.r'
     'sr_bias.r'
     'tests.r'
     'unified.r'
-RoxygenNote: 7.1.1
+    'utils.r'

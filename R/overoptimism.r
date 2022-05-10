@@ -41,7 +41,6 @@
 
 
 
-#' @importFrom epsiwal pconnorm ci_connorm
 
 #' @title test for multiple Sharpe ratios.
 #'
@@ -91,7 +90,7 @@
 #' @param conf.level confidence level of the test. We perform a one-sided test.
 #' @param type which method to apply.
 #' @return A list with class \code{"htest"} containing the following components:
-#' \item{statistic}{the value of the t- or Z-statistic.}
+#' \item{statistic}{the value of the statistic.}
 #' \item{parameter}{the degrees of freedom for the statistic.}
 #' \item{p.value}{the p-value for the test.}
 #' \item{conf.int}{a one-sided confidence interval appropriate to the specified alternative hypothesis.}
@@ -119,6 +118,8 @@
 #' sr_max_test(zetas,df=ope*2,ope=ope,type='Bonferroni')
 #' sr_max_test(zetas,zeta_0=zeta0,df=ope*2,ope=ope,type='Bonferroni')
 #' sr_max_test(zetas,zeta_0=zeta0,df=ope*2,ope=ope,type='chi-bar-square')
+#' @template etc
+#' @examples 
 #' @template etc
 #' @rdname sr_max_test
 #' @export
@@ -236,8 +237,8 @@ sr_max_test <- function(srs, df, ope=1, kappa=1, rho=0, zeta_0=0,
 		}
 	}
 	cint <- c(sqrt(ope)*clow,Inf)
-	names(z0) <- 'group signal-noise ratio'
 	attr(cint, "conf.level") <- conf.level
+	names(zeta_0) <- 'group signal-noise ratio'
 
 	# may need an estimate and a null.value?
 
@@ -245,6 +246,136 @@ sr_max_test <- function(srs, df, ope=1, kappa=1, rho=0, zeta_0=0,
 								 p.value = pval, 
 								 alternative = alternative, null.value = zeta_0,
 								 conf.int = cint, loglog = loglog,
+								 method = method, data.name = dname)
+	class(retval) <- "htest"
+	return(retval)
+}
+
+
+#' @title conditional test for maximum Sharpe ratios.
+#'
+#' @description 
+#'
+#' Performs tests for the hypothesis 
+#' \deqn{\zeta_{(k)} \le \zeta_0}{zeta_(k) <= zeta_0}
+#' against the alternative
+#' \deqn{\zeta_{(k)} > \zeta_0,}{zeta_(k) > zeta_0,}
+#' where \eqn{\zeta_{(k)}}{zeta_(k)} is the signal-noise ratio of the
+#' asset selected because it has the largest Sharpe ratio.
+#' The test is conditional on having selected the maximum.
+#' Testing is via the polyhedral lemma of Lee \emph{et al.}
+#'
+#' @details
+#'
+#' Performs the conditional estimation procedure as outlined in 
+#' Section 4.1.5 of \emph{The Sharpe Ratio: Statistics and Applications}.
+#'
+#' @param srs  A vector of Sharpe ratios, quoted in terms of a given epoch.
+#' @param df  The number of \sQuote{degrees of freedom} of the Sharpe ratios,
+#' which are assumed to have been measured over the same period.
+#' The degrees of freedom are one less than the number of observed returns.
+#' @template param-ope
+#' @param R      The correlation matrix of returns. Not needed if Rmax is given.
+#' @param Rmax   The column of the correlation matrix corresponding to the 
+#' maximal element of \code{srs}.
+#' @param zeta_0  The cutoff for the test. We test whether all Signal-noise
+#' ratios are equal to zeta_0.  This value is quoted in terms of the same epoch
+#' as \code{srs}.
+#' @param conf.level confidence level of the test. 
+#' @param alternative a character string specifying the alternative hypothesis,
+#'        must be one of \code{"two.sided"} (default), \code{"greater"} or
+#'        \code{"less"}. You can specify just the initial letter.
+#' @return A list with class \code{"htest"} containing the following components:
+#' \item{statistic}{the value of the conditional normal statistic.}
+#' \item{parameter}{the degrees of freedom for the statistic.}
+#' \item{p.value}{the p-value for the test.}
+#' \item{conf.int}{a one-sided confidence interval appropriate to the specified alternative hypothesis.}
+#' \item{alternative}{a character string describing the alternative hypothesis.}
+#' \item{method}{a character string indicating what type of test was performed.}
+#' \item{data.name}{a character string giving the name(s) of the data.}
+#' @keywords htest
+#' @keywords overoptimism
+#' @template etc
+#' @template ref-tsrsa
+#' @importFrom epsiwal pconnorm ci_connorm
+#'
+#' @seealso sr_max_test
+#' @references
+#' Lee, J. D., Sun, D. L., Sun, Y. and Taylor, J. E. "Exact post-selection inference, 
+#' with application to the Lasso." Ann. Statist. 44, no. 3 (2016): 907-927.
+#' doi:10.1214/15-AOS1371. \url{https://arxiv.org/abs/1311.6238}
+#'
+#'
+#' @examples 
+#' @template etc
+#' @rdname sr_conditional_test
+#' @export
+sr_conditional_test <- function(srs, df, R=NULL, Rmax=NULL, zeta_0=0, 
+																conf.level=0.95, 
+																alternative=c("two.sided","less","greater")) {
+	# all this stolen from t.test.default:
+	alternative <- match.arg(alternative)
+	dname <- deparse(substitute(srs))
+
+	nday <- 1 + df
+	nstrat <- length(srs)
+	kidx <- which.max(srs)
+	if (is.null(Rmax)) { 
+		Rmax = R[,kidx]
+	}
+	mySigma_eta <- (1/nday) * Rmax
+
+	# adjust back to individual units
+	zetas <- srs / sqrt(ope)
+	z0    <- zeta_0 / sqrt(ope)
+
+	y <- zetas
+	testzeta <- z0
+
+	# collect the maximum, so reorder the A above
+	yord <- order(y,decreasing=TRUE)
+	revo <- seq_len(nstrat)
+	revo[yord] <- revo
+
+  A1 <- cbind(-1,diag(nstrat-1))
+	A <- A1[,revo]
+	nu <- rep(0,nstrat)
+	nu[yord[1]] <- 1
+	b <- rep(0,nstrat-1)
+
+	pval <- epsiwal::pconnorm(y=y,A=A,b=b,eta=nu,eta_mu=testzeta,Sigma_eta=mySigma_eta,lower.tail=TRUE)
+	pval <- switch(alternative,
+								 two.sided = .oneside2two(pval),
+								 less = 1-pval,
+								 greater = pval)
+
+	statistic <- y[kidx]
+	names(statistic) <- "Conditional Z statistic"
+	parameter <- df
+
+	alpha <- 1 - conf.level
+	ps <- switch(alternative,
+							 two.sided = c(1-alpha/2,alpha/2),
+							 less = c(1,alpha),
+							 greater = c(1-alpha,0))
+	cint <- epsiwal::ci_connorm(y=y,A=A,b=b,eta=nu,Sigma_eta=mySigma_eta,p=ps)
+	cint <- sort(cint)
+	#idx <- 2
+	#epsiwal::pconnorm(y=y,A=A,b=b,eta=nu,eta_mu=cint[idx],Sigma_eta=mySigma_eta,lower.tail=TRUE) - ps[idx]
+
+	# convert back
+	cint <- sqrt(ope) * cint
+	attr(cint, "conf.level") <- conf.level
+	names(zeta_0) <- 'signal-noise ratio conditional on max'
+
+	method <- 'conditional inference'
+
+	# may need an estimate and a null.value?
+
+	retval <- list(statistic = statistic, parameter = parameter,
+								 p.value = pval, 
+								 alternative = alternative, null.value = zeta_0,
+								 conf.int = cint, 
 								 method = method, data.name = dname)
 	class(retval) <- "htest"
 	return(retval)

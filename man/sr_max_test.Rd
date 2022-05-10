@@ -49,7 +49,7 @@ number of effective strategies tested. Not yet applied for Follman's test.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:
-\item{statistic}{the value of the t- or Z-statistic.}
+\item{statistic}{the value of the statistic.}
 \item{parameter}{the degrees of freedom for the statistic.}
 \item{p.value}{the p-value for the test.}
 \item{conf.int}{a one-sided confidence interval appropriate to the specified alternative hypothesis.}
@@ -108,6 +108,8 @@ J. Bus. Ec. Stats, 23, no 4 (2005). \doi{10.1198/073500105000000063}
 \code{\link{reannualize}}
 }
 \author{
+Steven E. Pav \email{shabbychef@gmail.com}
+
 Steven E. Pav \email{shabbychef@gmail.com}
 
 Steven E. Pav \email{shabbychef@gmail.com}
