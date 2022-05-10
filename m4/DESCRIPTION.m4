@@ -26,6 +26,7 @@ Depends:
 Imports: 
     matrixcalc,
     zoo,
+    epsiwal,
     methods
 dnl sadists (>= 0.2.0)
 Suggests: 
