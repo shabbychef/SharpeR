@@ -305,12 +305,11 @@ sr_max_test <- function(srs, df, ope=1, kappa=1, rho=0, zeta_0=0,
 #' with application to the Lasso." Ann. Statist. 44, no. 3 (2016): 907-927.
 #' doi:10.1214/15-AOS1371. \url{https://arxiv.org/abs/1311.6238}
 #'
-#'
 #' @examples 
 #' @template etc
 #' @rdname sr_conditional_test
 #' @export
-sr_conditional_test <- function(srs, df, R=NULL, Rmax=NULL, zeta_0=0, 
+sr_conditional_test <- function(srs, df, ope=1, R=NULL, Rmax=NULL, zeta_0=0, 
 																conf.level=0.95, 
 																alternative=c("two.sided","less","greater")) {
 	# all this stolen from t.test.default:
