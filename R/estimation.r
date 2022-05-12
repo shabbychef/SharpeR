@@ -926,8 +926,10 @@ asnr_confint <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
 #' @method asnr_confint sropt
 #' @export
 asnr_confint.sropt <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
-	delta_2 <- inference(z.s,type='KRS')
 	levels <- c(level.lo,level.hi)
+
+	delta_2 <- inference(z.s,type='KRS')
+	delta_2 <- .deannualize(delta_2,z.s$ope)
   ub <- sqrt(as.numeric(delta_2))
 
 	nstrat <- z.s$df1
@@ -949,8 +951,10 @@ asnr_confint.sropt <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
 #' @method asnr_confint del_sropt
 #' @export
 asnr_confint.del_sropt <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
-	delta_2 <- inference(z.s,type='KRS')
 	levels <- c(level.lo,level.hi)
+
+	delta_2 <- inference(z.s,type='KRS')
+	delta_2 <- .deannualize(delta_2,z.s$ope)
   ub <- sqrt(as.numeric(delta_2))
 
 	nstrat <- z.s$df1 - z.s$df1.sub
