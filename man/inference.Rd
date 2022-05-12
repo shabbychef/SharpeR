@@ -33,10 +33,12 @@ estimate the non-centrality parameter from the statistic:
 
 \itemize{
 \item an unbiased estimator, which, unfortunately, may be negative.
+This is \eqn{\delta_0}{delta_0} of Equations (6.67) and (6.68) of \sQuote{The Sharpe Ratio: Statistics and Applications}.
 \item the Maximum Likelihood Estimator, which may be zero, but not
 negative.
 \item the estimator of Kubokawa, Roberts, and Shaleh (KRS), which
 is a shrinkage estimator.
+This is \eqn{\delta_2}{delta_2} of Equations (6.67) and (6.68) of \sQuote{The Sharpe Ratio: Statistics and Applications}.
 }
 
 The sropt distribution is equivalent to an F distribution up to a 
@@ -94,6 +96,8 @@ est3 <- inference(asro,type='MLE')
 
 }
 \references{
+Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
+
 Kubokawa, T., C. P. Robert, and A. K. Saleh. "Estimation of noncentrality parameters." 
 Canadian Journal of Statistics 21, no. 1 (1993): 45-57. \url{https://www.jstor.org/stable/3315657}
 
@@ -105,6 +109,7 @@ Journal of multivariate analysis 18, no. 2 (1986): 216-224.
 F-distribution functions, \code{\link{df}}.
 
 Other sropt Hotelling: 
+\code{\link{asnr_confint}()},
 \code{\link{sric}()}
 }
 \author{

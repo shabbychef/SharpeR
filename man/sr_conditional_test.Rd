@@ -7,6 +7,7 @@
 sr_conditional_test(
   srs,
   df,
+  ope = 1,
   R = NULL,
   Rmax = NULL,
   zeta_0 = 0,
@@ -20,6 +21,14 @@ sr_conditional_test(
 \item{df}{The number of \sQuote{degrees of freedom} of the Sharpe ratios,
 which are assumed to have been measured over the same period.
 The degrees of freedom are one less than the number of observed returns.}
+
+\item{ope}{the number of observations per 'epoch'. For convenience of
+interpretation, The Sharpe ratio is typically quoted in 'annualized' 
+units for some epoch, that is, 'per square root epoch', though returns 
+are observed at a frequency of \code{ope} per epoch. 
+The default value is 1, meaning the code will not attempt to guess
+what the observation frequency is, and no annualization adjustments
+will be made.}
 
 \item{R}{The correlation matrix of returns. Not needed if Rmax is given.}
 
@@ -35,14 +44,6 @@ as \code{srs}.}
 \item{alternative}{a character string specifying the alternative hypothesis,
 must be one of \code{"two.sided"} (default), \code{"greater"} or
 \code{"less"}. You can specify just the initial letter.}
-
-\item{ope}{the number of observations per 'epoch'. For convenience of
-interpretation, The Sharpe ratio is typically quoted in 'annualized' 
-units for some epoch, that is, 'per square root epoch', though returns 
-are observed at a frequency of \code{ope} per epoch. 
-The default value is 1, meaning the code will not attempt to guess
-what the observation frequency is, and no annualization adjustments
-will be made.}
 }
 \value{
 A list with class \code{"htest"} containing the following components:

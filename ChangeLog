@@ -1,4 +1,8 @@
 
+2022-05-?? Steven E. Pav <shabbychef@gmail.com>
+* Add inference on group SNR via Bonferroni and MHT tests.
+* Add confidence intervals on achieved SNR.
+
 2021-08-15 Steven E. Pav <shabbychef@gmail.com>
 * 1.3.0 on CRAN
 * Remove tests based on upsilon distribution. Also
