@@ -4,8 +4,8 @@ Authors@R: c(person(c("Steven", "E."), "Pav",
     role=c("aut","cre"),
     email="shabbychef@gmail.com",
     comment = c(ORCID = "0000-0002-4197-6195")))
-Version: 1.3.0
-Date: 2021-08-15
+Version: 1.3.0.008
+Date: 2022-05-11
 License: LGPL-3
 Title: Statistical Significance of the Sharpe Ratio
 BugReports: https://github.com/shabbychef/SharpeR/issues
@@ -21,6 +21,8 @@ Depends:
     R (>= 3.0.0)
 Imports: 
     matrixcalc,
+    zoo,
+    epsiwal,
     methods
 Suggests: 
     xtable,
@@ -42,6 +44,7 @@ Collate:
     'distributions.r'
     'sr.r'
     'estimation.r'
+    'overoptimism.r'
     'sr_bias.r'
     'tests.r'
     'unified.r'

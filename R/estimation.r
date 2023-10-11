@@ -1,4 +1,4 @@
-# Copyright 2012-2014 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2022 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -23,7 +23,7 @@
 # changelog: 
 #
 # Created: 2012.05.19
-# Copyright: Steven E. Pav, 2012-2013
+# Copyright: Steven E. Pav, 2012-2022
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
@@ -693,10 +693,12 @@ T2.inference <- function(T2,df1,df2,...) {
 #'
 #' \itemize{
 #' \item an unbiased estimator, which, unfortunately, may be negative.
+#' This is \eqn{\delta_0}{delta_0} of Equations (6.67) and (6.68) of \sQuote{The Sharpe Ratio: Statistics and Applications}.
 #' \item the Maximum Likelihood Estimator, which may be zero, but not
 #' negative.
 #' \item the estimator of Kubokawa, Roberts, and Shaleh (KRS), which
 #' is a shrinkage estimator.
+#' This is \eqn{\delta_2}{delta_2} of Equations (6.67) and (6.68) of \sQuote{The Sharpe Ratio: Statistics and Applications}.
 #' }
 #'
 #' The sropt distribution is equivalent to an F distribution up to a 
@@ -707,7 +709,6 @@ T2.inference <- function(T2,df1,df2,...) {
 #' units 'per square root time'. As such, the \code{'unbiased'}
 #' type can be problematic!
 #'
-#'
 #' @param z.s an object of type \code{sropt}, or \code{del_sropt}
 #' @param type the estimator type. one of \code{c("KRS", "MLE", "unbiased")}
 #' @keywords htest
@@ -717,6 +718,7 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @export 
 #' @template etc
 #' @family sropt Hotelling
+#' @template ref-tsrsa
 #' @references 
 #'
 #' Kubokawa, T., C. P. Robert, and A. K. Saleh. "Estimation of noncentrality parameters." 
@@ -860,6 +862,120 @@ sric <- function(z.s) {
 	retv <- .annualize(retv,z.s$ope)
 	retv
 }
+
+#' @title Confidence intervals on achieved SnR
+#'
+#' @description 
+#'
+#' Computes approximate bounds on the achieved signal-noise ratio of the
+#' Markowitz portfolio built on sample data.
+#'
+#' @details 
+#'
+#' Provides an approximate bound on the achieved Signal-noise ratio of the
+#' sample Markowitz portfolio. That is if \eqn{\mu}{mu} and \eqn{\Sigma}{Sigma}
+#' are the unknown mean and covariance of returns, and \eqn{w}{w} is the 
+#' sample Markowitz portfolio, then the probability that 
+#' \deqn{w^{\top}\mu / \sqrt{w^{\top}\Sigma w} \ge b}{w'mu/sqrt(w'Sigma w) >= b}
+#' is the given probability level.
+#' See section 8.3.1 of \sQuote{The Sharpe Ratio: Statistics and Applications}.
+#' Plugs in the \eqn{\delta_2}{delta_2} estimator.
+#'
+#' @param z.s an object of type \code{sropt}, or \code{del_sropt}
+#' @return an estimate of the non-centrality parameter, which is
+#' the maximal population Sharpe ratio.
+#' @export 
+#' @template etc
+#' @family sropt Hotelling
+#' @template ref-tsrsa
+#' @references 
+#'
+#' Pav, S. "Inference on achieved signal noise ratio." 2020
+#' \url{https://arxive.org/abs/2005.06171}
+#'
+#' @rdname asnr_confint
+#' @export asnr_confint
+#'
+#' @examples 
+#' # generate some sropts
+#' nfac <- 3
+#' nyr <- 5
+#' ope <- 253
+#' # simulations with no covariance structure.
+#' # under the null:
+#' set.seed(as.integer(charToRaw("determinstic")))
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0,sd=0.0125),ncol=nfac)
+#' asro <- as.sropt(Returns,drag=0,ope=ope)
+#' asnr_confint(asro)
+#'
+#' # for del_sropt:
+#' nfac <- 5
+#' nyr <- 10
+#' ope <- 253
+#' set.seed(as.integer(charToRaw("fix seed")))
+#' Returns <- matrix(rnorm(ope*nyr*nfac,mean=0.0005,sd=0.0125),ncol=nfac)
+#' # hedge out the first one:
+#' G <- matrix(diag(nfac)[1,],nrow=1)
+#' asro <- as.del_sropt(Returns,G,drag=0,ope=ope)
+#' asnr_confint(asro)
+#'
+asnr_confint <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
+	UseMethod("asnr_confint", z.s)
+}
+#' @rdname asnr_confint
+#' @method asnr_confint sropt
+#' @export
+asnr_confint.sropt <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
+	levels <- c(level.lo,level.hi)
+
+	delta_2 <- inference(z.s,type='KRS')
+	delta_2 <- .deannualize(delta_2,z.s$ope)
+  ub <- (as.numeric(delta_2))
+
+	nstrat <- z.s$df1
+	ssiz   <- z.s$df2
+  cons <- qchisq(levels,df=nstrat,ncp=ssiz*ub*ub/4,lower.tail=FALSE) - ssiz*ub*ub/4
+	ssrsqopt <- as.numeric(z.s$T2 / z.s$df2)
+  ssropt <- sqrt(ssrsqopt)
+  retval <- ssropt - cons / (ssiz*ssropt)
+
+	# 2FIX: drag is being ignored. harumph.
+	retval <- .annualize(retval,z.s$ope)
+	retval[levels == 1] <- Inf
+	retval[levels == 0] <- -Inf
+	retval <- matrix(retval,nrow=1)
+	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+	return(retval)
+}
+#' @rdname asnr_confint
+#' @method asnr_confint del_sropt
+#' @export
+asnr_confint.del_sropt <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
+	levels <- c(level.lo,level.hi)
+
+	delta_2 <- inference(z.s,type='KRS')
+	delta_2 <- .deannualize(delta_2,z.s$ope)
+  ub <- (as.numeric(delta_2))
+
+	nstrat <- z.s$df1 - z.s$df1.sub
+	ssiz   <- z.s$df2
+
+  cons <- qchisq(levels,df=nstrat,ncp=ssiz*ub*ub/4,lower.tail=FALSE) - ssiz*ub*ub/4
+	ssrsqopt <- as.numeric(z.s$T2.del / z.s$df2)
+  ssropt <- sqrt(ssrsqopt)
+  retval <- ssropt - cons / (ssiz*ssropt)
+
+	# 2FIX: drag is being ignored. harumph.
+	retval <- .annualize(retval,z.s$ope)
+	retval[levels == 1] <- Inf
+	retval[levels == 0] <- -Inf
+	retval <- matrix(retval,nrow=1)
+	colnames(retval) <- sapply(c(level.lo,level.hi),function(x) { sprintf("%g %%",100*x) })
+	return(retval)
+}
+
+
+
 #UNFOLD
 
 # notes:

@@ -1,4 +1,4 @@
-# Copyright 2012-2014 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2022 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -23,7 +23,7 @@
 # changelog: 
 #
 # Created: 2013.04.16
-# Copyright: Steven E. Pav, 2012-2013
+# Copyright: Steven E. Pav, 2012-2022
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 

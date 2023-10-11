@@ -50,6 +50,7 @@ arxiv preprint (2016): \url{https://arxiv.org/abs/1602.06186}
 }
 \seealso{
 Other sropt Hotelling: 
+\code{\link{asnr_confint}()},
 \code{\link{inference}()}
 }
 \author{
