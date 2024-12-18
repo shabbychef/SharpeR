@@ -1,4 +1,4 @@
-# Copyright 2019-2022 Steven E. Pav. All Rights Reserved.
+# Copyright 2019-2025 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav 
 
 # This file is part of SharpeR.
@@ -17,7 +17,7 @@
 # along with SharpeR.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Created: 2019.10.02
-# Copyright: Steven E. Pav, 2019-2022
+# Copyright: Steven E. Pav, 2019-2025
 # Author: Steven E. Pav <shabbychef@gmail.com>
 # Comments: Steven E. Pav
 

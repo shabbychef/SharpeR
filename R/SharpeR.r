@@ -1,4 +1,4 @@
-# Copyright 2012-2022 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2025 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -23,7 +23,7 @@
 # changelog: 
 #
 # Created: 2012.05.19
-# Copyright: Steven E. Pav, 2012-2022
+# Copyright: Steven E. Pav, 2012-2025
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
@@ -171,7 +171,6 @@
 #'
 #' @name SharpeR-package
 #' @rdname SharpeR
-#' @docType package
 #' @title statistics concerning Sharpe ratio and Markowitz portfolio
 #' @keywords package
 #' @family sr sropt
@@ -188,7 +187,7 @@
 #' @import matrixcalc 
 #' @importFrom stats complete.cases confint cov deviance df dt lm na.omit optimize pchisq pf power.t.test printCoefmat pt qf qnorm qt rchisq rf rnorm rt sd time uniroot vcov
 #' @importFrom utils capture.output
-NULL
+"_PACKAGE"
 
 #' @title News for package 'SharpeR':
 #'
@@ -198,6 +197,14 @@ NULL
 #'
 #' \newcommand{\CRANpkg}{\href{https://cran.r-project.org/package=#1}{\pkg{#1}}}
 #' \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
+#'
+#' @section Changes in \SharpeR{} Version 1.4.0 (2024-12-17) :
+#' \itemize{
+#' \item Add inference on group SNR via Bonferroni and MHT tests.
+#' \item Add confidence intervals on achieved SNR.
+#' \item Fix some time inference code.
+#' \item Add dependency on \code{epsiwal} and \code{zoo} packages.
+#' }
 #'
 #' @section Changes in \SharpeR{} Version 1.3.0 (2021-08-15) :
 #' \itemize{

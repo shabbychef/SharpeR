@@ -69,8 +69,19 @@ Testing is via the polyhedral lemma of Lee \emph{et al.}
 Performs the conditional estimation procedure as outlined in 
 Section 4.1.5 of \emph{The Sharpe Ratio: Statistics and Applications}.
 }
+\examples{
+# generate some fake data
+ope <- 252
+zeta0 <- 1.0
+set.seed(1234)
+zetas <- rsr(50, zeta=zeta0, df=ope*2, ope=ope)
+sr_conditional_test(zetas,df=ope*2,ope=ope,R=diag(length(zetas)))
+}
 \references{
 Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
+
+Pav, S. E. "Conditional inference on the asset with maximum Sharpe ratio."
+2019 \url{https://arxiv.org/abs/1906.00573}
 
 Lee, J. D., Sun, D. L., Sun, Y. and Taylor, J. E. "Exact post-selection inference, 
 with application to the Lasso." Ann. Statist. 44, no. 3 (2016): 907-927.
@@ -82,8 +93,6 @@ doi:10.1214/15-AOS1371. \url{https://arxiv.org/abs/1311.6238}
 sr_max_test
 }
 \author{
-Steven E. Pav \email{shabbychef@gmail.com}
-
 Steven E. Pav \email{shabbychef@gmail.com}
 }
 \keyword{htest}

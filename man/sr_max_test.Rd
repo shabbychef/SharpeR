@@ -98,6 +98,9 @@ sr_max_test(zetas,zeta_0=zeta0,df=ope*2,ope=ope,type='chi-bar-square')
 \references{
 Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 
+Pav, S. E. "Conditional inference on the asset with maximum Sharpe ratio."
+2019 \url{https://arxiv.org/abs/1906.00573}
+
 Follman, D. "A Simple Multivariate Test for One-Sided Alternatives." 
 JASA, 91, no 434 (1996): 854-861. \doi{10.2307/2291680}
 
@@ -106,12 +109,10 @@ J. Bus. Ec. Stats, 23, no 4 (2005). \doi{10.1198/073500105000000063}
 }
 \seealso{
 \code{\link{reannualize}}
+
+sr_conditional_test
 }
 \author{
-Steven E. Pav \email{shabbychef@gmail.com}
-
-Steven E. Pav \email{shabbychef@gmail.com}
-
 Steven E. Pav \email{shabbychef@gmail.com}
 }
 \keyword{htest}

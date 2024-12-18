@@ -9,6 +9,16 @@ News for package 'SharpeR'
 \newcommand{\CRANpkg}{\href{https://cran.r-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\SharpeR}{\CRANpkg{SharpeR}}
 }
+\section{Changes in \SharpeR{} Version 1.4.0 (2024-12-17) }{
+
+\itemize{
+\item Add inference on group SNR via Bonferroni and MHT tests.
+\item Add confidence intervals on achieved SNR.
+\item Fix some time inference code.
+\item Add dependency on \code{epsiwal} and \code{zoo} packages.
+}
+}
+
 \section{Changes in \SharpeR{} Version 1.3.0 (2021-08-15) }{
 
 \itemize{

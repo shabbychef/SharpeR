@@ -1,4 +1,4 @@
-# Copyright 2012-2022 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2025 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -23,7 +23,7 @@
 # changelog: 
 #
 # Created: 2013.04.16
-# Copyright: Steven E. Pav, 2012-2022
+# Copyright: Steven E. Pav, 2012-2025
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
@@ -350,7 +350,7 @@ as.sr.timeSeries <- function(x,c0=0,ope=1,na.rm=FALSE,epoch="yr",higher_order=FA
 #' is.sr(rvs)
 is.sr <- function(x) inherits(x,"sr")
 
-# ' @export
+# do not export this yet.
 # ' @export
 format.sr <- function(x,...) {
 	# oh! ugly! ugly!
@@ -542,6 +542,7 @@ as.markowitz <- function(X,...) {
 	UseMethod("as.markowitz", X)
 }
 
+# do not export this yet?
 # compute the (constrained) markowitz portfolio
 as.markowitz.default <- function(X,mu=NULL,Sigma=NULL,...) {
 	X <- na.omit(X)

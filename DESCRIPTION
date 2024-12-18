@@ -4,8 +4,8 @@ Authors@R: c(person(c("Steven", "E."), "Pav",
     role=c("aut","cre"),
     email="shabbychef@gmail.com",
     comment = c(ORCID = "0000-0002-4197-6195")))
-Version: 1.3.0.008
-Date: 2022-05-11
+Version: 1.4.0
+Date: 2024-12-17
 License: LGPL-3
 Title: Statistical Significance of the Sharpe Ratio
 BugReports: https://github.com/shabbychef/SharpeR/issues
@@ -48,4 +48,4 @@ Collate:
     'sr_bias.r'
     'tests.r'
     'unified.r'
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2

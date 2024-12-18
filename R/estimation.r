@@ -1,4 +1,4 @@
-# Copyright 2012-2022 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2025 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -23,7 +23,7 @@
 # changelog: 
 #
 # Created: 2012.05.19
-# Copyright: Steven E. Pav, 2012-2022
+# Copyright: Steven E. Pav, 2012-2025
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
@@ -882,17 +882,16 @@ sric <- function(z.s) {
 #' Plugs in the \eqn{\delta_2}{delta_2} estimator.
 #'
 #' @param z.s an object of type \code{sropt}, or \code{del_sropt}
+#' @param level the confidence level required.
+#' @param level.lo the lower confidence level required.
+#' @param level.hi the upper confidence level required.
 #' @return an estimate of the non-centrality parameter, which is
 #' the maximal population Sharpe ratio.
 #' @export 
 #' @template etc
 #' @family sropt Hotelling
 #' @template ref-tsrsa
-#' @references 
-#'
-#' Pav, S. "Inference on achieved signal noise ratio." 2020
-#' \url{https://arxive.org/abs/2005.06171}
-#'
+#' @template ref-SEP2020b
 #' @rdname asnr_confint
 #' @export asnr_confint
 #'
@@ -924,6 +923,7 @@ asnr_confint <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
 }
 #' @rdname asnr_confint
 #' @method asnr_confint sropt
+#' @importFrom stats qchisq
 #' @export
 asnr_confint.sropt <- function(z.s,level=0.95,level.lo=(1-level),level.hi=1) {
 	levels <- c(level.lo,level.hi)

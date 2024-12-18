@@ -112,8 +112,8 @@ Other sropt:
 \code{\link{pco_sropt}()},
 \code{\link{power.sropt_test}()},
 \code{\link{reannualize}()},
-\code{\link{sropt_test}()},
-\code{\link{sropt}}
+\code{\link{sropt}},
+\code{\link{sropt_test}()}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

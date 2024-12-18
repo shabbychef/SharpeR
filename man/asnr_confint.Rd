@@ -14,6 +14,12 @@ asnr_confint(z.s, level = 0.95, level.lo = (1 - level), level.hi = 1)
 }
 \arguments{
 \item{z.s}{an object of type \code{sropt}, or \code{del_sropt}}
+
+\item{level}{the confidence level required.}
+
+\item{level.lo}{the lower confidence level required.}
+
+\item{level.hi}{the upper confidence level required.}
 }
 \value{
 an estimate of the non-centrality parameter, which is
@@ -60,8 +66,8 @@ asnr_confint(asro)
 \references{
 Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 
-Pav, S. "Inference on achieved signal noise ratio." 2020
-\url{https://arxive.org/abs/2005.06171}
+Pav, S. E. "Inference on achieved signal noise ratio."
+2020 \url{https://arxiv.org/abs/2005.06171}
 }
 \seealso{
 Other sropt Hotelling: 

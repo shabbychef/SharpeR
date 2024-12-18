@@ -61,11 +61,11 @@ Other sr:
 \code{\link{predint}()},
 \code{\link{print.sr}()},
 \code{\link{se}()},
+\code{\link{sr}},
 \code{\link{sr_equality_test}()},
 \code{\link{sr_test}()},
 \code{\link{sr_unpaired_test}()},
 \code{\link{sr_vcov}()},
-\code{\link{sr}},
 \code{\link{summary.sr}}
 
 Other sropt: 
@@ -75,8 +75,8 @@ Other sropt:
 \code{\link{is.sropt}()},
 \code{\link{pco_sropt}()},
 \code{\link{power.sropt_test}()},
-\code{\link{sropt_test}()},
-\code{\link{sropt}}
+\code{\link{sropt}},
+\code{\link{sropt_test}()}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

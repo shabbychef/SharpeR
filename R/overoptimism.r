@@ -1,4 +1,4 @@
-# Copyright 2012-2022 Steven E. Pav. All Rights Reserved.
+# Copyright 2012-2025 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 
 # This file is part of SharpeR.
@@ -23,7 +23,7 @@
 # changelog: 
 #
 # Created: 2022.05.02
-# Copyright: Steven E. Pav, 2022
+# Copyright: Steven E. Pav, 2025
 # Author: Steven E. Pav
 # Comments: Steven E. Pav
 
@@ -101,6 +101,7 @@
 #' @keywords overoptimism
 #' @template etc
 #' @template ref-tsrsa
+#' @template ref-SEP2019b
 #'
 #' @references
 #' Follman, D. "A Simple Multivariate Test for One-Sided Alternatives." 
@@ -119,8 +120,9 @@
 #' sr_max_test(zetas,zeta_0=zeta0,df=ope*2,ope=ope,type='Bonferroni')
 #' sr_max_test(zetas,zeta_0=zeta0,df=ope*2,ope=ope,type='chi-bar-square')
 #' @template etc
-#' @examples 
 #' @template etc
+#' @importFrom stats qchisq
+#' @seealso sr_conditional_test
 #' @rdname sr_max_test
 #' @export
 sr_max_test <- function(srs, df, ope=1, kappa=1, rho=0, zeta_0=0, 
@@ -297,6 +299,7 @@ sr_max_test <- function(srs, df, ope=1, kappa=1, rho=0, zeta_0=0,
 #' @keywords overoptimism
 #' @template etc
 #' @template ref-tsrsa
+#' @template ref-SEP2019b
 #' @importFrom epsiwal pconnorm ci_connorm
 #'
 #' @seealso sr_max_test
@@ -306,6 +309,12 @@ sr_max_test <- function(srs, df, ope=1, kappa=1, rho=0, zeta_0=0,
 #' doi:10.1214/15-AOS1371. \url{https://arxiv.org/abs/1311.6238}
 #'
 #' @examples 
+#' # generate some fake data
+#' ope <- 252
+#' zeta0 <- 1.0
+#' set.seed(1234)
+#' zetas <- rsr(50, zeta=zeta0, df=ope*2, ope=ope)
+#' sr_conditional_test(zetas,df=ope*2,ope=ope,R=diag(length(zetas)))
 #' @template etc
 #' @rdname sr_conditional_test
 #' @export

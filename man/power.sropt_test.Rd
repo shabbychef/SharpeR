@@ -70,8 +70,8 @@ Other sropt:
 \code{\link{is.sropt}()},
 \code{\link{pco_sropt}()},
 \code{\link{reannualize}()},
-\code{\link{sropt_test}()},
-\code{\link{sropt}}
+\code{\link{sropt}},
+\code{\link{sropt_test}()}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

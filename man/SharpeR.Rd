@@ -2,6 +2,7 @@
 % Please edit documentation in R/SharpeR.r
 \docType{package}
 \name{SharpeR-package}
+\alias{SharpeR}
 \alias{SharpeR-package}
 \title{statistics concerning Sharpe ratio and Markowitz portfolio}
 \description{
@@ -184,8 +185,19 @@ and Normal Distributions with Applications to Discriminant Analysis
 and Portfolio Theory." Scandinavian Journal of Statistics 38, no. 2 (2011):
 311--331. \doi{10.1111/j.1467-9469.2011.00729.x}
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/shabbychef/SharpeR}
+  \item Report bugs at \url{https://github.com/shabbychef/SharpeR/issues}
+}
+
+}
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
+
+\strong{Maintainer}: Steven E. Pav \email{shabbychef@gmail.com} (\href{https://orcid.org/0000-0002-4197-6195}{ORCID})
+
 }
 \concept{sr sropt}
 \keyword{package}
