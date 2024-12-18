@@ -323,7 +323,7 @@ se <- function(z, type) {
 #' @references 
 #'
 #' Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
-#' 1996. \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
+#' 1996. \url{https://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
 #'
 #' @examples 
 #' asr <- as.sr(rnorm(128,0.2))
@@ -722,11 +722,11 @@ T2.inference <- function(T2,df1,df2,...) {
 #' @references 
 #'
 #' Kubokawa, T., C. P. Robert, and A. K. Saleh. "Estimation of noncentrality parameters." 
-#' Canadian Journal of Statistics 21, no. 1 (1993): 45-57. \url{https://www.jstor.org/stable/3315657}
+#' Canadian Journal of Statistics 21, no. 1 (1993): 45-57. \doi{10.2307/3315657}
 #'
 #' Spruill, M. C. "Computation of the maximum likelihood estimate of a noncentrality parameter." 
 #' Journal of multivariate analysis 18, no. 2 (1986): 216-224.
-#' \url{https://www.sciencedirect.com/science/article/pii/0047259X86900709}
+#' \doi{10.1016/0047-259X(86)90070-9}
 #'
 #' @rdname inference
 #' @export inference

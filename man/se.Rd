@@ -69,7 +69,7 @@ Management 8, no. 5 (2006): 308-336. \url{https://www.ssrn.com/paper=886728}
 Pav, S. E. "The Sharpe Ratio: Statistics and Applications." CRC Press, 2021.
 
 Walck, C. "Hand-book on STATISTICAL DISTRIBUTIONS for experimentalists."
-1996. \url{http://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
+1996. \url{https://www.stat.rice.edu/~dobelman/textfiles/DistributionsHandbook.pdf}
 }
 \seealso{
 sr-distribution functions, \code{\link{dsr}},
