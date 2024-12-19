@@ -48,6 +48,13 @@ jobs:
 
       - uses: r-lib/actions/setup-tinytex@v2
 
+      - name: Install dependencies
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_cran("rcmdcheck")
+          tinytex::parse_install( text = "! LaTeX Error: File paralist.sty' not found.") 
+        shell: Rscript {0}
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
