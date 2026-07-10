@@ -61,7 +61,7 @@ A list with class \code{"htest"} containing the following components:
 Performs tests for the hypothesis 
 \deqn{\forall i \zeta_i \le \zeta_0}{all i: zeta_i <= zeta_0}
 against the alternative
-\deqn{\exists i zeta_i > \zeta_0}{exists i: zeta_i > zeta_0}
+\deqn{\exists i \zeta_i > \zeta_0}{exists i: zeta_i > zeta_0}
 
 Multiple methods are supported for the test, including Bonferroni
 correction, a chi-bar-square test, and Follman's test.
